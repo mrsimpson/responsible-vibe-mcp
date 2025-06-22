@@ -123,6 +123,9 @@ export class DirectServerInterface {
         case 'proceed_to_phase':
           return await this.server.handleProceedToPhase(arguments_);
         
+        case 'start_development':
+          return await this.server.handleStartDevelopment(arguments_);
+        
         default:
           throw new Error(`Unknown tool: ${name}`);
       }

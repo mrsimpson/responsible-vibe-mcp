@@ -139,9 +139,8 @@ direct_transitions:
 
       await fs.writeFile(path.join(vibeDir, 'state-machine.yaml'), customStateMachine);
 
-      const result = await client.callTool('whats_next', {
-        user_input: 'start custom workflow'
-      });
+      // Initialize development with start_development first
+      const result = await client.callTool('start_development', {});
       const response = assertToolSuccess(result);
 
       expect(response.phase).toBe('planning');

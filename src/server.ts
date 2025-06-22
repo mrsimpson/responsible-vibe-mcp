@@ -632,6 +632,9 @@ export class VibeFeatureMCPServer {
         { currentPhase: transitionResult.newPhase }
       );
       
+      // Set state machine on plan manager before creating plan file
+      this.planManager.setStateMachine(stateMachine);
+      
       // Ensure plan file exists
       await this.planManager.ensurePlanFile(
         conversationContext.planFilePath,
