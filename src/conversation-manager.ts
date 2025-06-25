@@ -9,11 +9,11 @@
 import { execSync } from 'child_process';
 import { resolve } from 'path';
 import { existsSync } from 'fs';
-import { createLogger } from './logger';
-import { Database } from './database';
-import type { ConversationState, ConversationContext } from './types';
-import { WorkflowManager } from './workflow-manager';
-import { PlanManager } from './plan-manager';
+import { createLogger } from './logger.js';
+import { Database } from './database.js';
+import type { ConversationState, ConversationContext } from './types.js';
+import { WorkflowManager } from './workflow-manager.js';
+import { PlanManager } from './plan-manager.js';
 
 const logger = createLogger('ConversationManager');
 

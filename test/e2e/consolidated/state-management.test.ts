@@ -162,7 +162,7 @@ direct_transitions:
       const response = assertToolSuccess(result);
 
       expect(response.phase).toBe('planning');
-      expect(response.instructions).toContain('planning');
+      expect(response.instructions).toContain('whats_next()');
     });
 
     it('should support .yml extension for state machine files', async () => {

@@ -221,7 +221,7 @@ export class PlanManager {
     const phaseDescription = phaseDefinition.description;
     const capitalizedPhase = this.capitalizePhase(phase);
     
-    return `Update the ${capitalizedPhase} section with progress related to: ${phaseDescription}. Mark completed tasks with [x] and add new tasks as they are identified.`;
+    return `Update the ${capitalizedPhase} section with progress. Mark completed tasks with [x] and add new tasks as they are identified.`;
   }
 
   /**

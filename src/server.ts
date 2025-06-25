@@ -739,7 +739,7 @@ export class VibeFeatureMCPServer {
       
       const response = {
         phase: transitionResult.newPhase,
-        instructions: transitionResult.instructions,
+        instructions: 'Use the whats_next() tool to get guided instructions for the next current phase.',
         plan_file_path: conversationContext.planFilePath,
         conversation_id: conversationContext.conversationId
       };
