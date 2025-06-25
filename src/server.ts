@@ -14,6 +14,7 @@ import { TransitionEngine } from './transition-engine.js';
 import { InstructionGenerator } from './instruction-generator.js';
 import { PlanManager } from './plan-manager.js';
 import { InteractionLogger } from './interaction-logger.js';
+import { WorkflowManager } from './workflow-manager.js';
 import { generateSystemPrompt } from './system-prompt-generator.js';
 import { createLogger, setMcpServerForLogging } from './logger.js';
 
@@ -42,6 +43,7 @@ export class VibeFeatureMCPServer {
   private transitionEngine: TransitionEngine;
   private instructionGenerator: InstructionGenerator;
   private planManager: PlanManager;
+  private workflowManager: WorkflowManager;
   private interactionLogger?: InteractionLogger;
   private projectPath: string;
 
@@ -65,6 +67,7 @@ export class VibeFeatureMCPServer {
     this.transitionEngine.setConversationManager(this.conversationManager);
     this.planManager = new PlanManager();
     this.instructionGenerator = new InstructionGenerator(this.planManager);
+    this.workflowManager = new WorkflowManager();
     
     // Conditionally create interaction logger
     if (config.enableLogging !== false) {
@@ -80,8 +83,8 @@ export class VibeFeatureMCPServer {
   /**
    * Ensure state machine is loaded for the given project path
    */
-  private ensureStateMachineForProject(projectPath: string): void {
-    const stateMachine = this.transitionEngine.getStateMachine(projectPath);
+  private ensureStateMachineForProject(projectPath: string, workflowName?: string): void {
+    const stateMachine = this.transitionEngine.getStateMachine(projectPath, workflowName);
     this.planManager.setStateMachine(stateMachine);
     this.instructionGenerator.setStateMachine(stateMachine);
   }
@@ -217,8 +220,12 @@ export class VibeFeatureMCPServer {
     this.server.registerTool(
       'start_development',
       {
-        description: 'Initialize development workflow and transition to the initial development phase. This should be called at the beginning of a new development session.',
-        inputSchema: {},
+        description: 'Initialize development workflow and transition to the initial development phase. Choose from predefined workflows or use a custom workflow.',
+        inputSchema: {
+          workflow: z.enum(this.buildWorkflowEnum())
+            .default('waterfall')
+            .describe(this.generateWorkflowDescription())
+        },
         annotations: {
           title: 'Development Initializer',
           readOnlyHint: false,
@@ -450,7 +457,7 @@ export class VibeFeatureMCPServer {
       logger.debug('Current conversation state', { conversationId, currentPhase });
 
       // Ensure state machine is loaded for this project
-      this.ensureStateMachineForProject(conversationContext.projectPath);
+      this.ensureStateMachineForProject(conversationContext.projectPath, conversationContext.workflowName);
 
       // Ensure plan file exists
       await this.planManager.ensurePlanFile(
@@ -571,7 +578,8 @@ export class VibeFeatureMCPServer {
         currentPhase,
         target_phase,
         conversationContext.projectPath,
-        reason
+        reason,
+        conversationContext.workflowName
       );
 
       // Update conversation state
@@ -644,12 +652,20 @@ export class VibeFeatureMCPServer {
     try {
       logger.debug('Processing start_development request', args);
       
+      // Extract workflow selection from args
+      const selectedWorkflow = args.workflow; // Don't default to 'waterfall' - let WorkflowManager decide
+      
+      // Validate workflow selection if specified
+      if (selectedWorkflow && !this.workflowManager.validateWorkflowName(selectedWorkflow, this.projectPath)) {
+        throw new Error(`Invalid workflow: ${selectedWorkflow}. Available workflows: ${this.workflowManager.getWorkflowNames().join(', ')}, custom`);
+      }
+      
       // Get current conversation state
       const conversationContext = await this.conversationManager.getConversationContext();
       const currentPhase = conversationContext.currentPhase;
       
-      // Get the state machine to determine the initial phase
-      const stateMachine = this.transitionEngine.getStateMachine(conversationContext.projectPath);
+      // Load the selected workflow
+      const stateMachine = this.workflowManager.loadWorkflowForProject(conversationContext.projectPath, selectedWorkflow);
       const initialState = stateMachine.initial_state;
       
       // Check if development is already started
@@ -665,13 +681,17 @@ export class VibeFeatureMCPServer {
         currentPhase,
         targetPhase,
         conversationContext.projectPath,
-        'Development initialization'
+        'Development initialization',
+        selectedWorkflow
       );
       
-      // Update conversation state
+      // Update conversation state with workflow and phase
       await this.conversationManager.updateConversationState(
         conversationContext.conversationId,
-        { currentPhase: transitionResult.newPhase }
+        { 
+          currentPhase: transitionResult.newPhase,
+          workflowName: selectedWorkflow
+        }
       );
       
       // Set state machine on plan manager before creating plan file
@@ -726,8 +746,8 @@ export class VibeFeatureMCPServer {
       const planAnalysis = planInfo.exists ? this.analyzePlanFile(planInfo.content!) : null;
       
       // Get current state machine information
-      const stateMachineInfo = await this.getStateMachineInfo(conversationContext.projectPath);
-      const stateMachine = this.transitionEngine.getStateMachine(conversationContext.projectPath);
+      const stateMachineInfo = await this.getStateMachineInfo(conversationContext.projectPath, conversationContext.workflowName);
+      const stateMachine = this.transitionEngine.getStateMachine(conversationContext.projectPath, conversationContext.workflowName);
       
       // Generate system prompt if requested
       const systemPrompt = includeSystemPrompt ? generateSystemPrompt(stateMachine, simplePrompt) : null;
@@ -860,10 +880,10 @@ export class VibeFeatureMCPServer {
   /**
    * Get state machine information
    */
-  private async getStateMachineInfo(projectPath: string): Promise<any> {
+  private async getStateMachineInfo(projectPath: string, workflowName?: string): Promise<any> {
     try {
       // Get the actual state machine for this project
-      const stateMachine = this.transitionEngine.getStateMachine(projectPath);
+      const stateMachine = this.transitionEngine.getStateMachine(projectPath, workflowName);
       
       // Determine if it's custom or default by checking the name
       const isCustom = stateMachine.name !== 'Classical waterfall';
@@ -902,7 +922,7 @@ export class VibeFeatureMCPServer {
 
     try {
       // Get the state machine for this project
-      const stateMachine = this.transitionEngine.getStateMachine(context.projectPath);
+      const stateMachine = this.transitionEngine.getStateMachine(context.projectPath, context.workflowName);
       const currentPhase = context.currentPhase;
       const phaseDefinition = stateMachine.states[currentPhase];
 
@@ -978,6 +998,38 @@ export class VibeFeatureMCPServer {
     // Initialization success will be logged automatically by the logger
     
     logger.info('Server initialization completed');
+  }
+
+  /**
+   * Build workflow enum for Zod schema
+   */
+  private buildWorkflowEnum(): [string, ...string[]] {
+    const workflowNames = this.workflowManager.getWorkflowNames();
+    const allWorkflows = [...workflowNames, 'custom'];
+    
+    // Ensure we have at least one element for TypeScript
+    if (allWorkflows.length === 0) {
+      return ['waterfall'];
+    }
+    
+    return allWorkflows as [string, ...string[]];
+  }
+
+  /**
+   * Generate workflow description for tool schema
+   */
+  private generateWorkflowDescription(): string {
+    const workflows = this.workflowManager.getAvailableWorkflows();
+    let description = 'Choose your development workflow:\n\n';
+    
+    for (const workflow of workflows) {
+      description += `• **${workflow.name}**: ${workflow.displayName} - ${workflow.description}\n`;
+    }
+    
+    description += '• **custom**: Use custom workflow from .vibe/state-machine.yaml in your project\n\n';
+    description += 'Default: waterfall (recommended for larger, design-heavy tasks)';
+    
+    return description;
   }
 
   /**

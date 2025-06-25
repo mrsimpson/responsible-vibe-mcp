@@ -28,6 +28,7 @@ export interface ConversationState {
   gitBranch: string;
   currentPhase: string;
   planFilePath: string;
+  workflowName: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -41,4 +42,5 @@ export interface ConversationContext {
   gitBranch: string;
   currentPhase: string;
   planFilePath: string;
+  workflowName: string;
 }

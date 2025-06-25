@@ -51,6 +51,7 @@ export class Database {
           git_branch TEXT NOT NULL,
           current_phase TEXT NOT NULL,
           plan_file_path TEXT NOT NULL,
+          workflow_name TEXT DEFAULT 'waterfall',
           created_at TEXT NOT NULL,
           updated_at TEXT NOT NULL
         )
@@ -84,7 +85,7 @@ export class Database {
         ON interaction_logs(conversation_id)
       `);
 
-      // Run migrations to add soft delete columns if they don't exist
+      // Run migrations to add any missing columns
       await this.runMigrations();
       
       logger.info('Database initialized successfully', { dbPath: this.dbPath });
@@ -177,6 +178,7 @@ export class Database {
         gitBranch: row.git_branch,
         currentPhase: row.current_phase as DevelopmentPhase,
         planFilePath: row.plan_file_path,
+        workflowName: row.workflow_name || 'waterfall',
         createdAt: row.created_at,
         updatedAt: row.updated_at
       };
@@ -201,21 +203,23 @@ export class Database {
     logger.debug('Saving conversation state', { 
       conversationId: state.conversationId,
       currentPhase: state.currentPhase,
-      projectPath: state.projectPath
+      projectPath: state.projectPath,
+      workflowName: state.workflowName
     });
     
     try {
       await this.runQuery(
         `INSERT OR REPLACE INTO conversation_states (
           conversation_id, project_path, git_branch, current_phase,
-          plan_file_path, created_at, updated_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+          plan_file_path, workflow_name, created_at, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           state.conversationId,
           state.projectPath,
           state.gitBranch,
           state.currentPhase,
           state.planFilePath,
+          state.workflowName,
           state.createdAt,
           state.updatedAt
         ]
@@ -252,6 +256,7 @@ export class Database {
       gitBranch: row.git_branch,
       currentPhase: row.current_phase as DevelopmentPhase,
       planFilePath: row.plan_file_path,
+      workflowName: row.workflow_name || 'waterfall',
       createdAt: row.created_at,
       updatedAt: row.updated_at
     };
@@ -346,19 +351,37 @@ export class Database {
     logger.debug('Running database migrations');
     
     try {
-      // Check if soft delete columns exist in interaction_logs table
-      const tableInfo = await this.getAllRows("PRAGMA table_info(interaction_logs)");
-      const hasIsReset = tableInfo.some((col: any) => col.name === 'is_reset');
-      const hasResetAt = tableInfo.some((col: any) => col.name === 'reset_at');
+      // Check if interaction_logs table exists first
+      const tables = await this.getAllRows("SELECT name FROM sqlite_master WHERE type='table' AND name='interaction_logs'");
       
-      if (!hasIsReset) {
-        logger.info('Adding is_reset column to interaction_logs table');
-        await this.runQuery('ALTER TABLE interaction_logs ADD COLUMN is_reset BOOLEAN DEFAULT FALSE');
+      if (tables.length > 0) {
+        // Table exists, check for missing columns
+        const tableInfo = await this.getAllRows("PRAGMA table_info(interaction_logs)");
+        const hasIsReset = tableInfo.some((col: any) => col.name === 'is_reset');
+        const hasResetAt = tableInfo.some((col: any) => col.name === 'reset_at');
+        
+        if (!hasIsReset) {
+          logger.info('Adding is_reset column to interaction_logs table');
+          await this.runQuery('ALTER TABLE interaction_logs ADD COLUMN is_reset BOOLEAN DEFAULT FALSE');
+        }
+        
+        if (!hasResetAt) {
+          logger.info('Adding reset_at column to interaction_logs table');
+          await this.runQuery('ALTER TABLE interaction_logs ADD COLUMN reset_at TEXT');
+        }
       }
       
-      if (!hasResetAt) {
-        logger.info('Adding reset_at column to interaction_logs table');
-        await this.runQuery('ALTER TABLE interaction_logs ADD COLUMN reset_at TEXT');
+      // Check if conversation_states table exists and has workflow_name column
+      const conversationTables = await this.getAllRows("SELECT name FROM sqlite_master WHERE type='table' AND name='conversation_states'");
+      
+      if (conversationTables.length > 0) {
+        const conversationTableInfo = await this.getAllRows("PRAGMA table_info(conversation_states)");
+        const hasWorkflowName = conversationTableInfo.some((col: any) => col.name === 'workflow_name');
+        
+        if (!hasWorkflowName) {
+          logger.info('Adding workflow_name column to conversation_states table');
+          await this.runQuery('ALTER TABLE conversation_states ADD COLUMN workflow_name TEXT DEFAULT \'waterfall\'');
+        }
       }
       
       logger.debug('Database migrations completed successfully');

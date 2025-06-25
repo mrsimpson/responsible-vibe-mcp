@@ -1,0 +1,156 @@
+# yaml-language-server: $schema=../state-machine-schema.json
+---
+name: "bugfix"
+description: "A focused workflow for bug fixing: Reproduce, Analyze, Fix, Verify - optimized for debugging and fixing existing issues"
+initial_state: "reproduce"
+
+# Regular state transitions
+states:
+  reproduce:
+    description: "Reproduce and understand the bug"
+    transitions:
+      - trigger: "continue_reproduction"
+        to: "reproduce"
+        instructions: >
+          Continue working to reproduce the bug. Try different scenarios, gather more information about when
+          the bug occurs, and document the steps to reproduce. Create test cases that demonstrate the issue.
+          Update the plan file with reproduction progress.
+        transition_reason: "Still working to reliably reproduce the bug"
+      
+      - trigger: "bug_reproduced"
+        to: "analyze"
+        instructions: >
+          Bug successfully reproduced! ✅ Now transition to analysis phase. Examine the code paths involved,
+          identify the root cause, and understand why the bug occurs. Use debugging tools, add logging,
+          and trace through the problematic code. Document findings in the plan file.
+        transition_reason: "Bug reproduced successfully, ready to analyze root cause"
+      
+      - trigger: "bug_not_reproducible"
+        to: "reproduce"
+        instructions: >
+          Unable to reproduce the bug with current information. Gather more details about the environment,
+          conditions, or steps that lead to the issue. Contact stakeholders if needed for more context.
+          Document what you've tried in the plan file.
+        transition_reason: "Bug reproduction unsuccessful, need more information"
+      
+      - trigger: "abandon_bug"
+        to: "reproduce"
+        instructions: >
+          Bug investigation abandoned. Document what was learned and return to ready state for new bug reports.
+          The plan file will remain for future reference if the bug resurfaces.
+        transition_reason: "User decided to abandon this bug investigation"
+
+  analyze:
+    description: "Analyze the bug and identify root cause"
+    transitions:
+      - trigger: "continue_analysis"
+        to: "analyze"
+        instructions: >
+          Continue analyzing the bug. Dive deeper into the code, examine related components, check for similar
+          issues elsewhere, and understand the full scope of the problem. Update the plan file with analysis progress.
+        transition_reason: "Analysis continues, gathering more understanding of the root cause"
+      
+      - trigger: "need_more_reproduction"
+        to: "reproduce"
+        instructions: >
+          Analysis revealed need for more reproduction scenarios. Return to reproduction phase to test
+          additional cases, edge conditions, or related functionality that might be affected.
+        transition_reason: "Analysis revealed need for additional reproduction scenarios"
+      
+      - trigger: "root_cause_identified"
+        to: "fix"
+        instructions: >
+          Root cause identified! ✅ Now transition to fix phase. Implement the solution based on your analysis.
+          Be careful to fix only what's necessary and avoid introducing new issues. Consider the impact
+          on other parts of the system. Update the plan file and mark completed analysis tasks.
+        transition_reason: "Root cause identified, ready to implement fix"
+      
+      - trigger: "abandon_bug"
+        to: "reproduce"
+        instructions: >
+          Bug investigation abandoned during analysis. Document findings and return to ready state.
+          The analysis work will remain for future reference.
+        transition_reason: "User decided to abandon bug during analysis phase"
+
+  fix:
+    description: "Implement the bug fix"
+    transitions:
+      - trigger: "continue_fixing"
+        to: "fix"
+        instructions: >
+          Continue implementing the bug fix. Make targeted changes, avoid over-engineering, and ensure
+          the fix addresses the root cause without breaking other functionality. Update the plan file with progress.
+        transition_reason: "Fix implementation continues, making targeted changes"
+      
+      - trigger: "need_more_analysis"
+        to: "analyze"
+        instructions: >
+          Fix implementation revealed need for more analysis. The initial understanding may have been incomplete.
+          Return to analysis phase to better understand the problem before continuing with the fix.
+        transition_reason: "Fix implementation revealed need for deeper analysis"
+      
+      - trigger: "fix_complete"
+        to: "verify"
+        instructions: >
+          Fix implementation complete! ✅ Now transition to verification phase. Test the fix thoroughly,
+          ensure the original bug is resolved, and verify no new issues were introduced. Run existing tests
+          and create new ones if needed. Update the plan file and mark completed fix tasks.
+        transition_reason: "Fix implementation complete, ready for verification"
+      
+      - trigger: "abandon_bug"
+        to: "reproduce"
+        instructions: >
+          Bug fix abandoned during implementation. Clean up any incomplete changes and return to ready state.
+          Document what was attempted for future reference.
+        transition_reason: "User decided to abandon bug fix during implementation"
+
+  verify:
+    description: "Verify the fix and ensure no regressions"
+    transitions:
+      - trigger: "continue_verification"
+        to: "verify"
+        instructions: >
+          Continue verification work. Test more scenarios, run additional tests, check for edge cases,
+          and ensure the fix is robust. Look for potential regressions in related functionality.
+          Update the plan file with verification progress.
+        transition_reason: "Verification continues, ensuring fix is complete and robust"
+      
+      - trigger: "fix_issues_found"
+        to: "fix"
+        instructions: >
+          Verification found issues with the fix. Return to fix phase to address the problems identified
+          during testing. Focus on the specific issues found and ensure they are properly resolved.
+        transition_reason: "Verification found issues requiring fix adjustments"
+      
+      - trigger: "verification_complete"
+        to: "reproduce"
+        instructions: >
+          Bug fix verified and complete! ✅ The issue is resolved and no regressions were introduced.
+          Return to ready state for the next bug report. Mark all verification tasks as complete.
+          Document the final solution in the plan file.
+        transition_reason: "Bug fix verified and complete, ready for next issue"
+      
+      - trigger: "abandon_bug"
+        to: "reproduce"
+        instructions: >
+          Bug fix abandoned during verification. Clean up verification artifacts and return to ready state.
+          The fix work will remain for future reference.
+        transition_reason: "User decided to abandon bug during verification phase"
+
+# Direct transition instructions
+direct_transitions:
+  - state: "reproduce"
+    instructions: "Starting bug reproduction phase. Work to reliably reproduce the reported bug. Gather information about the conditions, environment, and steps that lead to the issue. Create test cases that demonstrate the problem. Document your findings in the plan file."
+    transition_reason: "Direct transition to bug reproduction phase"
+  
+  - state: "analyze"
+    instructions: "Starting bug analysis phase. Examine the code paths involved in the bug, identify the root cause, and understand why the issue occurs. Use debugging tools, add logging, and trace through the problematic code. Document your analysis in the plan file."
+    transition_reason: "Direct transition to bug analysis phase"
+  
+  - state: "fix"
+    instructions: "Starting bug fix phase. Implement the solution based on your analysis. Make targeted changes that address the root cause without introducing new issues. Be careful to maintain existing functionality while fixing the bug."
+    transition_reason: "Direct transition to bug fix phase"
+  
+  - state: "verify"
+    instructions: "Starting bug verification phase. Test the fix thoroughly to ensure the original bug is resolved and no new issues were introduced. Run existing tests, create new ones if needed, and verify the solution is robust."
+    transition_reason: "Direct transition to bug verification phase"

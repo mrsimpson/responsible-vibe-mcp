@@ -160,7 +160,7 @@ describe('StateMachineLoader', () => {
       
       // The path might be absolute or relative depending on the environment
       expect(fs.readFileSync).toHaveBeenCalled();
-      expect(vi.mocked(fs.readFileSync).mock.calls[0][0]).toMatch(/.*resources\/state-machine\.yaml$/);
+      expect(vi.mocked(fs.readFileSync).mock.calls[0][0]).toMatch(/.*resources\/workflows\/waterfall\.yaml$/);
       expect(vi.mocked(fs.readFileSync).mock.calls[0][1]).toBe('utf8');
       expect(result).toBeDefined();
       expect(result.name).toBe('Test State Machine');

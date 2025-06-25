@@ -9,10 +9,11 @@
 import { execSync } from 'child_process';
 import { resolve } from 'path';
 import { existsSync } from 'fs';
-import { createLogger } from './logger.js';
-import { Database } from './database.js';
-import type { ConversationState, ConversationContext } from './types.js';
-import { StateMachineLoader } from './state-machine-loader.js';
+import { createLogger } from './logger';
+import { Database } from './database';
+import type { ConversationState, ConversationContext } from './types';
+import { WorkflowManager } from './workflow-manager';
+import { PlanManager } from './plan-manager';
 
 const logger = createLogger('ConversationManager');
 
@@ -45,7 +46,9 @@ export class ConversationManager {
     
     // If no existing state, create a new one
     if (!state) {
-      state = await this.createNewConversationState(conversationId, projectPath, gitBranch);
+      // Detect the appropriate workflow for this project
+      const workflowName = this.detectWorkflowForProject(projectPath);
+      state = await this.createNewConversationState(conversationId, projectPath, gitBranch, workflowName);
     }
     
     // Return the conversation context
@@ -54,7 +57,8 @@ export class ConversationManager {
       projectPath: state.projectPath,
       gitBranch: state.gitBranch,
       currentPhase: state.currentPhase,
-      planFilePath: state.planFilePath
+      planFilePath: state.planFilePath,
+      workflowName: state.workflowName
     };
   }
   
@@ -66,7 +70,7 @@ export class ConversationManager {
    */
   async updateConversationState(
     conversationId: string, 
-    updates: Partial<Pick<ConversationState, 'currentPhase' | 'planFilePath'>>
+    updates: Partial<Pick<ConversationState, 'currentPhase' | 'planFilePath' | 'workflowName'>>
   ): Promise<void> {
     logger.debug('Updating conversation state', { conversationId, updates });
     
@@ -94,6 +98,29 @@ export class ConversationManager {
   }
   
   /**
+   * Detect the appropriate workflow for a project
+   * Checks for custom workflow first, then defaults to waterfall
+   */
+  private detectWorkflowForProject(projectPath: string): string {
+    // Check for custom workflow files
+    const customFilePaths = [
+      resolve(projectPath, '.vibe', 'state-machine.yaml'),
+      resolve(projectPath, '.vibe', 'state-machine.yml')
+    ];
+    
+    for (const filePath of customFilePaths) {
+      if (existsSync(filePath)) {
+        logger.debug('Custom workflow detected', { filePath });
+        return 'custom';
+      }
+    }
+    
+    // Default to waterfall
+    logger.debug('No custom workflow found, defaulting to waterfall');
+    return 'waterfall';
+  }
+
+  /**
    * Create a new conversation state
    * 
    * @param conversationId - ID for the new conversation
@@ -103,7 +130,8 @@ export class ConversationManager {
   private async createNewConversationState(
     conversationId: string,
     projectPath: string,
-    gitBranch: string
+    gitBranch: string,
+    workflowName: string = 'waterfall'
   ): Promise<ConversationState> {
     logger.info('Creating new conversation state', { 
       conversationId, 
@@ -120,11 +148,10 @@ export class ConversationManager {
     
     const planFilePath = resolve(projectPath, '.vibe', planFileName);
     
-    // Get initial state from state machine loader
-    // Import dynamically to avoid circular dependencies
-    const stateMachineLoader = new StateMachineLoader();
-    stateMachineLoader.loadStateMachine(projectPath);
-    const initialPhase = stateMachineLoader.getInitialState();
+    // Get initial state from the appropriate workflow
+    const workflowManager = new WorkflowManager();
+    const stateMachine = workflowManager.loadWorkflowForProject(projectPath, workflowName);
+    const initialPhase = stateMachine.initial_state;
 
     // Create new state
     const newState: ConversationState = {
@@ -133,6 +160,7 @@ export class ConversationManager {
       gitBranch,
       currentPhase: initialPhase,
       planFilePath,
+      workflowName,
       createdAt: timestamp,
       updatedAt: timestamp
     };
@@ -272,7 +300,6 @@ export class ConversationManager {
       logger.debug('Conversation state hard deleted');
       
       // Step 3: Hard delete plan file
-      const { PlanManager } = await import('./plan-manager.js');
       const planManager = new PlanManager();
       await planManager.deletePlanFile(context.planFilePath);
       resetItems.push('plan_file');
@@ -330,7 +357,7 @@ export class ConversationManager {
       }
       
       // Check that plan file is deleted
-      const { PlanManager } = await import('./plan-manager.js');
+      const { PlanManager } = await import('./plan-manager');
       const planManager = new PlanManager();
       const isDeleted = await planManager.ensurePlanFileDeleted(planFilePath);
       if (!isDeleted) {

@@ -1,6 +1,7 @@
-# yaml-language-server: $schema=./state-machine-schema.json
-name: "Classical waterfall"
-description: "From Specification down to test – the historical way"
+# yaml-language-server: $schema=../state-machine-schema.json
+---
+name: "waterfall"
+description: "From Specification down to test – the historical way. Ideal for larger, design-heavy tasks with well-defined requirements"
 initial_state: "idle"
 
 # Regular state transitions

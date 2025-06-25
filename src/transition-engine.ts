@@ -7,6 +7,7 @@
 
 import { createLogger } from './logger.js';
 import { StateMachineLoader } from './state-machine-loader.js';
+import { WorkflowManager } from './workflow-manager.js';
 
 const logger = createLogger('TransitionEngine');
 
@@ -29,11 +30,12 @@ export interface TransitionResult {
 
 export class TransitionEngine {
   private stateMachineLoader: StateMachineLoader;
+  private workflowManager: WorkflowManager;
   private conversationManager?: { hasInteractions: (conversationId: string) => Promise<boolean> };
   
   constructor(projectPath: string) {
     this.stateMachineLoader = new StateMachineLoader();
-    this.stateMachineLoader.loadStateMachine(projectPath);
+    this.workflowManager = new WorkflowManager();
     
     logger.info('TransitionEngine initialized', { projectPath });
   }
@@ -48,9 +50,9 @@ export class TransitionEngine {
   /**
    * Get the loaded state machine for the current project
    */
-  getStateMachine(projectPath: string) {
-    // Ensure we have the latest state machine for this project
-    return this.stateMachineLoader.loadStateMachine(projectPath);
+  getStateMachine(projectPath: string, workflowName?: string) {
+    // Use WorkflowManager to load the appropriate workflow
+    return this.workflowManager.loadWorkflowForProject(projectPath, workflowName);
   }
 
   /**
@@ -212,35 +214,40 @@ Once you've defined these criteria, we can begin development. Throughout the pro
     currentPhase: string,
     targetPhase: string,
     projectPath: string,
-    reason?: string
+    reason?: string,
+    workflowName?: string
   ): TransitionResult {
-    // Reload state machine for this specific project/conversation
-    this.stateMachineLoader.loadStateMachine(projectPath);
+    // Load the appropriate state machine for this project/workflow
+    const stateMachine = this.getStateMachine(projectPath, workflowName);
     
     logger.debug('Handling explicit phase transition', {
       currentPhase,
       targetPhase,
       projectPath,
+      workflowName,
       reason 
     });
     
     // Validate that the target phase exists in the state machine
-    if (!this.stateMachineLoader.isValidPhase(targetPhase)) {
-      const validPhases = this.stateMachineLoader.getValidPhases();
+    if (!stateMachine.states[targetPhase]) {
+      const validPhases = Object.keys(stateMachine.states);
       const errorMsg = `Invalid target phase: "${targetPhase}". Valid phases are: ${validPhases.join(', ')}`;
       logger.error('Invalid target phase', new Error(errorMsg));
       throw new Error(errorMsg);
     }
 
-    const transitionInfo = this.stateMachineLoader.getTransitionInstructions(
-      currentPhase, 
-      targetPhase
-    );
+    // Get transition instructions from the state machine
+    const directTransition = stateMachine.direct_transitions?.find(dt => dt.state === targetPhase);
+    const transitionInfo = {
+      instructions: directTransition?.instructions || `Transition to ${targetPhase}`,
+      transitionReason: directTransition?.transition_reason || reason || `Moving to ${targetPhase}`,
+      isModeled: !!directTransition
+    };
     
     logger.info('Explicit phase transition processed', {
       fromPhase: currentPhase,
       toPhase: targetPhase,
-      reason: reason || transitionInfo.transitionReason,
+      reason: transitionInfo.transitionReason,
       isModeled: transitionInfo.isModeled
     });
     

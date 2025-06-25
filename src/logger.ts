@@ -31,6 +31,9 @@ export interface LogContext {
 // Global MCP server reference for log notifications
 let mcpServerInstance: McpServer | null = null;
 
+// Test mode flag to suppress MCP notification errors
+const isTestMode = process.env.NODE_ENV === 'test' || process.env.VITEST === 'true';
+
 /**
  * Set the MCP server instance for log notifications
  */
@@ -97,7 +100,7 @@ class Logger {
       } catch (error) {
         // Fallback to stderr if MCP notification fails
         // Don't use this.error to avoid infinite recursion
-        process.stderr.write(`[MCP-LOG-ERROR] Failed to send log notification: ${error}\n`);
+        if (!isTestMode) { process.stderr.write(`[MCP-LOG-ERROR] Failed to send log notification: ${error}\n`); }
       }
     }
   }
@@ -176,7 +179,7 @@ class Logger {
       } catch (error) {
         // Fallback to stderr if MCP notification fails
         // Don't use this.error to avoid infinite recursion
-        process.stderr.write(`[MCP-LOG-ERROR] Failed to send log notification: ${error}\n`);
+        if (!isTestMode) { process.stderr.write(`[MCP-LOG-ERROR] Failed to send log notification: ${error}\n`); }
       }
     }
   }
