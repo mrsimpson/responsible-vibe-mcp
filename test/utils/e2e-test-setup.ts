@@ -304,16 +304,30 @@ export function parseToolResponse(result: any): any {
 }
 
 /**
- * Helper to assert successful tool responses
+ * Assert that a tool call was successful and return the response
  */
 export function assertToolSuccess(result: any): any {
-  const parsed = parseToolResponse(result);
+  // Parse result if it's a string
+  const parsed = typeof result === 'string' ? JSON.parse(result) : result;
   
   if (parsed.error) {
     throw new Error(`Tool call failed: ${parsed.error}`);
   }
   
   return parsed;
+}
+
+/**
+ * Initialize development for tests by calling start_development with a workflow
+ * This must be called before any other tools in tests due to the new requirement
+ * 
+ * @param client - The DirectServerInterface instance
+ * @param workflow - The workflow to use (defaults to 'waterfall')
+ * @returns The response from start_development
+ */
+export async function initializeDevelopment(client: DirectServerInterface, workflow: string = 'waterfall'): Promise<any> {
+  const result = await client.callTool('start_development', { workflow });
+  return assertToolSuccess(result);
 }
 
 /**

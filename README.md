@@ -379,11 +379,28 @@ The server ensures the LLM maintains a living development plan document:
 - **Decision Log**: Important technical and design decisions
 - **Timeline**: Progress tracking and milestone completion
 
+## Development Workflow
+
+### Starting Development
+
+Development must be explicitly initiated using the `start_development` tool, which allows users to select their preferred workflow:
+
+```
+start_development({ workflow: "waterfall" })
+```
+
+Available workflows include:
+- **waterfall**: Classical waterfall development process (default)
+- **agile**: Iterative development with sprint cycles
+- **custom**: Custom workflow defined in `.vibe/state-machine.yaml`
+
+> **Important**: The `start_development` tool must be called before any other tools (`whats_next`, `proceed_to_phase`, `resume_workflow`). This ensures that development follows a deliberate workflow selection process.
+
 ## Phase Progression Flow
 
 ### How Users Advance Through Development Phases
 
-The responsible-vibe-mcp server guides users through a structured development process using a two-tool approach that gives users full control over phase transitions:
+After development has been started, the responsible-vibe-mcp server guides users through a structured development process using a two-tool approach that gives users full control over phase transitions:
 
 #### 1. **Continuous Guidance with `whats_next`**
 - LLM calls `whats_next()` after each user interaction

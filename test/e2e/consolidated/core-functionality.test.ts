@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { TempProject, createTempProjectWithDefaultStateMachine } from '../../utils/temp-files';
-import { DirectServerInterface, createSuiteIsolatedE2EScenario, assertToolSuccess } from '../../utils/e2e-test-setup';
+import { DirectServerInterface, createSuiteIsolatedE2EScenario, assertToolSuccess, initializeDevelopment } from '../../utils/e2e-test-setup';
 
 vi.unmock('fs');
 vi.unmock('fs/promises');
@@ -27,6 +27,9 @@ describe('Core Functionality', () => {
     client = scenario.client;
     tempProject = scenario.tempProject;
     cleanup = scenario.cleanup;
+    
+    // Initialize development with default workflow before each test
+    await initializeDevelopment(client);
   });
 
   afterEach(async () => {

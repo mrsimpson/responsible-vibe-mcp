@@ -35,7 +35,12 @@ describe('Reset Functionality', () => {
   });
 
   it('should successfully reset with confirmation', async () => {
-    // First, create some state by calling whats_next
+    // First, initialize development with a workflow
+    await server.handleStartDevelopment({
+      workflow: 'waterfall'
+    });
+    
+    // Then create some state by calling whats_next
     await server.handleWhatsNext({
       context: 'test context',
       user_input: 'test input'

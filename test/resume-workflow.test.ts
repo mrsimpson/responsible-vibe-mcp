@@ -18,6 +18,9 @@ describe('resume_workflow tool', () => {
     });
     
     await server.initialize();
+    
+    // Initialize development with waterfall workflow before testing
+    await server.handleStartDevelopment({ workflow: 'waterfall' });
   });
 
   afterEach(async () => {
@@ -134,11 +137,26 @@ describe('resume_workflow tool', () => {
   });
 
   it('should handle missing plan file gracefully', async () => {
-    const result = await server.handleResumeWorkflow({});
+    // Create a custom test that mocks the plan manager to report no plan file
+    const originalPlanManager = (server as any).planManager;
     
-    const planStatus = result.plan_status;
-    expect(planStatus.exists).toBe(false);
-    expect(planStatus.analysis).toBeNull();
+    try {
+      // Replace plan manager with a mock that reports no plan file
+      (server as any).planManager = {
+        getPlanFileInfo: async () => ({ exists: false, path: '/fake/path.md' }),
+        ensurePlanFile: async () => {},
+        setStateMachine: () => {}
+      };
+      
+      const result = await server.handleResumeWorkflow({});
+      
+      const planStatus = result.plan_status;
+      expect(planStatus.exists).toBe(false);
+      expect(planStatus.analysis).toBeNull();
+    } finally {
+      // Restore original plan manager
+      (server as any).planManager = originalPlanManager;
+    }
   });
 
   it('should provide different recommendations based on phase', async () => {

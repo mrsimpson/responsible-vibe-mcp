@@ -35,6 +35,18 @@ To use this server with an MCP client, configure it as a stdio transport:
 
 ## Available Tools
 
+### `start_development`
+Initializes development workflow and transitions to the initial development phase. This tool **must be called first** before any other tools can be used.
+
+**Parameters:**
+- `workflow`: The development workflow to use (waterfall, agile, custom)
+
+**Returns:**
+- `phase`: Initial development phase
+- `instructions`: Detailed instructions for the LLM
+- `plan_file_path`: Path to the plan file to update
+- `conversation_id`: Unique conversation identifier
+
 ### `whats_next`
 The primary tool that analyzes conversation state and provides LLM instructions.
 
@@ -84,7 +96,17 @@ Dynamically generated system prompt for LLM integration with comprehensive usage
 
 ## Example Usage Flow
 
-1. **Start new feature:**
+1. **Initialize development with a workflow:**
+   ```json
+   {
+     "name": "start_development",
+     "arguments": {
+       "workflow": "waterfall"
+     }
+   }
+   ```
+
+2. **Start new feature:**
    ```json
    {
      "name": "whats_next",

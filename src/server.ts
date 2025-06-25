@@ -449,8 +449,22 @@ export class VibeFeatureMCPServer {
         recent_messages = []
       } = args;
 
-      // Get or create conversation
-      const conversationContext = await this.conversationManager.getConversationContext();
+      // Get conversation (will throw error if none exists)
+      let conversationContext;
+      try {
+        conversationContext = await this.conversationManager.getConversationContext();
+      } catch (error) {
+        // No conversation exists yet - provide helpful guidance
+        logger.info('whats_next called before conversation creation', { error });
+        return {
+          error: true,
+          message: 'No development conversation has been started for this project.',
+          instructions: 'Please use the start_development tool first to initialize development with a workflow.',
+          available_workflows: this.workflowManager.getWorkflowNames(),
+          example: 'start_development({ workflow: "waterfall" })'
+        };
+      }
+      
       const conversationId = conversationContext.conversationId;
       const currentPhase = conversationContext.currentPhase;
       
@@ -565,8 +579,22 @@ export class VibeFeatureMCPServer {
         throw new Error('target_phase is required');
       }
 
-      // Get current conversation state
-      const conversationContext = await this.conversationManager.getConversationContext();
+      // Get conversation (will throw error if none exists)
+      let conversationContext;
+      try {
+        conversationContext = await this.conversationManager.getConversationContext();
+      } catch (error) {
+        // No conversation exists yet - provide helpful guidance
+        logger.info('proceed_to_phase called before conversation creation', { error });
+        return {
+          error: true,
+          message: 'No development conversation has been started for this project.',
+          instructions: 'Please use the start_development tool first to initialize development with a workflow.',
+          available_workflows: this.workflowManager.getWorkflowNames(),
+          example: 'start_development({ workflow: "waterfall" })'
+        };
+      }
+      
       const conversationId = conversationContext.conversationId;
       const currentPhase = conversationContext.currentPhase;
 
@@ -653,15 +681,20 @@ export class VibeFeatureMCPServer {
       logger.debug('Processing start_development request', args);
       
       // Extract workflow selection from args
-      const selectedWorkflow = args.workflow; // Don't default to 'waterfall' - let WorkflowManager decide
+      const selectedWorkflow = args.workflow;
       
-      // Validate workflow selection if specified
-      if (selectedWorkflow && !this.workflowManager.validateWorkflowName(selectedWorkflow, this.projectPath)) {
+      // Require explicit workflow selection
+      if (!selectedWorkflow) {
+        throw new Error('workflow parameter is required. Please specify one of: ' + this.workflowManager.getWorkflowNames().join(', ') + ', or "custom"');
+      }
+      
+      // Validate workflow selection
+      if (!this.workflowManager.validateWorkflowName(selectedWorkflow, this.projectPath)) {
         throw new Error(`Invalid workflow: ${selectedWorkflow}. Available workflows: ${this.workflowManager.getWorkflowNames().join(', ')}, custom`);
       }
       
-      // Get current conversation state
-      const conversationContext = await this.conversationManager.getConversationContext();
+      // Create or get conversation context with the selected workflow
+      const conversationContext = await this.conversationManager.createConversationContext(selectedWorkflow);
       const currentPhase = conversationContext.currentPhase;
       
       // Load the selected workflow
@@ -736,8 +769,21 @@ export class VibeFeatureMCPServer {
       const includeSystemPrompt = args.include_system_prompt !== false; // Default to true
       const simplePrompt = args.simple_prompt !== false; // Default to true
       
-      // Get current conversation context
-      const conversationContext = await this.conversationManager.getConversationContext();
+      // Get conversation (will throw error if none exists)
+      let conversationContext;
+      try {
+        conversationContext = await this.conversationManager.getConversationContext();
+      } catch (error) {
+        // No conversation exists yet - provide helpful guidance
+        logger.info('resume_workflow called before conversation creation', { error });
+        return {
+          error: true,
+          message: 'No development conversation has been started for this project.',
+          instructions: 'Please use the start_development tool first to initialize development with a workflow.',
+          available_workflows: this.workflowManager.getWorkflowNames(),
+          example: 'start_development({ workflow: "waterfall" })'
+        };
+      }
       
       // Get plan file information
       const planInfo = await this.planManager.getPlanFileInfo(conversationContext.planFilePath);

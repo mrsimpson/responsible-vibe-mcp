@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { TempProject, createTempProjectWithDefaultStateMachine } from '../../utils/temp-files';
-import { DirectServerInterface, createSuiteIsolatedE2EScenario, assertToolSuccess } from '../../utils/e2e-test-setup';
+import { DirectServerInterface, createSuiteIsolatedE2EScenario, assertToolSuccess, initializeDevelopment } from '../../utils/e2e-test-setup';
 import { promises as fs } from 'fs';
 import path from 'path';
 
@@ -31,7 +31,7 @@ describe('Workflow Integration', () => {
     cleanup = scenario.cleanup;
 
     // Start development for all workflow integration tests
-    await client.callTool('start_development', {});
+    await initializeDevelopment(client, 'waterfall');
   });
 
   afterEach(async () => {
@@ -395,7 +395,13 @@ direct_transitions:
 
       await fs.writeFile(path.join(vibeDir, 'state-machine.yaml'), customWorkflow);
 
-      // Start development with custom state machine using whats_next
+      // First, initialize development with the custom workflow
+      const initResult = await client.callTool('start_development', {
+        workflow: 'custom'
+      });
+      assertToolSuccess(initResult);
+      
+      // Then call whats_next to get instructions
       const start = await client.callTool('whats_next', {
         user_input: 'start agile sprint development',
         context: 'new feature request'
