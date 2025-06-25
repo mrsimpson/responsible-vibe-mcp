@@ -739,9 +739,21 @@ export class VibeFeatureMCPServer {
       
       const response = {
         phase: transitionResult.newPhase,
-        instructions: 'Use the whats_next() tool to get guided instructions for the next current phase.',
+        instructions: `Look at the plan file. Define entrance criteria for each phase of the workflow except the initial phase. Those criteria shall be based on the contents of the previous phase. 
+        Example: 
+        \`\`\`
+        ## Design
+
+        ### Phase Entrance Criteria:
+        - [ ] The requirements have been thoroughly defined.
+        - [ ] Alternatives have been evaluated and are documented. 
+        - [ ] It's clear what's in scope and out of scope
+        \`\`\`
+        
+        Once you added reasonable entrance Use the whats_next() tool to get guided instructions for the next current phase.`,
         plan_file_path: conversationContext.planFilePath,
-        conversation_id: conversationContext.conversationId
+        conversation_id: conversationContext.conversationId,
+        workflow: stateMachine
       };
       
       // Log interaction

@@ -18,12 +18,12 @@ const logger = createLogger('SystemPromptGenerator');
  * @returns The generated system prompt
  */
 export function generateSystemPrompt(stateMachine: YamlStateMachine, simple: boolean = false): string {
-  logger.debug('Generating system prompt from state machine definition', { 
-    simple, 
+  logger.debug('Generating system prompt from state machine definition', {
+    simple,
     stateMachineName: stateMachine.name,
     phaseCount: Object.keys(stateMachine.states).length
   });
-  
+
   return simple ? generateSimpleSystemPrompt(stateMachine) : generateVerboseSystemPrompt(stateMachine);
 }
 
@@ -32,16 +32,12 @@ export function generateSystemPrompt(stateMachine: YamlStateMachine, simple: boo
  */
 function generateVerboseSystemPrompt(stateMachine: YamlStateMachine): string {
   logger.debug('Generating verbose system prompt');
-  
+
   const phases = Object.keys(stateMachine.states);
   const phaseDescriptions = generatePhaseDescriptions(stateMachine);
   const transitionInfo = generateTransitionInfo(stateMachine);
-  
-  const systemPrompt = `# LLM System Prompt for Vibe Feature MCP Integration
 
-Use this system prompt to configure your LLM client to properly integrate with responsible-vibe-mcp server.
-
-\`\`\`
+  const systemPrompt = `
 You are an AI assistant that helps users develop software features through a structured development process. You work in conjunction with the responsible-vibe-mcp server, which guides you through different development phases.
 
 responsible-vibe-mcp helps you transition through the phases of development and gives you tools for managing long term memory.
@@ -66,11 +62,9 @@ ${phaseDescriptions}
 
 ## Phase Transitions
 
-**IMPORTANT**: Phase transitions are now user-controlled based on entrance criteria defined in the plan file.
-
 ### How Phase Transitions Work:
 
-1. **First Interaction**: When starting from the initial phase, you'll be asked to define entrance criteria for each phase in the plan file
+1. **First Interaction**: When starting a new development, you have be asked to define entrance criteria for each phase in the plan file. If you don't find them, ask the user about it.
 2. **Ongoing Development**: Throughout development, consult the plan file's "Phase Entrance Criteria" section to determine when to transition
 3. **Evaluate Progress**: Check if the current phase's exit criteria or next phase's entrance criteria are met
 4. **Make Transition**: Use proceed_to_phase() when criteria are clearly satisfied
@@ -82,6 +76,7 @@ Before suggesting any phase transition:
 - **Evaluate current progress** against the defined criteria
 - **Only suggest transitions** when criteria are clearly met
 - **Be specific** about which criteria have been satisfied
+- **Ask the user** whether he agrees that the current phase is complete.
 
 **Usage:**
 \`\`\`
@@ -102,15 +97,16 @@ proceed_to_phase({
 
 **Remember**: The plan file contains the specific entrance criteria that were defined at the start of the conversation. These criteria are your guide for making transition decisions.
 
+### Possible transition of your development flow
+
 ${transitionInfo}
 
 ## Your Responsibilities
 
 ### When Starting a New Feature:
 
-1. Call whats_next() immediately when a user requests a new feature
+1. Call start_development() immediately when a user requests a new feature or a bug. Choose the workflow that fits the user's request.
 2. Follow the returned instructions to begin the appropriate phase
-3. Create or update the plan file as directed
 
 ### During Each Phase:
 
@@ -183,18 +179,14 @@ responsible-vibe-mcp: *provides design phase instructions*
 
 - **Never skip calling whats_next()** - this is how you stay synchronized with the development process
 - **Always provide conversation context** - the server needs this to make informed decisions about phase transitions
-- **Use proceed_to_phase when suggested** - when whats_next() indicates a phase is complete, use proceed_to_phase to transition
 - **Always update the plan file** when instructed - this serves as project memory
-- **Be thorough in requirements gathering** - ask clarifying questions before moving to design
 - **Document decisions** - record important technical choices in the plan file
-- **Follow coding best practices** during implementation guidance
-- **Ensure comprehensive testing** in the testing phase
 
 ## Error Handling
 
 If you encounter issues:
 1. Call whats_next() with context about the problem
-2. Follow any recovery instructions provided
+2. Engage with the user and follow any recovery instructions provided
 3. Use proceed_to_phase to return to previous phases if needed
 4. Update the plan file to reflect any issues or changes
 
@@ -222,11 +214,7 @@ Since responsible-vibe-mcp operates statelessly (it doesn't store conversation h
 - What you're trying to determine next
 
 Remember: responsible-vibe-mcp is your guide through the development process. It maintains project state and development phase, but relies on you to provide conversation context. Trust its phase transitions, use proceed_to_phase when suggested, and follow its instructions precisely to ensure a structured, comprehensive development workflow.
-\`\`\`
-
----
-
-*This system prompt was automatically generated from the responsible-vibe-mcp state machine definition to ensure accuracy and consistency.*`;
+`;
 
   logger.info('System prompt generated successfully', {
     phaseCount: phases.length,
@@ -241,17 +229,16 @@ Remember: responsible-vibe-mcp is your guide through the development process. It
  */
 function generateSimpleSystemPrompt(stateMachine: YamlStateMachine): string {
   logger.debug('Generating simple system prompt');
-  
+
   const phases = Object.keys(stateMachine.states);
   const phaseDescriptions = generateSimplifiedPhaseDescriptions(stateMachine);
-  
-  const systemPrompt = `# Vibe Feature MCP Integration
+
+  const systemPrompt = `
+You are an AI assistant that helps users develop software features through a structured development process guided by the responsible-vibe-mcp server.
 
 IMPORTANT: Always follow these instructions when working with responsible-vibe-mcp!
 
-You are an AI assistant that helps users develop software features through a structured development process guided by the responsible-vibe-mcp server.
-
-Use the start_development() whenever you are starting a conversation!
+Use the start_development() whenever you are starting a conversation! Chose the workflow that fits the user's request.
 
 ## Core Workflow
 
@@ -283,11 +270,14 @@ whats_next({
 
 ## Phase Transitions
 
+You can transition to the next phase when the tasks of the current phase were completed and the entrance criteria for the current phase have been met.
+
 Before suggesting any phase transition:
 - **Check the plan file** for the "Phase Entrance Criteria" section
 - **Evaluate current progress** against the defined criteria
 - **Only suggest transitions** when criteria are clearly met
 - **Be specific** about which criteria have been satisfied
+- **Ask the user** whether he agrees that the current phase is complete.
 
 \`\`\`
 proceed_to_phase({
@@ -335,7 +325,7 @@ function capitalizePhase(phase: string): string {
  */
 function generatePhaseDescriptions(stateMachine: YamlStateMachine): string {
   const phases = Object.keys(stateMachine.states);
-  
+
   return phases.map(phase => {
     const phaseDefinition = stateMachine.states[phase];
     const capitalizedPhase = capitalizePhase(phase);
@@ -348,22 +338,22 @@ function generatePhaseDescriptions(stateMachine: YamlStateMachine): string {
  */
 function generateTransitionInfo(stateMachine: YamlStateMachine): string {
   const phases = Object.keys(stateMachine.states);
-  
+
   let transitionInfo = `### Available Phases and Transitions:\n\n`;
-  
+
   phases.forEach(phase => {
     const phaseDefinition = stateMachine.states[phase];
     const capitalizedPhase = capitalizePhase(phase);
-    
+
     transitionInfo += `**${capitalizedPhase}**: ${phaseDefinition.description}\n`;
-    
+
     if (phaseDefinition.transitions && phaseDefinition.transitions.length > 0) {
       transitionInfo += `  Can transition to: ${phaseDefinition.transitions.map(t => capitalizePhase(t.to)).join(', ')}\n`;
     }
-    
+
     transitionInfo += '\n';
   });
-  
+
   transitionInfo += `### Example Transitions:
 
 \`\`\`
@@ -388,7 +378,7 @@ proceed_to_phase({
  */
 function generateSimplifiedPhaseDescriptions(stateMachine: YamlStateMachine): string {
   const phases = Object.keys(stateMachine.states);
-  
+
   return phases.map(phase => {
     const phaseDefinition = stateMachine.states[phase];
     const capitalizedPhase = capitalizePhase(phase);
