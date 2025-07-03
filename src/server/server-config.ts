@@ -49,7 +49,7 @@ export async function initializeServerComponents(config: ServerConfig = {}): Pro
   logger.debug('Initializing server components', config);
   
   // Set project path
-  const projectPath = normalizeProjectPath(config.projectPath);
+  const projectPath = normalizeProjectPath(config.projectPath || process.env.VIBE_PROJECT_PATH);
   
   // Initialize MCP server
   const mcpServer = new McpServer({
@@ -182,7 +182,9 @@ export function registerMcpTools(
       inputSchema: {
         workflow: z.enum(buildWorkflowEnum(context.workflowManager.getWorkflowNames()))
           .default('waterfall')
-          .describe(generateWorkflowDescription(context.workflowManager.getAvailableWorkflows()))
+          .describe(generateWorkflowDescription(context.workflowManager.getAvailableWorkflows())),
+        projectPath: z.string().optional()
+          .describe('Optional project path to use for development. If not provided, the server will use the configured project path or process.cwd().')
       },
       annotations: {
         title: 'Development Initializer',
