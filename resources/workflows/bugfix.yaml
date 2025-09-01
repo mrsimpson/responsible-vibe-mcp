@@ -153,11 +153,13 @@ states:
       **STEP 2: Documentation Review**
       Review and update documentation to reflect the bug fix:
 
-      1. **Compare Against Implementation**: Review documentation against the actual bug fix implemented
-      2. **Update Changed Sections**: Only modify documentation sections that have functional changes
-      3. **Remove Development Progress**: Remove references to investigation iterations, progress notes, and temporary decisions
-      4. **Focus on Final State**: Ensure documentation describes the final fixed state, not the debugging process
-      5. **Document Solution**: Ensure the bug fix solution is properly documented for future reference
+      1. **Update Long-Term Memory Documents**: Based on what was actually implemented:
+         • Update $DESIGN_DOC if design details were refined or changed during the fix
+      2. **Compare Against Implementation**: Review documentation against the actual bug fix implemented
+      3. **Update Changed Sections**: Only modify documentation sections that have functional changes
+      4. **Remove Development Progress**: Remove references to investigation iterations, progress notes, and temporary decisions
+      5. **Focus on Final State**: Ensure documentation describes the final fixed state, not the debugging process
+      6. **Ask User to Review Document Updates**: Ask the document changes
 
       **STEP 3: Final Validation**
       - Run existing tests to ensure cleanup didn't break functionality

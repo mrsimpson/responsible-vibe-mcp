@@ -153,11 +153,15 @@ states:
       **STEP 2: Documentation Review**
       Review and update documentation to reflect final implementation:
 
-      1. **Compare Against Implementation**: Review documentation against actual implemented functionality
-      2. **Update Changed Sections**: Only modify documentation sections that have functional changes
-      3. **Remove Development Progress**: Remove references to development iterations, progress notes, and temporary decisions
-      4. **Focus on Final State**: Ensure documentation describes the final implemented state, not the development process
-      5. **Verify Accuracy**: Ensure all examples, API descriptions, and usage instructions are accurate
+      1. **Update Long-Term Memory Documents**: Based on what was actually implemented:
+         • Update $REQUIREMENTS_DOC if requirements changed during development
+         • Update $ARCHITECTURE_DOC if architectural decisions evolved
+         • Update $DESIGN_DOC if design details were refined or changed
+      2. **Compare Against Implementation**: Review documentation against actual implemented functionality
+      3. **Update Changed Sections**: Only modify documentation sections that have functional changes
+      4. **Remove Development Progress**: Remove references to development iterations, progress notes, and temporary decisions
+      5. **Focus on Final State**: Ensure documentation describes the final implemented state, not the development process
+      6. **Ask User to Review Document Updates**
       6. **Comprehensive Documentation**: Ensure project has complete documentation for newcomers including setup, usage, architecture overview, and contribution guidelines
 
       **STEP 3: Final Validation**

@@ -237,6 +237,7 @@ Based on their responses, [guidance]. [Rest of existing instructions]."
 - [x] Clean up any development artifacts
 - [x] Update plan file with final status
 - [x] Verify all enhanced workflows load correctly
+- [x] Fix finalize phases to explicitly ask for document updates based on implementation
 
 ### Completed
 *None yet*

@@ -26,11 +26,11 @@ states:
   explore:
     description: 'Analysis and design phase - understanding and planning without implementation'
     default_instructions: >
-      You are in the exploration phase for minor enhancement. 
+      You are in the exploration phase for minor enhancement.
       This phase should be efficient since it's a minor enhancement.
-      Understand the problem, analyze existing patterns, and design your approach. 
-      Consider the scope and impact of the change. Document requirements in $REQUIREMENTS_DOC and respect the design approach in $DESIGN_DOC. 
-      Document your analysis and design decisions in the plan file. 
+      Understand the problem, analyze existing patterns, and design your approach.
+      Consider the scope and impact of the change. Document requirements in $REQUIREMENTS_DOC and respect the design approach in $DESIGN_DOC.
+      Document your analysis and design decisions in the plan file.
       Focus on analysis and design only - do not write any code yet.
     transitions:
       - trigger: 'exploration_complete'
@@ -41,7 +41,7 @@ states:
       - trigger: 'abandon_feature'
         to: 'explore'
         instructions: >
-          Minor enhancement abandoned. Revert potentially made changes. 
+          Minor enhancement abandoned. Revert potentially made changes.
           Return to exploration state for new tasks.
           The plan file will remain for future reference if needed.
         additional_instructions: 'Minor enhancement development abandoned. Clean up any analysis work and prepare for new tasks.'
@@ -81,7 +81,7 @@ states:
          Look for language-specific debug output methods (console logging, print statements, debug output functions).
          Remove any debugging statements that were added for development purposes.
 
-      2. **Review TODO/FIXME Comments**: 
+      2. **Review TODO/FIXME Comments**:
          - Address each TODO/FIXME comment by either implementing the solution or documenting why it's deferred
          - Remove completed TODOs
          - Convert remaining TODOs to proper issue tracking if needed
@@ -94,11 +94,14 @@ states:
       **STEP 2: Documentation Review**
       Review and update documentation to reflect final implementation:
 
-      1. **Compare Against Implementation**: Review documentation against actual implemented functionality
-      2. **Update Changed Sections**: Only modify documentation sections that have functional changes
-      3. **Remove Development Progress**: Remove references to development iterations, progress notes, and temporary decisions
-      4. **Focus on Final State**: Ensure documentation describes the final implemented state, not the development process
-      5. **Verify Accuracy**: Ensure all examples, API descriptions, and usage instructions are accurate
+      1. **Update Long-Term Memory Documents**: Based on what was actually implemented:
+         • Update $REQUIREMENTS_DOC if requirements changed during development
+         • Update $DESIGN_DOC if design details were refined or changed
+      2. **Compare Against Implementation**: Review documentation against actual implemented functionality
+      3. **Update Changed Sections**: Only modify documentation sections that have functional changes
+      4. **Remove Development Progress**: Remove references to development iterations, progress notes, and temporary decisions
+      5. **Focus on Final State**: Ensure documentation describes the final implemented state, not the development process
+      6. **Ask User to Review Document Updates**
 
       **STEP 3: Final Validation**
       - Run existing tests to ensure cleanup didn't break functionality
