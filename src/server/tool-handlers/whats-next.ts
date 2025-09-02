@@ -90,10 +90,19 @@ export class WhatsNextHandler extends ConversationRequiredToolHandler<
 
     // Update conversation state if phase changed
     if (transitionResult.newPhase !== currentPhase) {
-      await context.conversationManager.updateConversationState(
-        conversationId,
-        { currentPhase: transitionResult.newPhase }
+      const shouldUpdateState = await this.shouldUpdateConversationState(
+        currentPhase,
+        transitionResult.newPhase,
+        conversationContext,
+        context
       );
+
+      if (shouldUpdateState) {
+        await context.conversationManager.updateConversationState(
+          conversationId,
+          { currentPhase: transitionResult.newPhase }
+        );
+      }
 
       // If this was a first-call auto-transition, regenerate the plan file
       if (
@@ -175,5 +184,52 @@ export class WhatsNextHandler extends ConversationRequiredToolHandler<
     );
 
     return response;
+  }
+
+  /**
+   * Determines whether conversation state should be updated for a phase transition
+   */
+  private async shouldUpdateConversationState(
+    currentPhase: string,
+    newPhase: string,
+    conversationContext: ConversationContext,
+    context: ServerContext
+  ): Promise<boolean> {
+    if (!conversationContext.requireReviewsBeforePhaseTransition) {
+      return true;
+    }
+
+    const stateMachine = context.workflowManager.loadWorkflowForProject(
+      conversationContext.projectPath,
+      conversationContext.workflowName
+    );
+
+    const currentState = stateMachine.states[currentPhase];
+    if (!currentState) {
+      return true;
+    }
+
+    const transition = currentState.transitions.find(t => t.to === newPhase);
+    if (!transition) {
+      return true;
+    }
+
+    const hasReviewPerspectives =
+      transition.review_perspectives &&
+      transition.review_perspectives.length > 0;
+
+    if (hasReviewPerspectives) {
+      this.logger.debug(
+        'Preventing state update - review required for transition',
+        {
+          from: currentPhase,
+          to: newPhase,
+          reviewPerspectives: transition.review_perspectives?.length || 0,
+        }
+      );
+      return false;
+    }
+
+    return true;
   }
 }

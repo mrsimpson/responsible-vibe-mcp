@@ -41,6 +41,7 @@
   ],
   "allowedTools": [
     "fs_read",
+    "fs_write",
     "knowledge",
     "thinking",
     "@modelcontextprotocol Docs/fetch_generic_url_content",
