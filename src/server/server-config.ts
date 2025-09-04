@@ -8,6 +8,7 @@
 import { z } from 'zod';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { ResourceTemplate } from '@modelcontextprotocol/sdk/server/mcp.js';
+import { SetLevelRequestSchema } from '@modelcontextprotocol/sdk/types.js';
 
 import { DEFAULT_WORKFLOW_NAME } from '../constants.js';
 
@@ -20,7 +21,7 @@ import { InteractionLogger } from '../interaction-logger.js';
 import { WorkflowManager } from '../workflow-manager.js';
 import { GitManager } from '../git-manager.js';
 import { TemplateManager } from '../template-manager.js';
-import { createLogger } from '../logger.js';
+import { createLogger, setMcpLoggingLevel } from '../logger.js';
 
 import {
   ServerConfig,
@@ -86,6 +87,17 @@ export async function initializeServerComponents(
       },
     }
   );
+
+  // Register logging/setLevel handler to support MCP inspector
+  mcpServer.server.setRequestHandler(SetLevelRequestSchema, async request => {
+    const level = request.params.level;
+    logger.info('Setting logging level from MCP client', { level });
+
+    // Set the unified logging level
+    setMcpLoggingLevel(level);
+
+    return {};
+  });
 
   // Initialize core components
   logger.debug('Initializing core components');

@@ -31,6 +31,9 @@ export interface LogContext {
 // Global MCP server reference for log notifications
 let mcpServerInstance: McpServer | null = null;
 
+// Unified logging level - can be set by MCP client or environment
+let currentLoggingLevel: LogLevel | null = null;
+
 // Test mode detection function to check at runtime
 function isTestMode(): boolean {
   // Check explicit environment variables
@@ -59,6 +62,25 @@ export function setMcpServerForLogging(server: McpServer): void {
   mcpServerInstance = server;
 }
 
+/**
+ * Set the logging level from MCP client request
+ */
+export function setMcpLoggingLevel(level: string): void {
+  // Map MCP levels to our internal levels
+  const levelMap: Record<string, LogLevel> = {
+    debug: LogLevel.DEBUG,
+    info: LogLevel.INFO,
+    notice: LogLevel.INFO,
+    warning: LogLevel.WARN,
+    error: LogLevel.ERROR,
+    critical: LogLevel.ERROR,
+    alert: LogLevel.ERROR,
+    emergency: LogLevel.ERROR,
+  };
+
+  currentLoggingLevel = levelMap[level] ?? LogLevel.INFO;
+}
+
 class Logger {
   private component: string;
   private explicitLogLevel?: LogLevel;
@@ -72,6 +94,11 @@ class Logger {
     // Force ERROR level in test environments
     if (isTestMode()) {
       return LogLevel.ERROR;
+    }
+
+    // Use MCP-set level if available (takes precedence)
+    if (currentLoggingLevel !== null) {
+      return currentLoggingLevel;
     }
 
     // Check environment variable
@@ -120,7 +147,7 @@ class Logger {
   }
 
   /**
-   * Send log message to MCP client if server is available
+   * Send log message to MCP client if server is available and level is appropriate
    */
   private async sendMcpLogMessage(
     level: 'debug' | 'info' | 'warning' | 'error',
