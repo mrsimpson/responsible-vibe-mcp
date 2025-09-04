@@ -458,6 +458,20 @@ onMounted(async () => {
         fileUploadInput,
         workflowLoader
       );
+
+      // Set up file upload callbacks
+      fileUploadHandler.onWorkflowLoaded = async (workflow: any) => {
+        appState.currentWorkflow = workflow;
+        appState.selectedElement = null;
+        appState.highlightedPath = null;
+        await plantUMLRenderer.renderWorkflow(workflow);
+        updateSidePanel();
+      };
+
+      fileUploadHandler.onUploadError = (error: any) => {
+        console.error('File upload error:', error);
+        errorHandler.showError(error);
+      };
     }
 
     // Set up event listeners and populate workflow selector (only if selector exists)
