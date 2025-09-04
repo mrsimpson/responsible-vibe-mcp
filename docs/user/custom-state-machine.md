@@ -5,7 +5,7 @@ The Vibe Feature MCP server supports custom state machine definitions through YA
 ## How to Create a Custom State Machine
 
 1. Create a `.vibe` directory in your project root if it doesn't exist already
-2. Create a file named `state-machine.yaml` or `state-machine.yml` in the `.vibe` directory
+2. Create a file named `workflow.yaml` or `workflow.yml` in the `.vibe` directory
 3. Define your custom state machine following the schema below
 
 ## State Machine Schema
@@ -224,7 +224,7 @@ This provides code completion, validation, and documentation while editing your 
 
 To test your custom state machine:
 
-1. Place the YAML file in `.vibe/state-machine.yaml` in your project
+1. Place the YAML file in `.vibe/workflow.yaml` in your project
 2. Start the responsible-vibe-mcp server
 3. Check the logs for any validation errors
 4. Use the `whats_next` tool to see if your custom phases are being used
