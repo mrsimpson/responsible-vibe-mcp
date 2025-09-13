@@ -156,7 +156,7 @@ export class PlanManager {
 *Define what you're building or fixing - this will be updated as requirements are gathered*
 
 ## ${this.capitalizePhase(initialPhase)}
-### TasksÍ
+### Tasks
 - [ ] *Tasks will be added as they are identified*
 
 ### Completed
