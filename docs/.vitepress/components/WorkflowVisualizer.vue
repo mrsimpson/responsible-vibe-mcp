@@ -93,7 +93,11 @@ let appState: AppState = {
 };
 
 // Helper functions for handling interactions
-function handleElementClick(event: { elementType: string; elementId: string; data: unknown }): void {
+function handleElementClick(event: {
+  elementType: string;
+  elementId: string;
+  data: unknown;
+}): void {
   if (event.elementType === 'node' && event.data) {
     selectState(event.elementId, event.data);
   } else if (event.elementType === 'transition' && event.data) {
@@ -178,7 +182,10 @@ function renderSelectedElementDetails(): void {
   }
 }
 
-function renderStateDetailsWithHeader(stateId: string, stateData: unknown): void {
+function renderStateDetailsWithHeader(
+  stateId: string,
+  stateData: unknown
+): void {
   const workflow = appState.currentWorkflow;
   const isInitial = stateId === workflow.initial_state;
   const sidePanelHeader = document.querySelector('.side-panel-header');
@@ -215,9 +222,17 @@ function renderStateDetailsWithHeader(stateId: string, stateData: unknown): void
     <div class="detail-section">
       <h4 class="detail-subtitle">Transitions (${stateData.transitions.length})</h4>
       <ul class="transitions-list">
-        ${(stateData as { transitions: Array<{ to: string; trigger: string; transition_reason: string }> }).transitions
+        ${(
+          stateData as {
+            transitions: Array<{
+              to: string;
+              trigger: string;
+              transition_reason: string;
+            }>;
+          }
+        ).transitions
           .map(
-            (transition) => `
+            transition => `
           <li class="transition-item clickable-transition" data-from="${stateId}" data-to="${transition.to}" data-trigger="${transition.trigger}">
             <div class="transition-trigger">${transition.trigger}</div>
             <div class="transition-target">→ ${transition.to}</div>
@@ -242,9 +257,17 @@ function renderStateDetailsWithHeader(stateId: string, stateData: unknown): void
       const trigger = item.getAttribute('data-trigger');
 
       if (fromState && toState && trigger) {
-        const fullTransition = (stateData as { transitions: Array<{ to: string; trigger: string; instructions?: string; additional_instructions?: string; transition_reason?: string }> }).transitions.find(
-          (t) => t.to === toState && t.trigger === trigger
-        );
+        const fullTransition = (
+          stateData as {
+            transitions: Array<{
+              to: string;
+              trigger: string;
+              instructions?: string;
+              additional_instructions?: string;
+              transition_reason?: string;
+            }>;
+          }
+        ).transitions.find(t => t.to === toState && t.trigger === trigger);
 
         if (fullTransition) {
           appState.parentState = { id: stateId, data: stateData };
@@ -349,9 +372,13 @@ function renderTransitionDetailsWithHeader(transitionData: unknown): void {
 }
 
 function renderMetadataDetails(): void {
-  const workflow = appState.currentWorkflow as { name: string; description: string; metadata?: Record<string, unknown> } | null;
+  const workflow = appState.currentWorkflow as {
+    name: string;
+    description: string;
+    metadata?: Record<string, unknown>;
+  } | null;
   if (!workflow) return;
-  
+
   const metadata = workflow.metadata;
 
   const sidePanelHeader = document.querySelector('.side-panel-header');
