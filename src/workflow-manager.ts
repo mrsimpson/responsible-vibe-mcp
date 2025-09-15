@@ -11,6 +11,7 @@ import { createLogger } from './logger.js';
 import { DEFAULT_WORKFLOW_NAME } from './constants.js';
 import { StateMachineLoader } from './state-machine-loader.js';
 import { YamlStateMachine } from './state-machine-types.js';
+import { ConfigManager } from './config-manager.js';
 
 const logger = createLogger('WorkflowManager');
 
@@ -51,20 +52,57 @@ export class WorkflowManager {
 
   /**
    * Get available workflows for a specific project
-   * Filters out 'custom' workflow if no custom workflow file exists
+   * Applies configuration filtering and custom workflow validation
    */
   public getAvailableWorkflowsForProject(projectPath: string): WorkflowInfo[] {
     const allWorkflows = this.getAvailableWorkflows();
 
-    // Check if custom workflow file exists
-    const hasCustomWorkflow = this.validateWorkflowName('custom', projectPath);
+    // Load project configuration
+    const config = ConfigManager.loadProjectConfig(projectPath);
 
-    if (!hasCustomWorkflow) {
-      // Filter out custom workflow if no custom file exists
-      return allWorkflows.filter(w => w.name !== 'custom');
+    // Apply configuration filtering if enabled_workflows is specified
+    let filteredWorkflows = allWorkflows;
+    if (config?.enabled_workflows) {
+      // Validate that all configured workflows exist
+      for (const workflowName of config.enabled_workflows) {
+        if (
+          workflowName !== 'custom' &&
+          !this.isPredefinedWorkflow(workflowName)
+        ) {
+          throw new Error(
+            `Invalid workflow '${workflowName}' in configuration. Available workflows: ${this.getWorkflowNames().join(', ')}, custom`
+          );
+        }
+      }
+
+      // Filter to only enabled workflows
+      filteredWorkflows = allWorkflows.filter(
+        w => config.enabled_workflows?.includes(w.name) ?? false
+      );
     }
 
-    return allWorkflows;
+    // Handle custom workflow (only if custom is in enabled list or no config)
+    const customEnabled =
+      !config?.enabled_workflows || config.enabled_workflows.includes('custom');
+    if (customEnabled) {
+      const hasCustomWorkflow = this.validateWorkflowName(
+        'custom',
+        projectPath
+      );
+      if (hasCustomWorkflow) {
+        // Add custom workflow to the list if it exists and is enabled
+        const customWorkflowInfo: WorkflowInfo = {
+          name: 'custom',
+          displayName: 'Custom Workflow',
+          description: 'Project-specific custom workflow',
+          initialState: 'unknown', // Will be determined when loaded
+          phases: [], // Will be determined when loaded
+        };
+        filteredWorkflows.push(customWorkflowInfo);
+      }
+    }
+
+    return filteredWorkflows;
   }
 
   /**

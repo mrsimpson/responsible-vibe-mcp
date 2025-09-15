@@ -1,0 +1,2 @@
+ The more workflows are supported, the more options there are to pick the wrong one.
+I would like to allow the user to configure which ones are enabled in a project
