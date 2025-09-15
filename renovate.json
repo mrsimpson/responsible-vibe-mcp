@@ -45,7 +45,7 @@
     },
     {
       "description": "Group build tools",
-      "matchPackageNames": ["tsx", "vite-node", "@rollup/**"],
+      "matchPackageNames": ["tsx", "vite-node", "@rollup/**", "actions/"],
       "groupName": "Build Tools",
       "automerge": true,
       "addLabels": ["build"]
