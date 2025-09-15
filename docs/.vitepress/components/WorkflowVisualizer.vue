@@ -66,8 +66,24 @@ const props = withDefaults(defineProps<Props>(), {
   initialWorkflow: '',
 });
 
-let workflowVisualizerApp: any = null;
-let appState: any = {
+interface WorkflowVisualizerApp {
+  workflowLoader: unknown;
+  plantUMLRenderer: unknown;
+  fileUploadHandler: unknown;
+  errorHandler: unknown;
+}
+
+interface AppState {
+  currentWorkflow: unknown;
+  selectedElement: unknown;
+  highlightedPath: unknown;
+  isLoading: boolean;
+  error: unknown;
+  parentState: unknown;
+}
+
+let workflowVisualizerApp: WorkflowVisualizerApp | null = null;
+let appState: AppState = {
   currentWorkflow: null,
   selectedElement: null,
   highlightedPath: null,
@@ -77,7 +93,7 @@ let appState: any = {
 };
 
 // Helper functions for handling interactions
-function handleElementClick(event: any): void {
+function handleElementClick(event: { elementType: string; elementId: string; data: unknown }): void {
   if (event.elementType === 'node' && event.data) {
     selectState(event.elementId, event.data);
   } else if (event.elementType === 'transition' && event.data) {
@@ -85,7 +101,7 @@ function handleElementClick(event: any): void {
   }
 }
 
-function selectState(stateId: string, nodeData: any): void {
+function selectState(stateId: string, nodeData: unknown): void {
   const workflow = appState.currentWorkflow;
   if (!workflow || !workflow.states[stateId]) return;
 
@@ -100,7 +116,7 @@ function selectState(stateId: string, nodeData: any): void {
   updateSidePanel();
 }
 
-function selectTransition(transitionId: string, linkData: any): void {
+function selectTransition(transitionId: string, linkData: unknown): void {
   const workflow = appState.currentWorkflow;
   if (!workflow) return;
 
@@ -162,7 +178,7 @@ function renderSelectedElementDetails(): void {
   }
 }
 
-function renderStateDetailsWithHeader(stateId: string, stateData: any): void {
+function renderStateDetailsWithHeader(stateId: string, stateData: unknown): void {
   const workflow = appState.currentWorkflow;
   const isInitial = stateId === workflow.initial_state;
   const sidePanelHeader = document.querySelector('.side-panel-header');
@@ -199,9 +215,9 @@ function renderStateDetailsWithHeader(stateId: string, stateData: any): void {
     <div class="detail-section">
       <h4 class="detail-subtitle">Transitions (${stateData.transitions.length})</h4>
       <ul class="transitions-list">
-        ${stateData.transitions
+        ${(stateData as { transitions: Array<{ to: string; trigger: string; transition_reason: string }> }).transitions
           .map(
-            (transition: any) => `
+            (transition) => `
           <li class="transition-item clickable-transition" data-from="${stateId}" data-to="${transition.to}" data-trigger="${transition.trigger}">
             <div class="transition-trigger">${transition.trigger}</div>
             <div class="transition-target">→ ${transition.to}</div>
@@ -218,7 +234,7 @@ function renderStateDetailsWithHeader(stateId: string, stateData: any): void {
   const transitionItems = sidePanelContent.querySelectorAll(
     '.clickable-transition'
   );
-  transitionItems.forEach(item => {
+  for (const item of transitionItems) {
     item.addEventListener('click', e => {
       e.stopPropagation();
       const fromState = item.getAttribute('data-from');
@@ -226,8 +242,8 @@ function renderStateDetailsWithHeader(stateId: string, stateData: any): void {
       const trigger = item.getAttribute('data-trigger');
 
       if (fromState && toState && trigger) {
-        const fullTransition = stateData.transitions.find(
-          (t: any) => t.to === toState && t.trigger === trigger
+        const fullTransition = (stateData as { transitions: Array<{ to: string; trigger: string; instructions?: string; additional_instructions?: string; transition_reason?: string }> }).transitions.find(
+          (t) => t.to === toState && t.trigger === trigger
         );
 
         if (fullTransition) {
@@ -244,10 +260,10 @@ function renderStateDetailsWithHeader(stateId: string, stateData: any): void {
         }
       }
     });
-  });
+  }
 }
 
-function renderTransitionDetailsWithHeader(transitionData: any): void {
+function renderTransitionDetailsWithHeader(transitionData: unknown): void {
   const sidePanelHeader = document.querySelector('.side-panel-header');
   const sidePanelContent = document.querySelector('.side-panel-content');
 
@@ -264,48 +280,58 @@ function renderTransitionDetailsWithHeader(transitionData: any): void {
     goBackToParentState();
   });
 
+  const transition = transitionData as {
+    trigger: string;
+    from: string;
+    to: string;
+    transition_reason?: string;
+    instructions?: string;
+    additional_instructions?: string;
+    review_perspectives?: Array<{ perspective: string; prompt: string }>;
+  };
+
   // Render transition content
   sidePanelContent.innerHTML = `
     <div class="detail-section">
-      <h3 class="detail-title">Transition: ${transitionData.trigger}</h3>
+      <h3 class="detail-title">Transition: ${transition.trigger}</h3>
       <p class="detail-content">
-        <strong>${transitionData.from}</strong> → <strong>${transitionData.to}</strong>
+        <strong>${transition.from}</strong> → <strong>${transition.to}</strong>
       </p>
     </div>
     
     <div class="detail-section">
       <h4 class="detail-subtitle">Reason</h4>
-      <p class="detail-content">${transitionData.transition_reason}</p>
+      <p class="detail-content">${transition.transition_reason || ''}</p>
     </div>
     
     ${
-      transitionData.instructions
+      transition.instructions
         ? `
       <div class="detail-section">
         <h4 class="detail-subtitle">Instructions</h4>
-        <div class="code-block">${transitionData.instructions}</div>
+        <div class="code-block">${transition.instructions}</div>
       </div>
     `
         : ''
     }
     
     ${
-      transitionData.additional_instructions
+      transition.additional_instructions
         ? `
       <div class="detail-section">
         <h4 class="detail-subtitle">Additional Instructions</h4>
-        <div class="code-block">${transitionData.additional_instructions}</div>
+        <div class="code-block">${transition.additional_instructions}</div>
       </div>
     `
         : ''
     }
     
     ${
-      transitionData.review_perspectives?.length
+      transition.review_perspectives?.length
         ? `
       <div class="detail-section">
-        <h4 class="detail-subtitle">Review Perspectives (${transitionData.review_perspectives.length})</h4>
-        ${transitionData.review_perspectives
+        <h4 class="detail-subtitle">Review Perspectives (${transition.review_perspectives.length})</h4>
+        ${transition.review_perspectives
           .map(
             review => `
           <div class="review-perspective">
@@ -323,7 +349,9 @@ function renderTransitionDetailsWithHeader(transitionData: any): void {
 }
 
 function renderMetadataDetails(): void {
-  const workflow = appState.currentWorkflow!;
+  const workflow = appState.currentWorkflow as { name: string; description: string; metadata?: Record<string, unknown> } | null;
+  if (!workflow) return;
+  
   const metadata = workflow.metadata;
 
   const sidePanelHeader = document.querySelector('.side-panel-header');
@@ -460,7 +488,7 @@ onMounted(async () => {
       );
 
       // Set up file upload callbacks
-      fileUploadHandler.onWorkflowLoaded = async (workflow: any) => {
+      fileUploadHandler.onWorkflowLoaded = async (workflow: unknown) => {
         appState.currentWorkflow = workflow;
         appState.selectedElement = null;
         appState.highlightedPath = null;
@@ -468,7 +496,7 @@ onMounted(async () => {
         updateSidePanel();
       };
 
-      fileUploadHandler.onUploadError = (error: any) => {
+      fileUploadHandler.onUploadError = (error: unknown) => {
         console.error('File upload error:', error);
         errorHandler.showError(error);
       };
@@ -505,12 +533,12 @@ onMounted(async () => {
 
       // Populate workflow selector
       const workflows = workflowLoader.getAvailableWorkflows();
-      workflows.forEach(workflow => {
+      for (const workflow of workflows) {
         const option = document.createElement('option');
         option.value = workflow.name;
         option.textContent = `${workflow.displayName} - ${workflow.description}`;
         workflowSelector.appendChild(option);
-      });
+      }
     }
 
     // Load initial workflow if specified
