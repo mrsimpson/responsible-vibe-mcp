@@ -121,9 +121,9 @@ ENVIRONMENT VARIABLES:
   PROJECT_PATH    Set the project directory for custom workflow discovery
 
 DESCRIPTION:
-  A Model Context Protocol server that acts as an intelligent conversation 
-  state manager and development guide for LLMs. This server orchestrates 
-  feature development conversations by maintaining state, determining 
+  A Model Context Protocol server that acts as an intelligent conversation
+  state manager and development guide for LLMs. This server orchestrates
+  feature development conversations by maintaining state, determining
   development phases, and providing contextual instructions.
 
 WORKFLOW VISUALIZER:
@@ -133,17 +133,17 @@ WORKFLOW VISUALIZER:
 
 CONFIGURATION GENERATOR:
   Use --generate-config to create configuration files for AI coding agents:
-  
+
   Amazon Q CLI: --generate-config amazonq-cli  (generates .amazonq/cli-agents/vibe.json)
   Claude Code:  --generate-config claude       (generates CLAUDE.md, .mcp.json, settings.json)
   Gemini CLI:   --generate-config gemini       (generates settings.json, GEMINI.md)
-  
+
   Files are generated in the current directory with pre-configured settings
   for the responsible-vibe-mcp server and default tool permissions.
 
 MCP CLIENT CONFIGURATION:
   Add to your MCP client configuration:
-  
+
   Claude Desktop (.claude/config.json):
   {
     "mcpServers": {
@@ -153,12 +153,12 @@ MCP CLIENT CONFIGURATION:
       }
     }
   }
-  
+
   Amazon Q (.amazonq/mcp.json):
   {
     "mcpServers": {
       "responsible-vibe-mcp": {
-        "command": "npx", 
+        "command": "npx",
         "args": ["responsible-vibe-mcp"]
       }
     }
@@ -221,12 +221,6 @@ async function main() {
   try {
     const projectPath = process.env.PROJECT_PATH;
 
-    logger.info('Starting Vibe Feature MCP Server', {
-      projectPath: projectPath || 'default (process.cwd())',
-      nodeVersion: process.version,
-      platform: process.platform,
-    });
-
     // Create server instance with project path configuration
     const server = new ResponsibleVibeMCPServer({
       projectPath: projectPath,
@@ -241,7 +235,8 @@ async function main() {
     // Connect server to transport
     await server.getMcpServer().connect(transport);
 
-    logger.info('Vibe Feature MCP Server started successfully');
+    // Note: No logging here to ensure compatibility with Amazon Q CLI
+    // Amazon Q CLI expects no logging notifications before MCP initialization completes
 
     // Handle graceful shutdown
     process.on('SIGINT', async () => {

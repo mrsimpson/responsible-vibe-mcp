@@ -79,8 +79,6 @@ export class ResponsibleVibeMCPServer {
         responseRenderer,
         this.components.context
       );
-
-      logger.info('ResponsibleVibeMCPServer initialized successfully');
     } catch (error) {
       logger.error(
         'Failed to initialize ResponsibleVibeMCPServer',
