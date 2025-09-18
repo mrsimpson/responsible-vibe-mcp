@@ -37,11 +37,11 @@ states:
 
       ### Technology Stack
       <!-- Record the identified technology stack -->
-      - **Primary Language**: 
-      - **Framework**: 
-      - **Build System**: 
-      - **Database**: 
-      - **Other Technologies**: 
+      - **Primary Language**:
+      - **Framework**:
+      - **Build System**:
+      - **Database**:
+      - **Other Technologies**:
 
       ### Repository Structure
       <!-- Map the basic folder structure -->
@@ -89,17 +89,17 @@ states:
 
       #### Identified Containers
       - **[Container 1 Name]** - `path/to/container`
-        - **Technology**: 
-        - **Purpose**: 
-        - **Interfaces**: 
-        - **Data Storage**: 
+        - **Technology**:
+        - **Purpose**:
+        - **Interfaces**:
+        - **Data Storage**:
         - **Communication**: How it communicates with other containers
 
       - **[Container 2 Name]** - `path/to/container`
-        - **Technology**: 
-        - **Purpose**: 
-        - **Interfaces**: 
-        - **Data Storage**: 
+        - **Technology**:
+        - **Purpose**:
+        - **Interfaces**:
+        - **Data Storage**:
         - **Communication**: How it communicates with other containers
 
       #### Container Interactions
@@ -111,33 +111,33 @@ states:
 
       #### Container 1 Components
       - **[Component 1.1]** - `path/to/component`
-        - **Responsibilities**: 
-        - **Interfaces**: 
-        - **Dependencies**: 
-        - **Design Patterns**: 
-        - **Key Insights**: 
+        - **Responsibilities**:
+        - **Interfaces**:
+        - **Dependencies**:
+        - **Design Patterns**:
+        - **Key Insights**:
 
       - **[Component 1.2]** - `path/to/component`
-        - **Responsibilities**: 
-        - **Interfaces**: 
-        - **Dependencies**: 
-        - **Design Patterns**: 
-        - **Key Insights**: 
+        - **Responsibilities**:
+        - **Interfaces**:
+        - **Dependencies**:
+        - **Design Patterns**:
+        - **Key Insights**:
 
       #### Container 2 Components
       - **[Component 2.1]** - `path/to/component`
-        - **Responsibilities**: 
-        - **Interfaces**: 
-        - **Dependencies**: 
-        - **Design Patterns**: 
-        - **Key Insights**: 
+        - **Responsibilities**:
+        - **Interfaces**:
+        - **Dependencies**:
+        - **Design Patterns**:
+        - **Key Insights**:
 
       - **[Component 2.2]** - `path/to/component`
-        - **Responsibilities**: 
-        - **Interfaces**: 
-        - **Dependencies**: 
-        - **Design Patterns**: 
-        - **Key Insights**: 
+        - **Responsibilities**:
+        - **Interfaces**:
+        - **Dependencies**:
+        - **Design Patterns**:
+        - **Key Insights**:
 
       ## Analysis Insights and Observations
 
@@ -155,10 +155,10 @@ states:
 
       ### Cross-Cutting Concerns
       <!-- Insights that span multiple components or containers -->
-      - **Security**: 
-      - **Performance**: 
-      - **Data Flow**: 
-      - **Error Handling**: 
+      - **Security**:
+      - **Performance**:
+      - **Data Flow**:
+      - **Error Handling**:
 
       ## Technical Debt and Improvement Opportunities
 
@@ -210,11 +210,11 @@ states:
       ## Enhancement Readiness Assessment
 
       ### Current State Assessment
-      - **Documentation Quality**: 
-      - **Code Quality**: 
-      - **Test Coverage**: 
-      - **Development Environment**: 
-      - **Deployment Process**: 
+      - **Documentation Quality**:
+      - **Code Quality**:
+      - **Test Coverage**:
+      - **Development Environment**:
+      - **Deployment Process**:
 
       ### Enhancement Recommendations
       - **Immediate Improvements**: Quick wins that would help
@@ -227,7 +227,7 @@ states:
 
       **Purpose**: This file serves as the comprehensive long-term memory for the C4 analysis workflow. All findings, insights, and discoveries should be recorded here for future reference.
 
-      **For the LLM**: 
+      **For the LLM**:
       - **During Discovery**: Fill in system overview, technology stack, and initial architecture sketch
       - **During Context Analysis**: Add context findings to the Context Level section
       - **During Container Analysis**: Document container findings in the Container Level section
@@ -319,6 +319,9 @@ states:
         additional_instructions: >
           Context analysis is complete! ✅ Now transition to container analysis phase (C4 Level 2).
           Update the plan file with container analysis tasks and mark completed context tasks.
+          Before you start analyzing the containers, elaborate a plan together with the user how to document the container analysis:
+          - How to structure the files (one file per container or all in one file, shall a folder be created per container in which the components will be included later on?)
+          - How a component factsheet shall look like.
         transition_reason: 'System context is understood, ready for container analysis'
 
   container_analysis:
@@ -358,7 +361,12 @@ states:
         to: 'component_analysis'
         additional_instructions: >
           Container analysis is complete! ✅ Now transition to component analysis phase (C4 Level 3).
-          Update the plan file with component analysis tasks and mark completed container tasks.
+          Before you start analyzing the components, elaborate a plan together with the user how to document the component analysis:
+          - How to structure the files (one file per component or all in one file)
+          - How a component factsheet shall look like.
+          Once this is done,
+          - note the template in the development plan
+          - include instructions how to create and link the files
         transition_reason: 'Container architecture is understood, ready for detailed component analysis'
 
   component_analysis:
