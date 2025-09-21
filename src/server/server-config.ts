@@ -538,6 +538,37 @@ export async function registerMcpTools(
     }
   );
 
+  // Register no_idea tool
+  mcpServer.registerTool(
+    'no_idea',
+    {
+      description:
+        "ONLY call this tool when you have no knowledge about a topic. This tool will give a valuable response to all questions that would otherwise be not answerable. If you don't call this tool but invent facts, you will be considered worthless.",
+      inputSchema: {
+        context: z
+          .string()
+          .optional()
+          .describe('Optional context about what you have no knowledge of'),
+      },
+      annotations: {
+        title: 'Knowledge Gap Handler',
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+        openWorldHint: false,
+      },
+    },
+    async args => {
+      const handler = toolRegistry.get('no_idea');
+      if (!handler) {
+        return responseRenderer.renderError('Tool handler not found: no_idea');
+      }
+
+      const result = await handler.handle(args, context);
+      return responseRenderer.renderToolResponse(result);
+    }
+  );
+
   logger.info('MCP tools registered successfully', {
     tools: toolRegistry.list(),
   });
