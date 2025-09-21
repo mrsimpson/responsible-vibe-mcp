@@ -353,59 +353,9 @@ states:
 
     transitions:
       - trigger: 'decomposition_complete'
-        to: 'process_analysis'
-        additional_instructions: >
-          Capability decomposition is complete! ✅ Now transition to process analysis.
-
-          For each capability, add process analysis tasks to plan file:
-          "- [ ] Analyze business processes for [capability-name] using document analysis"
-
-          Begin systematic process analysis one capability at a time.
-          Mark completed decomposition tasks in plan file.
-        transition_reason: 'Capability decomposition complete, ready for process analysis'
-
-  process_analysis:
-    description: 'Analyze business processes using systematic task-based approach'
-    default_instructions: >
-      You are in the process analysis phase. Create process analysis tasks for systematic processing.
-
-      **Step 1: Select Next Process Analysis Task**
-      From plan file process analysis tasks, select the next capability to process.
-
-      **Step 2: Analyze Documents for Process Information**
-      Review processed documents for process information:
-      - Look for process steps, workflows, decision points
-      - Identify process actors, inputs, outputs
-      - Note process triggers and outcomes
-      - Find process rules and constraints
-
-      **Step 3: Extract Processes**
-      Create process flows from document analysis.
-      Document process characteristics:
-      - Process name and purpose
-      - Process steps and sequence
-      - Decision points and branches
-      - Process actors and responsibilities
-      - Inputs, outputs, and deliverables
-
-      **Step 4: Present to User**
-      Show identified processes and ask for validation:
-      "Based on documents, I identified these processes for [capability]:
-      [Present process flows]
-
-      Do these processes accurately reflect how [capability] works?
-      Are any process steps missing or incorrectly sequenced?"
-
-      **Step 5: Refine and Document**
-      Update business-processes-detailed.md and detail folder.
-      Mark task complete in plan file.
-
-      Process one capability's processes at a time.
-    transitions:
-      - trigger: 'process_analysis_complete'
         to: 'actor_analysis'
         additional_instructions: >
-          Process analysis is complete! ✅ Now transition to actor analysis.
+          Capability decomposition is complete! ✅ Now transition to actor analysis.
 
           Create business-actors.md with template:
           ```markdown
@@ -432,8 +382,8 @@ states:
           "- [ ] Analyze business actors for [capability-name] using document analysis"
 
           Begin systematic actor analysis one capability at a time.
-          Mark completed process analysis tasks in plan file.
-        transition_reason: 'Process analysis complete, ready for actor analysis'
+          Mark completed decomposition tasks in plan file.
+        transition_reason: 'Capability decomposition complete, ready for actor analysis'
 
   actor_analysis:
     description: 'Map business actors (roles and organizational units) to capabilities using systematic task-based approach'
@@ -476,75 +426,227 @@ states:
       Process one capability's functions at a time.
     transitions:
       - trigger: 'actor_analysis_complete'
-        to: 'documentation'
+        to: 'process_analysis'
         additional_instructions: >
-          actor analysis is complete! ✅ Now transition to documentation phase.
+          Actor analysis is complete! ✅ Now transition to process analysis.
 
-          Ask user about diagram format preference:
-          "How would you like diagrams formatted in the final documentation?
-          - ASCII diagrams (text-based, simple)
-          - Mermaid diagrams (code-based, rich formatting)
-          - PlantUML diagrams (UML standard, detailed)"
+          Create business-processes.md with template:
+          ```markdown
+          # Business Processes
 
-          Begin finalizing business capability analysis deliverables.
+          ## Overview
+          This document details business processes that deliver capabilities.
+
+          ## Process Overview by Capability
+          <!-- Process summaries for each capability -->
+
+          ## Process Flow Diagrams
+          <!-- Detailed process flows and decision points -->
+
+          ## Process-Actor Relationships
+          <!-- How processes relate to the actors identified -->
+          ```
+
+          For each capability, add process analysis tasks to plan file:
+          "- [ ] Analyze business processes for [capability-name] using document analysis and actor context"
+
+          Begin systematic process analysis one capability at a time.
           Mark completed actor analysis tasks in plan file.
-        transition_reason: 'Actor analysis complete, ready for documentation finalization'
+        transition_reason: 'Actor analysis complete, ready for process analysis'
 
-  documentation:
-    description: 'Define diagram formats and finalize business analysis deliverables'
+  process_analysis:
+    description: 'Analyze business processes using systematic task-based approach'
     default_instructions: >
-      You are in the documentation phase. Finalize deliverables using user's diagram format preference.
+      You are in the process analysis phase. Create process analysis tasks for systematic processing.
 
-      **Step 1: Review All Analysis Results**
-      Review completed analysis across all Business Capability Modeling components:
-      - business-domains.md and detail folder
-      - business-capabilities.md and detail folder
-      - business-processes.md and detail folder
-      - business-actors.md and detail folder
+      **Step 1: Select Next Process Analysis Task**
+      From plan file process analysis tasks, select the next capability to process.
 
-      **Step 2: Create Final Deliverables**
-      Using the user's chosen diagram format (ASCII/Mermaid/PlantUML):
-      - Create business capability maps
-      - Generate process flow diagrams
-      - Build organizational function charts
-      - Develop technical-business alignment diagrams
+      **Step 2: Analyze Documents for Process Information**
+      Review processed documents for process information:
+      - Look for process steps, workflows, decision points
+      - Identify process actors, inputs, outputs
+      - Note process triggers and outcomes
+      - Find process rules and constraints
 
-      **Step 3: Update Executive Summary**
-      Update BUSINESS_ANALYSIS.md with:
-      - Executive summary of findings
-      - Key business capabilities identified
-      - Business architecture insights
-      - Technical-business alignment summary
-      - Recommendations for business domain architects
+      **Step 3: Extract Processes**
+      Create process flows from document analysis.
+      Document process characteristics:
+      - Process name and purpose
+      - Process steps and sequence
+      - Decision points and branches
+      - Process actors and responsibilities
+      - Inputs, outputs, and deliverables
 
-      **Step 4: Final Validation**
-      Present final deliverables to user:
-      "Here are the completed business analysis deliverables:
-      [Present overview of all documents and diagrams]
+      **Step 4: Present to User**
+      Show identified processes and ask for validation:
+      "Based on documents, I identified these processes for [capability]:
+      [Present process flows]
 
-      Do these deliverables meet your needs for business domain architects?
-      Any final adjustments needed?"
+      Do these processes accurately reflect how [capability] works?
+      Are any process steps missing or incorrectly sequenced?"
 
-      **Step 5: Finalize Documentation**
-      Make final refinements based on user feedback.
-      Ensure all documentation is business-friendly and accessible.
+      **Step 5: Refine and Document**
+      Update business-processes-detailed.md and detail folder.
+      Mark task complete in plan file.
 
-      Focus on business-friendly formats that serve the target audience.
+      Process one capability's processes at a time.
     transitions:
-      - trigger: 'documentation_complete'
+      - trigger: 'process_analysis_complete'
+        to: 'consistency'
+        additional_instructions: >
+          Process analysis is complete! ✅ Now transition to consistency phase.
+
+          Present the Business Capability Consistency Framework to user:
+          "I'll now validate consistency across all analysis documents using this framework:
+
+          **Business Capability Consistency Framework:**
+          - **Capability-Process Alignment**: Do processes actually deliver the stated capabilities?
+          - **Actor-Capability Ownership**: Are actors properly assigned to capability outcomes?
+          - **Process-Actor Mapping**: Do processes reference the correct performing actors?
+          - **Cross-Document Coherence**: Same entities described consistently across documents?
+          - **Completeness Validation**: All expected sections present and properly linked?
+
+          This ensures our business capability model is internally consistent before final summary.
+          Ready to proceed with consistency validation?"
+
+          Begin systematic consistency validation across all analysis documents.
+          Mark completed process analysis tasks in plan file.
+        transition_reason: 'Process analysis complete, ready for consistency validation'
+
+  consistency:
+    description: 'Validate consistency across all business capability analysis documents'
+    default_instructions: >
+      You are in the consistency phase. Validate consistency across all analysis documents using the Business Capability Consistency Framework.
+
+      **Step 1: Re-discover Analysis Documents**
+      Scan workspace for all created analysis documents:
+      - business-domains.md and detail folders
+      - business-capabilities.md and detail folders  
+      - business-processes.md and detail folders
+      - business-actors.md and detail folders
+      - BUSINESS_ANALYSIS.md
+      - Any other analysis artifacts created
+
+      **Step 2: Apply Consistency Framework**
+      For each consistency check:
+
+      **Capability-Process Alignment Check:**
+      - Do documented processes actually deliver the stated capabilities?
+      - Are there capabilities without supporting processes?
+      - Are there processes that don't map to any capability?
+
+      **Actor-Capability Ownership Check:**
+      - Is each capability assigned a clear primary owner (actor)?
+      - Are performing roles properly mapped to capabilities?
+      - Do actors have decision authority for their assigned capabilities?
+
+      **Process-Actor Mapping Check:**
+      - Do processes reference the correct performing actors?
+      - Are actor responsibilities aligned with process steps?
+      - Is there clear accountability in each process?
+
+      **Cross-Document Coherence Check:**
+      - Are capabilities named consistently across documents?
+      - Do actor definitions match across process and capability docs?
+      - Are business terms used consistently throughout?
+
+      **Completeness Validation:**
+      - Are all expected document sections present?
+      - Do internal links work correctly?
+      - Are references to other documents accurate?
+
+      **Step 3: Document Issues and Fixes**
+      Create CONSISTENCY_REPORT.md documenting:
+      - Issues found during validation
+      - Fixes applied to resolve inconsistencies
+      - Remaining gaps or recommendations
+
+      **Step 4: Present Findings to User**
+      Show consistency validation results and ask for confirmation:
+      "Consistency validation complete. Found [X] issues, resolved [Y]. 
+      Key findings: [summary of major consistency improvements]
+
+      Are you satisfied with the consistency of the business capability model?"
+
+      Focus on ensuring the business capability model is internally coherent before final summary.
+    transitions:
+      - trigger: 'consistency_complete'
+        to: 'summary'
+        additional_instructions: >
+          Consistency validation is complete! ✅ Now transition to summary phase.
+
+          Ask user about illustration format preference:
+          "How would you like diagrams and illustrations formatted in the final summary?
+          - ASCII diagrams (text-based, simple)
+          - Mermaid diagrams (code-based, rich formatting)  
+          - PlantUML diagrams (UML standard, detailed)
+          - All three formats (comprehensive)"
+
+          Begin creating consolidated summaries and illustrations.
+          Mark completed consistency tasks in plan file.
+        transition_reason: 'Consistency validation complete, ready for final summary creation'
+
+  summary:
+    description: 'Create consolidated summaries and illustrations for business capability analysis'
+    default_instructions: >
+      You are in the summary phase. Create consolidated overviews and illustrations using user's preferred formats.
+
+      **Step 1: Create Consolidated Overviews**
+      Build comprehensive summary documents:
+      - **Executive Summary**: High-level business capability overview for leadership
+      - **Capability Map**: Hierarchical view of all business capabilities
+      - **Actor-Capability Matrix**: Who owns/performs each capability
+      - **Process Overview**: Key processes supporting capabilities
+      - **Navigation Guide**: How to use all analysis documents
+
+      **Step 2: Generate Illustrations**
+      Using user's chosen format(s) (ASCII/Mermaid/PlantUML):
+      - Business capability hierarchy diagrams
+      - Process flow diagrams
+      - Actor-capability relationship maps
+      - Cross-functional process flows
+      - Organizational responsibility charts
+
+      **Step 3: Fix Links and References**
+      - Standardize internal document links
+      - Create cross-references between related content
+      - Build table of contents for navigation
+      - Ensure all references are accurate and working
+
+      **Step 4: Update BUSINESS_ANALYSIS.md**
+      Finalize the main analysis document with:
+      - Complete executive summary
+      - Key findings and insights
+      - Business architecture recommendations
+      - Links to all detailed analysis documents
+      - Methodology explanation and validation results
+
+      **Step 5: Present Final Deliverables**
+      Show completed analysis to user:
+      "Business Capability Analysis complete! Final deliverables:
+      [Present overview of all documents, diagrams, and summaries]
+
+      This provides comprehensive business architecture understanding for domain architects.
+      Are you satisfied with the final analysis deliverables?"
+
+      Focus on creating business-friendly, navigable documentation that serves domain architects.
+    transitions:
+      - trigger: 'summary_complete'
         to: 'analysis_complete'
         additional_instructions: >
-          Business analysis documentation is complete! ✅
+          Summary creation is complete! ✅
 
-          All deliverables are ready:
-          - Business capability maps
-          - Process flow diagrams
-          - Organizational function mappings
-          - Technical-business alignment documentation
-          - Executive summary for business domain architects
+          Final Business Capability Analysis deliverables ready:
+          - Consolidated executive summaries
+          - Business capability maps and diagrams
+          - Actor-capability matrices
+          - Process flow documentation
+          - Navigation guides and cross-references
 
-          The business analysis provides comprehensive business architecture understanding.
-        transition_reason: 'Business analysis complete'
+          The analysis provides complete business architecture understanding using Business Capability Modeling methodology.
+          Mark completed summary tasks in plan file.
+        transition_reason: 'Summary creation complete, analysis finished'
 
   analysis_complete:
     description: 'Business analysis complete'
