@@ -102,6 +102,7 @@ Create a new workflow for business-perspective analysis of software systems that
 - [x] Compare implementation against documentation
 - [x] Final validation and testing
 - [x] Prepare for delivery
+- [x] Improve document consolidation phase by splitting into two phases
 
 ### Completed
 - [x] No debug output or temporary code found - implementation was clean
@@ -110,6 +111,7 @@ Create a new workflow for business-perspective analysis of software systems that
 - [x] All documentation is accurate and reflects final state
 - [x] Workflow structure validated and tested
 - [x] Ready for production delivery
+- [x] Split documents_consolidation into basic summarization and business_content_analysis phases
 
 ## Key Decisions
 - **Workflow Approach**: Using EPCC methodology to develop the business-analysis workflow
@@ -128,6 +130,7 @@ Create a new workflow for business-perspective analysis of software systems that
 - **Task-Based Processing**: LLM creates summarization tasks in plan file for systematic processing
 - **Document-Driven Approach**: Start capability identification by analyzing processed documents, then validate with user
 - **Phase Transition Optimization**: Move task creation and template creation into transition additional_instructions
+- **Document Consolidation Split**: Split documents_consolidation into basic summarization and separate business_content_analysis phase for explicit task creation
 
 ## Notes
 - The c4-analysis workflow focuses on technical architecture using C4 methodology (Context → Container → Component → Code)

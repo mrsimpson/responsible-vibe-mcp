@@ -32,25 +32,13 @@ states:
       Ask user to identify and provide available documents:
       - Business process documentation
       - Organizational charts
-      - System documentation  
+      - System documentation
       - Existing c4-analysis results
       - Business requirements documents
 
-      **Step 2: Create Standardized Business Capability Modeling Structure**
-      Always create this structure:
-      - BUSINESS_ANALYSIS.md (main overview)
-      - business-domains.md (overview)
-      - business-capabilities.md (overview)
-      - business-services.md (overview)
-      - business-processes.md (overview)
-      - business-actors.md (overview)
-      - business-analysis/business-domains/ (folder for details)
-      - business-analysis/business-capabilities/ (folder for details)
-      - business-analysis/business-services/ (folder for details)
-      - business-analysis/business-processes/ (folder for details)
-      - business-analysis/business-actors/ (folder for details)
+      IMPORTANT: In this phase, do not read the documents yet!
 
-      **Step 3: Create Document Processing Tasks**
+      **Step 2: Create Document Processing Tasks**
       For each gathered document, add task to plan file:
       "- [ ] Summarize [document-name] using structured chapter-by-chapter approach"
 
@@ -60,6 +48,126 @@ states:
         to: 'documents_consolidation'
         additional_instructions: >
           Document discovery is complete! ✅ Now transition to documents consolidation phase.
+
+          Begin systematic document processing using structured summarization technique.
+          Mark completed discovery tasks in plan file.
+        transition_reason: 'Documents gathered and Business Capability Modeling structure created, ready for consolidation'
+
+  documents_consolidation:
+    description: 'Process and consolidate gathered documents using structured summarization'
+    default_instructions: >
+      You are in the documents consolidation phase. Process each document systematically using basic structured summarization.
+
+      **Step 1: Apply Structured Summarization Technique**
+      For each document, use this approach:
+
+      1. Read document chapter by chapter
+      2. Maintain original hierarchical structure
+      3. Condense content while preserving key information
+      4. Create [document-name]-processed.md file
+      5. Mark task complete in plan file
+
+      **Summarization Guidelines:**
+      - Create structured summary based exclusively on source document information
+      - Identify chapters and hierarchy levels systematically
+      - Summarize level-by-level into [document-name]-processed.md
+      - Write chapter summaries in natural language (no bullet points)
+      - Include information about potential capabilities, services, processes, or actors
+      - Maintain folder structure if documents have associated folders
+
+      **Step 2: Create Bibliography**
+      Create BIBLIOGRAPHY.md with:
+      - "sources" section listing all processed documents
+      - "terms" section with important business terms and their source references
+
+      IMPORTANT: This phase focuses only on basic document processing. Business analysis happens in the next phase.
+    transitions:
+      - trigger: 'consolidation_complete'
+        to: 'business_content_analysis'
+        additional_instructions: >
+          Documents consolidation is complete! ✅ Now transition to business content analysis.
+
+          Begin identifying business-relevant chapters for detailed analysis.
+          Mark completed consolidation tasks in plan file.
+        transition_reason: 'Basic document processing complete, ready for business content analysis'
+
+  business_content_analysis:
+    description: 'Identify and analyze business-relevant content from processed documents'
+    default_instructions: >
+      You are in the business content analysis phase. Focus on identifying and analyzing business-relevant content.
+
+      **Step 1: Review Processed Documents**
+      Review all [document-name]-processed.md files from consolidation phase.
+      Identify chapters that contain business-relevant content:
+      - Business processes and workflows
+      - Organizational roles and responsibilities
+      - Business capabilities and functions
+      - Services and customer interactions
+      - Business rules and policies
+
+      **Step 2: Create Business Analysis Tasks**
+      For each business-relevant chapter identified, add a task to the plan file:
+      "- [ ] Create detailed business analysis of [document-name] Chapter [X]: [chapter-title]"
+
+      IMPORTANT: You MUST add these tasks to the plan file before proceeding.
+
+      **Step 3: Execute Business Analysis Tasks**
+      For each business analysis task:
+      1. Read the specific chapter in detail
+      2. Extract business information focusing on:
+         - What business capabilities are mentioned
+         - What services or processes are described
+         - Who (roles/actors) performs the work
+         - Why (business value/purpose) it exists
+      3. Create detailed business summary emphasizing WHAT, WHY, WHO (not HOW)
+      4. Mark task complete in plan file
+
+      **Step 4: Update Bibliography**
+      Update BIBLIOGRAPHY.md with business terms found during detailed analysis:
+      - check whether the "sources" section already contains an entry it. If not: create one (max 5 letters in brackets).
+      - In the "terms" section, check whether there is an entry for it - If not, create an entry for It
+      - add a reference to the source + chapter
+
+      --- sample 1 ---
+
+      Document "operations manual" reads about "payment processing" in Chapter 5.2
+
+      => in BIBLIOGRAPHY.md
+
+      # Sources
+
+      - Operations Manual [OPMAN]
+
+      # Terms
+
+      - payment processing
+        - OPMAN, 5.2
+
+      --- end of sample 1 ---
+
+      --- sample 2 ---
+
+      Document "requirements.md" reads about "payment processing" in Chapter 1.2.1
+
+      => in BIBLIOGRAPHY.md
+
+      # Sources
+
+      - Requirements [REQ]
+
+      # Terms
+
+      - payment processing
+        - REQ, 1.2.1
+
+      --- end of sample 2 ---
+
+      Process business analysis tasks systematically, one at a time.
+    transitions:
+      - trigger: 'business_analysis_complete'
+        to: 'capability_identification'
+        additional_instructions: >
+          Business content analysis is complete! ✅ Now transition to capability identification.
 
           Create BUSINESS_ANALYSIS.md with the following template content:
           ```markdown
@@ -95,23 +203,6 @@ states:
 
           ## Recommendations
           <!-- Business capability recommendations -->
-          ```
-
-          Create business-services-catalog.md with template:
-          ```markdown
-          # Business Services Catalog
-
-          ## Overview
-          This document provides an overview of business services mapped to capabilities.
-
-          ## Business Domains
-          <!-- High-level business domains -->
-
-          ## Business Capabilities by Domain
-          <!-- Capabilities organized by domain -->
-
-          ## Service Mappings
-          <!-- Services supporting each capability -->
           ```
 
           Create business-processes-detailed.md with template:
@@ -165,62 +256,22 @@ states:
           <!-- Business value of each technical component -->
           ```
 
-          Begin systematic document processing using structured summarization technique.
-          Mark completed discovery tasks in plan file.
-        transition_reason: 'Documents gathered and Business Capability Modeling structure created, ready for consolidation'
-
-  documents_consolidation:
-    description: 'Process and consolidate gathered documents using structured summarization'
-    default_instructions: >
-      You are in the documents consolidation phase. Process each document systematically using structured summarization.
-
-      **Step 1: Review Summarization Tasks**
-      Check plan file for document processing tasks created in discovery phase.
-      Work through each task systematically.
-
-      **Step 2: Apply Structured Summarization Technique**
-      For each document, use this approach:
-      "Create a structured summary based exclusively on the source document information. 
-      Examine the chapters and hierarchy levels systematically, and summarize them 
-      level-by-level into [document-name]-processed.md"
-
-      **Process:**
-      1. Read document chapter by chapter
-      2. Maintain original hierarchical structure
-      3. Condense content while preserving key information
-      4. Create [document-name]-processed.md file
-      5. Mark task complete in plan file
-
-      **Step 3: Categorize Processed Content**
-      As you process documents, start categorizing content into Business Capability Modeling components:
-      - Business domain information → business-domains/
-      - Business capability information → business-capabilities/
-      - Business services information → business-services/
-      - Process descriptions → business-processes/
-      - Organizational/role info → business-actors/
-
-      **Step 4: Populate Business Capability Modeling Structure**
-      Place processed content into appropriate Business Capability Modeling folders and update overview files.
-
-      **Step 5: Ask User for Priorities**
-      After processing all documents, ask user:
-      "Which business areas or capabilities should we focus on first for the business architecture analysis?"
-
-      Update plan file with consolidation progress and mark completed tasks.
-    transitions:
-      - trigger: 'consolidation_complete'
-        to: 'capability_identification'
-        additional_instructions: >
-          Documents consolidation is complete! ✅ Now transition to capability identification.
+          Create Standardized Business Capability Modeling folder Structure
+            - business-analysis/business-domains/ (folder for details)
+            - business-analysis/business-capabilities/ (folder for details)
+            - business-analysis/business-processes/ (folder for details)
+            - business-analysis/business-actors/ (folder for details)
 
           Begin analyzing processed documents to identify business capabilities and domains.
-          Mark completed consolidation tasks in plan file.
-        transition_reason: 'Document processing complete, ready for capability analysis'
+          Mark completed business analysis tasks in plan file.
+        transition_reason: 'Business content analysis complete, ready for capability identification'
 
   capability_identification:
     description: 'Identify business capabilities from processed documents'
     default_instructions: >
       You are in the capability identification phase. Analyze processed documents to identify business capabilities.
+
+      IMPORTANT: ALWAYS reference the existing documents!
 
       **Step 1: Analyze Processed Documents**
       Review all [document-name]-processed.md files from consolidation phase.
@@ -239,7 +290,7 @@ states:
       **Step 3: Identify Business Domains**
       Group capabilities into logical business domains:
       - Customer-related capabilities → Customer Management
-      - Order-related capabilities → Order Management  
+      - Order-related capabilities → Order Management
       - Financial capabilities → Financial Management
       - etc.
 
@@ -248,14 +299,13 @@ states:
       "Based on the documents, I identified these business domains and capabilities:
       [Present structured list]
 
-      Do these align with your understanding? 
+      Do these align with your understanding?
       Are there any capabilities missing or incorrectly categorized?"
 
       **Step 5: Refine with User Input**
       Adjust the capability model based on user feedback.
-      Document final capability list in business-services-catalog.md.
+      Document final capability list in business-capabilities.md.
 
-      Focus on document-driven discovery first, then validate with user knowledge.
     transitions:
       - trigger: 'capabilities_identified'
         to: 'capability_decomposition'
@@ -274,22 +324,21 @@ states:
     default_instructions: >
       You are in the capability decomposition phase. Analyze documents to identify sub-capabilities, then validate with user.
 
-      **Step 1: Select Next Capability**
-      From plan file decomposition tasks, select the next capability to decompose.
+      IMPORTANT: ALWAYS reference the existing documents!
 
-      **Step 2: Analyze Documents for Sub-capabilities**
-      Review processed documents for the selected capability:
+      **Step 1: Analyze Documents for Sub-capabilities**
+      Review processed documents for the next unprocessed capability:
       - Look for detailed activities mentioned within this capability
       - Identify specific processes or functions described
       - Find decision points and workflow steps
       - Note different outcomes or deliverables mentioned
 
-      **Step 3: Extract Potential Sub-capabilities**
+      **Step 2: Extract Potential Sub-capabilities**
       From document analysis, create initial list of sub-capabilities.
-      Use Business Capability Modeling naming: [Verb] + [Business Object] 
+      Use Business Capability Modeling naming: [Verb] + [Business Object]
       Example: For "Customer Management" → "Verify Customer Identity", "Setup Customer Account", "Maintain Customer Data"
 
-      **Step 4: Present Findings to User**
+      **Step 3: Present Findings to User**
       Show user the identified sub-capabilities:
       "Based on the documents, I identified these sub-capabilities for [capability]:
       [Present structured list]
@@ -297,73 +346,23 @@ states:
       Do these sub-capabilities accurately reflect [capability]?
       Are any activities missing or incorrectly categorized?"
 
-      **Step 5: Refine with User Input**
+      **Step 4: Refine with User Input**
       Adjust the sub-capability model based on user feedback.
-      Document refined decomposition in business-services-catalog/ detail folder.
+      Document refined decomposition in business-capabilities/ detail folder.
       Mark capability as complete and ask: "Ready for the next capability?"
 
-      Focus on ONE capability per session using document-driven discovery.
     transitions:
       - trigger: 'decomposition_complete'
-        to: 'service_mapping'
-        additional_instructions: >
-          Capability decomposition is complete! ✅ Now transition to service mapping.
-
-          For each capability (and sub-capabilities), add service mapping tasks to plan file:
-          "- [ ] Map business services for [capability-name] using document analysis"
-
-          Begin systematic service mapping one capability at a time.
-          Mark completed decomposition tasks in plan file.
-        transition_reason: 'Capability decomposition complete, ready for service mapping'
-
-  service_mapping:
-    description: 'Map business services to capabilities using systematic task-based approach'
-    default_instructions: >
-      You are in the service mapping phase. Create service mapping tasks for systematic processing.
-
-      **Step 1: Select Next Service Mapping Task**
-      From plan file service mapping tasks, select the next capability to process.
-
-      **Step 2: Analyze Documents for Services**
-      Review processed documents for the capability:
-      - Look for services, APIs, or interfaces mentioned
-      - Identify service consumers and providers
-      - Note service interactions and dependencies
-      - Find service level agreements or requirements
-
-      **Step 3: Extract Services**
-      Create initial service list from document analysis.
-      Document service characteristics:
-      - Service name and purpose
-      - Service consumers (who uses it)
-      - Service providers (who delivers it)
-      - Service interfaces and protocols
-
-      **Step 4: Present to User**
-      Show identified services and ask for validation:
-      "Based on documents, I identified these services for [capability]:
-      [Present service list]
-
-      Do these services accurately support [capability]?
-      Are any services missing or incorrectly mapped?"
-
-      **Step 5: Refine and Document**
-      Update business-services-catalog.md and detail folder.
-      Mark task complete in plan file.
-
-      Process one service mapping task at a time.
-    transitions:
-      - trigger: 'service_mapping_complete'
         to: 'process_analysis'
         additional_instructions: >
-          Service mapping is complete! ✅ Now transition to process analysis.
+          Capability decomposition is complete! ✅ Now transition to process analysis.
 
           For each capability, add process analysis tasks to plan file:
           "- [ ] Analyze business processes for [capability-name] using document analysis"
 
           Begin systematic process analysis one capability at a time.
-          Mark completed service mapping tasks in plan file.
-        transition_reason: 'Service mapping complete, ready for process analysis'
+          Mark completed decomposition tasks in plan file.
+        transition_reason: 'Capability decomposition complete, ready for process analysis'
 
   process_analysis:
     description: 'Analyze business processes using systematic task-based approach'
@@ -479,7 +478,7 @@ states:
       - trigger: 'actor_analysis_complete'
         to: 'documentation'
         additional_instructions: >
-          Function mapping is complete! ✅ Now transition to documentation phase.
+          actor analysis is complete! ✅ Now transition to documentation phase.
 
           Ask user about diagram format preference:
           "How would you like diagrams formatted in the final documentation?
@@ -488,7 +487,7 @@ states:
           - PlantUML diagrams (UML standard, detailed)"
 
           Begin finalizing business capability analysis deliverables.
-          Mark completed function mapping tasks in plan file.
+          Mark completed actor analysis tasks in plan file.
         transition_reason: 'Actor analysis complete, ready for documentation finalization'
 
   documentation:
@@ -500,7 +499,6 @@ states:
       Review completed analysis across all Business Capability Modeling components:
       - business-domains.md and detail folder
       - business-capabilities.md and detail folder
-      - business-services.md and detail folder
       - business-processes.md and detail folder
       - business-actors.md and detail folder
 
@@ -536,11 +534,11 @@ states:
       - trigger: 'documentation_complete'
         to: 'analysis_complete'
         additional_instructions: >
-          Business analysis documentation is complete! ✅ 
+          Business analysis documentation is complete! ✅
 
           All deliverables are ready:
           - Business capability maps
-          - Process flow diagrams  
+          - Process flow diagrams
           - Organizational function mappings
           - Technical-business alignment documentation
           - Executive summary for business domain architects
