@@ -7,6 +7,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { createLogger } from '../../logger.js';
 import {
   ResourceHandler,
@@ -71,7 +72,7 @@ export class WorkflowResourceHandler implements ResourceHandler {
         // Handle predefined workflows
         // Get the workflows directory path - more reliable approach
         const currentFileUrl = import.meta.url;
-        const currentFilePath = new URL(currentFileUrl).pathname;
+        const currentFilePath = fileURLToPath(currentFileUrl);
 
         // Navigate from the compiled location to the project root
         // From dist/server/resource-handlers/workflow-resource.js -> project root

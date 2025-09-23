@@ -7,6 +7,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { createRequire } from 'node:module';
+import { fileURLToPath } from 'node:url';
 import { createLogger } from './logger.js';
 import { DEFAULT_WORKFLOW_NAME } from './constants.js';
 import { StateMachineLoader } from './state-machine-loader.js';
@@ -188,7 +189,7 @@ export class WorkflowManager {
    */
   private findWorkflowsDirectory(): string | null {
     const currentFileUrl = import.meta.url;
-    const currentFilePath = new URL(currentFileUrl).pathname;
+    const currentFilePath = fileURLToPath(currentFileUrl);
     const strategies: string[] = [];
 
     // Strategy 1: Relative to current file (development and direct npm scenarios)
