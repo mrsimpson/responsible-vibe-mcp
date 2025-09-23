@@ -7,6 +7,7 @@
 import fs from 'node:fs';
 import yaml from 'js-yaml';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { createLogger } from './logger.js';
 import { YamlStateMachine, YamlTransition } from './state-machine-types.js';
 
@@ -74,7 +75,7 @@ export class StateMachineLoader {
     // Fall back to waterfall workflow as default
     // Use import.meta.url to get the current file's path in ESM
     const currentFileUrl = import.meta.url;
-    const currentFilePath = new URL(currentFileUrl).pathname;
+    const currentFilePath = fileURLToPath(currentFileUrl);
     const projectRoot = path.dirname(path.dirname(currentFilePath));
     const defaultFilePath = path.join(
       projectRoot,
