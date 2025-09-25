@@ -246,8 +246,13 @@ class OpencodeConfigGenerator extends ConfigGenerator {
             'Responsible vibe development agent with structured workflows',
           mode: 'primary',
           prompt: systemPrompt,
-          permissions: {
-            'responsible-vibe-mcp*proceed_to_phase': 'ask',
+          tools: {
+            'responsible-vibe-mcp*': true,
+          },
+          permission: {
+            'responsible-vibe-mcp_reset_development': 'ask',
+            'responsible-vibe-mcp_start_development': 'ask',
+            'responsible-vibe-mcp_proceed_to_phase': 'ask',
           },
         },
       },
