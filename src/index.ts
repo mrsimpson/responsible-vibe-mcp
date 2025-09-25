@@ -65,7 +65,7 @@ function parseCliArgs(): { shouldStartServer: boolean } {
     if (!agent) {
       console.error('❌ Error: --generate-config requires an agent parameter');
       console.error('Usage: --generate-config <agent>');
-      console.error('Supported agents: amazonq-cli, claude, gemini');
+      console.error('Supported agents: amazonq-cli, claude, gemini, opencode');
       process.exit(1);
     }
     handleGenerateConfig(agent);
@@ -115,7 +115,7 @@ OPTIONS:
   --system-prompt               Show the system prompt for LLM integration
   --visualize, --viz            Start the interactive workflow visualizer
   --generate-config <agent>     Generate configuration files for AI coding agents
-                                Supported agents: amazonq-cli, claude, gemini
+                                 Supported agents: amazonq-cli, claude, gemini, opencode
 
 ENVIRONMENT VARIABLES:
   PROJECT_PATH    Set the project directory for custom workflow discovery
@@ -137,6 +137,7 @@ CONFIGURATION GENERATOR:
   Amazon Q CLI: --generate-config amazonq-cli  (generates .amazonq/cli-agents/vibe.json)
   Claude Code:  --generate-config claude       (generates CLAUDE.md, .mcp.json, settings.json)
   Gemini CLI:   --generate-config gemini       (generates settings.json, GEMINI.md)
+  OpenCode CLI: --generate-config opencode     (generates opencode.json)
 
   Files are generated in the current directory with pre-configured settings
   for the responsible-vibe-mcp server and default tool permissions.

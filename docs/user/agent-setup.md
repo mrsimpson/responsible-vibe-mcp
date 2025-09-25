@@ -38,6 +38,14 @@ npx responsible-vibe-mcp --generate-config gemini
 
 **Creates**: `settings.json`, `GEMINI.md`
 
+### OpenCode CLI
+
+```bash
+npx responsible-vibe-mcp --generate-config opencode
+```
+
+**Creates**: `opencode.json`
+
 ## Manual Setup
 
 If you prefer manual configuration or use a different agent:
@@ -173,6 +181,20 @@ npx responsible-vibe-mcp --generate-config gemini
 1. Configure system prompt in Gemini settings
 2. Set up MCP server connection
 3. Ensure tool permissions are granted
+
+### OpenCode CLI
+
+**Automated Setup**:
+
+```bash
+npx responsible-vibe-mcp --generate-config opencode
+```
+
+**Manual Setup**:
+
+1. Create `opencode.json` with MCP server configuration
+2. System prompt is automatically provided via MCP
+3. Tool permissions are configured to prevent automatic phase transitions
 
 ## Custom Project Path
 

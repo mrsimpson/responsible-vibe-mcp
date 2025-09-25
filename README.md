@@ -30,6 +30,9 @@ npx responsible-vibe-mcp --generate-config claude
 
 # For Gemini CLI
 npx responsible-vibe-mcp --generate-config gemini
+
+# For OpenCode CLI
+npx responsible-vibe-mcp --generate-config opencode
 ```
 
 This automatically creates all necessary configuration files with the correct system prompt and MCP server settings.

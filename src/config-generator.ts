@@ -223,6 +223,42 @@ ${allowedTools.map(tool => `- ${tool}`).join('\n')}
 }
 
 /**
+ * OpenCode Configuration Generator
+ * Generates opencode.json with agent configuration and MCP server setup
+ */
+class OpencodeConfigGenerator extends ConfigGenerator {
+  async generate(outputDir: string): Promise<void> {
+    const systemPrompt = this.getSystemPrompt();
+
+    // Generate opencode.json configuration with correct MCP format
+    const config = {
+      $schema: 'https://opencode.ai/config.json',
+      mcp: {
+        'responsible-vibe-mcp': {
+          command: ['npx', 'responsible-vibe-mcp'],
+          type: 'local',
+          enabled: true,
+        },
+      },
+      agent: {
+        vibe: {
+          description:
+            'Responsible vibe development agent with structured workflows',
+          mode: 'primary',
+          prompt: systemPrompt,
+          permissions: {
+            'responsible-vibe-mcp*proceed_to_phase': 'ask',
+          },
+        },
+      },
+    };
+
+    const configPath = join(outputDir, 'opencode.json');
+    await this.writeFile(configPath, JSON.stringify(config, null, 2));
+  }
+}
+
+/**
  * Factory class for creating configuration generators
  */
 class ConfigGeneratorFactory {
@@ -234,9 +270,11 @@ class ConfigGeneratorFactory {
         return new ClaudeConfigGenerator();
       case 'gemini':
         return new GeminiConfigGenerator();
+      case 'opencode':
+        return new OpencodeConfigGenerator();
       default:
         throw new Error(
-          `Unsupported agent: ${agent}. Supported agents: amazonq-cli, claude, gemini`
+          `Unsupported agent: ${agent}. Supported agents: amazonq-cli, claude, gemini, opencode`
         );
     }
   }
