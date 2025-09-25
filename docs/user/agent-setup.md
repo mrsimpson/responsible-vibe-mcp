@@ -46,6 +46,8 @@ npx responsible-vibe-mcp --generate-config opencode
 
 **Creates**: `opencode.json`
 
+_Limitation: Until [`#1961`](https://github.com/sst/opencode/issues/1961) is resolved, permissions to ask the user before executing proceed_to_phase will not be respected. Thus, RV MCP in OpenCode is currently a bit ... stressful_
+
 ## Manual Setup
 
 If you prefer manual configuration or use a different agent:
