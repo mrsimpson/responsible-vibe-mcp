@@ -304,6 +304,24 @@ Project Path → Branch Detection → Plan File Path → Content Generation → 
 - Separate development contexts for different features
 - Integration with existing git workflows
 
+### 6. **Flexible Documentation Architecture**
+
+- **Optional Documentation**: Workflows can specify whether formal documentation is required
+- **Conditional References**: Workflows adapt instructions based on document availability
+- **Workflow-Specific Requirements**: `requiresDocumentation` metadata flag controls documentation enforcement
+- **Backward Compatibility**: Existing workflows default to optional documentation
+
+## Optional Documentation Architecture
+
+The system supports flexible documentation requirements to accommodate both comprehensive and lightweight development approaches:
+
+### Documentation Requirement Levels
+
+| **Workflow Type** | **requiresDocumentation** | **Behavior**                                       | **Examples**                       |
+| ----------------- | ------------------------- | -------------------------------------------------- | ---------------------------------- |
+| **Comprehensive** | `true`                    | Documentation setup required before workflow start | greenfield, waterfall, c4-analysis |
+| **Lightweight**   | `false` (default)         | Skip documentation setup, proceed directly         | epcc, minor, bugfix                |
+
 ## Scalability Considerations
 
 ### 1. **Multi-Project Support**

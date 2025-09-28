@@ -142,6 +142,28 @@ export async function initializeServerComponents(
 }
 
 /**
+ * Helper function to create tool handlers with consistent error handling
+ */
+function createToolHandler(
+  toolName: string,
+  toolRegistry: ToolRegistry,
+  responseRenderer: ResponseRenderer,
+  context: ServerContext
+) {
+  return async (args: unknown) => {
+    const handler = toolRegistry.get(toolName);
+    if (!handler) {
+      return responseRenderer.renderError(
+        `Tool handler not found: ${toolName}`
+      );
+    }
+
+    const result = await handler.handle(args, context);
+    return responseRenderer.renderToolResponse(result);
+  };
+}
+
+/**
  * Register MCP tools with the server
  */
 export async function registerMcpTools(
@@ -197,17 +219,7 @@ export async function registerMcpTools(
         openWorldHint: false,
       },
     },
-    async args => {
-      const handler = toolRegistry.get('whats_next');
-      if (!handler) {
-        return responseRenderer.renderError(
-          'Tool handler not found: whats_next'
-        );
-      }
-
-      const result = await handler.handle(args, context);
-      return responseRenderer.renderToolResponse(result);
-    }
+    createToolHandler('whats_next', toolRegistry, responseRenderer, context)
   );
 
   // Register proceed_to_phase tool
@@ -242,17 +254,12 @@ export async function registerMcpTools(
         openWorldHint: false,
       },
     },
-    async args => {
-      const handler = toolRegistry.get('proceed_to_phase');
-      if (!handler) {
-        return responseRenderer.renderError(
-          'Tool handler not found: proceed_to_phase'
-        );
-      }
-
-      const result = await handler.handle(args, context);
-      return responseRenderer.renderToolResponse(result);
-    }
+    createToolHandler(
+      'proceed_to_phase',
+      toolRegistry,
+      responseRenderer,
+      context
+    )
   );
 
   // Register conduct_review tool
@@ -276,17 +283,7 @@ export async function registerMcpTools(
         openWorldHint: false,
       },
     },
-    async args => {
-      const handler = toolRegistry.get('conduct_review');
-      if (!handler) {
-        return responseRenderer.renderError(
-          'Tool handler not found: conduct_review'
-        );
-      }
-
-      const result = await handler.handle(args, context);
-      return responseRenderer.renderToolResponse(result);
-    }
+    createToolHandler('conduct_review', toolRegistry, responseRenderer, context)
   );
 
   // Register start_development tool with dynamic commit_behaviour description
@@ -327,17 +324,12 @@ export async function registerMcpTools(
         openWorldHint: false,
       },
     },
-    async args => {
-      const handler = toolRegistry.get('start_development');
-      if (!handler) {
-        return responseRenderer.renderError(
-          'Tool handler not found: start_development'
-        );
-      }
-
-      const result = await handler.handle(args, context);
-      return responseRenderer.renderToolResponse(result);
-    }
+    createToolHandler(
+      'start_development',
+      toolRegistry,
+      responseRenderer,
+      context
+    )
   );
 
   // Register resume_workflow tool
@@ -362,17 +354,12 @@ export async function registerMcpTools(
         openWorldHint: false,
       },
     },
-    async args => {
-      const handler = toolRegistry.get('resume_workflow');
-      if (!handler) {
-        return responseRenderer.renderError(
-          'Tool handler not found: resume_workflow'
-        );
-      }
-
-      const result = await handler.handle(args, context);
-      return responseRenderer.renderToolResponse(result);
-    }
+    createToolHandler(
+      'resume_workflow',
+      toolRegistry,
+      responseRenderer,
+      context
+    )
   );
 
   // Register reset_development tool
@@ -400,17 +387,12 @@ export async function registerMcpTools(
         openWorldHint: false,
       },
     },
-    async args => {
-      const handler = toolRegistry.get('reset_development');
-      if (!handler) {
-        return responseRenderer.renderError(
-          'Tool handler not found: reset_development'
-        );
-      }
-
-      const result = await handler.handle(args, context);
-      return responseRenderer.renderToolResponse(result);
-    }
+    createToolHandler(
+      'reset_development',
+      toolRegistry,
+      responseRenderer,
+      context
+    )
   );
 
   // Register list_workflows tool
@@ -430,17 +412,7 @@ export async function registerMcpTools(
         openWorldHint: false,
       },
     },
-    async args => {
-      const handler = toolRegistry.get('list_workflows');
-      if (!handler) {
-        return responseRenderer.renderError(
-          'Tool handler not found: list_workflows'
-        );
-      }
-
-      const result = await handler.handle(args, context);
-      return responseRenderer.renderToolResponse(result);
-    }
+    createToolHandler('list_workflows', toolRegistry, responseRenderer, context)
   );
 
   // Register get_tool_info tool
@@ -460,17 +432,7 @@ export async function registerMcpTools(
         openWorldHint: false,
       },
     },
-    async args => {
-      const handler = toolRegistry.get('get_tool_info');
-      if (!handler) {
-        return responseRenderer.renderError(
-          'Tool handler not found: get_tool_info'
-        );
-      }
-
-      const result = await handler.handle(args, context);
-      return responseRenderer.renderToolResponse(result);
-    }
+    createToolHandler('get_tool_info', toolRegistry, responseRenderer, context)
   );
 
   // Register setup_project_docs tool with enhanced file linking support
@@ -484,16 +446,16 @@ export async function registerMcpTools(
         'Create project documentation artifacts (architecture.md, requirements.md, design.md) using configurable templates OR by linking existing files via symlinks. ' +
         'Each parameter accepts either a template name, a file path to an existing document, or "none" to disable that document type.\n\n' +
         '**Template Options:**\n' +
-        `- Architecture: ${availableTemplates.architecture.join(', ')}\n` +
-        `- Requirements: ${availableTemplates.requirements.join(', ')}\n` +
-        `- Design: ${availableTemplates.design.join(', ')}\n\n` +
+        `- Architecture: ${availableTemplates.architecture.join(', ')}, none\n` +
+        `- Requirements: ${availableTemplates.requirements.join(', ')}, none\n` +
+        `- Design: ${availableTemplates.design.join(', ')}, none\n\n` +
         '**File Path Examples:**\n' +
         '- `README.md` (project root)\n' +
         '- `docs/architecture.md` (relative path)\n' +
         '- `/absolute/path/to/requirements.txt`\n\n' +
-        '**Disable Document Types:**\n' +
+        '**Using "none" Option:**\n' +
         '- Use `"none"` to create a placeholder that instructs LLM to use plan file instead\n' +
-        '- Useful for users who prefer plan-file-only workflows\n\n' +
+        '- Useful when you prefer plan-file-only workflows\n\n' +
         '**Common Documentation Files:**\n' +
         '- README.md, ARCHITECTURE.md, DESIGN.md, REQUIREMENTS.md\n' +
         '- Files in docs/ folder\n\n' +
@@ -525,17 +487,12 @@ export async function registerMcpTools(
         openWorldHint: false,
       },
     },
-    async args => {
-      const handler = toolRegistry.get('setup_project_docs');
-      if (!handler) {
-        return responseRenderer.renderError(
-          'Tool handler not found: setup_project_docs'
-        );
-      }
-
-      const result = await handler.handle(args, context);
-      return responseRenderer.renderToolResponse(result);
-    }
+    createToolHandler(
+      'setup_project_docs',
+      toolRegistry,
+      responseRenderer,
+      context
+    )
   );
 
   // Register no_idea tool
@@ -558,15 +515,7 @@ export async function registerMcpTools(
         openWorldHint: false,
       },
     },
-    async args => {
-      const handler = toolRegistry.get('no_idea');
-      if (!handler) {
-        return responseRenderer.renderError('Tool handler not found: no_idea');
-      }
-
-      const result = await handler.handle(args, context);
-      return responseRenderer.renderToolResponse(result);
-    }
+    createToolHandler('no_idea', toolRegistry, responseRenderer, context)
   );
 
   logger.info('MCP tools registered successfully', {

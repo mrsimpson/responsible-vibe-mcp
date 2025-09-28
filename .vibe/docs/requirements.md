@@ -69,34 +69,36 @@ Complex requirements for unwanted behavior also include the If-Then keywords.
 
 # Requirements Document
 
-## REQ-1: Enhanced Workflow Descriptions
-**User Story:** As an LLM assistant, I want detailed workflow descriptions with use cases so that I can recommend the most appropriate workflow for the user's task.
+## REQ-1: Optional Documentation for Workflows
+**User Story:** As a developer using lightweight workflows, I want to skip formal documentation setup when it's not necessary so that I can start development immediately without unnecessary overhead.
 
 **Acceptance Criteria:**
-- WHEN start_development tool is called THEN the system SHALL provide detailed descriptions including use cases for each workflow
-- WHEN workflow descriptions are generated THEN the system SHALL include task type recommendations (e.g., "best for bug fixes")
-- WHEN workflow descriptions are generated THEN the system SHALL include complexity indicators (number of phases, typical duration)
+- WHEN using lightweight workflows (epcc, minor, bugfix) THEN the system SHALL allow skipping documentation setup
+- WHEN using comprehensive workflows (greenfield, waterfall, c4-analysis) THEN the system SHALL still require documentation setup
+- WHEN documentation is optional THEN workflow instructions SHALL reference docs conditionally using "If $DOC exists..." patterns
+- WHEN documentation is required THEN workflow initiation SHALL be blocked until documents exist
 
-## REQ-2: Task-Type Workflow Mapping
-**User Story:** As an LLM assistant, I want clear guidance on which workflow suits different task types so that I can make informed workflow recommendations.
-
-**Acceptance Criteria:**
-- WHEN generating workflow descriptions THEN the system SHALL include specific use case examples
-- WHEN a workflow is described THEN the system SHALL indicate what types of tasks it's optimized for
-- WHEN multiple workflows could apply THEN the system SHALL provide guidance on selection criteria
-
-## REQ-3: Workflow Metadata Enhancement
-**User Story:** As an LLM assistant, I want access to workflow metadata (phases, complexity, duration) so that I can set proper expectations with users.
+## REQ-2: Workflow-Specific Documentation Requirements
+**User Story:** As a workflow designer, I want to specify whether my workflow requires formal documentation so that users get appropriate guidance for their development approach.
 
 **Acceptance Criteria:**
-- WHEN workflow information is provided THEN the system SHALL include phase count and names
-- WHEN workflow information is provided THEN the system SHALL include estimated complexity level
-- WHEN workflow information is provided THEN the system SHALL include typical use case scenarios
+- WHEN defining a workflow THEN the system SHALL support a requiresDocumentation metadata flag
+- WHEN requiresDocumentation is true THEN the system SHALL enforce document setup before workflow start
+- WHEN requiresDocumentation is false or undefined THEN the system SHALL proceed directly to development without document checks
+- WHEN no metadata is specified THEN the system SHALL default to optional documentation (requiresDocumentation: false)
 
-## REQ-4: Backward Compatibility
-**User Story:** As a system maintainer, I want enhanced descriptions to be backward compatible so that existing integrations continue to work.
+## REQ-3: Backward Compatibility
+**User Story:** As a system maintainer, I want the optional documentation feature to be backward compatible so that existing workflows continue to work without modification.
 
 **Acceptance Criteria:**
-- WHEN workflow descriptions are enhanced THEN the system SHALL maintain existing tool schema structure
-- WHEN new metadata is added THEN the system SHALL not break existing tool calls
-- WHEN descriptions are improved THEN the system SHALL preserve all current workflow names and basic functionality
+- WHEN existing workflows have no requiresDocumentation metadata THEN the system SHALL default to optional documentation
+- WHEN new metadata is added THEN the system SHALL not break existing workflow definitions
+- WHEN documentation requirements change THEN all existing tool interfaces SHALL remain functional
+
+## REQ-4: Conditional Documentation References
+**User Story:** As a workflow author, I want to reference documentation conditionally so that workflows can adapt to whether documents exist or not.
+
+**Acceptance Criteria:**
+- WHEN workflows reference documentation THEN instructions SHALL use conditional patterns like "If the $ARCHITECTURE_DOC exists..."
+- WHEN documents don't exist THEN workflows SHALL provide alternative guidance using plan file instead
+- WHEN documents exist THEN workflows SHALL reference them normally in instructions

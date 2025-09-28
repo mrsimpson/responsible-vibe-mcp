@@ -20,6 +20,7 @@ metadata:
     - 'Create a new authentication system'
     - 'Build a reporting dashboard'
     - 'Implement a payment processing workflow'
+  requiresDocumentation: true
 
 # States with default instructions and transitions
 states:

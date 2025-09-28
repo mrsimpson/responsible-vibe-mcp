@@ -29,7 +29,7 @@ states:
       You are in the exploration phase for minor enhancement.
       This phase should be efficient since it's a minor enhancement.
       Understand the problem, analyze existing patterns, and design your approach.
-      Consider the scope and impact of the change. Document requirements in $REQUIREMENTS_DOC and respect the design approach in $DESIGN_DOC.
+      Consider the scope and impact of the change. If $REQUIREMENTS_DOC exists, document requirements there, otherwise document them in the plan file. If $DESIGN_DOC exists, respect the design approach in $DESIGN_DOC.
       Document your analysis and design decisions in the plan file.
       Focus on analysis and design only - do not write any code yet.
     transitions:
@@ -49,7 +49,7 @@ states:
 
   implement:
     description: 'Combined implementation phase - code, test, and commit'
-    default_instructions: "You are in the implementation phase for minor enhancement. This phase combines coding, testing, and commit preparation. Follow your design from $DESIGN_DOC and ensure the relevant requirements from $REQUIREMENTS_DOC are met. Write clean, focused code for the minor enhancement. Test your changes to ensure they work correctly and don't break existing functionality. Prepare documentation and commit when ready. Update progress in the plan file."
+    default_instructions: "You are in the implementation phase for minor enhancement. This phase combines coding, testing, and commit preparation. If $DESIGN_DOC exists, follow your design from $DESIGN_DOC. If $REQUIREMENTS_DOC exists, ensure the relevant requirements from $REQUIREMENTS_DOC are met, otherwise ensure plan file requirements are met. Write clean, focused code for the minor enhancement. Test your changes to ensure they work correctly and don't break existing functionality. Prepare documentation and commit when ready. Update progress in the plan file."
     transitions:
       - trigger: 'need_more_analysis'
         to: 'explore'
@@ -94,9 +94,9 @@ states:
       **STEP 2: Documentation Review**
       Review and update documentation to reflect final implementation:
 
-      1. **Update Long-Term Memory Documents**: Based on what was actually implemented:
-         • Update $REQUIREMENTS_DOC if requirements changed during development
-         • Update $DESIGN_DOC if design details were refined or changed
+       1. **Update Long-Term Memory Documents**: Based on what was actually implemented:
+          • If $REQUIREMENTS_DOC exists, update $REQUIREMENTS_DOC if requirements changed during development
+          • If $DESIGN_DOC exists, update $DESIGN_DOC if design details were refined or changed
       2. **Compare Against Implementation**: Review documentation against actual implemented functionality
       3. **Update Changed Sections**: Only modify documentation sections that have functional changes
       4. **Remove Development Progress**: Remove references to development iterations, progress notes, and temporary decisions

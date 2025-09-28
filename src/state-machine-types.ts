@@ -66,5 +66,6 @@ export interface YamlStateMachine {
     bestFor?: string[];
     useCases?: string[];
     examples?: string[];
+    requiresDocumentation?: boolean;
   };
 }

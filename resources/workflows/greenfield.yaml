@@ -20,6 +20,7 @@ metadata:
     - 'Build a new web application'
     - 'Create a microservice architecture'
     - 'Develop a new CLI tool'
+  requiresDocumentation: true
 
 # States with default instructions and transitions
 states:

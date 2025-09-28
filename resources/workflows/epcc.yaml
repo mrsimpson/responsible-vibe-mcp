@@ -28,7 +28,7 @@ states:
     default_instructions: |
       You are in the exploration phase. Research the codebase, understand existing patterns, and gather context about the problem space.
       If you are not certain about conventions or rules, ask the user about them.
-      Read relevant files and documentation. Understand the requirements and document them in $REQUIREMENTS_DOC. Don't write code yet - focus on understanding. Document your findings in the plan file.
+      Read relevant files and documentation. If $REQUIREMENTS_DOC exists, understand and document requirements there, otherwise document them in the plan file. Don't write code yet - focus on understanding. Document your findings in the plan file.
     transitions:
       - trigger: 'exploration_complete'
         to: 'plan'
@@ -45,7 +45,7 @@ states:
 
   plan:
     description: 'Planning phase - creating a detailed implementation strategy'
-    default_instructions: 'You are in the planning phase. Create a detailed implementation strategy based on your exploration and requirements from $REQUIREMENTS_DOC. Break down the work into specific, actionable tasks. Consider edge cases, dependencies, and potential challenges. If it impacts the general architecture, document this in $ARCHITECTURE_DOC. Make sure to adhere to the design in $DESIGN_DOC. Document the plan thoroughly. Important: Tasks that you identify for the actual coding shall be in the Code section in the plan.'
+    default_instructions: 'You are in the planning phase. Create a detailed implementation strategy based on your exploration. If $REQUIREMENTS_DOC exists, base your strategy on requirements from $REQUIREMENTS_DOC, otherwise use the plan file context. Break down the work into specific, actionable tasks. Consider edge cases, dependencies, and potential challenges. If it impacts the general architecture and $ARCHITECTURE_DOC exists, document this in $ARCHITECTURE_DOC, otherwise use the plan file. If $DESIGN_DOC exists, make sure to adhere to the design in $DESIGN_DOC. Document the plan thoroughly. Important: Tasks that you identify for the actual coding shall be in the Code section in the plan.'
     transitions:
       - trigger: 'need_more_exploration'
         to: 'explore'
@@ -72,7 +72,7 @@ states:
 
   code:
     description: 'Implementation phase - writing and building the solution'
-    default_instructions: 'You are in the implementation phase. Follow your plan and design from $DESIGN_DOC to build the solution according to the architecture in $ARCHITECTURE_DOC. Ensure requirements from $REQUIREMENTS_DOC are met. Write clean, well-structured code with proper error handling. Prevent regression by building, linting and executing existing tests. Stay flexible and adapt the plan as you learn more during implementation. Update progress in the plan file. Important: Tasks that you identify for the actual coding shall be in the Code section in the plan.'
+    default_instructions: 'You are in the implementation phase. Follow your plan and if $DESIGN_DOC exists, follow the design from $DESIGN_DOC to build the solution. If $ARCHITECTURE_DOC exists, build according to the architecture in $ARCHITECTURE_DOC. If $REQUIREMENTS_DOC exists, ensure requirements from $REQUIREMENTS_DOC are met, otherwise ensure plan file requirements are met. Write clean, well-structured code with proper error handling. Prevent regression by building, linting and executing existing tests. Stay flexible and adapt the plan as you learn more during implementation. Update progress in the plan file. Important: Tasks that you identify for the actual coding shall be in the Code section in the plan.'
     transitions:
       - trigger: 'need_replanning'
         to: 'plan'

@@ -20,6 +20,7 @@ metadata:
     - 'Analyze a legacy Java monolith for microservices migration'
     - 'Document architecture of inherited Node.js application'
     - 'Understand legacy system before adding new features'
+  requiresDocumentation: true
 
 # States with default instructions and transitions
 states:

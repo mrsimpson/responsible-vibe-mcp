@@ -8,7 +8,10 @@ import { mkdirSync, writeFileSync, existsSync } from 'node:fs';
 import { execSync } from 'node:child_process';
 import { join } from 'node:path';
 import { vi, expect } from 'vitest';
-import { ResponsibleVibeMCPServer } from '../../src/server/index.js';
+import {
+  ResponsibleVibeMCPServer,
+  StartDevelopmentResult,
+} from '../../src/server/index.js';
 import type { ServerContext } from '../../src/server/types.js';
 import { TempProject } from './temp-files.js';
 
@@ -221,24 +224,60 @@ export const TEST_WORKFLOWS = {
       },
     },
   },
+
+  // Test workflows with requiresDocumentation: true
+  requiredArchDoc: {
+    initial_state: 'design',
+    metadata: {
+      requiresDocumentation: true,
+    },
+    states: {
+      design: {
+        description: 'Create design',
+        instructions:
+          'Review the architecture in $ARCHITECTURE_DOC and create detailed design.',
+      },
+    },
+  },
+
+  requiredMultipleDocs: {
+    initial_state: 'implementation',
+    metadata: {
+      requiresDocumentation: true,
+    },
+    states: {
+      implementation: {
+        description: 'Implement solution',
+        instructions:
+          'Follow the architecture in $ARCHITECTURE_DOC and implement according to $DESIGN_DOC requirements.',
+      },
+      testing: {
+        description: 'Test solution',
+        instructions: 'Verify all requirements from $REQUIREMENTS_DOC are met.',
+      },
+    },
+  },
 } as const;
 
 /**
  * Common test assertions
  */
 export class TestAssertions {
-  static expectValidResult(result: unknown): void {
+  static expectValidResult(result: StartDevelopmentResult): void {
     expect(result).toBeTypeOf('object');
     expect(result.phase).toBeDefined();
     expect(result.instructions).toBeDefined();
   }
 
-  static expectArtifactSetupPhase(result: unknown): void {
+  static expectArtifactSetupPhase(result: StartDevelopmentResult): void {
     expect(result.phase).toBe('artifact-setup');
     expect(result.instructions).toContain('Referenced Variables');
   }
 
-  static expectNormalPhase(result: unknown, expectedPhase: string): void {
+  static expectNormalPhase(
+    result: StartDevelopmentResult,
+    expectedPhase: string
+  ): void {
     expect(result.phase).toBe(expectedPhase);
     expect(result.instructions).toBeDefined();
   }

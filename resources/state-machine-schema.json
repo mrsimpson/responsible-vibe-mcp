@@ -46,6 +46,11 @@
             "type": "string"
           },
           "description": "Example scenarios where this workflow would be used"
+        },
+        "requiresDocumentation": {
+          "type": "boolean",
+          "description": "Whether this workflow requires project documentation (architecture, requirements, design) to be set up before starting. Defaults to false for backwards compatibility.",
+          "default": false
         }
       }
     },

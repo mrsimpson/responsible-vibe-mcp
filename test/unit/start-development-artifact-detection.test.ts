@@ -8,6 +8,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { TestAccess } from '../utils/test-access.js';
 import { StartDevelopmentHandler } from '../../src/server/tool-handlers/start-development.js';
+import type { YamlStateMachine } from './../../src/state-machine-types';
 import { join } from 'node:path';
 import {
   MockContextFactory,
@@ -77,7 +78,7 @@ describe('StartDevelopmentHandler - Dynamic Artifact Detection', () => {
 
     it('should detect and validate only referenced document variables', async () => {
       mockContext.workflowManager.loadWorkflowForProject.mockReturnValue(
-        TEST_WORKFLOWS.withArchDoc
+        TEST_WORKFLOWS.requiredArchDoc
       );
 
       // Update mock context to match the workflow's initial state
@@ -120,7 +121,7 @@ describe('StartDevelopmentHandler - Dynamic Artifact Detection', () => {
 
     it('should detect multiple document variables in workflow', async () => {
       mockContext.workflowManager.loadWorkflowForProject.mockReturnValue(
-        TEST_WORKFLOWS.withMultipleDocs
+        TEST_WORKFLOWS.requiredMultipleDocs
       );
 
       // Update mock context to match the workflow's initial state
@@ -163,7 +164,7 @@ describe('StartDevelopmentHandler - Dynamic Artifact Detection', () => {
 
     it('should proceed normally when all referenced documents exist', async () => {
       mockContext.workflowManager.loadWorkflowForProject.mockReturnValue(
-        TEST_WORKFLOWS.withMultipleDocs
+        TEST_WORKFLOWS.requiredMultipleDocs
       );
 
       // Mock conversation context to match initial state
@@ -211,14 +212,19 @@ describe('StartDevelopmentHandler - Dynamic Artifact Detection', () => {
     it('should handle partial document availability correctly', async () => {
       // Mock workflow that references REQUIREMENTS_DOC and DESIGN_DOC
       const partialWorkflow = {
+        name: 'req-design-focused',
+        description: 'Workflow focusing on requirements and design docs',
         initial_state: 'development',
+        metadata: {
+          requiresDocumentation: true,
+        },
         states: {
           development: {
-            instructions:
+            default_instructions:
               'Implement features based on $REQUIREMENTS_DOC and follow $DESIGN_DOC patterns.',
           },
         },
-      };
+      } as Partial<YamlStateMachine>;
 
       mockContext.workflowManager.loadWorkflowForProject.mockReturnValue(
         partialWorkflow
@@ -289,7 +295,7 @@ describe('StartDevelopmentHandler - Dynamic Artifact Detection', () => {
 
     it('should include detected variables in setup guidance', async () => {
       mockContext.workflowManager.loadWorkflowForProject.mockReturnValue(
-        TEST_WORKFLOWS.withArchDoc
+        TEST_WORKFLOWS.requiredArchDoc
       );
 
       // Update mock context to match the workflow's initial state
@@ -327,6 +333,55 @@ describe('StartDevelopmentHandler - Dynamic Artifact Detection', () => {
       expect(result.instructions).toContain(
         'detected variables: `$ARCHITECTURE_DOC`'
       );
+    });
+
+    it('should proceed normally for optional workflows with missing documents', async () => {
+      // Use a workflow that has document variables but NO requiresDocumentation flag
+      mockContext.workflowManager.loadWorkflowForProject.mockReturnValue(
+        TEST_WORKFLOWS.withArchDoc
+      );
+
+      // Mock conversation context to match initial state
+      mockContext.conversationManager.createConversationContext.mockResolvedValue(
+        {
+          conversationId: 'test-conversation',
+          currentPhase: 'design',
+          projectPath: testProjectPath,
+          planFilePath: join(testProjectPath, '.vibe', 'plan.md'),
+          gitBranch: 'feature-branch',
+        }
+      );
+
+      // Mock transition engine to return the correct phase
+      mockContext.transitionEngine.handleExplicitTransition.mockResolvedValue({
+        newPhase: 'design',
+      });
+
+      // Mock all documents as missing
+      mockProjectDocsManager.getProjectDocsInfo.mockResolvedValue({
+        architecture: {
+          exists: false,
+          path: join(testProjectPath, '.vibe', 'docs', 'architecture.md'),
+        },
+        requirements: {
+          exists: false,
+          path: join(testProjectPath, '.vibe', 'docs', 'requirements.md'),
+        },
+        design: {
+          exists: false,
+          path: join(testProjectPath, '.vibe', 'docs', 'design.md'),
+        },
+      });
+
+      const result = await handler.executeHandler(
+        { workflow: 'optional-arch-workflow' },
+        mockContext
+      );
+
+      // Should proceed to normal phase instead of artifact-setup
+      // because requiresDocumentation is not set (defaults to false)
+      TestAssertions.expectNormalPhase(result, 'design');
+      expect(result.instructions).not.toContain('Referenced Variables');
     });
   });
 });

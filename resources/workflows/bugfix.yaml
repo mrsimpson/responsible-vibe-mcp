@@ -79,7 +79,7 @@ states:
   fix:
     description: 'Implement the bug fix'
     default_instructions: |
-      Implement the solution based on your analysis and design from $DESIGN_DOC. Before implementing, assess the approach:
+      Implement the solution based on your analysis. If $DESIGN_DOC exists, follow the design from $DESIGN_DOC. Before implementing, assess the approach:
         • How critical is this system? What is the blast radius if the fix causes issues?
         • Should this be a minimal fix or a more comprehensive solution?
       Make targeted changes that address the root cause without introducing new issues. Be careful to maintain existing functionality while fixing the bug.
@@ -153,8 +153,8 @@ states:
       **STEP 2: Documentation Review**
       Review and update documentation to reflect the bug fix:
 
-      1. **Update Long-Term Memory Documents**: Based on what was actually implemented:
-         • Update $DESIGN_DOC if design details were refined or changed during the fix
+       1. **Update Long-Term Memory Documents**: Based on what was actually implemented:
+          • If $DESIGN_DOC exists, update $DESIGN_DOC if design details were refined or changed during the fix
       2. **Compare Against Implementation**: Review documentation against the actual bug fix implemented
       3. **Update Changed Sections**: Only modify documentation sections that have functional changes
       4. **Remove Development Progress**: Remove references to investigation iterations, progress notes, and temporary decisions

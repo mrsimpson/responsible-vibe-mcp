@@ -1,6 +1,46 @@
 # Development
 
-This document provides information for developers working on the Responsible Vibe MCP Server, including testing, logging, and debugging.
+This document provides information for developers working on the Responsible Vibe MCP Server, including testing, logging, debugging, and architectural decisions.
+
+## Optional Documentation Feature
+
+The system includes a flexible documentation architecture that allows workflows to specify their documentation requirements:
+
+### Key Implementation Components
+
+#### 1. Workflow Metadata Schema
+
+```typescript
+interface YamlStateMachine {
+  metadata?: {
+    requiresDocumentation?: boolean; // defaults to false
+    // ... other metadata
+  };
+}
+```
+
+#### 2. Start Development Handler Logic
+
+The `StartDevelopmentHandler` implements conditional documentation checking:
+
+- **Required workflows**: Block on missing documents, provide setup guidance
+- **Optional workflows**: Skip artifact checks entirely, proceed to initial phase
+- **Backward compatibility**: Existing workflows without metadata default to optional
+
+#### 3. Workflow Updates
+
+- **Comprehensive workflows** (greenfield, waterfall, c4-analysis): Set `requiresDocumentation: true`
+- **Lightweight workflows** (epcc, minor, bugfix): Default to optional documentation
+- **Conditional instructions**: Use "If $DOC exists..." patterns for flexible workflows
+
+### Testing Coverage
+
+The implementation includes comprehensive test coverage:
+
+- **Unit tests**: Verify requiresDocumentation flag behavior
+- **Integration tests**: Test both required and optional workflow paths
+- **Edge case tests**: Handle partial document availability and malformed workflows
+- **Regression tests**: Ensure backward compatibility
 
 ## Testing
 

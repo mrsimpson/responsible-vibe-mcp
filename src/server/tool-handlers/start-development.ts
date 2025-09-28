@@ -236,6 +236,7 @@ export class StartDevelopmentHandler extends BaseToolHandler<
   /**
    * Check if project documentation artifacts exist and provide setup guidance if needed
    * Dynamically analyzes the selected workflow to determine which documents are referenced
+   * Blocks workflow start if the workflow requires documentation
    */
   private async checkProjectArtifacts(
     projectPath: string,
@@ -248,6 +249,19 @@ export class StartDevelopmentHandler extends BaseToolHandler<
         projectPath,
         workflowName
       );
+
+      // Check if this workflow requires documentation (defaults to false)
+      const requiresDocumentation =
+        stateMachine.metadata?.requiresDocumentation ?? false;
+
+      // If workflow doesn't require documentation, skip artifact check entirely
+      if (!requiresDocumentation) {
+        this.logger.debug(
+          'Workflow does not require documentation, skipping artifact check',
+          { workflowName, requiresDocumentation }
+        );
+        return null;
+      }
 
       // Analyze workflow content to detect referenced document variables
       const referencedVariables = this.analyzeWorkflowDocumentReferences(
@@ -294,9 +308,10 @@ export class StartDevelopmentHandler extends BaseToolHandler<
       );
 
       this.logger.info(
-        'Missing referenced project artifacts detected, providing setup guidance',
+        'Missing required project artifacts detected for workflow that requires documentation',
         {
           workflowName,
+          requiresDocumentation,
           referencedVariables,
           missingDocs,
           projectPath,
