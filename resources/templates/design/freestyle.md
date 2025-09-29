@@ -1,31 +1,37 @@
 <!--
-INSTRUCTIONS FOR DESIGN DOCUMENT (FREESTYLE):
-- Document technical implementation details in whatever format works best
-- Focus on what to build and how to build it well
-- Include key decisions, patterns, and implementation guidance
-- Consider including testing approach, error handling, and performance
-- Reference architecture document for high-level context
-- Keep it practical and actionable for developers
+DESIGN DOCUMENT TEMPLATE - FREESTYLE APPROACH
+
+PURPOSE: Document design principles and standards in your preferred format.
+NOTE: Technology stack decisions belong in the Architecture Document, not here.
+
+DESIGN FOCUS AREAS:
+✅ Design principles and patterns that guide implementation
+✅ Naming conventions and coding standards
+✅ Component design approaches and boundaries
+✅ Data modeling and design principles
+✅ Quality attribute design strategies (performance, security, etc.)
+❌ NO Technology stack choices (goes in Architecture doc)
+❌ NO Concrete class names or implementations
+❌ NO Code snippets or method signatures
+
+TIERED APPROACH SUGGESTION:
+Start with core design principles, add complexity as project grows.
+Consider organizing by: Essential → Core → Advanced → Specialized sections.
+
+EXAMPLES:
+✅ GOOD: "Repository pattern abstracts data access with clean interfaces"
+✅ GOOD: "Components follow single responsibility principle with clear boundaries"
+✅ GOOD: "Error handling uses custom exception hierarchy for different failure types"
+❌ BAD: "PaymentController.processPayment() validates and processes transactions"
+❌ BAD: "UserService extends BaseService and implements AuthService interface"
+
+IMPORTANT: DO NOT REMOVE THIS COMMENT HOW TO USE THE TEMPLATE!
 -->
 
 # Design Document
 
 ## Architecture Reference
 
-See [Architecture Document](./architecture.md) for high-level system context and architecture decisions.
+See [Architecture Document](./architecture.md) for high-level system context and architecture decisions such as chosen technologies and frameworks.
 
-## Implementation Overview
-
-<!-- Brief overview of the technical implementation approach -->
-
-## Key Design Decisions
-
-<!-- Important technical decisions and their rationale -->
-
-## Implementation Details
-
-<!-- Specific implementation guidance, patterns, and approaches -->
-
-## Development Guidelines
-
-<!-- Coding standards, patterns, and best practices for this project -->
+<!-- Here goes your freestyle design -->
