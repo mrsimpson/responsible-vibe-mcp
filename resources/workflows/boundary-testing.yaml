@@ -6,6 +6,7 @@ initial_state: 'architecture_analysis'
 
 # Enhanced metadata for better discoverability
 metadata:
+  domain: 'architecture'
   complexity: 'medium'
   bestFor:
     - 'System boundary testing'

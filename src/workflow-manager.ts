@@ -24,6 +24,7 @@ export interface WorkflowInfo {
   phases: string[];
   // Enhanced metadata for better discoverability
   metadata?: {
+    domain?: string;
     complexity?: 'low' | 'medium' | 'high';
     bestFor?: string[];
     useCases?: string[];
@@ -36,26 +37,120 @@ export interface WorkflowInfo {
  */
 export class WorkflowManager {
   private predefinedWorkflows: Map<string, YamlStateMachine> = new Map();
+  private projectWorkflows: Map<string, YamlStateMachine> = new Map();
   private workflowInfos: Map<string, WorkflowInfo> = new Map();
   private stateMachineLoader: StateMachineLoader;
+  private enabledDomains: Set<string>;
 
   constructor() {
     this.stateMachineLoader = new StateMachineLoader();
+    this.enabledDomains = this.parseEnabledDomains();
     this.loadPredefinedWorkflows();
   }
 
   /**
-   * Get all available predefined workflows
+   * Parse enabled domains from environment variable
    */
+  private parseEnabledDomains(): Set<string> {
+    const domainsEnv = process.env.VIBE_WORKFLOW_DOMAINS;
+    if (!domainsEnv) {
+      return new Set(['code']);
+    }
+
+    return new Set(
+      domainsEnv
+        .split(',')
+        .map(d => d.trim())
+        .filter(d => d)
+    );
+  }
+
+  /**
+   * Load project-specific workflows from .vibe/workflows/
+   */
+  public loadProjectWorkflows(projectPath: string): void {
+    const workflowsDir = path.join(projectPath, '.vibe', 'workflows');
+
+    if (!fs.existsSync(workflowsDir)) {
+      return;
+    }
+
+    try {
+      const files = fs.readdirSync(workflowsDir);
+      const yamlFiles = files.filter(
+        file => file.endsWith('.yaml') || file.endsWith('.yml')
+      );
+
+      for (const file of yamlFiles) {
+        try {
+          const filePath = path.join(workflowsDir, file);
+          const workflow = this.stateMachineLoader.loadFromFile(filePath);
+          const workflowName = workflow.name; // Use name from YAML, not filename
+
+          // Project workflows are always loaded (no domain filtering)
+          this.projectWorkflows.set(workflowName, workflow);
+
+          const workflowInfo: WorkflowInfo = {
+            name: workflowName,
+            displayName: workflow.name,
+            description: workflow.description,
+            initialState: workflow.initial_state,
+            phases: Object.keys(workflow.states),
+            metadata: workflow.metadata,
+          };
+
+          this.workflowInfos.set(workflowName, workflowInfo);
+
+          logger.info('Loaded project workflow', {
+            name: workflowName,
+            domain: workflow.metadata?.domain,
+          });
+        } catch (error) {
+          logger.error('Failed to load project workflow', error as Error, {
+            file,
+          });
+        }
+      }
+    } catch (error) {
+      logger.error(
+        'Failed to scan project workflows directory',
+        error as Error,
+        { workflowsDir }
+      );
+    }
+  }
+  /**
+   * Get all available workflows regardless of domain filtering
+   */
+  public getAllAvailableWorkflows(): WorkflowInfo[] {
+    // Create a temporary manager with all domains enabled
+    const originalEnv = process.env.VIBE_WORKFLOW_DOMAINS;
+    process.env.VIBE_WORKFLOW_DOMAINS = 'code,architecture,office';
+
+    try {
+      const tempManager = new WorkflowManager();
+      return tempManager.getAvailableWorkflows();
+    } finally {
+      if (originalEnv !== undefined) {
+        process.env.VIBE_WORKFLOW_DOMAINS = originalEnv;
+      } else {
+        delete process.env.VIBE_WORKFLOW_DOMAINS;
+      }
+    }
+  }
+
   public getAvailableWorkflows(): WorkflowInfo[] {
     return Array.from(this.workflowInfos.values());
   }
 
   /**
    * Get available workflows for a specific project
-   * Applies configuration filtering and custom workflow validation
+   * Applies configuration filtering and loads project-specific workflows
    */
   public getAvailableWorkflowsForProject(projectPath: string): WorkflowInfo[] {
+    // Load project workflows first
+    this.loadProjectWorkflows(projectPath);
+
     const allWorkflows = this.getAvailableWorkflows();
 
     // Load project configuration
@@ -114,10 +209,12 @@ export class WorkflowManager {
   }
 
   /**
-   * Get a specific workflow by name
+   * Get a specific workflow by name (checks both predefined and project workflows)
    */
   public getWorkflow(name: string): YamlStateMachine | undefined {
-    return this.predefinedWorkflows.get(name);
+    return (
+      this.projectWorkflows.get(name) || this.predefinedWorkflows.get(name)
+    );
   }
 
   /**
@@ -371,28 +468,36 @@ export class WorkflowManager {
         try {
           const filePath = path.join(workflowsDir, file);
           const workflow = this.stateMachineLoader.loadFromFile(filePath);
-
-          // Use filename without extension as workflow name
           const workflowName = path.basename(file, path.extname(file));
 
-          // Store the workflow
+          // Apply domain filtering
+          if (this.enabledDomains.size > 0 && workflow.metadata?.domain) {
+            if (!this.enabledDomains.has(workflow.metadata.domain)) {
+              logger.debug('Skipping workflow due to domain filter', {
+                name: workflowName,
+                domain: workflow.metadata.domain,
+                enabledDomains: Array.from(this.enabledDomains),
+              });
+              continue;
+            }
+          }
+
           this.predefinedWorkflows.set(workflowName, workflow);
 
-          // Create workflow info
           const workflowInfo: WorkflowInfo = {
             name: workflowName,
             displayName: workflow.name,
             description: workflow.description,
             initialState: workflow.initial_state,
             phases: Object.keys(workflow.states),
-            metadata: workflow.metadata, // Include metadata if present
+            metadata: workflow.metadata,
           };
 
           this.workflowInfos.set(workflowName, workflowInfo);
 
           logger.info('Loaded predefined workflow', {
             name: workflowName,
-            displayName: workflow.name,
+            domain: workflow.metadata?.domain,
             phases: workflowInfo.phases.length,
           });
         } catch (error) {

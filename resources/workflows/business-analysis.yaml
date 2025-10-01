@@ -6,6 +6,7 @@ initial_state: 'document_discovery'
 
 # Enhanced metadata for better discoverability
 metadata:
+  domain: 'architecture'
   complexity: 'medium'
   bestFor:
     - 'Business capability modeling'

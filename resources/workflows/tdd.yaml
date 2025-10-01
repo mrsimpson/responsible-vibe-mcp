@@ -6,6 +6,7 @@ initial_state: 'explore'
 
 # Enhanced metadata for better discoverability
 metadata:
+  domain: 'code'
   complexity: 'medium'
   bestFor:
     - 'TDD development'

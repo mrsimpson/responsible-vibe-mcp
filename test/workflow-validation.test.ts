@@ -39,20 +39,33 @@ describe('Workflow Validation', () => {
     });
 
     it('should load ALL workflow files from resources directory', () => {
-      const workflowManager = new WorkflowManager();
-      const loadedWorkflows = workflowManager.getAvailableWorkflows();
-      const loadedWorkflowNames = loadedWorkflows.map(w => w.name);
+      // Temporarily disable domain filtering for this test
+      const originalEnv = process.env.VIBE_WORKFLOW_DOMAINS;
+      process.env.VIBE_WORKFLOW_DOMAINS = 'code,architecture,office';
 
-      // Count expected workflow files
-      const expectedWorkflowCount = workflowFiles.length;
+      try {
+        // Create manager after setting env var to include all domains
+        const workflowManager = new WorkflowManager();
+        const loadedWorkflows = workflowManager.getAvailableWorkflows();
+        const loadedWorkflowNames = loadedWorkflows.map(w => w.name);
 
-      // Should load exactly the same number of workflows as files
-      expect(loadedWorkflows.length).toBe(expectedWorkflowCount);
+        // Count expected workflow files
+        const expectedWorkflowCount = workflowFiles.length;
 
-      // Each workflow file should correspond to a loaded workflow
-      for (const file of workflowFiles) {
-        const workflowName = file.replace(/\.(yaml|yml)$/, '');
-        expect(loadedWorkflowNames).toContain(workflowName);
+        // Should load exactly the same number of workflows as files
+        expect(loadedWorkflows.length).toBe(expectedWorkflowCount);
+
+        // Each workflow file should correspond to a loaded workflow
+        for (const file of workflowFiles) {
+          const workflowName = file.replace(/\.(yaml|yml)$/, '');
+          expect(loadedWorkflowNames).toContain(workflowName);
+        }
+      } finally {
+        if (originalEnv !== undefined) {
+          process.env.VIBE_WORKFLOW_DOMAINS = originalEnv;
+        } else {
+          delete process.env.VIBE_WORKFLOW_DOMAINS;
+        }
       }
     });
 

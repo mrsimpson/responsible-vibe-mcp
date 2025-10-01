@@ -6,6 +6,7 @@ initial_state: 'requirements'
 
 # Enhanced metadata for better discoverability
 metadata:
+  domain: 'code'
   complexity: 'high'
   bestFor:
     - 'Large feature development'

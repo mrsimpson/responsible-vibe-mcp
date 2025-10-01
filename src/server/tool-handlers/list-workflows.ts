@@ -16,7 +16,12 @@ const logger = createLogger('ListWorkflowsHandler');
  * Schema for list_workflows tool arguments
  */
 const ListWorkflowsArgsSchema = z.object({
-  // No input parameters needed
+  include_unloaded: z
+    .boolean()
+    .optional()
+    .describe(
+      'Include workflows not loaded due to domain filtering. Default: false'
+    ),
 });
 
 type ListWorkflowsArgs = z.infer<typeof ListWorkflowsArgsSchema>;
@@ -50,13 +55,21 @@ export class ListWorkflowsHandler extends BaseToolHandler<
   ): Promise<ListWorkflowsResponse> {
     logger.info('Listing available workflows', {
       projectPath: context.projectPath,
+      includeUnloaded: args.include_unloaded,
     });
 
-    // Get workflows available for this project (filters custom workflow appropriately)
-    const availableWorkflows =
-      context.workflowManager.getAvailableWorkflowsForProject(
-        context.projectPath
-      );
+    let availableWorkflows;
+
+    if (args.include_unloaded) {
+      // Get all workflows regardless of domain filtering
+      availableWorkflows = context.workflowManager.getAllAvailableWorkflows();
+    } else {
+      // Get only loaded workflows (respects current domain filtering)
+      availableWorkflows =
+        context.workflowManager.getAvailableWorkflowsForProject(
+          context.projectPath
+        );
+    }
 
     // Transform to response format with resource URIs
     const workflows: WorkflowOverview[] = availableWorkflows.map(workflow => ({
@@ -72,6 +85,7 @@ export class ListWorkflowsHandler extends BaseToolHandler<
 
     logger.info('Successfully listed workflows', {
       count: workflows.length,
+      includeUnloaded: args.include_unloaded,
       workflows: workflows.map(w => w.name),
     });
 

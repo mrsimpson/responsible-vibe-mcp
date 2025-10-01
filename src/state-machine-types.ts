@@ -63,6 +63,7 @@ export interface YamlStateMachine {
   /** Optional metadata for enhanced discoverability */
   metadata?: {
     complexity?: 'low' | 'medium' | 'high';
+    domain: string;
     bestFor?: string[];
     useCases?: string[];
     examples?: string[];

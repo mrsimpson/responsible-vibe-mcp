@@ -6,6 +6,7 @@ initial_state: 'ideation'
 
 # Enhanced metadata for better discoverability
 metadata:
+  domain: 'code'
   complexity: 'high'
   bestFor:
     - 'New projects from scratch'

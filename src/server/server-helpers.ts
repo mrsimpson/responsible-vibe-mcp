@@ -181,9 +181,7 @@ export function generateWorkflowDescription(
   }
 
   description +=
-    '• **custom**: Use custom workflow from .vibe/workflow.yaml in your project\n\n';
-  description +=
-    'Default: waterfall (recommended for larger, design-heavy tasks)';
+    '• **custom**: Use custom workflow from .vibe/workflows in your project\n\n';
 
   return description;
 }

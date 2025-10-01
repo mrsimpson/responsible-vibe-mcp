@@ -4,6 +4,7 @@ initial_state: discovery
 
 # Enhanced metadata for better discoverability
 metadata:
+  domain: 'office'
   complexity: 'medium'
   bestFor:
     - 'Blog post writing'

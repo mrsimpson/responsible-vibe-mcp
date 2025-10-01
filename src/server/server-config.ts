@@ -10,8 +10,6 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { ResourceTemplate } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { SetLevelRequestSchema } from '@modelcontextprotocol/sdk/types.js';
 
-import { DEFAULT_WORKFLOW_NAME } from '../constants.js';
-
 import { Database } from '../database.js';
 import { ConversationManager } from '../conversation-manager.js';
 import { TransitionEngine } from '../transition-engine.js';
@@ -300,7 +298,6 @@ export async function registerMcpTools(
       inputSchema: {
         workflow: z
           .enum(buildWorkflowEnum(context.workflowManager.getWorkflowNames()))
-          .default(DEFAULT_WORKFLOW_NAME)
           .describe(
             generateWorkflowDescription(
               context.workflowManager.getAvailableWorkflows()
@@ -395,14 +392,52 @@ export async function registerMcpTools(
     )
   );
 
+  // Register install_workflow tool
+  mcpServer.registerTool(
+    'install_workflow',
+    {
+      description:
+        'Install a workflow to .vibe/workflows/ directory. Source can be a predefined workflow name (from unloaded workflows) or URL. Installed workflows become available and override predefined ones with the same name.',
+      inputSchema: {
+        source: z
+          .string()
+          .describe('Source workflow name or URL to workflow file'),
+        name: z
+          .string()
+          .optional()
+          .describe(
+            'Custom name for installed workflow (defaults to source name)'
+          ),
+      },
+      annotations: {
+        title: 'Workflow Installation Tool',
+        readOnlyHint: false,
+        destructiveHint: false,
+        idempotentHint: false,
+        openWorldHint: false,
+      },
+    },
+    createToolHandler(
+      'install_workflow',
+      toolRegistry,
+      responseRenderer,
+      context
+    )
+  );
+
   // Register list_workflows tool
   mcpServer.registerTool(
     'list_workflows',
     {
       description:
-        'Get an overview of all available workflows with their descriptions and resource URIs. Use this to understand what development workflows are available and access detailed workflow information through the provided resource URIs.',
+        'Get an overview of available workflows. By default returns only loaded workflows (respecting domain filtering). Use include_unloaded=true to see all workflows regardless of domain filtering.',
       inputSchema: {
-        // No input parameters needed
+        include_unloaded: z
+          .boolean()
+          .optional()
+          .describe(
+            'Include workflows not loaded due to domain filtering. Default: false'
+          ),
       },
       annotations: {
         title: 'Workflow Overview Tool',

@@ -6,6 +6,7 @@ initial_state: 'discovery'
 
 # Enhanced metadata for better discoverability
 metadata:
+  domain: 'architecture'
   complexity: 'medium'
   bestFor:
     - 'Legacy system analysis'

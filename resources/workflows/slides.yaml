@@ -4,6 +4,7 @@ initial_state: ideate
 
 # Enhanced metadata for better discoverability
 metadata:
+  domain: 'office'
   complexity: 'medium'
   bestFor:
     - 'Presentation creation'
