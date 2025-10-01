@@ -401,7 +401,9 @@ export async function registerMcpTools(
       inputSchema: {
         source: z
           .string()
-          .describe('Source workflow name or URL to workflow file'),
+          .describe(
+            'Source workflow name. Use "list_workflows" with "include_unloaded=true" tool to see options.'
+          ),
         name: z
           .string()
           .optional()
@@ -479,21 +481,13 @@ export async function registerMcpTools(
     {
       description:
         'Create project documentation artifacts (architecture.md, requirements.md, design.md) using configurable templates OR by linking existing files via symlinks. ' +
-        'Each parameter accepts either a template name, a file path to an existing document, or "none" to disable that document type.\n\n' +
-        '**Template Options:**\n' +
-        `- Architecture: ${availableTemplates.architecture.join(', ')}, none\n` +
-        `- Requirements: ${availableTemplates.requirements.join(', ')}, none\n` +
-        `- Design: ${availableTemplates.design.join(', ')}, none\n\n` +
-        '**File Path Examples:**\n' +
+        '**Linking existing documents Examples:**\n' +
         '- `README.md` (project root)\n' +
         '- `docs/architecture.md` (relative path)\n' +
         '- `/absolute/path/to/requirements.txt`\n\n' +
         '**Using "none" Option:**\n' +
         '- Use `"none"` to create a placeholder that instructs LLM to use plan file instead\n' +
         '- Useful when you prefer plan-file-only workflows\n\n' +
-        '**Common Documentation Files:**\n' +
-        '- README.md, ARCHITECTURE.md, DESIGN.md, REQUIREMENTS.md\n' +
-        '- Files in docs/ folder\n\n' +
         '**Mixed Usage Examples:**\n' +
         '- `setup_project_docs({ architecture: "README.md", requirements: "none", design: "comprehensive" })`\n' +
         '- `setup_project_docs({ architecture: "arc42", requirements: "ears", design: "none" })`',
@@ -501,17 +495,17 @@ export async function registerMcpTools(
         architecture: z
           .string()
           .describe(
-            `Architecture documentation: template name (${availableTemplates.architecture.join(', ')}) OR file path to existing document`
+            `Architecture documentation: template name (${availableTemplates.architecture.join(', ')}, none) OR file path to existing document`
           ),
         requirements: z
           .string()
           .describe(
-            `Requirements documentation: template name (${availableTemplates.requirements.join(', ')}) OR file path to existing document`
+            `Requirements documentation: template name (${availableTemplates.requirements.join(', ')}, none) OR file path to existing document`
           ),
         design: z
           .string()
           .describe(
-            `Design documentation: template name (${availableTemplates.design.join(', ')}) OR file path to existing document`
+            `Design documentation: template name (${availableTemplates.design.join(', ')}, none) OR file path to existing document`
           ),
       },
       annotations: {

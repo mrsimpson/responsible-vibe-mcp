@@ -50,12 +50,6 @@ export class WorkflowLoader {
       displayName: 'Posts',
       description: 'Workflow for writing blog posts and content',
     },
-    // Add fallback for any other workflows
-    bugfix3: {
-      displayName: 'Bug Fix 3',
-      description:
-        'Test workflow - copy of bugfix for testing dynamic discovery',
-    },
   };
 
   constructor() {

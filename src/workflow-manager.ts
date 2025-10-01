@@ -9,7 +9,6 @@ import path from 'node:path';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import { createLogger } from './logger.js';
-import { DEFAULT_WORKFLOW_NAME } from './constants.js';
 import { StateMachineLoader } from './state-machine-loader.js';
 import { YamlStateMachine } from './state-machine-types.js';
 import { ConfigManager } from './config-manager.js';
@@ -239,9 +238,16 @@ export class WorkflowManager {
     projectPath: string,
     workflowName?: string
   ): YamlStateMachine {
-    // If no workflow specified, default to waterfall
+    // If no workflow specified, use first available workflow
     if (!workflowName) {
-      workflowName = DEFAULT_WORKFLOW_NAME;
+      const availableWorkflows =
+        this.getAvailableWorkflowsForProject(projectPath);
+      if (availableWorkflows.length === 0) {
+        throw new Error(
+          'No workflows available. Please install a workflow or adjust VIBE_WORKFLOW_DOMAINS environment variable.'
+        );
+      }
+      workflowName = availableWorkflows[0].name;
     }
 
     // If workflow name is 'custom', try to load custom workflow

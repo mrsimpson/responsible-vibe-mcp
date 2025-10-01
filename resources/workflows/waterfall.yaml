@@ -1,7 +1,7 @@
 # yaml-language-server: $schema=../state-machine-schema.json
 ---
 name: 'waterfall'
-description: 'From Specification down to test – the historical way. Ideal for larger, design-heavy tasks with well-defined requirements'
+description: 'V-Model: Specification down to test – the historical way. Ideal for larger, design-heavy tasks with well-defined requirements'
 initial_state: 'requirements'
 
 # Enhanced metadata for better discoverability

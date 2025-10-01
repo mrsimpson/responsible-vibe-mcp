@@ -66,9 +66,11 @@ Optimize workflow selection and reduce context size by improving how workflows a
 - [x] **FIXED**: Reload workflows after installation for immediate availability
 - [x] **FIXED**: Project workflows ignore domain filtering (always available)
 - [x] **TESTS**: Add comprehensive tests for workflow functionality
-- [ ] Update `start_development` tool to work with filtered workflows
+- [x] Update `start_development` tool to work with filtered workflows
 - [x] Handle workflow name conflicts between sources (project workflows prioritized)
 - [x] Update existing tests for multi-source workflow loading
+- [x] **FIXED**: Remove DEFAULT_WORKFLOW_NAME dependency - use first available workflow
+- [x] **FIXED**: Handle case where no workflows are available in error messages
 - [ ] Update documentation for new workflow management system
 
 ### Completed

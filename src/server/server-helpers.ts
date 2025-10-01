@@ -7,7 +7,6 @@
 
 import { homedir } from 'node:os';
 import { createLogger } from '../logger.js';
-import { DEFAULT_WORKFLOW_NAME } from '../constants.js';
 import { HandlerResult } from './types.js';
 
 const logger = createLogger('ServerHelpers');
@@ -106,12 +105,26 @@ export function validateRequiredArgs(
 /**
  * Check if a conversation exists and provide helpful error if not
  */
-export function createConversationNotFoundResult(): HandlerResult<never> {
+export function createConversationNotFoundResult(
+  availableWorkflows: string[] = []
+): HandlerResult<never> {
+  if (availableWorkflows.length === 0) {
+    return createErrorResult(
+      'No development conversation has been started for this project and no workflows are available. Please install a workflow first or adjust the VIBE_WORKFLOW_DOMAINS environment variable.',
+      {
+        suggestion:
+          'install_workflow({ source: "waterfall" }) or set VIBE_WORKFLOW_DOMAINS=code,architecture,office',
+        availableWorkflows: [],
+      }
+    );
+  }
+
+  const firstWorkflow = availableWorkflows[0];
   return createErrorResult(
     'No development conversation has been started for this project. Please use the start_development tool first to initialize development with a workflow.',
     {
-      suggestion: `start_development({ workflow: "${DEFAULT_WORKFLOW_NAME}" })`,
-      availableWorkflows: [DEFAULT_WORKFLOW_NAME, 'epcc', 'bugfix', 'custom'],
+      suggestion: `start_development({ workflow: "${firstWorkflow}" })`,
+      availableWorkflows,
     }
   );
 }
