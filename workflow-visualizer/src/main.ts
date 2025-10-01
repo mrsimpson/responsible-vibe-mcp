@@ -144,7 +144,9 @@ class WorkflowVisualizerApp {
       for (const workflow of workflows) {
         const option = document.createElement('option');
         option.value = workflow.name;
-        option.textContent = `${workflow.displayName} - ${workflow.description}`;
+        // Include domain in option text if available
+        const domainText = workflow.domain ? ` [${workflow.domain}]` : '';
+        option.textContent = `${workflow.displayName}${domainText} - ${workflow.description}`;
         this.workflowSelector.appendChild(option);
       }
     } catch (error) {
@@ -322,7 +324,7 @@ class WorkflowVisualizerApp {
         <h3 class="detail-title">${workflow.name} Workflow</h3>
         <p class="detail-content">${workflow.description || 'No description available'}</p>
       </div>
-      
+
       ${
         metadata?.complexity
           ? `
@@ -333,7 +335,7 @@ class WorkflowVisualizerApp {
       `
           : ''
       }
-      
+
       ${
         metadata?.bestFor?.length
           ? `
@@ -346,7 +348,7 @@ class WorkflowVisualizerApp {
       `
           : ''
       }
-      
+
       ${
         metadata?.useCases?.length
           ? `
@@ -359,7 +361,7 @@ class WorkflowVisualizerApp {
       `
           : ''
       }
-      
+
       ${
         metadata?.examples?.length
           ? `
@@ -372,7 +374,7 @@ class WorkflowVisualizerApp {
       `
           : ''
       }
-      
+
       <div class="detail-section">
         <p class="detail-hint">Click on states or transitions to see detailed information.</p>
       </div>
@@ -444,12 +446,12 @@ class WorkflowVisualizerApp {
         </h3>
         <p class="detail-content">${stateData.description}</p>
       </div>
-      
+
       <div class="detail-section">
         <h4 class="detail-subtitle">Default Instructions</h4>
         <div class="code-block">${stateData.default_instructions}</div>
       </div>
-      
+
       <div class="detail-section">
         <h4 class="detail-subtitle">Transitions (${stateData.transitions.length})</h4>
         <ul class="transitions-list">
@@ -557,12 +559,12 @@ class WorkflowVisualizerApp {
           <strong>${transitionData.from}</strong> → <strong>${transitionData.to}</strong>
         </p>
       </div>
-      
+
       <div class="detail-section">
         <h4 class="detail-subtitle">Reason</h4>
         <p class="detail-content">${transitionData.transition_reason}</p>
       </div>
-      
+
       ${
         transitionData.instructions
           ? `
@@ -573,7 +575,7 @@ class WorkflowVisualizerApp {
       `
           : ''
       }
-      
+
       ${
         transitionData.additional_instructions
           ? `
@@ -584,7 +586,7 @@ class WorkflowVisualizerApp {
       `
           : ''
       }
-      
+
       ${
         transitionData.review_perspectives?.length
           ? `

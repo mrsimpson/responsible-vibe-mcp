@@ -69,7 +69,7 @@ export class PlantUMLRenderer {
         " 
         class="workflow-title-clickable"
         title="Click to show workflow information"
-        >${workflow.name} Workflow</h2>
+        >${workflow.name} Workflow ${workflow.metadata?.domain ? `<span class="domain-pill" data-domain="${workflow.metadata.domain}">${workflow.metadata.domain}</span>` : ''}</h2>
       </div>
       <p style="color: #64748b; margin-bottom: 20px; text-align: center;">${workflow.description || ''}</p>
     `;

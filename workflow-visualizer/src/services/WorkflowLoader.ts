@@ -64,12 +64,27 @@ export class WorkflowLoader {
 
     return workflowNames.map(name => {
       const metadata = this.WORKFLOW_METADATA[name];
+
+      // Load workflow to extract domain from metadata
+      let domain: string | undefined;
+      try {
+        const yamlContent = getBundledWorkflow(name);
+        if (yamlContent) {
+          const workflow = this.yamlParser.parseWorkflow(yamlContent);
+          domain = workflow.metadata?.domain;
+        }
+      } catch (error) {
+        // If workflow fails to load, continue without domain
+        console.warn(`Failed to load domain for workflow ${name}:`, error);
+      }
+
       return {
         name,
         displayName: metadata?.displayName || this.formatDisplayName(name),
         description:
           metadata?.description || `${this.formatDisplayName(name)} workflow`,
-        source: 'builtin',
+        source: 'builtin' as const,
+        domain,
       };
     });
   }

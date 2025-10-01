@@ -387,3 +387,30 @@
   text-align: center;
   margin-top: var(--spacing-md);
 }
+/* Domain pill styling */
+.domain-pill {
+  display: inline-block;
+  background-color: #e5e7eb;
+  color: #374151;
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+  margin-left: 0.5rem;
+  vertical-align: middle;
+}
+
+.domain-pill[data-domain='code'] {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+.domain-pill[data-domain='architecture'] {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.domain-pill[data-domain='office'] {
+  background-color: #d1fae5;
+  color: #065f46;
+}

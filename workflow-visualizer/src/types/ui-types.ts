@@ -67,6 +67,7 @@ export interface WorkflowMetadata {
   displayName: string;
   description: string;
   source: 'builtin' | 'uploaded';
+  domain?: string;
 }
 
 /**

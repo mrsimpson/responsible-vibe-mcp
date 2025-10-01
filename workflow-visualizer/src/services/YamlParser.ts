@@ -65,14 +65,7 @@ export class YamlParser {
       description: parsedData.description as string,
       initial_state: parsedData.initial_state as string,
       states: states,
-      metadata: parsedData.metadata as
-        | {
-            complexity?: 'low' | 'medium' | 'high';
-            bestFor?: string[];
-            useCases?: string[];
-            examples?: string[];
-          }
-        | undefined,
+      metadata: parsedData.metadata as YamlStateMachine['metadata'],
     };
   }
 
