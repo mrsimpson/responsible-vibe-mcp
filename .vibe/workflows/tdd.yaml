@@ -1,0 +1,157 @@
+# yaml-language-server: $schema=../state-machine-schema.json
+---
+name: 'my-tdd'
+description: 'Test-Driven Development workflow: Explore → Red → Green → Refactor cycle for quality-focused development'
+initial_state: 'explore'
+
+# Enhanced metadata for better discoverability
+metadata:
+  domain: 'code'
+  complexity: 'medium'
+  bestFor:
+    - 'TDD development'
+    - 'Test-first coding'
+    - 'Quality-focused development'
+    - 'Refactoring existing code'
+  useCases:
+    - 'Adding new features with comprehensive tests'
+    - 'Refactoring legacy code safely'
+    - 'Building robust, well-tested components'
+  examples:
+    - 'Add new API endpoint with full test coverage'
+    - 'Refactor existing function with safety net of tests'
+    - 'Build new feature following TDD principles'
+
+# States with default instructions and transitions
+states:
+  explore:
+    description: 'Research and exploration phase - understanding the problem space and codebase'
+    default_instructions: |
+      You are in the TDD exploration phase.
+      Your main objective now is to gather context about what needs to be developed. Focus on the WHY and WHAT, not the HOW.
+      Research the codebase, understand existing patterns,
+      If you are not certain about conventions or rules, ask the user about them.
+      Read relevant files and documentation. If $REQUIREMENTS_DOC exists, understand and document requirements there, otherwise document them in the plan file.
+      Don't write code or tests yet - focus on understanding. Document your findings in the plan file.
+    transitions:
+      - trigger: 'exploration_complete'
+        to: 'red'
+        additional_instructions: 'Mark completed exploration tasks.'
+        transition_reason: 'Sufficient understanding gained, ready to start TDD cycle with failing test'
+
+      - trigger: 'abandon_feature'
+        to: 'explore'
+        instructions: >
+          Feature development abandoned. Return to exploration state for new tasks.
+          The plan file will remain for future reference if needed.
+        additional_instructions: 'Clean up any work in progress and prepare for new tasks.'
+        transition_reason: 'User decided to abandon current feature development'
+
+  red:
+    description: 'RED phase - Write a failing test that defines the expected behavior'
+    default_instructions: |
+      You are in the RED phase of TDD. Write a failing test that defines the expected behavior.
+
+      **CRITICAL QUALITY GATE**: Before writing the test, ask the user about:
+      1. What type of test is appropriate (unit, integration, acceptance, etc.)
+      2. Validate with the user that your test actually tests what needs to be developed
+
+      Write a test that:
+      - Clearly defines the expected behavior
+      - Will fail initially (since the functionality doesn't exist yet)
+      - Is specific and focused on one aspect of the functionality
+      - Uses appropriate assertions (not assert(true) or similar meaningless checks)
+
+      Run the test to confirm it fails for the right reason. Document the test in the plan file.
+    transitions:
+      - trigger: 'test_written_and_failing'
+        to: 'green'
+        additional_instructions: 'Mark completed test tasks.'
+        transition_reason: 'Failing test successfully written and validated, ready to implement'
+
+      - trigger: 'need_more_exploration'
+        to: 'explore'
+        transition_reason: 'Test writing revealed need for more exploration'
+
+      - trigger: 'abandon_feature'
+        to: 'explore'
+        additional_instructions: 'Clean up any test artifacts and prepare for new tasks.'
+        transition_reason: 'User decided to abandon feature during test phase'
+
+  green:
+    description: 'GREEN phase - Write only the necessary code to make the test pass'
+    default_instructions: |
+      You are in the GREEN phase of TDD. Write only the necessary code to make the failing test pass with a proper implementation.
+
+      **CRITICAL QUALITY GATE**: Verify your implementation has NO dirty hacks such as:
+      - assert(true) or similar meaningless assertions
+      - Hardcoded return values that don't represent real logic
+      - Shortcuts that bypass the actual functionality
+      - Copy-paste code without understanding
+
+      Focus on:
+      - Making the test pass with real, working code
+      - Writing only what's necessary (no over-engineering)
+      - Ensuring the solution actually solves the problem
+      - Implementing proper logic, not shortcuts
+      - Running the test to confirm it passes
+
+      Document your implementation approach in the plan file.
+    transitions:
+      - trigger: 'test_passing'
+        to: 'refactor'
+        additional_instructions: 'Mark completed implementation tasks.'
+        transition_reason: 'Test passes with proper implementation, ready for refactoring'
+
+      - trigger: 'need_different_test'
+        to: 'red'
+        transition_reason: 'Implementation work revealed need to revise the test'
+
+      - trigger: 'need_more_exploration'
+        to: 'explore'
+        transition_reason: 'Implementation work revealed need for more exploration'
+
+      - trigger: 'abandon_feature'
+        to: 'explore'
+        additional_instructions: 'Clean up any incomplete code and prepare for new tasks.'
+        transition_reason: 'User decided to abandon feature during implementation'
+
+  refactor:
+    description: 'REFACTOR phase - Improve code quality while keeping tests green (cleanup phase)'
+    default_instructions: |
+      You are in the REFACTOR phase of TDD. This is the cleanup phase - improve code quality while keeping all tests green.
+
+      Focus on:
+      - Removing code duplication
+      - Improving variable and function names
+      - Extracting methods for better organization
+      - Simplifying complex logic
+      - Enhancing readability and maintainability
+      - Applying appropriate design patterns
+
+      **Safety Rules**:
+      - Run tests after each refactoring change
+      - If any test breaks, immediately revert the change
+      - Make small, incremental improvements
+      - Stop when code is clean and no obvious improvements remain
+
+      Document significant refactoring decisions in the plan file.
+    transitions:
+      - trigger: 'refactoring_complete'
+        to: 'red'
+        additional_instructions: 'Mark completed refactoring tasks.'
+        transition_reason: 'Code cleanup complete, ready for next TDD cycle'
+
+      - trigger: 'need_different_approach'
+        to: 'green'
+        transition_reason: 'Refactoring revealed need to revise implementation'
+
+      - trigger: 'feature_complete'
+        to: 'explore'
+        additional_instructions: 'Mark feature as complete in plan file.'
+        transition_reason: 'Feature fully implemented and cleaned up, ready for new tasks'
+
+      - trigger: 'abandon_feature'
+        to: 'explore'
+        additional_instructions: 'Clean up any refactoring work and prepare for new tasks.'
+        transition_reason: 'User decided to abandon feature during refactoring'

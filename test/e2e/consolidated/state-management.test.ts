@@ -142,7 +142,7 @@ describe('State Management', () => {
       await fs.mkdir(vibeDir, { recursive: true });
 
       const customStateMachine = `
-name: "Custom Development"
+name: "custom"
 description: "Custom development workflow for testing"
 initial_state: "planning"
 states:
@@ -189,7 +189,7 @@ states:
       await fs.mkdir(vibeDir, { recursive: true });
 
       const customStateMachine = `
-name: "YML Test"
+name: "custom"
 description: "Test .yml extension"
 initial_state: "start"
 states:

@@ -396,7 +396,7 @@ describe('Workflow Integration - Custom State Machines', () => {
       await fs.mkdir(vibeDir, { recursive: true });
 
       const customWorkflow = `
-name: "Agile Sprint Workflow"
+name: "custom"
 description: "Custom agile development workflow"
 initial_state: "backlog"
 states:

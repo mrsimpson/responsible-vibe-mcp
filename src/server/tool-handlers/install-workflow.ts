@@ -8,6 +8,7 @@ import { z } from 'zod';
 import { BaseToolHandler } from './base-tool-handler.js';
 import { ServerContext } from '../types.js';
 import { createLogger } from '../../logger.js';
+import { notificationService } from '../notification-service.js';
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -152,6 +153,9 @@ export class InstallWorkflowHandler extends BaseToolHandler<
       target: targetName,
       path: targetFile,
     });
+
+    // Notify MCP client that tool list has changed (workflow enum updated)
+    await notificationService.notifyToolListChanged();
 
     return {
       success: true,

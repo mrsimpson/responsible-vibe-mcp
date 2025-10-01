@@ -33,6 +33,7 @@ import {
   buildWorkflowEnum,
   generateWorkflowDescription,
 } from './server-helpers.js';
+import { notificationService } from './notification-service.js';
 
 const logger = createLogger('ServerConfig');
 
@@ -171,6 +172,9 @@ export async function registerMcpTools(
   context: ServerContext
 ): Promise<void> {
   logger.debug('Registering MCP tools');
+
+  // Initialize notification service
+  notificationService.setMcpServer(mcpServer);
 
   // Register whats_next tool
   mcpServer.registerTool(

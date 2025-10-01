@@ -36,6 +36,7 @@ describe('Commit Behaviour Interface', () => {
       },
       workflowManager: {
         validateWorkflowName: vi.fn().mockReturnValue(true),
+        loadProjectWorkflows: vi.fn(),
         loadWorkflowForProject: vi
           .fn()
           .mockReturnValue({ name: 'minor', phases: ['explore', 'implement'] }),
@@ -46,6 +47,7 @@ describe('Commit Behaviour Interface', () => {
           .mockResolvedValue({ newPhase: 'explore' }),
       },
       planManager: {
+        setStateMachine: vi.fn(),
         ensurePlanFile: vi.fn().mockResolvedValue('/test/plan.md'),
       },
       instructionGenerator: {
@@ -90,6 +92,7 @@ describe('Commit Behaviour Interface', () => {
       },
       workflowManager: {
         validateWorkflowName: vi.fn().mockReturnValue(true),
+        loadProjectWorkflows: vi.fn(),
         loadWorkflowForProject: vi
           .fn()
           .mockReturnValue({ name: 'minor', phases: ['explore', 'implement'] }),
@@ -100,6 +103,7 @@ describe('Commit Behaviour Interface', () => {
           .mockResolvedValue({ newPhase: 'explore' }),
       },
       planManager: {
+        setStateMachine: vi.fn(),
         ensurePlanFile: vi.fn().mockResolvedValue('/test/plan.md'),
       },
       instructionGenerator: {
@@ -112,7 +116,7 @@ describe('Commit Behaviour Interface', () => {
         workflow: 'minor',
         commit_behaviour: 'phase',
       },
-      mockContext as ServerContext
+      mockContext as unknown as ServerContext
     );
 
     expect(
@@ -142,6 +146,7 @@ describe('Commit Behaviour Interface', () => {
       },
       workflowManager: {
         validateWorkflowName: vi.fn().mockReturnValue(true),
+        loadProjectWorkflows: vi.fn(),
         loadWorkflowForProject: vi
           .fn()
           .mockReturnValue({ name: 'minor', phases: ['explore', 'implement'] }),
@@ -152,6 +157,7 @@ describe('Commit Behaviour Interface', () => {
           .mockResolvedValue({ newPhase: 'explore' }),
       },
       planManager: {
+        setStateMachine: vi.fn(),
         ensurePlanFile: vi.fn().mockResolvedValue('/test/plan.md'),
       },
       instructionGenerator: {
@@ -194,6 +200,7 @@ describe('Commit Behaviour Interface', () => {
       },
       workflowManager: {
         validateWorkflowName: vi.fn().mockReturnValue(true),
+        loadProjectWorkflows: vi.fn(),
         loadWorkflowForProject: vi
           .fn()
           .mockReturnValue({ name: 'minor', phases: ['explore', 'implement'] }),
@@ -204,6 +211,7 @@ describe('Commit Behaviour Interface', () => {
           .mockResolvedValue({ newPhase: 'explore' }),
       },
       planManager: {
+        setStateMachine: vi.fn(),
         ensurePlanFile: vi.fn().mockResolvedValue('/test/plan.md'),
       },
       instructionGenerator: {

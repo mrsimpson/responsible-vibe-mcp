@@ -185,29 +185,6 @@ export class ConversationManager {
   }
 
   /**
-   * Detect the appropriate workflow for a project
-   * Checks for custom workflow first, then defaults to waterfall
-   */
-  private detectWorkflowForProject(projectPath: string): string {
-    // Check for custom workflow files
-    const customFilePaths = [
-      resolve(projectPath, '.vibe', 'workflow.yaml'),
-      resolve(projectPath, '.vibe', 'workflow.yml'),
-    ];
-
-    for (const filePath of customFilePaths) {
-      if (existsSync(filePath)) {
-        logger.debug('Custom workflow detected', { filePath });
-        return 'custom';
-      }
-    }
-
-    // Default to waterfall
-    logger.debug('No custom workflow found, defaulting to waterfall');
-    return 'waterfall';
-  }
-
-  /**
    * Create a new conversation state
    *
    * @param conversationId - ID for the new conversation

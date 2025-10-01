@@ -118,6 +118,7 @@ export class MockContextFactory {
         getWorkflowNames: vi
           .fn()
           .mockReturnValue(['waterfall', 'epcc', 'greenfield']),
+        loadProjectWorkflows: vi.fn(),
         loadWorkflowForProject: vi.fn().mockReturnValue({
           initial_state: 'requirements',
           states: {

@@ -90,7 +90,8 @@ export class StartDevelopmentHandler extends BaseToolHandler<
       gitCommitConfig,
     });
 
-    // Validate workflow selection
+    // Validate workflow selection (ensure project workflows are loaded first)
+    context.workflowManager.loadProjectWorkflows(context.projectPath);
     if (
       !context.workflowManager.validateWorkflowName(
         selectedWorkflow,
@@ -99,7 +100,7 @@ export class StartDevelopmentHandler extends BaseToolHandler<
     ) {
       const availableWorkflows = context.workflowManager.getWorkflowNames();
       throw new Error(
-        `Invalid workflow: ${selectedWorkflow}. Available workflows: ${availableWorkflows.join(', ')}, custom`
+        `Invalid workflow: ${selectedWorkflow}. Available workflows: ${availableWorkflows.join(', ')}`
       );
     }
 

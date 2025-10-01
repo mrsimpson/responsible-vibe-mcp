@@ -76,6 +76,7 @@ vi.mock('../../src/workflow-manager', () => ({
   WorkflowManager: vi.fn().mockImplementation(() => ({
     validateWorkflowName: vi.fn().mockReturnValue(true),
     getWorkflowNames: vi.fn().mockReturnValue(['waterfall', 'agile', 'custom']),
+    loadProjectWorkflows: vi.fn(),
     loadWorkflowForProject: vi.fn().mockReturnValue({
       name: 'Test Workflow',
       description: 'Test workflow',

@@ -68,6 +68,9 @@ export class WorkflowManager {
    * Load project-specific workflows from .vibe/workflows/
    */
   public loadProjectWorkflows(projectPath: string): void {
+    // First, migrate any legacy workflow files
+    this.migrateLegacyWorkflow(projectPath);
+
     const workflowsDir = path.join(projectPath, '.vibe', 'workflows');
 
     if (!fs.existsSync(workflowsDir)) {
@@ -116,6 +119,44 @@ export class WorkflowManager {
         error as Error,
         { workflowsDir }
       );
+    }
+  }
+
+  /**
+   * Migrate legacy workflow.yaml to new workflows directory
+   */
+  private migrateLegacyWorkflow(projectPath: string): void {
+    const legacyPaths = [
+      path.join(projectPath, '.vibe', 'workflow.yaml'),
+      path.join(projectPath, '.vibe', 'workflow.yml'),
+    ];
+
+    const workflowsDir = path.join(projectPath, '.vibe', 'workflows');
+    const targetPath = path.join(workflowsDir, 'custom.yaml');
+
+    for (const legacyPath of legacyPaths) {
+      if (fs.existsSync(legacyPath) && !fs.existsSync(targetPath)) {
+        try {
+          // Create workflows directory if it doesn't exist
+          if (!fs.existsSync(workflowsDir)) {
+            fs.mkdirSync(workflowsDir, { recursive: true });
+          }
+
+          // Copy the file to new location
+          fs.copyFileSync(legacyPath, targetPath);
+
+          // Remove the old file
+          fs.unlinkSync(legacyPath);
+
+          logger.info('Migrated legacy workflow to new location', {
+            from: legacyPath,
+            to: targetPath,
+          });
+          break;
+        } catch (_error) {
+          logger.error('Failed to migrate legacy workflow');
+        }
+      }
     }
   }
   /**
@@ -225,9 +266,21 @@ export class WorkflowManager {
 
   /**
    * Get workflow names as enum values for tool schema
+   * Includes both predefined and project workflows
    */
   public getWorkflowNames(): string[] {
-    return Array.from(this.predefinedWorkflows.keys());
+    const predefinedNames = Array.from(this.predefinedWorkflows.keys());
+    const projectNames = Array.from(this.projectWorkflows.keys());
+
+    // Combine and deduplicate (project workflows override predefined ones)
+    const allNames = [...predefinedNames];
+    for (const projectName of projectNames) {
+      if (!allNames.includes(projectName)) {
+        allNames.push(projectName);
+      }
+    }
+
+    return allNames;
   }
 
   /**
@@ -238,6 +291,9 @@ export class WorkflowManager {
     projectPath: string,
     workflowName?: string
   ): YamlStateMachine {
+    // Load project workflows first
+    this.loadProjectWorkflows(projectPath);
+
     // If no workflow specified, use first available workflow
     if (!workflowName) {
       const availableWorkflows =
@@ -250,35 +306,20 @@ export class WorkflowManager {
       workflowName = availableWorkflows[0].name;
     }
 
-    // If workflow name is 'custom', try to load custom workflow
-    if (workflowName === 'custom') {
-      const customFilePaths = [
-        path.join(projectPath, '.vibe', 'workflow.yaml'),
-        path.join(projectPath, '.vibe', 'workflow.yml'),
-      ];
-
-      try {
-        for (const filePath of customFilePaths) {
-          if (fs.existsSync(filePath)) {
-            logger.info('Loading custom workflow from project', { filePath });
-            return this.stateMachineLoader.loadFromFile(filePath);
-          }
-        }
-        // If custom workflow was requested but not found, throw error
-        throw new Error(
-          `Custom workflow not found. Expected .vibe/workflow.yaml or .vibe/workflow.yml in ${projectPath}`
-        );
-      } catch (error) {
-        logger.error('Could not load custom state machine:', error as Error);
-        throw error;
-      }
-    }
-
     // If it's a predefined workflow, return it
     if (this.isPredefinedWorkflow(workflowName)) {
       const workflow = this.getWorkflow(workflowName);
       if (workflow) {
         logger.info('Loading predefined workflow', { workflowName });
+        return workflow;
+      }
+    }
+
+    // Check project workflows
+    if (this.projectWorkflows.has(workflowName)) {
+      const workflow = this.projectWorkflows.get(workflowName);
+      if (workflow) {
+        logger.info('Loading project workflow', { workflowName });
         return workflow;
       }
     }
@@ -534,14 +575,15 @@ export class WorkflowManager {
       return true;
     }
 
-    // Check if it's 'custom' and custom workflow exists
-    if (workflowName === 'custom') {
-      const customFilePaths = [
-        path.join(projectPath, '.vibe', 'workflow.yaml'),
-        path.join(projectPath, '.vibe', 'workflow.yml'),
-      ];
+    // Check if it's a project workflow (load project workflows first)
+    this.loadProjectWorkflows(projectPath);
+    if (this.projectWorkflows.has(workflowName)) {
+      return true;
+    }
 
-      return customFilePaths.some(filePath => fs.existsSync(filePath));
+    // Also check workflow infos in case workflow failed to load but info was created
+    if (this.workflowInfos.has(workflowName)) {
+      return true;
     }
 
     return false;

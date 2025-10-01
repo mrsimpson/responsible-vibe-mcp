@@ -81,12 +81,54 @@ AI Agent: "Let me understand your requirements:
 
 ## Available Workflows
 
+The system includes workflows organized by domain for better context management:
+
+### Code Development Workflows (Default)
+
 - **waterfall**: Full-featured development (requirements → design → implementation → QA → testing)
 - **epcc**: Explore → Plan → Code → Commit (Anthropic's methodology)
 - **bugfix**: Reproduce → Analyze → Fix → Verify
 - **minor**: Streamlined for small changes
 - **greenfield**: New projects from scratch
-- **custom**: Define your own in `.vibe/workflow.yaml`
+- **tdd**: Test-Driven Development workflow
+
+### Architecture & Analysis Workflows
+
+- **big-bang-conversion**: Complete system replacement with behavioral validation
+- **boundary-testing**: System boundary and API testing
+- **business-analysis**: Business capability modeling and analysis
+- **c4-analysis**: Legacy system analysis using C4 methodology
+
+### Office & Content Workflows
+
+- **posts**: Blog post and content creation workflow
+- **slides**: Presentation creation workflow
+
+### Workflow Management
+
+**Domain Filtering**: By default, only code development workflows are loaded to reduce context size. Control this with:
+
+```bash
+# Load all workflows
+export VIBE_WORKFLOW_DOMAINS=code,architecture,office
+
+# Load only specific domains
+export VIBE_WORKFLOW_DOMAINS=code,architecture
+```
+
+**Install Workflows**: Add workflows to your project on-demand:
+
+```bash
+# Through your AI agent
+"Install the posts workflow for content creation"
+# This calls: install_workflow({ source: "posts" })
+```
+
+**Custom Workflows**: Create project-specific workflows in `.vibe/workflows/`:
+
+- Override predefined workflows by using the same `name` in your YAML
+- Custom workflows are always available regardless of domain filtering
+- Use any filename - the `name` field in YAML determines the workflow identity
 
 ## Key Features
 

@@ -45,95 +45,70 @@ export class WorkflowResourceHandler implements ResourceHandler {
       let yamlContent: string;
       let filePath: string;
 
-      // Handle custom workflow
-      if (workflowName === 'custom') {
-        const customFilePaths = [
-          path.join(context.projectPath, '.vibe', 'workflow.yaml'),
-          path.join(context.projectPath, '.vibe', 'workflow.yml'),
-        ];
+      // Try to get workflow from workflow manager
+      const workflow = context.workflowManager.getWorkflow(workflowName);
+      if (!workflow) {
+        throw new Error(`Workflow '${workflowName}' not found`);
+      }
 
-        let customFile: string | null = null;
-        for (const customPath of customFilePaths) {
-          if (fs.existsSync(customPath)) {
-            customFile = customPath;
-            break;
-          }
-        }
+      // Handle predefined workflows
+      // Get the workflows directory path - more reliable approach
+      const currentFileUrl = import.meta.url;
+      const currentFilePath = fileURLToPath(currentFileUrl);
 
-        if (!customFile) {
-          throw new Error(
-            'Custom workflow file not found. Expected .vibe/workflow.yaml or .vibe/workflow.yml'
-          );
-        }
-
-        filePath = customFile;
-        yamlContent = fs.readFileSync(customFile, 'utf-8');
+      // Navigate from the compiled location to the project root
+      // From dist/server/resource-handlers/workflow-resource.js -> project root
+      let projectRoot: string;
+      if (currentFilePath.includes('/dist/')) {
+        // Running from compiled code - dist is one level down from project root
+        projectRoot = path.resolve(path.dirname(currentFilePath), '../../../');
       } else {
-        // Handle predefined workflows
-        // Get the workflows directory path - more reliable approach
-        const currentFileUrl = import.meta.url;
-        const currentFilePath = fileURLToPath(currentFileUrl);
+        // Running from source (development) - src is one level down from project root
+        projectRoot = path.resolve(path.dirname(currentFilePath), '../../../');
+      }
 
-        // Navigate from the compiled location to the project root
-        // From dist/server/resource-handlers/workflow-resource.js -> project root
-        let projectRoot: string;
-        if (currentFilePath.includes('/dist/')) {
-          // Running from compiled code - dist is one level down from project root
-          projectRoot = path.resolve(
-            path.dirname(currentFilePath),
-            '../../../'
-          );
-        } else {
-          // Running from source (development) - src is one level down from project root
-          projectRoot = path.resolve(
-            path.dirname(currentFilePath),
-            '../../../'
-          );
-        }
+      const workflowFile = path.join(
+        projectRoot,
+        'resources',
+        'workflows',
+        `${workflowName}.yaml`
+      );
 
-        const workflowFile = path.join(
+      if (!fs.existsSync(workflowFile)) {
+        // Try .yml extension
+        const workflowFileYml = path.join(
           projectRoot,
           'resources',
           'workflows',
-          `${workflowName}.yaml`
+          `${workflowName}.yml`
         );
-
-        if (!fs.existsSync(workflowFile)) {
-          // Try .yml extension
-          const workflowFileYml = path.join(
-            projectRoot,
-            'resources',
-            'workflows',
-            `${workflowName}.yml`
+        if (!fs.existsSync(workflowFileYml)) {
+          // Log debug info to help troubleshoot
+          logger.error(
+            'Workflow file not found',
+            new Error(`Workflow '${workflowName}' not found`),
+            {
+              workflowName,
+              currentFilePath,
+              projectRoot,
+              workflowFile,
+              workflowFileYml,
+              workflowsDir: path.join(projectRoot, 'resources', 'workflows'),
+              workflowsDirExists: fs.existsSync(
+                path.join(projectRoot, 'resources', 'workflows')
+              ),
+            }
           );
-          if (!fs.existsSync(workflowFileYml)) {
-            // Log debug info to help troubleshoot
-            logger.error(
-              'Workflow file not found',
-              new Error(`Workflow '${workflowName}' not found`),
-              {
-                workflowName,
-                currentFilePath,
-                projectRoot,
-                workflowFile,
-                workflowFileYml,
-                workflowsDir: path.join(projectRoot, 'resources', 'workflows'),
-                workflowsDirExists: fs.existsSync(
-                  path.join(projectRoot, 'resources', 'workflows')
-                ),
-              }
-            );
-            throw new Error(
-              `Workflow '${workflowName}' not found in resources/workflows/`
-            );
-          }
-          filePath = workflowFileYml;
-        } else {
-          filePath = workflowFile;
+          throw new Error(
+            `Workflow '${workflowName}' not found in resources/workflows/`
+          );
         }
-
-        yamlContent = fs.readFileSync(filePath, 'utf-8');
+        filePath = workflowFileYml;
+      } else {
+        filePath = workflowFile;
       }
+
+      yamlContent = fs.readFileSync(filePath, 'utf-8');
 
       logger.info('Successfully loaded workflow resource', {
         workflowName,
