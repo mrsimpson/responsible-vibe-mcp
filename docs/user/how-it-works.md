@@ -27,38 +27,6 @@ flowchart TD
 
 Here's the actual mechanics: Your AI agent calls **MCP tools** that return **phase-specific instructions**. It's prompt engineering, but contextual and systematic.
 
-Most MCP tools return data. **Responsible Vibe tools return instructions** – side-effect free guidance on what to do next.
-
-## Self-Documenting Tool System
-
-Here's the clever part: MCP tools don't just return data – they expose **rich parameter descriptions** and **verbose errors** that teach the AI how to use the entire system.
-
-**Real Example - `whats_next` Tool:**
-
-```json
-{
-  "name": "whats_next",
-  "description": "Get guidance for the current development phase and determine what to work on next. Call this tool after each user message to receive phase-specific instructions and check if you should transition to the next development phase. The tool will reference your plan file for specific tasks and context.",
-  "parameters": {
-    "context": "Brief description of what you're currently working on or discussing with the user",
-    "user_input": "The user's most recent message or request",
-    "conversation_summary": "Summary of the development progress and key decisions made so far"
-  }
-}
-```
-
-**What happens when called without starting development:**
-
-```
-Error: "No development conversation has been started for this project.
-Please use the start_development tool first to initialize development with a workflow."
-
-Suggestion: start_development({ workflow: "waterfall" })
-Available workflows: ["waterfall", "epcc", "tdd", "bugfix", "greenfield", "minor"]
-```
-
-The AI learns the entire interaction pattern: **call `start_development` first**, **pick a workflow**, **then use `whats_next`** for guidance.
-
 ## The Core MCP Tools
 
 ### `whats_next()` - The Permanent Nudger
@@ -127,6 +95,36 @@ decisions and create component diagrams."
 Update the plan file with progress. Don't change architecture
 without going back to design phase."
 ```
+
+## Self-Documenting Tool System
+
+MCP tools don't just return data – they expose **rich parameter descriptions** and **verbose errors** that teach the AI how to use the entire system.
+
+**Real Example - `whats_next` Tool:**
+
+```json
+{
+  "name": "whats_next",
+  "description": "Get guidance for the current development phase and determine what to work on next. Call this tool after each user message to receive phase-specific instructions and check if you should transition to the next development phase. The tool will reference your plan file for specific tasks and context.",
+  "parameters": {
+    "context": "Brief description of what you're currently working on or discussing with the user",
+    "user_input": "The user's most recent message or request",
+    "conversation_summary": "Summary of the development progress and key decisions made so far"
+  }
+}
+```
+
+**What happens when called without starting development:**
+
+```
+Error: "No development conversation has been started for this project.
+Please use the start_development tool first to initialize development with a workflow."
+
+Suggestion: start_development({ workflow: "waterfall" })
+Available workflows: ["waterfall", "epcc", "tdd", "bugfix", "greenfield", "minor"]
+```
+
+The AI learns the entire interaction pattern: **call `start_development` first**, **pick a workflow**, **then use `whats_next`** for guidance.
 
 ## Workflow Selection Magic
 
