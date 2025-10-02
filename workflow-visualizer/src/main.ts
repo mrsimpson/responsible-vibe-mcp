@@ -146,7 +146,7 @@ class WorkflowVisualizerApp {
         option.value = workflow.name;
         // Include domain in option text if available
         const domainText = workflow.domain ? ` [${workflow.domain}]` : '';
-        option.textContent = `${workflow.displayName}${domainText} - ${workflow.description}`;
+        option.textContent = `${workflow.displayName}${domainText}`;
         this.workflowSelector.appendChild(option);
       }
     } catch (error) {

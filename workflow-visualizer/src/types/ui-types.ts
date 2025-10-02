@@ -65,7 +65,6 @@ export interface TransitionData {
 export interface WorkflowMetadata {
   name: string;
   displayName: string;
-  description: string;
   source: 'builtin' | 'uploaded';
   domain?: string;
 }

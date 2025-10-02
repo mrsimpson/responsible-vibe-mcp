@@ -17,41 +17,6 @@ import {
 export class WorkflowLoader {
   private readonly yamlParser: YamlParser;
 
-  // Workflow display names and descriptions (can be extended as needed)
-  private readonly WORKFLOW_METADATA: Record<
-    string,
-    { displayName: string; description: string }
-  > = {
-    waterfall: {
-      displayName: 'Waterfall',
-      description: 'Classical waterfall development process',
-    },
-    epcc: {
-      displayName: 'EPCC',
-      description: 'Explore, Plan, Code, Commit workflow',
-    },
-    bugfix: {
-      displayName: 'Bug Fix',
-      description: 'Focused workflow for bug fixing',
-    },
-    minor: {
-      displayName: 'Minor Enhancement',
-      description: 'Streamlined workflow for small changes',
-    },
-    greenfield: {
-      displayName: 'Greenfield',
-      description: 'Comprehensive workflow for new projects',
-    },
-    slides: {
-      displayName: 'Slides',
-      description: 'Workflow for creating presentations',
-    },
-    posts: {
-      displayName: 'Posts',
-      description: 'Workflow for writing blog posts and content',
-    },
-  };
-
   constructor() {
     this.yamlParser = new YamlParser();
   }
@@ -63,8 +28,6 @@ export class WorkflowLoader {
     const workflowNames = getBundledWorkflowNames();
 
     return workflowNames.map(name => {
-      const metadata = this.WORKFLOW_METADATA[name];
-
       // Load workflow to extract domain from metadata
       let domain: string | undefined;
       try {
@@ -80,9 +43,7 @@ export class WorkflowLoader {
 
       return {
         name,
-        displayName: metadata?.displayName || this.formatDisplayName(name),
-        description:
-          metadata?.description || `${this.formatDisplayName(name)} workflow`,
+        displayName: this.formatDisplayName(name),
         source: 'builtin' as const,
         domain,
       };

@@ -1,3 +1,4 @@
+---
 # Example .vibe/config.yaml
 #
 # This file demonstrates how to configure which workflows are available
@@ -5,26 +6,16 @@
 
 # Simple allowlist of enabled workflows
 enabled_workflows:
-  - waterfall # Full-featured development workflow
-  - epcc # Explore, Plan, Code, Commit workflow
-  - bugfix # Focused bug fixing workflow
-  - custom # Your custom workflow (if .vibe/workflow.yaml exists)
+  - greenfield
+  - epcc
+  - bugfix
+  - my-tdd # Custom TDD workflow from the .vibe/workflows directory
 
 # Available predefined workflows:
-# - waterfall: From Specification down to test – the historical way
-# - epcc: Explore, Plan, Code, Commit - Anthropic's methodology
-# - bugfix: Reproduce, Analyze, Fix, Verify - for debugging
-# - minor: Streamlined workflow for small-impact changes
-# - greenfield: Comprehensive workflow for new projects from scratch
-# - posts: Workflow for writing posts and content
-# - slides: Workflow for creating presentations
-# - c4-analysis: Workflow for analyzing legacy systems using C4 methodology
-# - boundary-testing: Workflow for creating boundary and API tests
-# - big-bang-conversion: Workflow for test-driven big-bang conversion
-# - custom: Your project-specific workflow (requires .vibe/workflow.yaml)
+# You can retrieve the full list by asking your agent to "list available workflows including the unloaded ones")
 
 # Notes:
 # - If no config file exists, all workflows are available (backward compatibility)
 # - Empty enabled_workflows array will cause startup to fail
 # - Invalid workflow names will cause startup to fail
-# - Custom workflow is only available if .vibe/workflow.yaml exists
+# - Custom workflows can be loaded from the .vibe/workflows directory
