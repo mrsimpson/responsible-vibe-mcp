@@ -8,14 +8,17 @@ Responsible Vibe flips this around. Instead of your AI waiting for instructions,
 
 ```mermaid
 flowchart TD
-    A[You] --> B[AI Agent]
-    B --> C[whats_next]
-    C --> E[Phase-Specific Instructions]
-    E --> B
-    B --> F[Follows Instructions]
-    F --> G[Updates Plan]
-    G --> C
+    A[🤓 You] -->|1| B[🤖 AI Agent]
+    B -->|2| C[🛠️ whats_next]
+    C -->|3| E@{ shape: paper-tape, label: "Instructions where to find
+    phase specific tasks"}
+    E -->|4| B
+    B -->|5| F[🤖 Reads Section in Plan]
+    F -->|6| G[🤖 Follows Instructions]
+    G -->|7| H[🤖 Updates Plan]
+    H -->|8| A
 
+    style A fill:#f5e1fe
     style C fill:#e1f5fe
     style E fill:#fff3e0
 ```
