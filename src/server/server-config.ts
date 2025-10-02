@@ -498,16 +498,19 @@ export async function registerMcpTools(
       inputSchema: {
         architecture: z
           .string()
+          .default('freestyle')
           .describe(
             `Architecture documentation: template name (${availableTemplates.architecture.join(', ')}, none) OR file path to existing document`
           ),
         requirements: z
           .string()
+          .default('none')
           .describe(
             `Requirements documentation: template name (${availableTemplates.requirements.join(', ')}, none) OR file path to existing document`
           ),
         design: z
           .string()
+          .default('freestyle')
           .describe(
             `Design documentation: template name (${availableTemplates.design.join(', ')}, none) OR file path to existing document`
           ),
