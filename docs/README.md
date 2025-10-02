@@ -1,264 +1,49 @@
-# Responsible Vibe MCP Server
+# Responsible Vibe MCP
 
-[![Tests](https://github.com/mrsimpson/vibe-feature-mcp/actions/workflows/pr.yml/badge.svg)](https://github.com/mrsimpson/vibe-feature-mcp/actions/workflows/pr.yml)
-[![Release](https://github.com/mrsimpson/vibe-feature-mcp/actions/workflows/release.yml/badge.svg)](https://github.com/mrsimpson/vibe-feature-mcp/actions/workflows/release.yml)
-[![npm version](https://badge.fury.io/js/responsible-vibe-mcp.svg)](https://badge.fury.io/js/responsible-vibe-mcp)
+Transform any AI coding agent into a structured development partner with battle-tested engineering workflows.
 
-A Model Context Protocol (MCP) server that acts as an intelligent conversation state manager and development guide for LLMs. This server orchestrates feature development conversations by maintaining state, determining development phases, and providing contextual instructions to guide LLMs through structured development processes.
+## The Problem with AI Coding Tools
 
-## Overview
+Most AI coding tools are glorified autocomplete on steroids. They research you code base, may even check guide on the internet – end then they spit out a full blown solution. But here's the thing: **software engineering isn't just about writing code**. It's about thinking through problems, making architectural decisions, and following proven methodologies that prevent you from painting yourself into corners.
 
-**Responsible Vibe MCP** serves as a conversation coordinator that:
+The faster these tools get, the easier it becomes to skip the thinking part. Before you know it, you're three hours deep in a refactor that could have been avoided with 10 minutes of upfront design.
 
-- **Manages Conversation State**: Tracks development phase and conversation context across sessions
-- **Guides LLM Behavior**: Provides phase-specific instructions telling the LLM what to do next
-- **Maintains Project Memory**: Comprehensive long-term memory system with persistent plan files and structured project artifacts
-- **Orchestrates Development Flow**: Intelligently determines when to transition between development phases
-- **Ensures Progress Tracking**: Continuously instructs the LLM to update completed tasks in the plan file
+## How Responsible Vibe Changes the Game
 
-## Core Interaction Pattern
+Instead of just responding to your requests, Responsible Vibe **proactively guides your AI agent** through proven engineering workflows. Your agent doesn't just write code – it engineers solutions.
 
-```
-User: "implement feature X"
-  ↓
-LLM: calls whats_next()
-  ↓
-Responsible-Vibe-MCP: analyzes context → determines phase → returns instructions
-  ↓
-LLM: follows instructions → interacts with user → updates plan file
-  ↓
-LLM: calls whats_next() again
-  ↓
-[cycle continues...]
-```
+Think of it as having a senior engineer sitting next to your AI, constantly asking: _"Did you think about the how it integrates with the existing architecture? What about edge cases? We're doing TDD – let's create a red test case first"_
+
+## What You Actually Get
+
+**Multiple Battle-Tested Workflows**: Not just one-size-fits-all. Building a new project? Use the traditional V-model or the more ideation-focused greenfield. Adding a feature? EPCC works great. Fixing a bug? There's a workflow for that too.
+
+**Your AI Remembers Everything**: Conversations, decisions, architectural choices – all persisted across sessions and even git branches.
+
+**Process Guidance That Actually Works**: Your AI knows what phase it's in and what to focus on next. No more random code generation – structured, methodical development.
+
+## Universal MCP Support
+
+Works with any agent that supports the Model Context Protocol. Amazon Q CLI, Claude Code, Gemini CLI – doesn't matter. When the next "revolutionary" coding IDE launches next month, you won't need to change how you work.
 
 ## Quick Start
 
-### 🚨 **Critical: System Prompt Required**
-
-**This MCP server requires a specific system prompt to function properly.** The LLM must be configured with the correct system prompt to know how to interact with the tools.
-
-**Get the system prompt:**
-
 ```bash
-npx responsible-vibe-mcp --system-prompt
+# Setup your coding agent (works with any MCP-compatible agent)
+npx responsible-vibe-mcp --generate-config amazonq-cli  # or claude, gemini, opencode
 ```
 
-**Configure your LLM with this system prompt** - without it, the server won't work correctly.
+Head to an empty directory and try: _"Build a simple todo app with a terminal interface"_
 
-### Installation & Configuration
+Watch your agent start with architecture decisions instead of jumping straight into code. That's engineering.
 
-**Requirements**: Node.js 18.0.0 or higher
+## Next Steps
 
-#### Claude Desktop Configuration
+- **[How It Works](./user/how-it-works.md)** – The technical details and what makes it different
+- **[Quick Setup](./user/agent-setup.md)** – Get your agent configured in 2 minutes
+- **[Hands-On Tutorial](./user/tutorial.md)** – Learn by building (todo app → enhancement → bugfix)
+- **[Interactive Workflows](./workflows)** – Explore all available methodologies
 
-1. **Get the system prompt** and configure it in Claude Desktop
-2. **Add the MCP server** to your Claude Desktop configuration file:
+---
 
-```json
-{
-  "mcpServers": {
-    "responsible-vibe-mcp": {
-      "command": "npx",
-      "args": ["responsible-vibe-mcp"]
-    }
-  }
-}
-```
-
-#### Amazon Q Configuration
-
-1. **Get the system prompt** and configure it in Amazon Q
-2. **Add the MCP server** to your `.amazonq/mcp.json` file:
-
-```json
-{
-  "mcpServers": {
-    "responsible-vibe-mcp": {
-      "command": "npx",
-      "args": ["responsible-vibe-mcp"]
-    }
-  }
-}
-```
-
-#### Custom Project Path
-
-Configure a different project directory using the `PROJECT_PATH` environment variable:
-
-```json
-{
-  "mcpServers": {
-    "responsible-vibe-mcp": {
-      "command": "npx",
-      "args": ["responsible-vibe-mcp"],
-      "env": {
-        "PROJECT_PATH": "/path/to/your/project"
-      }
-    }
-  }
-}
-```
-
-### For Developers and Testing
-
-Use the MCP Inspector to test and explore capabilities:
-
-```bash
-npx @modelcontextprotocol/inspector
-```
-
-Then configure it to connect to `npx responsible-vibe-mcp`.
-
-## How It Works
-
-The server provides tools that the LLM calls automatically based on the system prompt instructions:
-
-- **LLM calls `whats_next()`** after each user interaction to get phase-specific guidance
-- **LLM calls `proceed_to_phase()`** when ready to transition between development phases
-- **LLM calls `start_development()`** to begin with a chosen workflow
-- **Server responds** with contextual instructions telling the LLM exactly what to do next
-
-The user interacts normally with the LLM - the tool calls happen automatically in the background.
-
-## Key Features
-
-- **Workflow Visualizer**: Interactive web interface for exploring workflow state machines
-- **Git Integration**: Optional automatic commits with intelligent defaults
-- **State Persistence**: Conversation state survives server restarts
-- **Multi-Project Support**: Handle multiple concurrent project conversations
-- **Branch Awareness**: Separate development contexts for different git branches
-
-## Utility Commands
-
-### Get System Prompt
-
-```bash
-# Get the system prompt for your LLM
-npx responsible-vibe-mcp --system-prompt
-```
-
-### Workflow Visualizer
-
-```bash
-# Start the interactive workflow visualizer
-npx responsible-vibe-mcp --visualize
-# or
-npx responsible-vibe-mcp --viz
-```
-
-### Help and Version
-
-```bash
-npx responsible-vibe-mcp --help
-npx responsible-vibe-mcp --version
-```
-
-## API Reference
-
-The server provides tools that are automatically called by the LLM (not by users directly). The LLM uses these tools based on the system prompt instructions to coordinate development workflows.
-
-### Tools
-
-The LLM automatically calls these tools based on the system prompt instructions:
-
-#### `start_development`
-
-Begin a new development project with a structured workflow. Must be called before other development tools.
-
-#### `whats_next`
-
-Primary tool that analyzes conversation state and provides LLM instructions.
-
-#### `proceed_to_phase`
-
-Explicitly transition to a new development phase when current phase is complete.
-
-#### `resume_workflow`
-
-Resume development workflow after conversation compression with comprehensive project context.
-
-#### `reset_development`
-
-Reset conversation state and development progress (requires confirmation).
-
-### Resources
-
-#### `development-plan`
-
-- **URI**: `plan://current`
-- **Description**: Current development plan document (markdown)
-
-#### `conversation-state`
-
-- **URI**: `state://current`
-- **Description**: Current conversation state and phase information
-
-#### `system-prompt`
-
-- **URI**: `system-prompt://`
-- **Description**: Complete system prompt for LLM integration
-
-### Prompts
-
-#### `phase-guidance`
-
-Provides detailed guidance prompts for specific development phases.
-
-**Arguments:**
-
-- `phase` (string): Development phase name
-- `context` (string): Additional context or specific questions
-
-## Example Usage
-
-### Starting Development
-
-```javascript
-// Start with a specific workflow
-start_development({ workflow: 'your-preferred-workflow' });
-
-// With git commit configuration
-start_development({
-  workflow: 'your-workflow',
-  commit_behaviour: 'end',
-});
-```
-
-### Basic Development Flow
-
-```javascript
-// LLM calls after each user interaction
-whats_next({
-  context: 'user wants to add authentication',
-  user_input: 'implement user login',
-  conversation_summary: 'Working on user authentication feature',
-});
-
-// When phase is complete, transition explicitly
-proceed_to_phase({
-  target_phase: 'next-phase',
-  reason: 'current phase tasks completed',
-});
-```
-
-## Documentation
-
-For detailed information, see:
-
-- **[Architecture](./docs/ARCHITECTURE.md)** - Detailed system architecture and components
-- **[Examples](./docs/EXAMPLES.md)** - Comprehensive interaction examples and workflows
-- **[Development](./docs/DEVELOPMENT.md)** - Testing, logging, and debugging information
-- **[Git Integration](./docs/git-commit-feature.md)** - Git commit feature documentation
-
-## Contributing
-
-This project uses conventional commits for version management. When contributing:
-
-- Use conventional commit format
-- Run tests with `npm run test:run`
-- Ensure all tests pass before submitting PRs
-
-## License
-
-[License information]
+_Because software engineering is a creative process that happens in your brain – not in the LLM's context window._

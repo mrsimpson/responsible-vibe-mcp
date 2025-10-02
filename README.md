@@ -1,211 +1,51 @@
-# Responsible Vibe MCP Server
+# Responsible Vibe MCP
 
 [![Tests](https://github.com/mrsimpson/vibe-feature-mcp/actions/workflows/pr.yml/badge.svg)](https://github.com/mrsimpson/vibe-feature-mcp/actions/workflows/pr.yml)
 [![Release](https://github.com/mrsimpson/vibe-feature-mcp/actions/workflows/release.yml/badge.svg)](https://github.com/mrsimpson/vibe-feature-mcp/actions/workflows/release.yml)
 [![npm version](https://badge.fury.io/js/responsible-vibe-mcp.svg)](https://badge.fury.io/js/responsible-vibe-mcp)
 
-An intelligent conversation coordinator for AI coding agents that provides structured development workflows through the Model Context Protocol (MCP).
+Transform any AI coding agent into a structured development partner with battle-tested engineering workflows.
 
-## What is Responsible Vibe MCP?
-
-**Responsible Vibe MCP** transforms your AI coding agent into a structured development partner that:
-
-- **Guides Development Workflows**: Takes you through proven development phases (requirements → design → implementation → testing)
-- **Maintains Project Memory**: Keeps track of decisions, progress, and context across conversations
-- **Provides Phase-Specific Guidance**: Tells your AI exactly what to focus on at each development stage
-- **Manages Project Documentation**: Creates and maintains architecture, requirements, and design documents
-
-## Quick Start
-
-### 🚀 **1-Command Setup**
-
-Choose your AI coding agent and run the setup command:
+## ⚡ Quick Start
 
 ```bash
-# For Amazon Q CLI
-npx responsible-vibe-mcp --generate-config amazonq-cli
-
-# For Claude Code
-npx responsible-vibe-mcp --generate-config claude
-
-# For Gemini CLI
-npx responsible-vibe-mcp --generate-config gemini
-
-# For OpenCode CLI
-npx responsible-vibe-mcp --generate-config opencode
+# Setup your coding agent
+npx responsible-vibe-mcp --generate-config amazonq-cli  # or claude, gemini, opencode
+# OR manually configure any MCP agent with our system prompt, check the docs for that
 ```
 
-This automatically creates all necessary configuration files with the correct system prompt and MCP server settings.
+Head over to a new empty dir and ask your agent: _"Build a UNO-like card game"_ – and instantly experience how your agent doesn't just shoot, but starts engineering – with YOU in the driver seat!
 
-### ✅ **Verify Setup**
+## What You Get
 
-Start a conversation with your AI agent and ask:
+✅ **Multiple battle-tested workflows** (classical [V-model "waterfall"](https://en.wikipedia.org/wiki/V-model), [Anthropic's EPCC](https://www.anthropic.com/engineering/claude-code-best-practices), [Test-Driven-Development](https://en.wikipedia.org/wiki/Test-driven_development), Reproduction-based bugfix, and many more)
 
-> "Help me implement a new feature"
+✅ **Context-aware process guidance**: Your agent will take notes and plan tasks which survive context compression and even sessions.
 
-Your agent should automatically call MCP tools and guide you through a structured development process.
+✅ **Project memory across conversations** and branches
+
+✅ **Automatic documentation** and decision tracking
+
+## Universal MCP Support
+
+Works in any agent that supports the Model-Context-Protocol. Whenever a new IDE or Terminal UI rises: You don't need to change the way you work.
+
+## How It's Different
+
+There are zillions of "game changer next gen IDEs" out there, each claiming they will revolutionalize how software is going to be created.
+
+In the end, they all just manipulate context of a transformer based LLM – it's all [just noodle soup](https://mrsimpson.github.io/slides-context-is-all-you-need/22). And they are fast at changing wha't going to be part of the context, and it's even getting accelerated by parallel agents.
+
+The problem: **The faster agents become, the harder it is to engineer**. I strongly believe that software engineering is a **creative process** which majorly happens inside the engineers brain.
+
+Responsible-Vibe-MCP helps to **fill the conversation context with contents from YOUR brain** – instead of relying the agent will have understood what you should have thought about.
+
+And since may developers tend to through structured processing off the cliff once they think they start coding, responsible-vibe-mcp will maintain **proactive process guidance** - your AI knows what to do next in each development phase, follow proven engineering methodologies, and maintain long-term project context.
 
 ## How It Works
 
-```mermaid
-flowchart LR
-    A[You] --> B[AI Agent]
-    B --> C[responsible-vibe-mcp]
-    C --> D[Development Plan]
-    C --> E[Project Docs]
+Check the 📖 **[Complete Documentation →](https://mrsimpson.github.io/responsible-vibe-mcp/)**
 
-    style C fill:#e1f5fe
-```
+---
 
-1. **You interact** with your AI coding agent normally
-2. **AI agent calls** responsible-vibe-mcp tools automatically (via system prompt)
-3. **MCP server provides** phase-specific guidance and maintains project context
-4. **Development progresses** through structured workflows with persistent memory
-
-## Example Development Flow
-
-```
-You: "I need user authentication for my app"
-
-AI Agent: *calls whats_next() automatically*
-↓
-MCP Server: "Start requirements phase. Ask about auth type, user data, security needs..."
-↓
-AI Agent: "Let me understand your requirements:
-1. What type of authentication? (email/password, social login, etc.)
-2. What user information do you need to store?
-3. Any specific security requirements?"
-
-[Conversation continues through requirements → design → implementation → testing]
-```
-
-## Available Workflows
-
-The system includes workflows organized by domain for better context management:
-
-### Code Development Workflows (Default)
-
-- **waterfall**: Full-featured development (requirements → design → implementation → QA → testing)
-- **epcc**: Explore → Plan → Code → Commit (Anthropic's methodology)
-- **bugfix**: Reproduce → Analyze → Fix → Verify
-- **minor**: Streamlined for small changes
-- **greenfield**: New projects from scratch
-- **tdd**: Test-Driven Development workflow
-
-### Architecture & Analysis Workflows
-
-- **big-bang-conversion**: Complete system replacement with behavioral validation
-- **boundary-testing**: System boundary and API testing
-- **business-analysis**: Business capability modeling and analysis
-- **c4-analysis**: Legacy system analysis using C4 methodology
-
-### Office & Content Workflows
-
-- **posts**: Blog post and content creation workflow
-- **slides**: Presentation creation workflow
-
-### Workflow Management
-
-**Domain Filtering**: By default, only code development workflows are loaded to reduce context size. Control this with:
-
-```bash
-# Load all workflows
-export VIBE_WORKFLOW_DOMAINS=code,architecture,office
-
-# Load only specific domains
-export VIBE_WORKFLOW_DOMAINS=code,architecture
-```
-
-**Install Workflows**: Add workflows to your project on-demand:
-
-```bash
-# Through your AI agent
-"Install the posts workflow for content creation"
-# This calls: install_workflow({ source: "posts" })
-```
-
-**Custom Workflows**: Create project-specific workflows in `.vibe/workflows/`:
-
-- Override predefined workflows by using the same `name` in your YAML
-- Custom workflows are always available regardless of domain filtering
-- Use any filename - the `name` field in YAML determines the workflow identity
-
-## Key Features
-
-- **🧠 Long-Term Memory**: Project context survives across conversations and restarts
-- **📋 Structured Workflows**: Proven development methodologies built-in
-- **📚 Smart Documentation**: Auto-generates and maintains project docs
-- **🔄 Phase Transitions**: Clear progression through development stages
-- **🎯 Contextual Guidance**: AI gets specific instructions for each phase
-- **🔧 Git Integration**: Optional automatic commits with configurable behavior
-- **👥 Review System**: Optional quality gates before phase transitions
-
-## Requirements
-
-- **Node.js 18.0.0+**
-- **AI Coding Agent** (Amazon Q, Claude, Gemini, etc.)
-- **Git repository** (optional, for commit features)
-
-## Manual Setup
-
-If you prefer manual configuration:
-
-### 1. Get System Prompt
-
-```bash
-npx responsible-vibe-mcp --system-prompt
-```
-
-### 2. Configure Your AI Agent
-
-Add the system prompt to your AI agent's configuration.
-
-### 3. Add MCP Server
-
-Configure your agent to connect to `npx responsible-vibe-mcp`.
-
-## Documentation
-
-📖 **Complete documentation available at: https://mrsimpson.github.io/responsible-vibe-mcp/**
-
-### Quick Links
-
-- **[Getting Started](https://mrsimpson.github.io/responsible-vibe-mcp/user/agent-setup.html)** - Detailed setup for all agents
-- **[How It Works](https://mrsimpson.github.io/responsible-vibe-mcp/user/how-it-works.html)** - Understanding the development flow
-- **[Workflows](https://mrsimpson.github.io/responsible-vibe-mcp/workflows/)** - Available development methodologies
-- **[Long-Term Memory](https://mrsimpson.github.io/responsible-vibe-mcp/user/long-term-memory.html)** - Project context and documentation system
-
-## Troubleshooting
-
-**Agent doesn't call MCP tools?**
-
-- Verify system prompt is configured correctly
-- Check MCP server connection in agent settings
-
-**"Tool not found" errors?**
-
-- Ensure `npx responsible-vibe-mcp` runs successfully
-- Restart your agent/IDE after configuration
-
-**Need help?**
-
-- Check the [troubleshooting guide](https://mrsimpson.github.io/responsible-vibe-mcp/user/agent-setup.html#troubleshooting)
-- Test with MCP Inspector: `npx @modelcontextprotocol/inspector`
-
-## Contributing
-
-This project uses conventional commits for version management:
-
-```bash
-# Install dependencies
-npm install
-
-# Run tests (always use --run flag)
-npm run test:run
-
-# Make changes with conventional commits
-git commit -m "feat: add new feature"
-git commit -m "fix: resolve issue"
-```
-
-See [development documentation](https://mrsimpson.github.io/responsible-vibe-mcp/dev/) for detailed contributor information.
+**GPL License** | **[Contributing](CONTRIBUTING.md)** | **[Issues](https://github.com/mrsimpson/vibe-feature-mcp/issues)**

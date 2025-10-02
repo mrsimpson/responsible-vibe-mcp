@@ -40,20 +40,31 @@ export default withMermaid(
 
       sidebar: [
         {
-          text: 'User Guide',
+          text: 'Getting Started',
           items: [
             { text: 'Overview', link: '/' },
-            { text: 'How it works', link: '/user/how-it-works' },
-            {
-              text: 'Long term project memory',
-              link: '/user/long-term-memory',
-            },
-            {
-              text: 'Custom State Machine',
-              link: '/user/custom-state-machine',
-            },
-            { text: 'Commits', link: '/user/git-commit-feature' },
+            { text: 'How It Works', link: '/user/how-it-works' },
+            { text: 'Quick Setup', link: '/user/agent-setup' },
+            { text: 'Hands-On Tutorial', link: '/user/tutorial' },
           ],
+        },
+        {
+          text: 'User Guides',
+          items: [
+            {
+              text: 'Automatic Workflow Selection',
+              link: '/user/workflow-selection',
+            },
+            {
+              text: 'Advanced Engineering',
+              link: '/user/advanced-engineering',
+            },
+            { text: 'Long-Term Memory', link: '/user/long-term-memory' },
+          ],
+        },
+        {
+          text: 'Interactive Workflows',
+          items: [{ text: 'Explore All Workflows', link: '/workflows' }],
         },
         {
           text: 'Development',
