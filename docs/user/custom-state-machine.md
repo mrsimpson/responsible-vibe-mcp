@@ -1,233 +1,261 @@
-# Custom State Machine Configuration
+# Custom Workflows
 
-The Vibe Feature MCP server supports custom state machine definitions through YAML files. This allows you to customize the development workflow, transitions, and prompts to match your specific needs.
+Responsible Vibe supports custom workflow definitions that you can create, install, and share. The system uses a directory-based approach with domain filtering for better organization.
 
-## How to Create a Custom State Machine
+## How Custom Workflows Work
 
-1. Create a `.vibe` directory in your project root if it doesn't exist already
-2. Create a file named `workflow.yaml` or `workflow.yml` in the `.vibe` directory
-3. Define your custom state machine following the schema below
+### The `.vibe/workflows/` Directory
 
-## State Machine Schema
+Custom workflows are stored in your project's `.vibe/workflows/` directory:
 
-The state machine YAML file must follow this structure:
-
-```yaml
-name: 'Your Workflow Name'
-description: 'Description of your workflow'
-initial_state: 'starting_state'
-
-# State definitions with default instructions and transitions
-states:
-  state_name:
-    description: 'Description of this state'
-    default_instructions: 'Default instructions when entering this state'
-    transitions:
-      - trigger: 'event_name'
-        to: 'target_state'
-        instructions: 'Instructions to provide when this transition occurs (optional - uses target state default if not provided)'
-        additional_instructions: "Additional context to combine with target state's default instructions (optional)"
-        transition_reason: 'Reason for this transition'
+```
+.vibe/
+├── workflows/
+│   ├── my-custom-workflow.yaml
+│   ├── team-review-process.yaml
+│   └── client-specific-flow.yaml
+└── development-plan-main.md
 ```
 
-### Key Changes in the New Format
+### Workflow Domains
 
-- **`default_instructions`**: Each state now has default instructions that are used when entering the state
-- **Optional `instructions`**: Transition instructions are now optional - if not provided, the target state's default instructions are used
-- **`additional_instructions`**: For special transitions, you can provide additional context that gets combined with the target state's default instructions
-- **No `direct_transitions`**: The old `direct_transitions` section has been removed - default instructions per state replace this functionality
+Workflows are organized by domains to keep things manageable:
 
-## Example: Anthropic's "Explore, Plan, Code, Commit" Workflow
+- **`code`**: Software development workflows (default)
+- **`architecture`**: System design and architecture workflows
+- **`office`**: Business process and documentation workflows
 
-Here's a complete state machine based on Anthropic's recommended development workflow using the new simplified format:
+**Control which domains are loaded:**
+
+```bash
+export VIBE_WORKFLOW_DOMAINS="code,architecture"
+# Only loads workflows from code and architecture domains
+```
+
+## Creating Custom Workflows
+
+### 1. Basic Workflow Structure
+
+Create a YAML file in `.vibe/workflows/`:
 
 ```yaml
-name: 'Explore-Plan-Code-Commit Workflow'
-description: "A comprehensive development workflow based on Anthropic's best practices: Explore, Plan, Code, Commit based on https://www.anthropic.com/engineering/claude-code-best-practices"
-initial_state: 'explore'
+name: 'my-custom-workflow'
+description: 'Custom workflow for my specific needs'
+initial_state: 'start'
+
+metadata:
+  domain: 'code'
+  complexity: 'medium'
+  bestFor: ['Custom processes', 'Team workflows']
+  useCases: ['Specific project needs']
+  examples: ['Custom review process']
 
 states:
-  explore:
-    description: 'Research and exploration phase - understanding the problem space'
-    default_instructions: "Starting exploration phase. Read relevant files, understand the codebase structure, and gather context about the problem. Use general pointers or specific filenames, but don't write any code yet."
+  start:
+    description: 'Initial phase'
+    instructions: |
+      Start your custom process here.
+      Define what the AI should focus on in this phase.
+
     transitions:
-      - trigger: 'exploration_complete'
-        to: 'plan'
-        instructions: "Exploration complete! You've gathered sufficient information about the codebase, requirements, and constraints. Now think hard about creating a comprehensive plan. Make sure you documented knowledge in the plan"
-        transition_reason: 'Sufficient exploration completed, ready to plan'
+      - trigger: 'ready_for_next'
+        to: 'next_phase'
+        transition_reason: 'Ready to move forward'
 
-      - trigger: 'continue_exploring'
-        to: 'explore'
-        additional_instructions: "Continue exploring the codebase and problem space. Read relevant files, understand existing patterns, and gather more context. Don't write any code yet - focus on understanding. Document knowledge in the plan"
-        transition_reason: 'More exploration needed'
+  next_phase:
+    description: 'Next phase'
+    instructions: |
+      Continue with the next step of your process.
 
-  plan:
-    description: 'Planning phase - creating a detailed implementation strategy'
-    default_instructions: "Starting planning phase. Think hard about the implementation approach. Use 'think harder' or 'ultrathink' to evaluate alternatives thoroughly. Create a comprehensive plan that addresses the requirements and constraints you've discovered."
     transitions:
-      - trigger: 'plan_complete'
-        to: 'code'
-        instructions: "You've thought through the approach thoroughly and created a solid strategy. Now implement the solution step by step, verifying the reasonableness of each piece as you build it. Implement automated tests where appropriate"
-        transition_reason: 'Comprehensive plan created, ready to implement'
+      - trigger: 'workflow_complete'
+        to: 'start'
+        transition_reason: 'Workflow complete, ready for new task'
+```
 
-      - trigger: 'need_more_exploration'
-        to: 'explore'
-        additional_instructions: "The planning revealed gaps in understanding. Gather more information about the codebase, requirements, or constraints before continuing with the plan. You may need to revert artifacts you've already created."
-        transition_reason: 'Planning revealed knowledge gaps'
+### 2. Advanced Features
 
-      - trigger: 'refine_plan'
-        to: 'plan'
-        additional_instructions: "Continue refining the plan. Think harder about edge cases, alternative approaches, and potential issues. Consider creating a document or GitHub issue with your plan for future reference. You may need to revert artifacts you've already created."
-        transition_reason: 'Plan needs more refinement'
+**Phase-specific instructions:**
 
-  code:
-    description: 'Implementation phase - writing and building the solution'
-    default_instructions: 'Starting implementation phase. Follow your plan step by step, implementing the solution while verifying the reasonableness of each component. Maintain good coding practices and test as you go.'
+```yaml
+states:
+  design:
+    instructions: |
+      You are in the design phase. Focus on:
+      - System architecture decisions
+      - Component interfaces
+      - Data flow design
+
+      Reference existing architecture: $ARCHITECTURE_DOC
+      Document your design in: $DESIGN_DOC
+```
+
+**Conditional transitions:**
+
+```yaml
+transitions:
+  - trigger: 'design_approved'
+    to: 'implementation'
+    additional_instructions: 'Call setup_project_docs to create implementation templates before starting'
+  - trigger: 'need_more_design'
+    to: 'requirements'
+    additional_instructions: 'Review and update requirements.md based on design feedback'
+```
+
+## Installing Workflows
+
+### From Unloaded Workflows
+
+Use the `install_workflow` tool to install workflows from the broader ecosystem:
+
+```bash
+# Your AI can call this or you can request it
+"Install the TDD workflow for test-driven development"
+```
+
+This installs workflows to `.vibe/workflows/` where they become available for your project.
+
+### From URLs or Files
+
+```bash
+# Install from URL
+"Install workflow from https://example.com/my-workflow.yaml"
+
+# Install with custom name
+"Install the waterfall workflow as 'detailed-waterfall'"
+```
+
+## Workflow Discovery
+
+### List Available Workflows
+
+```bash
+# See all workflows available to your project
+"List available workflows"
+
+# See all workflows regardless of domain filtering
+"List all workflows including unloaded ones"
+```
+
+### Domain Filtering in Action
+
+```bash
+# Default: only 'code' domain workflows
+VIBE_WORKFLOW_DOMAINS="code"
+
+# Multiple domains
+VIBE_WORKFLOW_DOMAINS="code,architecture,office"
+
+# All domains
+VIBE_WORKFLOW_DOMAINS="code,architecture,office"
+```
+
+## Project-Specific Configuration
+
+### `.vibe/config.yaml`
+
+Control which workflows are available for your project:
+
+```yaml
+enabled_workflows:
+  - 'waterfall'
+  - 'my-custom-workflow'
+  - 'team-review-process'
+```
+
+This filters the available workflows to only those specified, regardless of domain settings.
+
+## Workflow Metadata
+
+### Enhanced Discoverability
+
+```yaml
+metadata:
+  domain: 'code' # Which domain this belongs to
+  complexity: 'high' # low, medium, high
+  bestFor: # What this workflow is good for
+    - 'Large features'
+    - 'Design-heavy projects'
+  useCases: # Specific use cases
+    - 'Building new systems'
+    - 'Complex integrations'
+  examples: # Example scenarios
+    - 'Create authentication system'
+    - 'Build reporting dashboard'
+```
+
+This metadata helps your AI automatically select the right workflow for different scenarios.
+
+## Real-World Example
+
+```yaml
+name: 'api-development'
+description: 'Workflow for developing REST APIs with proper testing'
+initial_state: 'api_design'
+
+metadata:
+  domain: 'code'
+  complexity: 'medium'
+  bestFor: ['API development', 'Backend services']
+  useCases: ['REST API creation', 'Microservice development']
+
+states:
+  api_design:
+    description: 'Design API endpoints and contracts'
+    instructions: |
+      Design your API:
+      - Define endpoints and HTTP methods
+      - Specify request/response schemas
+      - Document authentication requirements
+      - Plan error handling approach
+
+      Document in $DESIGN_DOC
+
+    transitions:
+      - trigger: 'api_design_complete'
+        to: 'implementation'
+        additional_instructions: 'Create API implementation templates and set up testing framework'
+
+  implementation:
+    description: 'Implement API endpoints'
+    instructions: |
+      Implement the API following your design:
+      - Create route handlers
+      - Implement business logic
+      - Add input validation
+      - Include proper error handling
+
     transitions:
       - trigger: 'implementation_complete'
-        to: 'commit'
-        instructions: 'Implementation complete! The code is working and meets the requirements. Now prepare to commit your changes and create a pull request with proper documentation if possible.'
-        transition_reason: 'Implementation finished successfully'
+        to: 'testing'
+        additional_instructions: 'Set up test environment and create test data fixtures'
 
-      - trigger: 'implementation_issues'
-        to: 'plan'
-        additional_instructions: 'Implementation revealed issues with the plan. Go back to planning to address the problems discovered during coding. Think through alternative approaches.'
-        transition_reason: 'Implementation revealed planning issues'
+  testing:
+    description: 'Test API endpoints'
+    instructions: |
+      Test your API thoroughly:
+      - Unit tests for business logic
+      - Integration tests for endpoints
+      - Test error scenarios
+      - Validate against API design
 
-      - trigger: 'continue_coding'
-        to: 'code'
-        additional_instructions: 'Continue implementing the solution. Follow the plan step by step, verify the reasonableness of each component as you build it, and maintain good coding practices.'
-        transition_reason: 'Implementation in progress'
-
-      - trigger: 'need_exploration'
-        to: 'explore'
-        additional_instructions: 'Implementation revealed the need for more exploration. Investigate the codebase further to understand how to properly integrate your changes.'
-        transition_reason: 'Implementation requires more exploration'
-
-  commit:
-    description: 'Finalization phase - committing changes and documentation'
-    default_instructions: 'Starting commit preparation phase. Finalize your implementation, update documentation, create clear commit messages, and prepare a pull request with proper explanation of the changes.'
     transitions:
-      - trigger: 'commit_complete'
-        to: 'explore'
-        instructions: 'Changes committed successfully! Pull request created with proper documentation. Ready to start the next development cycle. Begin by exploring what to work on next.'
-        transition_reason: 'Development cycle complete, starting fresh'
-
-      - trigger: 'need_code_fixes'
-        to: 'code'
-        additional_instructions: 'Issues found during commit preparation. Return to implementation to fix the problems before committing.'
-        transition_reason: 'Code needs fixes before commit'
-
-      - trigger: 'continue_commit_prep'
-        to: 'commit'
-        additional_instructions: 'Continue preparing the commit. Update READMEs, changelogs, documentation, and ensure the pull request has a clear explanation of what was implemented and why.'
-        transition_reason: 'Commit preparation in progress'
+      - trigger: 'testing_complete'
+        to: 'api_design'
+        additional_instructions: 'Document API completion and prepare for next API development cycle'
+        transition_reason: 'API complete, ready for next API'
 ```
 
-## Validation
+## Why This System Works
 
-The state machine file is validated when loaded. Common validation errors include:
+**Directory-based**: Easy to see and manage all your custom workflows  
+**Domain filtering**: Only load workflows relevant to your work  
+**Project-specific**: Each project can have its own custom workflows  
+**Shareable**: Workflows can be installed from URLs or shared between projects  
+**Discoverable**: Rich metadata helps AI select appropriate workflows
 
-- Missing required properties (`name`, `description`, `initial_state`, `states`)
-- States missing required `default_instructions` field
-- References to undefined states in transitions
-- Invalid transition targets
-- Missing `transition_reason` in transitions
+Your custom workflows integrate seamlessly with the built-in ones, giving you complete control over your development process.
 
-If validation fails, the server will fall back to the default state machine and log an error.
+---
 
-## Benefits of the New Format
-
-- **Reduced redundancy**: No more duplicate instruction definitions between `direct_transitions` and state-specific transitions
-- **Cleaner structure**: Each state has clear default behavior with optional special cases
-- **Better maintainability**: Single source of truth for phase instructions
-- **Simpler composition**: Additional instructions are clearly combined with defaults
-
-## Editor Support
-
-For VSCode users, you can enable schema validation by adding this line at the top of your YAML file:
-
-```yaml
-# yaml-language-server: $schema=../node_modules/responsible-vibe-mcp/resources/state-machine-schema.json
-```
-
-This provides code completion, validation, and documentation while editing your custom state machine.
-
-## Key Features of This Workflow
-
-### 1. **Exploration First**
-
-- Emphasizes understanding before coding
-- Encourages reading relevant files and gathering context
-- Supports subagent usage for complex investigations
-- Prevents jumping straight to implementation
-
-### 2. **Thoughtful Planning**
-
-- Uses Anthropic's thinking triggers ("think hard", "think harder", "ultrathink")
-- Encourages creating plan documents for reference
-- Allows returning to exploration if gaps are discovered
-- Supports plan refinement and alternative evaluation
-
-### 3. **Verified Implementation**
-
-- Step-by-step implementation following the plan
-- Continuous verification of solution reasonableness
-- Ability to return to planning if issues arise
-- Maintains good coding practices throughout
-
-### 4. **Proper Finalization**
-
-- Comprehensive commit preparation
-- Documentation updates (READMEs, changelogs)
-- Clear pull request descriptions
-- Proper explanation of changes and rationale
-
-## Workflow Benefits
-
-- **Reduced Context Loss**: Exploration and planning phases preserve context for complex problems
-- **Better Solutions**: Thinking time allocated for evaluating alternatives
-- **Fewer Iterations**: Thorough planning reduces implementation rework
-- **Complete Documentation**: Ensures proper documentation and explanation of changes
-- **Flexible Navigation**: Can move between phases as needed based on discoveries
-
-## Usage Tips
-
-1. **Start with Exploration**: Always begin by understanding the problem space thoroughly
-2. **Use Thinking Triggers**: Leverage "think hard", "think harder", or "ultrathink" during planning
-3. **Document Your Plan**: Create plan documents or GitHub issues for complex features
-4. **Verify as You Go**: Check the reasonableness of each implementation piece
-5. **Complete the Cycle**: Don't skip the commit phase - proper documentation is crucial
-
-## Validation
-
-The state machine file is validated when loaded. Common validation errors include:
-
-- Missing required properties (`name`, `description`, `initial_state`, `states`)
-- References to undefined states in transitions
-- Invalid transition targets
-- Missing instructions or transition reasons
-
-If validation fails, the server will fall back to the default state machine and log an error.
-
-## Editor Support
-
-For VSCode users, you can enable schema validation by adding this line at the top of your YAML file:
-
-```yaml
-# yaml-language-server: $schema=../node_modules/responsible-vibe-mcp/resources/state-machine-schema.json
-```
-
-This provides code completion, validation, and documentation while editing your custom state machine.
-
-## Testing Your Custom State Machine
-
-To test your custom state machine:
-
-1. Place the YAML file in `.vibe/workflow.yaml` in your project
-2. Start the responsible-vibe-mcp server
-3. Check the logs for any validation errors
-4. Use the `whats_next` tool to see if your custom phases are being used
-5. Test transitions between phases using `proceed_to_phase`
-
-The server will automatically detect and load your custom state machine when it starts up.
+**Next**: [Git Commits](./git-commit-feature.md) – Configure automatic commit behavior

@@ -60,6 +60,8 @@ export default withMermaid(
               link: '/user/advanced-engineering',
             },
             { text: 'Long-Term Memory', link: '/user/long-term-memory' },
+            { text: 'Custom Workflows', link: '/user/custom-state-machine' },
+            { text: 'Git Commits', link: '/user/git-commit-feature' },
           ],
         },
         {

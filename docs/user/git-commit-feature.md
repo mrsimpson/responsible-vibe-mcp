@@ -1,6 +1,15 @@
 # Git Commit Feature
 
+⚠️ **Work in Progress**: This feature doesn't work reliably with all LLMs. Some AI agents may not properly trigger automatic commits. Manual git control is recommended for production use.
+
 The responsible-vibe-mcp server supports configurable automatic git commits during development interactions. This feature allows users to control when the system creates commits, providing better integration with git workflows.
+
+## ⚠️ Known Limitations
+
+- **LLM Compatibility**: Not all AI agents properly trigger automatic commits
+- **Timing Issues**: Some agents may commit at unexpected times
+- **Reliability**: Manual git control is more reliable for important projects
+- **Status**: This feature is experimental and under active development
 
 ## Overview
 
@@ -9,7 +18,7 @@ The git commit feature provides four levels of commit automation:
 1. **`step`**: Commit after each development step (most granular)
 2. **`phase`**: Commit before each phase transition (milestone commits)
 3. **`end`**: Single final commit at development completion (default)
-4. **`none`**: No automatic commits (manual git control)
+4. **`none`**: No automatic commits (manual git control) **← Recommended**
 
 ## Configuration
 
