@@ -50,8 +50,20 @@ abstract class ConfigGenerator {
 
   /**
    * Get default MCP server configuration
+   * On Windows, npx commands need to be prefixed with "cmd /c"
    */
   protected getDefaultMcpConfig(): object {
+    const isWindows = process.platform.startsWith('win');
+
+    if (isWindows) {
+      return {
+        'responsible-vibe-mcp': {
+          command: 'cmd',
+          args: ['/c', 'npx', 'responsible-vibe-mcp'],
+        },
+      };
+    }
+
     return {
       'responsible-vibe-mcp': {
         command: 'npx',
