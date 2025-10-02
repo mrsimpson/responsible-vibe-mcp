@@ -16,6 +16,17 @@ npx responsible-vibe-mcp --generate-config amazonq-cli  # or claude, gemini, ope
 
 Head over to a new empty dir and ask your agent: _"Build a UNO-like card game"_ – and instantly experience how your agent doesn't just shoot, but starts engineering – with YOU in the driver seat!
 
+## 🎬 See It In Action
+
+<div style="position: relative; display: inline-block; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+  <a href="https://agentic-rpl.netlify.app/conversation?url=https://github.com/mrsimpson/responsible-vibe-mcp/tree/demo-todo-greenfield/examples/greenfield-todo" target="_blank">
+    <img src="docs/images/placeholder-demo-greenfield.png" alt="Interactive demo showing Responsible Vibe MCP in action" style="width: 100%; max-width: 600px; height: auto; display: block;">
+    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.7); border-radius: 50%; width: 80px; height: 80px; display: flex; align-items: center; justify-content: center;">
+      <div style="width: 0; height: 0; border-left: 25px solid white; border-top: 15px solid transparent; border-bottom: 15px solid transparent; margin-left: 5px;"></div>
+    </div>
+  </a>
+</div>
+
 ## What You Get
 
 ✅ **Multiple battle-tested workflows** (classical [V-model "waterfall"](https://en.wikipedia.org/wiki/V-model), [Anthropic's EPCC](https://www.anthropic.com/engineering/claude-code-best-practices), [Test-Driven-Development](https://en.wikipedia.org/wiki/Test-driven_development), Reproduction-based bugfix, and many more)
