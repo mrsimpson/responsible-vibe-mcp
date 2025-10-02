@@ -44,8 +44,8 @@ And since may developers tend to through structured processing off the cliff onc
 
 ## How It Works
 
-Check the 📖 **[Complete Documentation →](https://mrsimpson.github.io/responsible-vibe-mcp/)**
+Check the 📖 **[Complete Documentation →](https://mrsimpson.github.io/responsible-vibe-mcp/user/how-it-works.html)**
 
 ---
 
-**GPL License** | **[Contributing](CONTRIBUTING.md)** | **[Issues](https://github.com/mrsimpson/vibe-feature-mcp/issues)**
+**[Open Source](LICENSE.md)** | **[Issues](https://github.com/mrsimpson/vibe-feature-mcp/issues)**
