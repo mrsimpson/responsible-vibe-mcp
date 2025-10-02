@@ -49,15 +49,18 @@ todo help                      # Show usage information
 next_id: 4
 tasks:
   1:
+    id: 1
     description: "Buy groceries"
     created: "2025-10-02T12:30:00Z"
     completed: false
   2:
+    id: 2
     description: "Write documentation"
     created: "2025-10-02T12:31:00Z"
     completed: true
     completed_at: "2025-10-02T13:00:00Z"
   3:
+    id: 3
     description: "Review code"
     created: "2025-10-02T12:32:00Z"
     completed: false
