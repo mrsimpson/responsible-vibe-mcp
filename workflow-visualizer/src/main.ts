@@ -328,7 +328,7 @@ class WorkflowVisualizerApp {
       ${
         metadata?.complexity
           ? `
-        <div class="detail-section">
+        <div class="detail-section one-line">
           <h4 class="detail-subtitle">Complexity</h4>
           <span class="badge badge-${metadata.complexity}">${metadata.complexity.toUpperCase()}</span>
         </div>

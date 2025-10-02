@@ -10,6 +10,15 @@
   border-bottom: 1px solid var(--color-gray-200);
 }
 
+.detail-section.one-line {
+  display: flex;
+  flex-direction: row;
+}
+
+.detail-section.one-line h4 {
+  margin-bottom: 0;
+  margin-right: 1rem;
+}
 .detail-section:last-child {
   border-bottom: none;
   margin-bottom: 0;
@@ -332,7 +341,6 @@
 
 .metadata-list li {
   padding: 4px 0;
-  border-bottom: 1px solid var(--color-gray-200);
   color: var(--color-gray-700);
 }
 
