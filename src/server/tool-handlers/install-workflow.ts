@@ -154,12 +154,14 @@ export class InstallWorkflowHandler extends BaseToolHandler<
       path: targetFile,
     });
 
-    // Notify MCP client that tool list has changed (workflow enum updated)
+    // Notify MCP client that tool list has changed. There is no specific
+    // notification for parameter description changes, so we reuse tool list change.
+    // most MCP hosts will however not support this properly, thus we'll instruct the user to restart the server.
     await notificationService.notifyToolListChanged();
 
     return {
       success: true,
-      message: `Workflow '${workflowName}' installed as '${targetName}' in .vibe/workflows/`,
+      message: `Workflow '${workflowName}' installed as '${targetName}' in .vibe/workflows/ . You may need to restart your agent to use it.`,
       installedPath: targetFile,
     };
   }
