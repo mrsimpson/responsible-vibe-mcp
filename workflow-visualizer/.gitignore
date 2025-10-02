@@ -12,3 +12,4 @@ src/services/BundledWorkflows.dev.ts
 *.log
 .vscode/
 .idea/
+src/services/BundledWorkflows*
