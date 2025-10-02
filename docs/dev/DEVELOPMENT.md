@@ -1,366 +1,267 @@
-# Development
+# Detailed Design: CLI Todo App
 
-This document provides information for developers working on the Responsible Vibe MCP Server, including testing, logging, debugging, and architectural decisions.
+## Implementation Strategy
 
-## Optional Documentation Feature
+### Development Phases
 
-The system includes a flexible documentation architecture that allows workflows to specify their documentation requirements:
+#### Phase 1: Foundation (Core Infrastructure)
 
-### Key Implementation Components
+**Goal**: Establish basic project structure and data handling
 
-#### 1. Workflow Metadata Schema
+1. **Project Setup**
+   - Initialize Go module: `go mod init todo`
+   - Create basic file structure
+   - Add YAML dependency: `gopkg.in/yaml.v3`
 
-```typescript
-interface YamlStateMachine {
-  metadata?: {
-    requiresDocumentation?: boolean; // defaults to false
-    // ... other metadata
-  };
+2. **Storage Layer (`storage.go`)**
+   - `TodoData` struct with NextID and Tasks map
+   - `LoadTodos()` function - read YAML file, handle missing file
+   - `SaveTodos()` function - atomic write with temp file
+   - `GetTodoFilePath()` function - cross-platform home directory
+
+3. **Task Model (`task.go`)**
+   - `Task` struct with ID, Description, Created, Completed, CompletedAt
+   - `NewTask()` constructor function
+   - `MarkCompleted()` method
+   - Task validation functions
+
+#### Phase 2: Core Commands (MVP)
+
+**Goal**: Implement essential CRUD operations
+
+4. **Add Command**
+   - Parse task description from arguments
+   - Validate non-empty description
+   - Generate new ID, create task
+   - Save to file, return success message with ID
+
+5. **List Command**
+   - Load todos from file
+   - Filter active tasks (completed=false)
+   - Format output: "ID: Description"
+   - Handle empty list gracefully
+
+6. **Complete Command**
+   - Parse task ID from arguments
+   - Validate ID exists and is numeric
+   - Mark task as completed with timestamp
+   - Save to file, return confirmation with ID
+
+#### Phase 3: Extended Commands
+
+**Goal**: Add remaining CRUD operations
+
+7. **Edit Command**
+   - Parse ID and new description
+   - Validate task exists and description not empty
+   - Update task description
+   - Save to file, return confirmation
+
+8. **Delete Command**
+   - Parse task ID from arguments
+   - Validate task exists
+   - Remove from tasks map
+   - Save to file, return confirmation
+
+9. **List All Command**
+   - Load todos from file
+   - Show all tasks with completion status
+   - Format: "ID: Description [DONE]" for completed
+
+#### Phase 4: Polish & Testing
+
+**Goal**: Robust error handling and user experience
+
+10. **Error Handling**
+    - File permission errors
+    - YAML parsing errors
+    - Invalid input validation
+    - Consistent error messages
+
+11. **Help System**
+    - Usage information for each command
+    - Command examples
+    - Error message improvements
+
+12. **Testing & Validation**
+    - Manual testing of all commands
+    - Edge case validation
+    - Cross-platform testing
+
+## Detailed Component Design
+
+### Main Entry Point (`main.go`)
+
+```go
+func main() {
+    if len(os.Args) < 2 {
+        listTasks(false) // Default to list active tasks
+        return
+    }
+
+    command := os.Args[1]
+    switch command {
+    case "add":
+        addTask(os.Args[2:])
+    case "list":
+        showAll := len(os.Args) > 2 && os.Args[2] == "--all"
+        listTasks(showAll)
+    case "complete":
+        completeTask(os.Args[2:])
+    case "edit":
+        editTask(os.Args[2:])
+    case "delete":
+        deleteTask(os.Args[2:])
+    case "help":
+        showHelp()
+    default:
+        fmt.Printf("Unknown command: %s\n", command)
+        showHelp()
+        os.Exit(1)
+    }
 }
 ```
 
-#### 2. Start Development Handler Logic
+### Storage Operations
 
-The `StartDevelopmentHandler` implements conditional documentation checking:
+```go
+func LoadTodos() (*TodoData, error) {
+    // Get file path, handle missing file
+    // Read YAML, unmarshal to TodoData
+    // Return initialized structure if file missing
+}
 
-- **Required workflows**: Block on missing documents, provide setup guidance
-- **Optional workflows**: Skip artifact checks entirely, proceed to initial phase
-- **Backward compatibility**: Existing workflows without metadata default to optional
+func SaveTodos(data *TodoData) error {
+    // Marshal to YAML
+    // Write to temp file atomically
+    // Rename temp file to final location
+}
+```
 
-#### 3. Workflow Updates
+### Command Implementations
 
-- **Comprehensive workflows** (greenfield, waterfall, c4-analysis): Set `requiresDocumentation: true`
-- **Lightweight workflows** (epcc, minor, bugfix): Default to optional documentation
-- **Conditional instructions**: Use "If $DOC exists..." patterns for flexible workflows
+```go
+func addTask(args []string) {
+    // Validate description not empty
+    // Load current todos
+    // Create new task with next ID
+    // Save todos
+    // Print "Task X added"
+}
 
-### Testing Coverage
+func listTasks(showAll bool) {
+    // Load todos
+    // Filter by completion status
+    // Format and print each task
+}
 
-The implementation includes comprehensive test coverage:
+func completeTask(args []string) {
+    // Parse and validate ID
+    // Load todos
+    // Mark task completed
+    // Save todos
+    // Print "Task X completed"
+}
+```
 
-- **Unit tests**: Verify requiresDocumentation flag behavior
-- **Integration tests**: Test both required and optional workflow paths
-- **Edge case tests**: Handle partial document availability and malformed workflows
-- **Regression tests**: Ensure backward compatibility
+## Error Handling Strategy
 
-## Testing
+### Input Validation
 
-The project includes comprehensive test coverage with different test execution options to balance thoroughness with development speed:
+- Empty task descriptions → "Task description cannot be empty"
+- Invalid task IDs → "Invalid task ID: {input}"
+- Missing arguments → Show command usage
 
-### Test Commands
+### File Operations
 
-#### Default Test Run (Quiet)
+- Missing todo file → Create automatically with empty structure
+- Permission errors → "Cannot access todo file: {error}"
+- YAML parsing errors → Backup corrupted file, create new one
+
+### Task Operations
+
+- Task not found → "Task ID {id} not found"
+- Already completed → "Task {id} already completed"
+- System errors → Generic error with exit code 2
+
+## Data Flow
+
+### Add Task Flow
+
+1. Parse command line arguments
+2. Validate description not empty
+3. Load existing todos from file
+4. Generate new task with incremented ID
+5. Add task to todos map
+6. Save updated todos to file
+7. Print confirmation with task ID
+
+### List Tasks Flow
+
+1. Load todos from file
+2. Filter tasks based on completion status
+3. Sort tasks by ID
+4. Format and display each task
+5. Handle empty list case
+
+### Complete Task Flow
+
+1. Parse and validate task ID
+2. Load todos from file
+3. Verify task exists
+4. Update task completion status and timestamp
+5. Save updated todos to file
+6. Print confirmation message
+
+## Testing Strategy
+
+### Manual Test Cases
+
+1. **First Run**: Verify file creation
+2. **Add Tasks**: Multiple tasks with various descriptions
+3. **List Tasks**: Empty list, single task, multiple tasks
+4. **Complete Tasks**: Valid IDs, invalid IDs, already completed
+5. **Edit Tasks**: Valid updates, empty descriptions
+6. **Delete Tasks**: Existing tasks, non-existent tasks
+7. **Edge Cases**: Special characters, very long descriptions
+8. **File Operations**: Permission issues, corrupted files
+
+### Cross-Platform Testing
+
+- Test on macOS, Linux, Windows
+- Verify file path resolution
+- Check binary execution
+
+## Performance Considerations
+
+### File I/O Optimization
+
+- Read entire file into memory (acceptable for personal use)
+- Use atomic writes to prevent corruption
+- Minimal file system calls per operation
+
+### Memory Usage
+
+- Keep data structures simple
+- Avoid unnecessary copying
+- Use pointers for large structs
+
+## Build and Distribution
+
+### Build Commands
 
 ```bash
-npm test          # Interactive test runner
-npm run test:run  # Single test run (quiet, no noisy tests)
+# Development build
+go build -o todo
+
+# Release builds
+GOOS=linux GOARCH=amd64 go build -o todo-linux
+GOOS=darwin GOARCH=amd64 go build -o todo-macos
+GOOS=windows GOARCH=amd64 go build -o todo.exe
 ```
-
-- Excludes the MCP contract test (which shows INFO logs due to SDK limitations)
-- Clean output with ERROR-level logging only
-- **Recommended for development** - fast and quiet
-
-#### All Tests (Including Noisy)
-
-```bash
-npm run test:all  # Run all tests including noisy ones
-```
-
-- **10 test files**, **96+ tests**
-- Includes the MCP contract test with spawned processes
-- Shows INFO-level logs from MCP SDK (unavoidable)
-- **Use for comprehensive testing** before commits/releases
-
-#### Specific Test Categories
-
-```bash
-npm run test:noisy        # Run only the noisy MCP contract test
-npm run test:mcp-contract # Run MCP contract test (with custom state machine check)
-npm run test:ui           # Interactive test UI
-```
-
-### Test Configuration
-
-The test setup automatically:
-
-- Sets `LOG_LEVEL=ERROR` for clean output during testing
-- Configures test environment variables (`NODE_ENV=test`, `VITEST=true`)
-- Excludes noisy tests by default unless `INCLUDE_NOISY_TESTS=true`
-- Uses TypeScript source files and compiled JavaScript as needed
-
-## Testing Architecture
-
-The project uses an innovative E2E testing approach without process spawning, providing consumer perspective testing with real file system integration.
-
-### Testing Pattern
-
-- **Production**: Client → Transport → Server → Components
-- **Testing**: Test → DirectInterface → Server → Components
-
-### Test Structure
-
-```typescript
-it('should work end-to-end', async () => {
-  const tempProject = createTempProjectWithDefaultStateMachine();
-  const { client, cleanup } = await createE2EScenario({ tempProject });
-
-  const result = await client.callTool('whats_next', {
-    user_input: 'implement auth',
-  });
-
-  expect(result.phase).toBeDefined();
-});
-```
-
-## Logging and Debugging
-
-The server includes comprehensive logging with configurable levels for debugging, monitoring, and troubleshooting:
-
-### Log Levels
-
-- **DEBUG**: Detailed tracing and execution flow
-- **INFO**: Success operations and important milestones (default)
-- **WARN**: Expected errors and recoverable issues
-- **ERROR**: Caught but unexpected errors
-
-### Configuration
-
-Set the log level using the `LOG_LEVEL` environment variable:
-
-```bash
-# Debug level (most verbose)
-LOG_LEVEL=DEBUG npx tsx src/index.ts
-
-# Production level
-LOG_LEVEL=INFO node dist/index.js
-```
-
-### Log Components
-
-- **Server**: Main server operations and tool handlers
-- **Database**: SQLite operations and state persistence
-- **ConversationManager**: Conversation context management
-- **TransitionEngine**: Phase transition analysis
-- **PlanManager**: Plan file operations
-
-For detailed logging documentation, see [LOGGING.md](./LOGGING.md).
-
-## Interaction Logging
-
-Vibe Feature MCP includes a comprehensive interaction logging system that records all tool calls and responses for debugging and analysis purposes:
-
-### Logged Information
-
-- **Tool Calls**: All calls to `whats_next` and `proceed_to_phase` tools
-- **Input Parameters**: Complete request parameters for each tool call
-- **Response Data**: Complete response data returned to the LLM
-- **Current Phase**: Development phase at the time of the interaction
-- **Timestamp**: When the interaction occurred
-- **Conversation ID**: Which conversation the interaction belongs to
-
-### Data Storage
-
-All interaction logs are stored in the local SQLite database in the `.vibe` directory of your project. The data is stored without masking or filtering, as it is kept locally on your system.
-
-### Querying Logs
-
-Logs can be queried by conversation ID for analysis and debugging purposes. No UI is provided in the current implementation, but the database can be accessed directly using SQLite tools.
-
-**Note**: All interaction data is stored locally on your system and is never transmitted to external services.
-
-## Development Setup
-
-### Prerequisites
-
-- Node.js 18.0.0 or higher
-- npm or yarn
 
 ### Installation
 
-```bash
-# Clone the repository
-git clone <repository-url>
-cd responsible-vibe-mcp
-
-# Install dependencies
-npm install
-
-# Build the project
-npm run build
-```
-
-## Project File Organization
-
-The server creates a `.vibe` subdirectory in your project to store all responsible-vibe-mcp related files:
-
-```
-your-project/
-├── .vibe/
-│   ├── conversation-state.sqlite      # SQLite database for conversation state
-│   ├── development-plan.md        # Main development plan (main/master branch)
-│   └── development-plan-{branch}.md  # Branch-specific development plans
-├── src/
-├── package.json
-└── ... (your project files)
-```
-
-### Plan File Management
-
-The server automatically creates and manages development plan files:
-
-- **Main branch**: `.vibe/development-plan.md`
-- **Feature branches**: `.vibe/development-plan-{branch-name}.md`
-
-The LLM is instructed to continuously update these files with:
-
-- Task progress and completion status
-- Technical decisions and design choices
-- Implementation notes and progress
-- Testing results and validation
-
-### Database Storage
-
-Conversation state is persisted in a project-local SQLite database:
-`.vibe/conversation-state.sqlite`
-
-This ensures:
-
-- **Project isolation**: Each project has its own conversation state
-- **Branch awareness**: Different branches can have separate development contexts
-- **Persistence**: State survives server restarts and provides conversation continuity
-- **Portability**: Database travels with your project
-
-## Project Identification
-
-Each conversation is uniquely identified by:
-
-- **Project path**: Absolute path to current working directory
-- **Git branch**: Current git branch (or 'no-git' if not in a git repo)
-
-This allows multiple projects and branches to have independent conversation states.
-
-### Development Commands
-
-```bash
-# Start development server
-npm run dev
-
-# Build for production
-npm run build
-
-# Run tests
-npm run test:run
-
-# Run all tests (including noisy ones)
-npm run test:all
-
-# Start workflow visualizer
-npm run visualize
-```
-
-### Project Structure
-
-```
-src/
-├── index.ts              # Main server entry point
-├── server.ts             # MCP server implementation
-├── conversation/         # Conversation management
-├── database/            # Database operations
-├── plan/               # Plan file management
-├── transitions/        # Phase transition logic
-├── workflows/          # Workflow definitions
-└── utils/              # Utility functions
-
-tests/
-├── unit/               # Unit tests
-├── integration/        # Integration tests
-└── fixtures/           # Test fixtures
-
-docs/
-├── ARCHITECTURE.md     # Architecture documentation
-├── EXAMPLES.md         # Usage examples
-├── DEVELOPMENT.md      # This file
-└── *.md               # Other documentation
-```
-
-## Debugging Tips
-
-### Common Issues
-
-1. **Server not responding**: Check if the server process is running and listening on the correct port
-2. **Database errors**: Ensure the SQLite database file has proper permissions
-3. **Git integration issues**: Verify git is installed and the project is in a git repository
-4. **Plan file not updating**: Check file permissions and project path configuration
-
-### Debug Mode
-
-Enable debug logging to see detailed execution flow:
-
-```bash
-LOG_LEVEL=DEBUG npx responsible-vibe-mcp
-```
-
-### Testing with MCP Inspector
-
-Use the MCP Inspector for interactive testing:
-
-```bash
-npx @modelcontextprotocol/inspector
-```
-
-Configure it to connect to your local server instance.
-
-## Contributing
-
-### Code Style
-
-- Use TypeScript for all new code
-- Follow existing code formatting conventions
-- Add tests for new functionality
-- Update documentation for API changes
-
-### Commit Messages
-
-Use conventional commits for version management:
-
-```
-feat: add new workflow support
-fix: resolve database connection issue
-docs: update API documentation
-test: add integration tests for phase transitions
-```
-
-### Pull Request Process
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes with tests
-4. Ensure all tests pass (`npm run test:all`)
-5. Update documentation as needed
-6. Submit a pull request
-
-### Automated Checks
-
-The project includes several automated checks that run on every PR:
-
-- **Tests**: Comprehensive test suite including MCP contract tests
-- **Linting**: Code style and quality checks
-- **Type Checking**: TypeScript compilation verification
-- **Build Verification**: Ensures the project builds successfully
-
-### Dependency Management
-
-This project uses **Renovate** for automated dependency management:
-
-- Automatically creates PRs for dependency updates
-- Follows semantic versioning for update scheduling
-- Includes security updates with higher priority
-- Configuration in `.github/renovate.json`
-- Helps keep dependencies current and secure
-
-### Release Process
-
-The project uses automated releases based on conventional commits:
-
-- `feat:` commits trigger minor version bumps
-- `fix:` commits trigger patch version bumps
-- `BREAKING CHANGE:` in commit body triggers major version bumps
+1. Place binary in PATH directory
+2. Run `todo help` to verify installation
+3. First command will create `~/.todos.yaml`
