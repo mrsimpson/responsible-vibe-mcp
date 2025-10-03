@@ -51,22 +51,22 @@ export class PlantUMLRenderer {
     const title = document.createElement('div');
     title.innerHTML = `
       <div style="
-        display: flex; 
-        align-items: center; 
-        justify-content: center; 
-        gap: 12px; 
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
         margin-bottom: 10px;
         flex-wrap: wrap;
       ">
         <h2 style="
-          color: #1e293b; 
-          margin: 0; 
+          color: #1e293b;
+          margin: 0;
           font-size: 1.5rem;
           cursor: pointer;
           padding: 8px 12px;
           border-radius: 6px;
           transition: background-color 0.2s ease;
-        " 
+        "
         class="workflow-title-clickable"
         title="Click to show workflow information"
         >${workflow.name} Workflow ${workflow.metadata?.domain ? `<span class="domain-pill" data-domain="${workflow.metadata.domain}">${workflow.metadata.domain}</span>` : ''}</h2>

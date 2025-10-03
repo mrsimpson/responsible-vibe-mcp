@@ -12,6 +12,7 @@ import { YamlParser } from './YamlParser';
 import {
   getBundledWorkflow,
   getBundledWorkflowNames,
+  getBundledWorkflowMetadata,
 } from './BundledWorkflows';
 
 export class WorkflowLoader {
@@ -28,24 +29,14 @@ export class WorkflowLoader {
     const workflowNames = getBundledWorkflowNames();
 
     return workflowNames.map(name => {
-      // Load workflow to extract domain from metadata
-      let domain: string | undefined;
-      try {
-        const yamlContent = getBundledWorkflow(name);
-        if (yamlContent) {
-          const workflow = this.yamlParser.parseWorkflow(yamlContent);
-          domain = workflow.metadata?.domain;
-        }
-      } catch (error) {
-        // If workflow fails to load, continue without domain
-        console.warn(`Failed to load domain for workflow ${name}:`, error);
-      }
+      // Use pre-parsed metadata from build time
+      const metadata = getBundledWorkflowMetadata(name);
 
       return {
         name,
         displayName: this.formatDisplayName(name),
         source: 'builtin' as const,
-        domain,
+        domain: metadata?.domain,
       };
     });
   }

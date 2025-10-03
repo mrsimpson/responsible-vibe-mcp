@@ -5,9 +5,10 @@
  * Dynamically discovers all YAML files for development mode
  */
 
-import { writeFile, readdir } from 'node:fs/promises';
+import { writeFile, readdir, readFile } from 'node:fs/promises';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import yaml from 'js-yaml';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -44,8 +45,32 @@ async function buildDevWorkflows() {
     // Generate imports and entries for development (loads from source)
     const workflowImports = [];
     const workflowEntries = [];
+    const workflowMetadata = [];
 
     for (const file of yamlFiles) {
+      // Parse YAML to extract metadata
+      const sourcePath = join(sourceDir, file);
+      const content = await readFile(sourcePath, 'utf8');
+
+      let metadata = null;
+      try {
+        const parsed = yaml.load(content);
+        metadata = {
+          name: parsed.name,
+          description: parsed.description,
+          domain: parsed.metadata?.domain,
+          complexity: parsed.metadata?.complexity,
+          bestFor: parsed.metadata?.bestFor,
+          useCases: parsed.metadata?.useCases,
+          examples: parsed.metadata?.examples,
+        };
+      } catch (error) {
+        console.warn(
+          `⚠️  Failed to parse metadata for ${file}:`,
+          error.message
+        );
+      }
+
       // Generate safe variable names (replace non-alphanumeric with underscore)
       const workflowName = file.replace(/\.(yaml|yml)$/, '');
       const safeVarName = workflowName.replace(/[^a-zA-Z0-9]/g, '_');
@@ -55,6 +80,9 @@ async function buildDevWorkflows() {
         `import ${importName} from '../../../resources/workflows/${file}?raw';`
       );
       workflowEntries.push(`  '${workflowName}': ${importName}`);
+      workflowMetadata.push(
+        `  '${workflowName}': ${JSON.stringify(metadata, null, 4).replace(/\n/g, '\n    ')}`
+      );
 
       console.log(`  ✅ ${file} -> ${workflowName}`);
     }
@@ -75,8 +103,16 @@ export const BUNDLED_WORKFLOWS: Record<string, string> = {
 ${workflowEntries.join(',\n')}
 };
 
+export const BUNDLED_WORKFLOW_METADATA: Record<string, any> = {
+${workflowMetadata.join(',\n')}
+};
+
 export function getBundledWorkflow(name: string): string | null {
   return BUNDLED_WORKFLOWS[name] || null;
+}
+
+export function getBundledWorkflowMetadata(name: string): any | null {
+  return BUNDLED_WORKFLOW_METADATA[name] || null;
 }
 
 export function getBundledWorkflowNames(): string[] {

@@ -213,12 +213,12 @@ function renderStateDetailsWithHeader(
       </h3>
       <p class="detail-content">${stateData.description}</p>
     </div>
-    
+
     <div class="detail-section">
       <h4 class="detail-subtitle">Default Instructions</h4>
       <div class="code-block">${stateData.default_instructions}</div>
     </div>
-    
+
     <div class="detail-section">
       <h4 class="detail-subtitle">Transitions (${stateData.transitions.length})</h4>
       <ul class="transitions-list">
@@ -321,12 +321,12 @@ function renderTransitionDetailsWithHeader(transitionData: unknown): void {
         <strong>${transition.from}</strong> → <strong>${transition.to}</strong>
       </p>
     </div>
-    
+
     <div class="detail-section">
       <h4 class="detail-subtitle">Reason</h4>
       <p class="detail-content">${transition.transition_reason || ''}</p>
     </div>
-    
+
     ${
       transition.instructions
         ? `
@@ -337,7 +337,7 @@ function renderTransitionDetailsWithHeader(transitionData: unknown): void {
     `
         : ''
     }
-    
+
     ${
       transition.additional_instructions
         ? `
@@ -348,7 +348,7 @@ function renderTransitionDetailsWithHeader(transitionData: unknown): void {
     `
         : ''
     }
-    
+
     ${
       transition.review_perspectives?.length
         ? `
@@ -395,7 +395,7 @@ function renderMetadataDetails(): void {
       <h3 class="detail-title">${workflow.name}</h3>
       <p class="detail-content">${workflow.description}</p>
     </div>
-    
+
     ${
       metadata
         ? `
@@ -563,7 +563,9 @@ onMounted(async () => {
       for (const workflow of workflows) {
         const option = document.createElement('option');
         option.value = workflow.name;
-        option.textContent = `${workflow.displayName} - ${workflow.description}`;
+        // Include domain in option text if available
+        const domainText = workflow.domain ? ` [${workflow.domain}]` : '';
+        option.textContent = `${workflow.displayName}${domainText}`;
         workflowSelector.appendChild(option);
       }
     }
