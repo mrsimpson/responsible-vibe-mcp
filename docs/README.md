@@ -24,7 +24,7 @@ Think of it as having a senior engineer sitting next to your AI, constantly aski
 </div>
 
 <div v-show="showModal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; padding: 20px; box-sizing: border-box;" @click="closeDemo">
-  <div style="position: relative; width: 100%; height: 100%; max-width: 1200px; margin: 0 auto;">
+  <div style="position: relative; width: 95%; height: 100%; margin: 0 auto;">
     <button @click="closeDemo" style="position: absolute; top: -10px; right: -10px; background: white; border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 24px; cursor: pointer; z-index: 1001; display: flex; align-items: center; justify-content: center;" aria-label="Close demo">×</button>
     <iframe :src="iframeSrc" style="width: 100%; height: 100%; border: none; border-radius: 8px;" title="Responsible Vibe MCP Interactive Demo"></iframe>
   </div>
