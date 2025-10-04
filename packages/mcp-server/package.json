@@ -1,0 +1,23 @@
+{
+  "name": "@responsible-vibe/mcp-server",
+  "version": "3.1.6",
+  "description": "MCP server implementation for responsible-vibe",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "responsible-vibe-mcp": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "clean:build": "rimraf ./dist",
+    "dev": "tsc --watch"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.17.5",
+    "@responsible-vibe/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  }
+}
