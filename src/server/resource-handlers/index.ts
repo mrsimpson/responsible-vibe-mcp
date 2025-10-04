@@ -5,8 +5,8 @@
  * functionality for resource handlers used by the MCP server.
  */
 
-import { createLogger } from '../../logger.js';
-import { ResourceHandler, ResourceRegistry } from '../types.js';
+import { createLogger } from '@responsible-vibe/core';
+import { ResourceHandler, ResourceRegistry } from '@responsible-vibe/core';
 import { DevelopmentPlanResourceHandler } from './development-plan.js';
 import { ConversationStateResourceHandler } from './conversation-state.js';
 import { WorkflowResourceHandler } from './workflow-resource.js';

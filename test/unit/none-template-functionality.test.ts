@@ -5,7 +5,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { ProjectDocsManager } from '../../src/project-docs-manager.js';
+import { ProjectDocsManager } from '@responsible-vibe/core';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { mkdir, rmdir, readFile } from 'node:fs/promises';

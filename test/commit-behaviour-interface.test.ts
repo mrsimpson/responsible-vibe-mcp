@@ -4,7 +4,7 @@
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { StartDevelopmentHandler } from '../src/server/tool-handlers/start-development.js';
-import * as GitManagerModule from '../src/git-manager.js';
+import * as GitManagerModule from '@responsible-vibe/core';
 import type { ServerContext } from '../src/server/types.js';
 
 // Spy on GitManager methods

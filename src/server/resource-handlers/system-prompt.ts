@@ -6,16 +6,16 @@
  * system prompt through the MCP protocol. The system prompt is workflow-independent.
  */
 
-import { createLogger } from '../../logger.js';
+import { createLogger } from '@responsible-vibe/core';
 import {
   ResourceHandler,
   ServerContext,
   HandlerResult,
   ResourceContent,
-} from '../types.js';
+} from '@responsible-vibe/core';
 import { safeExecute } from '../server-helpers.js';
-import { generateSystemPrompt } from '../../system-prompt-generator.js';
-import { StateMachineLoader } from '../../state-machine-loader.js';
+import { generateSystemPrompt } from '@responsible-vibe/core';
+import { StateMachineLoader } from '@responsible-vibe/core';
 
 const logger = createLogger('SystemPromptResourceHandler');
 

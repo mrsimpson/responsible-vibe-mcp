@@ -6,7 +6,7 @@
  */
 
 import { ConversationRequiredToolHandler } from './base-tool-handler.js';
-import { ServerContext } from '../types.js';
+import { ServerContext } from '@responsible-vibe/core';
 import { validateRequiredArgs } from '../server-helpers.js';
 import type { ConversationContext } from '../../types.js';
 

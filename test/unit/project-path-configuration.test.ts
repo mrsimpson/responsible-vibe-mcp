@@ -9,15 +9,19 @@ import { promises as fs } from 'node:fs';
 import { ResponsibleVibeMCPServer } from '../../src/server.js';
 
 // Mock the logger to prevent console noise during tests
-vi.mock('../../src/logger', () => ({
-  createLogger: () => ({
-    debug: vi.fn(),
-    info: vi.fn(),
-    warn: vi.fn(),
-    error: vi.fn(),
-  }),
-  setMcpServerForLogging: vi.fn(),
-}));
+vi.mock('@responsible-vibe/core', async () => {
+  const actual = await vi.importActual('@responsible-vibe/core');
+  return {
+    ...actual,
+    createLogger: () => ({
+      debug: vi.fn(),
+      info: vi.fn(),
+      warn: vi.fn(),
+      error: vi.fn(),
+    }),
+    setMcpServerForLogging: vi.fn(),
+  };
+});
 
 // Mock all dependencies with minimal implementations
 vi.mock('../../src/database', () => ({
@@ -134,8 +138,9 @@ describe('Project Path Configuration', () => {
 
   describe('Environment Variable Support', () => {
     it('should use PROJECT_PATH when provided', async () => {
-      // Set environment variable
-      const testProjectPath = '/custom/project/path';
+      // Create temporary directory for test
+      const tempDir = await fs.mkdtemp('/tmp/test-custom-');
+      const testProjectPath = tempDir;
       process.env.PROJECT_PATH = testProjectPath;
 
       // Create server instance
@@ -151,11 +156,15 @@ describe('Project Path Configuration', () => {
     });
 
     it('should use config projectPath over environment variable', async () => {
+      // Create temporary directories for test
+      const envTempDir = await fs.mkdtemp('/tmp/test-env-');
+      const configTempDir = await fs.mkdtemp('/tmp/test-config-');
+
       // Set environment variable
-      process.env.PROJECT_PATH = '/env/project/path';
+      process.env.PROJECT_PATH = envTempDir;
 
       // Create server with explicit config
-      const configProjectPath = '/config/project/path';
+      const configProjectPath = configTempDir;
       const server = new ResponsibleVibeMCPServer({
         projectPath: configProjectPath,
       });
@@ -188,8 +197,9 @@ describe('Project Path Configuration', () => {
 
   describe('Integration Tests', () => {
     it('should properly pass environment variable through server initialization', async () => {
-      // Set environment variable
-      const testProjectPath = '/integration/test/path';
+      // Create temporary directory for test
+      const tempDir = await fs.mkdtemp('/tmp/test-integration-');
+      const testProjectPath = tempDir;
       process.env.PROJECT_PATH = testProjectPath;
 
       // Create and initialize server

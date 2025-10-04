@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { WorkflowManager } from '../../src/workflow-manager.js';
+import { WorkflowManager } from '@responsible-vibe/core';
 
 describe('Workflow Prioritization', () => {
   it('should prioritize project workflows over predefined ones in getWorkflow method', () => {

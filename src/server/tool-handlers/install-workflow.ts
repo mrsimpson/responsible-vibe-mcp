@@ -6,8 +6,8 @@
 
 import { z } from 'zod';
 import { BaseToolHandler } from './base-tool-handler.js';
-import { ServerContext } from '../types.js';
-import { createLogger } from '../../logger.js';
+import { ServerContext } from '@responsible-vibe/core';
+import { createLogger } from '@responsible-vibe/core';
 import { notificationService } from '../notification-service.js';
 import fs from 'node:fs';
 import path from 'node:path';

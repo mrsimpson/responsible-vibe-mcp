@@ -10,16 +10,16 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { ResourceTemplate } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { SetLevelRequestSchema } from '@modelcontextprotocol/sdk/types.js';
 
-import { Database } from '../database.js';
-import { ConversationManager } from '../conversation-manager.js';
-import { TransitionEngine } from '../transition-engine.js';
-import { InstructionGenerator } from '../instruction-generator.js';
-import { PlanManager } from '../plan-manager.js';
-import { InteractionLogger } from '../interaction-logger.js';
-import { WorkflowManager } from '../workflow-manager.js';
-import { GitManager } from '../git-manager.js';
-import { TemplateManager } from '../template-manager.js';
-import { createLogger, setMcpLoggingLevel } from '../logger.js';
+import { Database } from '@responsible-vibe/core';
+import { ConversationManager } from '@responsible-vibe/core';
+import { TransitionEngine } from '@responsible-vibe/core';
+import { InstructionGenerator } from '@responsible-vibe/core';
+import { PlanManager } from '@responsible-vibe/core';
+import { InteractionLogger } from '@responsible-vibe/core';
+import { WorkflowManager } from '@responsible-vibe/core';
+import { GitManager } from '@responsible-vibe/core';
+import { TemplateManager } from '@responsible-vibe/core';
+import { createLogger, setMcpLoggingLevel } from '@responsible-vibe/core';
 
 import {
   ServerConfig,
@@ -27,7 +27,7 @@ import {
   ToolRegistry,
   ResourceRegistry,
   ResponseRenderer,
-} from './types.js';
+} from '@responsible-vibe/core';
 import {
   normalizeProjectPath,
   buildWorkflowEnum,

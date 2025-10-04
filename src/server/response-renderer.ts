@@ -5,14 +5,14 @@
  * This provides clean separation between business logic and protocol concerns.
  */
 
-import { createLogger } from '../logger.js';
+import { createLogger } from '@responsible-vibe/core';
 import {
   ResponseRenderer,
   HandlerResult,
   ResourceContent,
   McpToolResponse,
   McpResourceResponse,
-} from './types.js';
+} from '@responsible-vibe/core';
 
 const logger = createLogger('ResponseRenderer');
 

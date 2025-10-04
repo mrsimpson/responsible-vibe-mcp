@@ -2,15 +2,12 @@
   "name": "responsible-vibe-mcp",
   "version": "3.1.6",
   "description": "A Model Context Protocol server that acts as an intelligent conversation state manager and development guide for LLMs, featuring comprehensive long-term memory with persistent project artifacts",
-  "main": "dist/index.js",
-  "bin": {
-    "responsible-vibe-mcp": "dist/index.js",
-    "workflow-visualizer": "workflow-visualizer/bin/visualizer.js"
-  },
   "type": "module",
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=18.0.0",
+    "pnpm": ">=9.0.0"
   },
+  "packageManager": "pnpm@9.14.2",
   "files": [
     "dist/**/*",
     "resources/**/*",
@@ -36,27 +33,29 @@
     "url": "git+https://github.com/mrsimpson/vibe-feature-mcp.git"
   },
   "scripts": {
-    "build": "tsc",
-    "build:ci": "tsc",
+    "build": "turbo run build",
+    "build:ci": "turbo run build",
     "build:visualizer": "cd workflow-visualizer && npm install && npm run build",
     "inspector": "npx @modelcontextprotocol/inspector",
-    "dev": "tsc --watch",
-    "clean": "rm -rf dist",
+    "dev": "turbo run dev",
+    "clean": "turbo run clean:build",
     "prepublishOnly": "npm run build",
-    "test": "vitest",
+    "test": "vitest --run && turbo run test",
+    "test:root": "vitest --run",
     "test:ui": "vitest --ui",
-    "test:run": "vitest run",
+    "test:run": "vitest --run && turbo run test",
     "test:manual": "npm run build && npm run inspector",
     "test:mcp-contract": "[ -f .vibe/state-machine.yml ] || [ -f .vibe/state-machine.yaml ] && echo '⚠️  Skipping MCP contract tests: Custom state machine detected' || vitest run --run test/e2e/consolidated/mcp-contract.test.ts",
     "generate-system-prompt": "vite-node src/scripts/generate-system-prompt.ts",
-    "lint": "oxlint",
-    "lint:fix": "oxlint --fix",
-    "format": "prettier --write .",
-    "format:check": "prettier --check .",
+    "lint": "turbo run lint",
+    "lint:fix": "turbo run lint:fix",
+    "format": "turbo run format",
+    "format:check": "turbo run format",
     "prepare": "husky"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.17.5",
+    "@responsible-vibe/core": "workspace:*",
     "@types/js-yaml": "4.0.9",
     "js-yaml": "4.1.0",
     "sqlite3": "^5.1.7",
@@ -64,6 +63,8 @@
   },
   "devDependencies": {
     "@modelcontextprotocol/inspector": "0.16.8",
+    "@tsconfig/node22": "22.0.2",
+    "@tsconfig/strictest": "2.0.6",
     "@types/jsdom": "21.1.7",
     "@types/node": "^20.0.0",
     "@types/sqlite3": "^3.1.11",
@@ -73,6 +74,7 @@
     "oxlint": "1.16.0",
     "prettier": "3.6.2",
     "tsx": "4.20.5",
+    "turbo": "^2.3.3",
     "typescript": "^5.0.0",
     "vitepress": "^1.6.3",
     "vitest": "3.2.4"

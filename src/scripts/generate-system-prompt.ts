@@ -12,8 +12,8 @@
 
 import { writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import { generateSystemPrompt } from '../system-prompt-generator.js';
-import { createLogger } from '../logger.js';
+import { generateSystemPrompt } from '@responsible-vibe/core';
+import { createLogger } from '@responsible-vibe/core';
 
 const logger = createLogger('GenerateSystemPrompt');
 

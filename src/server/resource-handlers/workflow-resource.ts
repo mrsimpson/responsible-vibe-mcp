@@ -8,13 +8,13 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { createLogger } from '../../logger.js';
+import { createLogger } from '@responsible-vibe/core';
 import {
   ResourceHandler,
   ServerContext,
   HandlerResult,
   ResourceContent,
-} from '../types.js';
+} from '@responsible-vibe/core';
 import { safeExecute } from '../server-helpers.js';
 
 const logger = createLogger('WorkflowResourceHandler');

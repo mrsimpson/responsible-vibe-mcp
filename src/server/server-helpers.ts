@@ -6,8 +6,8 @@
  */
 
 import { homedir } from 'node:os';
-import { createLogger } from '../logger.js';
-import { HandlerResult } from './types.js';
+import { createLogger } from '@responsible-vibe/core';
+import { HandlerResult } from '@responsible-vibe/core';
 
 const logger = createLogger('ServerHelpers');
 

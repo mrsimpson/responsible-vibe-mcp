@@ -9,7 +9,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { existsSync, writeFileSync, mkdirSync, rmSync } from 'node:fs';
 import { resolve, join } from 'node:path';
 import { tmpdir } from 'node:os';
-import { WorkflowManager } from '../../src/workflow-manager.js';
+import { WorkflowManager } from '@responsible-vibe/core';
 
 describe('WorkflowManager enhanced path resolution', () => {
   let tempDir: string;

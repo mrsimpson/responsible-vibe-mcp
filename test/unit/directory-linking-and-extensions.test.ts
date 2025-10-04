@@ -7,8 +7,8 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { PathValidationUtils } from '../../src/path-validation-utils.js';
-import { ProjectDocsManager } from '../../src/project-docs-manager.js';
+import { PathValidationUtils } from '@responsible-vibe/core';
+import { ProjectDocsManager } from '@responsible-vibe/core';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { mkdir, writeFile, rm, readlink, lstat } from 'node:fs/promises';

@@ -76,7 +76,10 @@ export class StateMachineLoader {
     // Use import.meta.url to get the current file's path in ESM
     const currentFileUrl = import.meta.url;
     const currentFilePath = fileURLToPath(currentFileUrl);
-    const projectRoot = path.dirname(path.dirname(currentFilePath));
+    // Go up from packages/core/dist/ to project root (4 levels up)
+    const projectRoot = path.dirname(
+      path.dirname(path.dirname(path.dirname(currentFilePath)))
+    );
     const defaultFilePath = path.join(
       projectRoot,
       'resources',

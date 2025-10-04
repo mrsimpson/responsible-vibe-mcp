@@ -9,10 +9,10 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { WorkflowInfo, WorkflowManager } from '../src/workflow-manager.js';
+import { WorkflowInfo, WorkflowManager } from '@responsible-vibe/core';
 import { readdirSync } from 'node:fs';
 import { join } from 'node:path';
-import { YamlStateMachine, YamlState } from '../src/state-machine-types.js';
+import { YamlStateMachine, YamlState } from '@responsible-vibe/core';
 
 describe('Workflow Validation', () => {
   const workflowsDir = join(__dirname, '..', 'resources', 'workflows');

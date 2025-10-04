@@ -1,0 +1,25 @@
+{
+  "name": "@responsible-vibe/core",
+  "version": "3.1.6",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "clean:build": "rimraf ./dist",
+    "test": "vitest --run",
+    "lint": "oxlint .",
+    "lint:fix": "oxlint --fix .",
+    "format": "prettier --check .",
+    "format:fix": "prettier --write ."
+  },
+  "dependencies": {
+    "@types/js-yaml": "4.0.9",
+    "js-yaml": "4.1.0",
+    "sqlite3": "^5.1.7",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "rimraf": "^6.0.1"
+  }
+}

@@ -7,8 +7,8 @@
  */
 
 import { ConversationRequiredToolHandler } from './base-tool-handler.js';
-import { ServerContext } from '../types.js';
-import { generateSystemPrompt } from '../../system-prompt-generator.js';
+import { ServerContext } from '@responsible-vibe/core';
+import { generateSystemPrompt } from '@responsible-vibe/core';
 import type { YamlStateMachine, YamlState } from '../../state-machine-types.js';
 
 /**

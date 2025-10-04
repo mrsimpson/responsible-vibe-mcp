@@ -1,0 +1,710 @@
+{
+  "timestamp": "2025-10-04T10:35:06.575Z",
+  "summary": {
+    "files_processed": 130,
+    "files_changed": 50,
+    "total_changes": 100
+  },
+  "changes": [
+    {
+      "file": "src/config-generator.ts",
+      "old_import": "./system-prompt-generator.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.414Z"
+    },
+    {
+      "file": "src/config-generator.ts",
+      "old_import": "./state-machine-loader.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.414Z"
+    },
+    {
+      "file": "src/config-generator.ts",
+      "old_import": "./logger.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.414Z"
+    },
+    {
+      "file": "src/index.ts",
+      "old_import": "./logger.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.415Z"
+    },
+    {
+      "file": "src/index.ts",
+      "old_import": "./system-prompt-generator.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.415Z"
+    },
+    {
+      "file": "src/index.ts",
+      "old_import": "./state-machine-loader.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.415Z"
+    },
+    {
+      "file": "src/scripts/generate-system-prompt.ts",
+      "old_import": "../system-prompt-generator.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.416Z"
+    },
+    {
+      "file": "src/scripts/generate-system-prompt.ts",
+      "old_import": "../logger.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.416Z"
+    },
+    {
+      "file": "src/server/index.ts",
+      "old_import": "../logger.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.417Z"
+    },
+    {
+      "file": "src/server/index.ts",
+      "old_import": "./types.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.417Z"
+    },
+    {
+      "file": "src/server/resource-handlers/conversation-state.ts",
+      "old_import": "../../logger.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.418Z"
+    },
+    {
+      "file": "src/server/resource-handlers/conversation-state.ts",
+      "old_import": "../types.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.418Z"
+    },
+    {
+      "file": "src/server/resource-handlers/development-plan.ts",
+      "old_import": "../../logger.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.419Z"
+    },
+    {
+      "file": "src/server/resource-handlers/development-plan.ts",
+      "old_import": "../types.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.419Z"
+    },
+    {
+      "file": "src/server/resource-handlers/index.ts",
+      "old_import": "../../logger.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.420Z"
+    },
+    {
+      "file": "src/server/resource-handlers/index.ts",
+      "old_import": "../types.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.420Z"
+    },
+    {
+      "file": "src/server/resource-handlers/system-prompt.ts",
+      "old_import": "../../logger.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.420Z"
+    },
+    {
+      "file": "src/server/resource-handlers/system-prompt.ts",
+      "old_import": "../types.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.420Z"
+    },
+    {
+      "file": "src/server/resource-handlers/system-prompt.ts",
+      "old_import": "../../system-prompt-generator.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.420Z"
+    },
+    {
+      "file": "src/server/resource-handlers/system-prompt.ts",
+      "old_import": "../../state-machine-loader.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.420Z"
+    },
+    {
+      "file": "src/server/resource-handlers/workflow-resource.ts",
+      "old_import": "../../logger.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.421Z"
+    },
+    {
+      "file": "src/server/resource-handlers/workflow-resource.ts",
+      "old_import": "../types.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.421Z"
+    },
+    {
+      "file": "src/server/response-renderer.ts",
+      "old_import": "../logger.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.423Z"
+    },
+    {
+      "file": "src/server/response-renderer.ts",
+      "old_import": "./types.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.423Z"
+    },
+    {
+      "file": "src/server/server-config.ts",
+      "old_import": "../database.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.425Z"
+    },
+    {
+      "file": "src/server/server-config.ts",
+      "old_import": "../conversation-manager.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.426Z"
+    },
+    {
+      "file": "src/server/server-config.ts",
+      "old_import": "../transition-engine.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.426Z"
+    },
+    {
+      "file": "src/server/server-config.ts",
+      "old_import": "../instruction-generator.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.426Z"
+    },
+    {
+      "file": "src/server/server-config.ts",
+      "old_import": "../plan-manager.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.426Z"
+    },
+    {
+      "file": "src/server/server-config.ts",
+      "old_import": "../interaction-logger.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.426Z"
+    },
+    {
+      "file": "src/server/server-config.ts",
+      "old_import": "../workflow-manager.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.426Z"
+    },
+    {
+      "file": "src/server/server-config.ts",
+      "old_import": "../git-manager.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.426Z"
+    },
+    {
+      "file": "src/server/server-config.ts",
+      "old_import": "../template-manager.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.426Z"
+    },
+    {
+      "file": "src/server/server-config.ts",
+      "old_import": "../logger.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.426Z"
+    },
+    {
+      "file": "src/server/server-config.ts",
+      "old_import": "./types.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.426Z"
+    },
+    {
+      "file": "src/server/server-helpers.ts",
+      "old_import": "../logger.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.426Z"
+    },
+    {
+      "file": "src/server/server-helpers.ts",
+      "old_import": "./types.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.426Z"
+    },
+    {
+      "file": "src/server/tool-handlers/base-tool-handler.ts",
+      "old_import": "../../logger.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.427Z"
+    },
+    {
+      "file": "src/server/tool-handlers/base-tool-handler.ts",
+      "old_import": "../types.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.427Z"
+    },
+    {
+      "file": "src/server/tool-handlers/conduct-review.ts",
+      "old_import": "../types.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.427Z"
+    },
+    {
+      "file": "src/server/tool-handlers/get-tool-info.ts",
+      "old_import": "../types.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.428Z"
+    },
+    {
+      "file": "src/server/tool-handlers/get-tool-info.ts",
+      "old_import": "../../logger.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.428Z"
+    },
+    {
+      "file": "src/server/tool-handlers/index.ts",
+      "old_import": "../../logger.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.429Z"
+    },
+    {
+      "file": "src/server/tool-handlers/index.ts",
+      "old_import": "../types.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.429Z"
+    },
+    {
+      "file": "src/server/tool-handlers/install-workflow.ts",
+      "old_import": "../types.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.430Z"
+    },
+    {
+      "file": "src/server/tool-handlers/install-workflow.ts",
+      "old_import": "../../logger.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.430Z"
+    },
+    {
+      "file": "src/server/tool-handlers/list-workflows.ts",
+      "old_import": "../types.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.430Z"
+    },
+    {
+      "file": "src/server/tool-handlers/list-workflows.ts",
+      "old_import": "../../logger.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.430Z"
+    },
+    {
+      "file": "src/server/tool-handlers/no-idea.ts",
+      "old_import": "../types.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.430Z"
+    },
+    {
+      "file": "src/server/tool-handlers/proceed-to-phase.ts",
+      "old_import": "../types.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.434Z"
+    },
+    {
+      "file": "src/server/tool-handlers/reset-development.ts",
+      "old_import": "../types.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.455Z"
+    },
+    {
+      "file": "src/server/tool-handlers/resume-workflow.ts",
+      "old_import": "../types.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.460Z"
+    },
+    {
+      "file": "src/server/tool-handlers/resume-workflow.ts",
+      "old_import": "../../system-prompt-generator.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.460Z"
+    },
+    {
+      "file": "src/server/tool-handlers/setup-project-docs.ts",
+      "old_import": "../types.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.460Z"
+    },
+    {
+      "file": "src/server/tool-handlers/setup-project-docs.ts",
+      "old_import": "../../project-docs-manager.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.460Z"
+    },
+    {
+      "file": "src/server/tool-handlers/setup-project-docs.ts",
+      "old_import": "../../template-manager.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.460Z"
+    },
+    {
+      "file": "src/server/tool-handlers/setup-project-docs.ts",
+      "old_import": "../../path-validation-utils.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.460Z"
+    },
+    {
+      "file": "src/server/tool-handlers/start-development.ts",
+      "old_import": "../types.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.466Z"
+    },
+    {
+      "file": "src/server/tool-handlers/start-development.ts",
+      "old_import": "../../types.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.466Z"
+    },
+    {
+      "file": "src/server/tool-handlers/start-development.ts",
+      "old_import": "../../git-manager.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.466Z"
+    },
+    {
+      "file": "src/server/tool-handlers/start-development.ts",
+      "old_import": "../../project-docs-manager.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.466Z"
+    },
+    {
+      "file": "src/server/tool-handlers/whats-next.ts",
+      "old_import": "../types.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.467Z"
+    },
+    {
+      "file": "src/server/types.ts",
+      "old_import": "../conversation-manager.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.468Z"
+    },
+    {
+      "file": "src/server/types.ts",
+      "old_import": "../transition-engine.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.468Z"
+    },
+    {
+      "file": "src/server/types.ts",
+      "old_import": "../plan-manager.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.468Z"
+    },
+    {
+      "file": "src/server/types.ts",
+      "old_import": "../instruction-generator.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.468Z"
+    },
+    {
+      "file": "src/server/types.ts",
+      "old_import": "../workflow-manager.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.468Z"
+    },
+    {
+      "file": "src/server/types.ts",
+      "old_import": "../interaction-logger.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.468Z"
+    },
+    {
+      "file": "test/commit-behaviour-interface.test.ts",
+      "old_import": "../src/git-manager.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.469Z"
+    },
+    {
+      "file": "test/git-commit-integration.test.ts",
+      "old_import": "../src/git-manager.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.472Z"
+    },
+    {
+      "file": "test/git-manager.test.ts",
+      "old_import": "../src/git-manager.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.472Z"
+    },
+    {
+      "file": "test/unit/custom-workflow-loading.test.ts",
+      "old_import": "../../src/workflow-manager.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.482Z"
+    },
+    {
+      "file": "test/unit/directory-linking-and-extensions.test.ts",
+      "old_import": "../../src/path-validation-utils.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.483Z"
+    },
+    {
+      "file": "test/unit/directory-linking-and-extensions.test.ts",
+      "old_import": "../../src/project-docs-manager.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.483Z"
+    },
+    {
+      "file": "test/unit/file-linking-integration.test.ts",
+      "old_import": "../../src/path-validation-utils.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.483Z"
+    },
+    {
+      "file": "test/unit/file-linking-integration.test.ts",
+      "old_import": "../../src/file-detection-manager.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.483Z"
+    },
+    {
+      "file": "test/unit/file-linking-integration.test.ts",
+      "old_import": "../../src/project-docs-manager.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.483Z"
+    },
+    {
+      "file": "test/unit/install-workflow.test.ts",
+      "old_import": "../../src/workflow-manager.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.484Z"
+    },
+    {
+      "file": "test/unit/instruction-generator.test.ts",
+      "old_import": "../../src/instruction-generator.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.484Z"
+    },
+    {
+      "file": "test/unit/instruction-generator.test.ts",
+      "old_import": "../../src/plan-manager.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.484Z"
+    },
+    {
+      "file": "test/unit/instruction-generator.test.ts",
+      "old_import": "../../src/project-docs-manager.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.484Z"
+    },
+    {
+      "file": "test/unit/list-workflows-filtering.test.ts",
+      "old_import": "../../src/workflow-manager.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.485Z"
+    },
+    {
+      "file": "test/unit/none-template-functionality.test.ts",
+      "old_import": "../../src/project-docs-manager.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.485Z"
+    },
+    {
+      "file": "test/unit/project-docs-manager.test.ts",
+      "old_import": "../../src/project-docs-manager.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.486Z"
+    },
+    {
+      "file": "test/unit/project-docs-manager.test.ts",
+      "old_import": "../../src/template-manager.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.486Z"
+    },
+    {
+      "file": "test/unit/setup-project-docs-handler.test.ts",
+      "old_import": "../../src/project-docs-manager.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.487Z"
+    },
+    {
+      "file": "test/unit/setup-project-docs-handler.test.ts",
+      "old_import": "../../src/template-manager.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.487Z"
+    },
+    {
+      "file": "test/unit/state-machine-loader.test.ts",
+      "old_import": "../../src/state-machine-loader.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.488Z"
+    },
+    {
+      "file": "test/unit/template-manager.test.ts",
+      "old_import": "../../src/template-manager.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.488Z"
+    },
+    {
+      "file": "test/unit/validate-workflow-name.test.ts",
+      "old_import": "../../src/workflow-manager.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.494Z"
+    },
+    {
+      "file": "test/unit/workflow-domain-filtering.test.ts",
+      "old_import": "../../src/workflow-manager.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.495Z"
+    },
+    {
+      "file": "test/unit/workflow-enum-generation.test.ts",
+      "old_import": "../../src/workflow-manager.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.496Z"
+    },
+    {
+      "file": "test/unit/workflow-manager-enhanced-path-resolution.test.ts",
+      "old_import": "../../src/workflow-manager.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.497Z"
+    },
+    {
+      "file": "test/unit/workflow-manager-path-resolution.test.ts",
+      "old_import": "../../src/workflow-manager.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.498Z"
+    },
+    {
+      "file": "test/unit/workflow-migration.test.ts",
+      "old_import": "../../src/workflow-manager.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.499Z"
+    },
+    {
+      "file": "test/unit/workflow-override-by-name.test.ts",
+      "old_import": "../../src/workflow-manager.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.499Z"
+    },
+    {
+      "file": "test/unit/workflow-prioritization.test.ts",
+      "old_import": "../../src/workflow-manager.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.500Z"
+    },
+    {
+      "file": "test/workflow-configuration.test.ts",
+      "old_import": "../src/workflow-manager.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.501Z"
+    },
+    {
+      "file": "test/workflow-validation.test.ts",
+      "old_import": "../src/workflow-manager.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.502Z"
+    },
+    {
+      "file": "test/workflow-validation.test.ts",
+      "old_import": "../src/state-machine-types.js",
+      "new_import": "@responsible-vibe/core",
+      "target_package": "@responsible-vibe/core",
+      "timestamp": "2025-10-04T10:35:06.502Z"
+    }
+  ]
+}

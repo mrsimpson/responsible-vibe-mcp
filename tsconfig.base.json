@@ -11,6 +11,8 @@
     "noEmit": true,
     "module": "ESNext",
     "moduleResolution": "bundler",
+    "target": "ES2022",
+    "downlevelIteration": true,
     /* Strict Type-Checking Options */
     "noImplicitAny": true,
     "strictNullChecks": true,

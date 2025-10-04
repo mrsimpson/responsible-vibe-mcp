@@ -3,8 +3,6 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { ConversationManager } from '../../src/conversation-manager';
-import { Database } from '../../src/database';
 
 // Mock database
 const mockGetConversationState = vi.fn();
@@ -14,40 +12,7 @@ const mockSoftDeleteInteractionLogs = vi.fn();
 const mockInitialize = vi.fn();
 const mockClose = vi.fn();
 
-vi.mock('../../src/database', () => {
-  return {
-    Database: vi.fn().mockImplementation(() => ({
-      getConversationState: mockGetConversationState,
-      saveConversationState: mockSaveConversationState,
-      deleteConversationState: mockDeleteConversationState,
-      softDeleteInteractionLogs: mockSoftDeleteInteractionLogs,
-      initialize: mockInitialize,
-      close: mockClose,
-    })),
-  };
-});
-
-// Mock child_process for git branch detection
-vi.mock('child_process', () => ({
-  execSync: vi.fn().mockReturnValue('main'),
-}));
-
-// Mock fs for file existence checks
-vi.mock('fs', () => ({
-  existsSync: vi.fn().mockReturnValue(true),
-}));
-
-// Mock logger
-vi.mock('../../src/logger', () => ({
-  createLogger: () => ({
-    debug: vi.fn(),
-    info: vi.fn(),
-    warn: vi.fn(),
-    error: vi.fn(),
-  }),
-}));
-
-// Mock WorkflowManager
+// Mock WorkflowManager state machine
 const mockStateMachine = {
   name: 'Test Workflow',
   description: 'Test workflow for unit tests',
@@ -61,27 +26,40 @@ const mockStateMachine = {
 };
 
 // Replace the actual WorkflowManager with our mock
-vi.mock('../../src/workflow-manager', () => {
+vi.mock('@responsible-vibe/core', async () => {
+  const actual = await vi.importActual('@responsible-vibe/core');
   return {
-    WorkflowManager: function () {
-      return {
-        loadWorkflowForProject: () => mockStateMachine,
-        validateWorkflowName: () => true,
-        getWorkflowNames: () => ['waterfall', 'agile', 'custom'],
-      };
-    },
-  };
-});
-
-// Mock PlanManager
-vi.mock('../../src/plan-manager', () => {
-  return {
+    ...actual,
+    Database: vi.fn().mockImplementation(() => ({
+      getConversationState: mockGetConversationState,
+      saveConversationState: mockSaveConversationState,
+      deleteConversationState: mockDeleteConversationState,
+      softDeleteInteractionLogs: mockSoftDeleteInteractionLogs,
+      initialize: mockInitialize,
+      close: mockClose,
+    })),
+    WorkflowManager: vi.fn().mockImplementation(() => ({
+      loadWorkflowForProject: vi.fn().mockReturnValue(mockStateMachine),
+      validateWorkflowName: vi.fn().mockReturnValue(true),
+      getWorkflowNames: vi
+        .fn()
+        .mockReturnValue(['waterfall', 'agile', 'custom']),
+    })),
+    createLogger: () => ({
+      debug: vi.fn(),
+      info: vi.fn(),
+      warn: vi.fn(),
+      error: vi.fn(),
+    }),
     PlanManager: vi.fn().mockImplementation(() => ({
       deletePlanFile: vi.fn().mockResolvedValue(true),
       ensurePlanFileDeleted: vi.fn().mockResolvedValue(true),
     })),
   };
 });
+
+import { ConversationManager } from '@responsible-vibe/core';
+import { Database } from '@responsible-vibe/core';
 
 describe('ConversationManager', () => {
   let conversationManager: ConversationManager;
@@ -167,7 +145,7 @@ describe('ConversationManager', () => {
 
       // Call the method - WorkflowManager is already mocked at the module level
       const result =
-        await conversationManager.createConversationContext('custom');
+        await conversationManager.createConversationContext('waterfall');
 
       // Verify result has expected structure
       expect(result).toHaveProperty('conversationId');
@@ -175,7 +153,7 @@ describe('ConversationManager', () => {
       expect(result).toHaveProperty('gitBranch', 'default'); // The actual value is 'default' not 'main'
       expect(result).toHaveProperty('currentPhase', 'idle');
       expect(result).toHaveProperty('planFilePath');
-      expect(result).toHaveProperty('workflowName', 'custom');
+      expect(result).toHaveProperty('workflowName', 'waterfall');
 
       // Verify database was called to save the new state
       expect(mockSaveConversationState).toHaveBeenCalled();

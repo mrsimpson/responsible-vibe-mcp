@@ -337,9 +337,12 @@ export class WorkflowManager {
     const strategies: string[] = [];
 
     // Strategy 1: Relative to current file (development and direct npm scenarios)
-    // From dist/workflow-manager.js -> ../resources/workflows
+    // From packages/core/dist/workflow-manager.js -> ../../../../resources/workflows
     strategies.push(
-      path.resolve(path.dirname(currentFilePath), '../resources/workflows')
+      path.resolve(
+        path.dirname(currentFilePath),
+        '../../../../resources/workflows'
+      )
     );
 
     // Strategy 2: Find package root by looking for package.json with our package name

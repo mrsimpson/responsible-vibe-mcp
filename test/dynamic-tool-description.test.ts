@@ -104,7 +104,7 @@ describe('Dynamic Tool Description', () => {
 
   it('should verify GitManager correctly detects repository status', async () => {
     // Test non-git directory
-    const { GitManager } = await import('../src/git-manager.js');
+    const { GitManager } = await import('@responsible-vibe/core');
 
     expect(GitManager.isGitRepository(tempDir)).toBe(false);
 

@@ -11,9 +11,9 @@
 
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { ResponsibleVibeMCPServer } from './server.js';
-import { createLogger } from './logger.js';
-import { generateSystemPrompt } from './system-prompt-generator.js';
-import { StateMachineLoader } from './state-machine-loader.js';
+import { createLogger } from '@responsible-vibe/core';
+import { generateSystemPrompt } from '@responsible-vibe/core';
+import { StateMachineLoader } from '@responsible-vibe/core';
 import { readFile } from 'node:fs/promises';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';

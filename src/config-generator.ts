@@ -8,9 +8,9 @@
 
 import { writeFile, mkdir } from 'node:fs/promises';
 import { join } from 'node:path';
-import { generateSystemPrompt } from './system-prompt-generator.js';
-import { StateMachineLoader } from './state-machine-loader.js';
-import {} from './logger.js';
+import { generateSystemPrompt } from '@responsible-vibe/core';
+import { StateMachineLoader } from '@responsible-vibe/core';
+import {} from '@responsible-vibe/core';
 
 /**
  * Abstract base class for configuration generators

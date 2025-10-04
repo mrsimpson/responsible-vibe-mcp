@@ -7,10 +7,10 @@
  */
 
 import { BaseToolHandler } from './base-tool-handler.js';
-import { ServerContext } from '../types.js';
-import { ProjectDocsManager } from '../../project-docs-manager.js';
-import { TemplateOptions } from '../../template-manager.js';
-import { PathValidationUtils } from '../../path-validation-utils.js';
+import { ServerContext } from '@responsible-vibe/core';
+import { ProjectDocsManager } from '@responsible-vibe/core';
+import { TemplateOptions } from '@responsible-vibe/core';
+import { PathValidationUtils } from '@responsible-vibe/core';
 
 export interface SetupProjectDocsArgs {
   architecture: string; // Template name OR file path

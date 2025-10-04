@@ -2,12 +2,12 @@
  * Core types and interfaces for the refactored server architecture
  */
 
-import { ConversationManager } from '../conversation-manager.js';
-import { TransitionEngine } from '../transition-engine.js';
-import { PlanManager } from '../plan-manager.js';
-import { InstructionGenerator } from '../instruction-generator.js';
-import { WorkflowManager } from '../workflow-manager.js';
-import { InteractionLogger } from '../interaction-logger.js';
+import { ConversationManager } from '@responsible-vibe/core';
+import { TransitionEngine } from '@responsible-vibe/core';
+import { PlanManager } from '@responsible-vibe/core';
+import { InstructionGenerator } from '@responsible-vibe/core';
+import { WorkflowManager } from '@responsible-vibe/core';
+import { InteractionLogger } from '@responsible-vibe/core';
 
 /**
  * Server context shared across all handlers

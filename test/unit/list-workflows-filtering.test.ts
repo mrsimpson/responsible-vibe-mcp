@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { ListWorkflowsHandler } from '../../src/server/tool-handlers/list-workflows.js';
-import { WorkflowManager } from '../../src/workflow-manager.js';
+import { WorkflowManager } from '@responsible-vibe/core';
 
 describe('List Workflows Filtering', () => {
   let originalEnv: string | undefined;

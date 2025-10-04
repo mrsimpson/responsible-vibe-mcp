@@ -7,8 +7,8 @@
 
 import { z } from 'zod';
 import { BaseToolHandler } from './base-tool-handler.js';
-import { ServerContext } from '../types.js';
-import { createLogger } from '../../logger.js';
+import { ServerContext } from '@responsible-vibe/core';
+import { createLogger } from '@responsible-vibe/core';
 
 const logger = createLogger('ListWorkflowsHandler');
 

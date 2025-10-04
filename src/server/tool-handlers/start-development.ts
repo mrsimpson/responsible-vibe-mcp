@@ -6,18 +6,15 @@
  */
 
 import { BaseToolHandler } from './base-tool-handler.js';
-import { ServerContext } from '../types.js';
+import { ServerContext } from '@responsible-vibe/core';
 import { validateRequiredArgs } from '../server-helpers.js';
 import { basename } from 'node:path';
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { GitCommitConfig } from '../../types.js';
-import { GitManager } from '../../git-manager.js';
+import { GitCommitConfig } from '@responsible-vibe/core';
+import { GitManager } from '@responsible-vibe/core';
 import type { YamlStateMachine } from '../../state-machine-types.js';
-import {
-  ProjectDocsManager,
-  ProjectDocsInfo,
-} from '../../project-docs-manager.js';
+import { ProjectDocsManager, ProjectDocsInfo } from '@responsible-vibe/core';
 
 /**
  * Arguments for the start_development tool

@@ -6,13 +6,13 @@
  * current development phase, and plan file location.
  */
 
-import { createLogger } from '../../logger.js';
+import { createLogger } from '@responsible-vibe/core';
 import {
   ResourceHandler,
   ServerContext,
   HandlerResult,
   ResourceContent,
-} from '../types.js';
+} from '@responsible-vibe/core';
 import { safeExecute } from '../server-helpers.js';
 
 const logger = createLogger('ConversationStateResourceHandler');

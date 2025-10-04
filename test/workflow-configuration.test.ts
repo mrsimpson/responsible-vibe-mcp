@@ -14,7 +14,7 @@ import {
 } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
-import { WorkflowManager } from '../src/workflow-manager.js';
+import { WorkflowManager } from '@responsible-vibe/core';
 import { ListWorkflowsHandler } from '../src/server/tool-handlers/list-workflows.js';
 import { ServerContext } from '../src/server/types.js';
 

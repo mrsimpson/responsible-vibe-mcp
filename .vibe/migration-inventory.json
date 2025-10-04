@@ -1,0 +1,179 @@
+{
+  "migration_timestamp": "2025-10-04T10:06:00Z",
+  "steps_completed": [
+    "foundation_setup",
+    "core_package_creation"
+  ],
+  "packages": {
+    "core": {
+      "status": "completed",
+      "package_name": "@responsible-vibe/core",
+      "files_moved": [
+        {
+          "from": "src/state-machine.ts",
+          "to": "packages/core/src/state-machine.ts",
+          "target_package": "@responsible-vibe/core",
+          "export_name": "state-machine",
+          "timestamp": "2025-10-04T10:06:00Z"
+        },
+        {
+          "from": "src/state-machine-loader.ts",
+          "to": "packages/core/src/state-machine-loader.ts",
+          "target_package": "@responsible-vibe/core",
+          "export_name": "state-machine-loader",
+          "timestamp": "2025-10-04T10:06:00Z"
+        },
+        {
+          "from": "src/state-machine-types.ts",
+          "to": "packages/core/src/state-machine-types.ts",
+          "target_package": "@responsible-vibe/core",
+          "export_name": "state-machine-types",
+          "timestamp": "2025-10-04T10:06:00Z"
+        },
+        {
+          "from": "src/workflow-manager.ts",
+          "to": "packages/core/src/workflow-manager.ts",
+          "target_package": "@responsible-vibe/core",
+          "export_name": "workflow-manager",
+          "timestamp": "2025-10-04T10:06:00Z"
+        },
+        {
+          "from": "src/database.ts",
+          "to": "packages/core/src/database.ts",
+          "target_package": "@responsible-vibe/core",
+          "export_name": "database",
+          "timestamp": "2025-10-04T10:06:00Z"
+        },
+        {
+          "from": "src/conversation-manager.ts",
+          "to": "packages/core/src/conversation-manager.ts",
+          "target_package": "@responsible-vibe/core",
+          "export_name": "conversation-manager",
+          "timestamp": "2025-10-04T10:06:00Z"
+        },
+        {
+          "from": "src/plan-manager.ts",
+          "to": "packages/core/src/plan-manager.ts",
+          "target_package": "@responsible-vibe/core",
+          "export_name": "plan-manager",
+          "timestamp": "2025-10-04T10:06:00Z"
+        },
+        {
+          "from": "src/template-manager.ts",
+          "to": "packages/core/src/template-manager.ts",
+          "target_package": "@responsible-vibe/core",
+          "export_name": "template-manager",
+          "timestamp": "2025-10-04T10:06:00Z"
+        },
+        {
+          "from": "src/project-docs-manager.ts",
+          "to": "packages/core/src/project-docs-manager.ts",
+          "target_package": "@responsible-vibe/core",
+          "export_name": "project-docs-manager",
+          "timestamp": "2025-10-04T10:06:00Z"
+        },
+        {
+          "from": "src/file-detection-manager.ts",
+          "to": "packages/core/src/file-detection-manager.ts",
+          "target_package": "@responsible-vibe/core",
+          "export_name": "file-detection-manager",
+          "timestamp": "2025-10-04T10:06:00Z"
+        },
+        {
+          "from": "src/config-manager.ts",
+          "to": "packages/core/src/config-manager.ts",
+          "target_package": "@responsible-vibe/core",
+          "export_name": "config-manager",
+          "timestamp": "2025-10-04T10:06:00Z"
+        },
+        {
+          "from": "src/git-manager.ts",
+          "to": "packages/core/src/git-manager.ts",
+          "target_package": "@responsible-vibe/core",
+          "export_name": "git-manager",
+          "timestamp": "2025-10-04T10:06:00Z"
+        },
+        {
+          "from": "src/logger.ts",
+          "to": "packages/core/src/logger.ts",
+          "target_package": "@responsible-vibe/core",
+          "export_name": "logger",
+          "timestamp": "2025-10-04T10:06:00Z"
+        },
+        {
+          "from": "src/interaction-logger.ts",
+          "to": "packages/core/src/interaction-logger.ts",
+          "target_package": "@responsible-vibe/core",
+          "export_name": "interaction-logger",
+          "timestamp": "2025-10-04T10:06:00Z"
+        },
+        {
+          "from": "src/instruction-generator.ts",
+          "to": "packages/core/src/instruction-generator.ts",
+          "target_package": "@responsible-vibe/core",
+          "export_name": "instruction-generator",
+          "timestamp": "2025-10-04T10:06:00Z"
+        },
+        {
+          "from": "src/system-prompt-generator.ts",
+          "to": "packages/core/src/system-prompt-generator.ts",
+          "target_package": "@responsible-vibe/core",
+          "export_name": "system-prompt-generator",
+          "timestamp": "2025-10-04T10:06:00Z"
+        },
+        {
+          "from": "src/transition-engine.ts",
+          "to": "packages/core/src/transition-engine.ts",
+          "target_package": "@responsible-vibe/core",
+          "export_name": "transition-engine",
+          "timestamp": "2025-10-04T10:06:00Z"
+        },
+        {
+          "from": "src/path-validation-utils.ts",
+          "to": "packages/core/src/path-validation-utils.ts",
+          "target_package": "@responsible-vibe/core",
+          "export_name": "path-validation-utils",
+          "timestamp": "2025-10-04T10:06:00Z"
+        },
+        {
+          "from": "src/types.ts",
+          "to": "packages/core/src/types.ts",
+          "target_package": "@responsible-vibe/core",
+          "export_name": "types",
+          "timestamp": "2025-10-04T10:06:00Z"
+        }
+      ],
+      "imports_updated": [
+        {
+          "file": "test/unit/conversation-manager.test.ts",
+          "old_import": "../../src/conversation-manager",
+          "new_import": "@responsible-vibe/core",
+          "timestamp": "2025-10-04T10:26:57Z"
+        },
+        {
+          "file": "test/unit/conversation-manager.test.ts",
+          "old_import": "../../src/database",
+          "new_import": "@responsible-vibe/core",
+          "timestamp": "2025-10-04T10:26:57Z"
+        }
+      ],
+      "tests_affected": [
+        "test/unit/conversation-manager.test.ts",
+        "test/unit/database.test.ts",
+        "test/unit/state-machine-loader.test.ts",
+        "test/unit/workflow-manager.test.ts",
+        "test/unit/plan-manager.test.ts",
+        "test/unit/template-manager.test.ts",
+        "test/unit/project-docs-manager.test.ts",
+        "test/unit/file-detection-manager.test.ts",
+        "test/unit/config-manager.test.ts",
+        "test/unit/git-manager.test.ts",
+        "test/unit/logger.test.ts",
+        "test/unit/instruction-generator.test.ts",
+        "test/unit/system-prompt-generator.test.ts",
+        "test/unit/transition-engine.test.ts",
+        "test/unit/path-validation-utils.test.ts"
+      ]
+    }
+  }
+}

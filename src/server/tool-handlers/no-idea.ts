@@ -7,7 +7,7 @@
 
 import { z } from 'zod';
 import { BaseToolHandler } from './base-tool-handler.js';
-import { ServerContext } from '../types.js';
+import { ServerContext } from '@responsible-vibe/core';
 
 /**
  * Schema for no_idea tool arguments

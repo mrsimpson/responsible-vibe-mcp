@@ -6,7 +6,7 @@
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { TestAccess } from '../utils/test-access.js';
-import { TemplateManager } from '../../src/template-manager.js';
+import { TemplateManager } from '@responsible-vibe/core';
 import { mkdir, writeFile, rmdir } from 'node:fs/promises';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';

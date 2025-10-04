@@ -5,8 +5,8 @@
  * functionality for tool handlers used by the MCP server.
  */
 
-import { createLogger } from '../../logger.js';
-import { ToolHandler, ToolRegistry } from '../types.js';
+import { createLogger } from '@responsible-vibe/core';
+import { ToolHandler, ToolRegistry } from '@responsible-vibe/core';
 import { WhatsNextHandler } from './whats-next.js';
 import { ProceedToPhaseHandler } from './proceed-to-phase.js';
 import { ConductReviewHandler } from './conduct-review.js';

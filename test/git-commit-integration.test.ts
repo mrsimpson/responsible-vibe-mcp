@@ -6,7 +6,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { GitManager } from '../src/git-manager.js';
+import { GitManager } from '@responsible-vibe/core';
 
 describe('Git Commit Integration', () => {
   describe('GitManager Repository Detection', () => {
