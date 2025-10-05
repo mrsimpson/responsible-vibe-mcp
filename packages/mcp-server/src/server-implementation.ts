@@ -6,7 +6,7 @@
  */
 
 import { setMcpServerForLogging, createLogger } from '@responsible-vibe/core';
-import { ServerConfig } from '@responsible-vibe/core';
+import { ServerConfig } from './types.js';
 import {
   initializeServerComponents,
   registerMcpTools,

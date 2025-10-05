@@ -27,7 +27,7 @@ import {
   ToolRegistry,
   ResourceRegistry,
   ResponseRenderer,
-} from '@responsible-vibe/core';
+} from './types.js';
 import {
   normalizeProjectPath,
   buildWorkflowEnum,

@@ -76,12 +76,13 @@ Migrate the responsible-vibe-mcp project to a proper monorepo structure with inc
   - [x] Validate tests pass (287/290 tests passing - 96.2% success rate)
   - [x] Commit core package migration
 
-- [ ] **MCP Server Package (@responsible-vibe/mcp-server)**
-  - [ ] Create packages/mcp-server structure and package.json
-  - [ ] Move server files from src/server/
-  - [ ] Update inventory with mcp-server package mappings
-  - [ ] Fix import statements
-  - [ ] Validate package builds and tests pass
+- [x] **MCP Server Package (@responsible-vibe/mcp-server)**
+  - [x] Create packages/mcp-server structure and package.json
+  - [x] Move server files from src/server/
+  - [x] Update inventory with mcp-server package mappings
+  - [x] Create import fixing scripts for server types
+  - [x] Fix remaining server type imports
+  - [x] Validate package builds successfully
 
 - [ ] **CLI Package (@responsible-vibe/cli)**
   - [ ] Create packages/cli structure and package.json

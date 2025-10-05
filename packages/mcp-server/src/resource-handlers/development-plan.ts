@@ -11,7 +11,7 @@ import {
   ServerContext,
   HandlerResult,
   ResourceContent,
-} from '@responsible-vibe/core';
+} from '../types.js';
 import { safeExecute } from '../server-helpers.js';
 
 const logger = createLogger('DevelopmentPlanResourceHandler');

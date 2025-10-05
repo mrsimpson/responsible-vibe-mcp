@@ -87,7 +87,7 @@ export class GetToolInfoHandler extends BaseToolHandler<
   protected readonly argsSchema = GetToolInfoArgsSchema;
 
   async executeHandler(
-    args: GetToolInfoArgs,
+    _args: GetToolInfoArgs,
     context: ServerContext
   ): Promise<GetToolInfoResponse> {
     logger.info('Generating comprehensive tool information', {

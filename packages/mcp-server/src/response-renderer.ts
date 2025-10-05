@@ -12,7 +12,7 @@ import {
   ResourceContent,
   McpToolResponse,
   McpResourceResponse,
-} from '@responsible-vibe/core';
+} from './types.js';
 
 const logger = createLogger('ResponseRenderer');
 
