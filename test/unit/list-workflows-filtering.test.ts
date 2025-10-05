@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { ListWorkflowsHandler } from '../../src/server/tool-handlers/list-workflows.js';
+import { ListWorkflowsHandler } from '../../packages/mcp-server/src/tool-handlers/list-workflows.js';
 import { WorkflowManager } from '@responsible-vibe/core';
 
 describe('List Workflows Filtering', () => {

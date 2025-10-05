@@ -14,10 +14,10 @@ import {
   Mocked,
 } from 'vitest';
 import { TestAccess } from '../utils/test-access.js';
-import { SetupProjectDocsHandler } from '../../src/server/tool-handlers/setup-project-docs.js';
+import { SetupProjectDocsHandler } from '../../packages/mcp-server/src/tool-handlers/setup-project-docs.js';
 import { ProjectDocsManager } from '@responsible-vibe/core';
 import { TemplateManager } from '@responsible-vibe/core';
-import { ServerContext } from '../../src/server/types.js';
+import { ServerContext } from '../../packages/mcp-server/src/types';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { mkdir, rmdir } from 'node:fs/promises';

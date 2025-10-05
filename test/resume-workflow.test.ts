@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { ResponsibleVibeMCPServer } from '../src/server.js';
+import { ResponsibleVibeMCPServer } from '../packages/mcp-server/src/server.js';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { mkdtemp, rm, writeFile, mkdir } from 'node:fs/promises';

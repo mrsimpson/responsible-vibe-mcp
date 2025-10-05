@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { ResponsibleVibeMCPServer } from '../src/server.js';
+import { ResponsibleVibeMCPServer } from '../packages/mcp-server/src/server.js';
 import { TempProject } from './utils/temp-files.js';
 import { ServerTestHelper, MockDocsHelper } from './utils/test-helpers.js';
 

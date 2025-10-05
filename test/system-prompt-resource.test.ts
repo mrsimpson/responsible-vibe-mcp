@@ -6,8 +6,8 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { SystemPromptResourceHandler } from '../src/server/resource-handlers/system-prompt.js';
-import type { ServerContext } from '../src/server/types.js';
+import { SystemPromptResourceHandler } from '../packages/mcp-server/src/resource-handlers/system-prompt.js';
+import type { ServerContext } from '../packages/mcp-server/src/types';
 
 describe('System Prompt Resource', () => {
   it('should expose system prompt as MCP resource', async () => {

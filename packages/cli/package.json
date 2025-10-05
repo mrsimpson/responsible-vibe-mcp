@@ -1,0 +1,22 @@
+{
+  "name": "@responsible-vibe/cli",
+  "version": "3.1.6",
+  "description": "CLI tools for responsible-vibe development workflows",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "responsible-vibe-cli": "dist/visualization-launcher.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "clean:build": "rimraf ./dist"
+  },
+  "dependencies": {
+    "@responsible-vibe/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "rimraf": "^5.0.0",
+    "typescript": "^5.0.0"
+  }
+}

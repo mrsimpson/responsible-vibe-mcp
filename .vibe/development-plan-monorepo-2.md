@@ -84,12 +84,12 @@ Migrate the responsible-vibe-mcp project to a proper monorepo structure with inc
   - [x] Fix remaining server type imports
   - [x] Validate package builds successfully
 
-- [ ] **CLI Package (@responsible-vibe/cli)**
-  - [ ] Create packages/cli structure and package.json
-  - [ ] Move CLI files from src/cli/
-  - [ ] Update inventory with cli package mappings
-  - [ ] Fix import statements
-  - [ ] Validate package builds and tests pass
+- [x] **CLI Package (@responsible-vibe/cli)**
+  - [x] Create packages/cli structure and package.json
+  - [x] Move CLI files from src/cli/
+  - [x] Update inventory with cli package mappings
+  - [x] Fix import statements
+  - [x] Validate package builds and tests pass
 
 - [ ] **Visualizer Packages**
   - [ ] Create packages/visualizer-core

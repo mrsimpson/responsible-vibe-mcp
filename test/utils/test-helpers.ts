@@ -11,8 +11,8 @@ import { vi, expect } from 'vitest';
 import {
   ResponsibleVibeMCPServer,
   StartDevelopmentResult,
-} from '../../src/server/index.js';
-import type { ServerContext } from '../../src/server/types.js';
+} from '../../packages/mcp-server/src/server.js';
+import type { ServerContext } from '../../packages/mcp-server/src/types';
 import { TempProject } from './temp-files.js';
 
 /**

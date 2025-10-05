@@ -68,6 +68,7 @@
     "@types/jsdom": "21.1.7",
     "@types/node": "^20.0.0",
     "@types/sqlite3": "^3.1.11",
+    "glob": "11.0.3",
     "husky": "9.1.7",
     "jsdom": "26.1.0",
     "lint-staged": "16.1.6",

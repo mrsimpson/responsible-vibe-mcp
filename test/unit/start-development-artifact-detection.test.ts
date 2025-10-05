@@ -7,7 +7,7 @@
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { TestAccess } from '../utils/test-access.js';
-import { StartDevelopmentHandler } from '../../src/server/tool-handlers/start-development.js';
+import { StartDevelopmentHandler } from '../../packages/mcp-server/src/tool-handlers/start-development.js';
 import type { YamlStateMachine } from './../../src/state-machine-types';
 import { join } from 'node:path';
 import {

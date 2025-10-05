@@ -4,8 +4,8 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { ConductReviewHandler } from '../../src/server/tool-handlers/conduct-review.js';
-import type { ServerContext } from '../../src/server/types.js';
+import { ConductReviewHandler } from '../../packages/mcp-server/src/tool-handlers/conduct-review.js';
+import type { ServerContext } from '../../packages/mcp-server/src/types';
 import type { ConversationContext } from '../../src/types.js';
 
 // Mock logger

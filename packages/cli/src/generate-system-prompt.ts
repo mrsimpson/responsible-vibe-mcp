@@ -26,10 +26,13 @@ function parseArgs() {
 
   for (const arg of args) {
     if (arg.startsWith('--output=')) {
-      options.output = arg.split('=')[1];
-      // If path is not absolute, make it relative to current directory
-      if (!options.output.startsWith('/')) {
-        options.output = join(process.cwd(), options.output);
+      const outputValue = arg.split('=')[1];
+      if (outputValue) {
+        options.output = outputValue;
+        // If path is not absolute, make it relative to current directory
+        if (!options.output.startsWith('/')) {
+          options.output = join(process.cwd(), options.output);
+        }
       }
     }
   }
@@ -43,7 +46,7 @@ async function main() {
     logger.info('Starting system prompt generation', options);
 
     // Load the default state machine for prompt generation
-    const { StateMachineLoader } = await import('../state-machine-loader.js');
+    const { StateMachineLoader } = await import('@responsible-vibe/core');
     const loader = new StateMachineLoader();
     const stateMachine = loader.loadStateMachine(process.cwd()); // Use current directory
 

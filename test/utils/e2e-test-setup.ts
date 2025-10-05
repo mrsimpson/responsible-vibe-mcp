@@ -7,12 +7,15 @@
  */
 
 import { vi } from 'vitest';
-import { ResponsibleVibeMCPServer, ServerConfig } from '../../src/server.js';
+import {
+  ResponsibleVibeMCPServer,
+  ServerConfig,
+} from '../../packages/mcp-server/src/server.js';
 import { TempProject } from './temp-files.js';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { mkdirSync, rmSync, existsSync } from 'node:fs';
-import type { ServerContext } from '../../src/server/types.js';
+import type { ServerContext } from '../../packages/mcp-server/src/types';
 import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 
 // Disable fs mocking for E2E tests
@@ -226,7 +229,7 @@ export class DirectServerInterface {
   async getSystemPrompt(): Promise<unknown> {
     // Use the system prompt handler directly with the default workflow
     const { SystemPromptResourceHandler } = await import(
-      '../../src/server/resource-handlers/system-prompt.js'
+      '../../packages/mcp-server/src/resource-handlers/system-prompt.js'
     );
     const handler = new SystemPromptResourceHandler();
 

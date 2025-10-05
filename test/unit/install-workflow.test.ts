@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { InstallWorkflowHandler } from '../../src/server/tool-handlers/install-workflow.js';
+import { InstallWorkflowHandler } from '../../packages/mcp-server/src/tool-handlers/install-workflow.js';
 import { WorkflowManager } from '@responsible-vibe/core';
 import fs from 'node:fs';
 import path from 'node:path';

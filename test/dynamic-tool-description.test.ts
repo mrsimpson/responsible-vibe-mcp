@@ -9,7 +9,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { mkdirSync, rmSync } from 'node:fs';
-import { ResponsibleVibeMCPServer } from '../src/server/index.js';
+import { ResponsibleVibeMCPServer } from '../packages/mcp-server/src/server.js';
 import {
   GitTestHelper,
   ServerTestHelper,

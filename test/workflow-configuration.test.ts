@@ -15,8 +15,8 @@ import {
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { WorkflowManager } from '@responsible-vibe/core';
-import { ListWorkflowsHandler } from '../src/server/tool-handlers/list-workflows.js';
-import { ServerContext } from '../src/server/types.js';
+import { ListWorkflowsHandler } from '../packages/mcp-server/src/tool-handlers/list-workflows.js';
+import { ServerContext } from '../packages/mcp-server/src/types';
 
 describe('Workflow Configuration', () => {
   let tempDir: string;

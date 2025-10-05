@@ -6,7 +6,7 @@
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { promises as fs } from 'node:fs';
-import { ResponsibleVibeMCPServer } from '../../src/server.js';
+import { ResponsibleVibeMCPServer } from '../../packages/mcp-server/src/server.js';
 
 // Mock the logger to prevent console noise during tests
 vi.mock('@responsible-vibe/core', async () => {

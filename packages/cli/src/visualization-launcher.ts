@@ -24,7 +24,7 @@ Starting development server...
     const visualizerPath = join(__dirname, '..', '..', 'workflow-visualizer');
 
     // Check if we're in development or production
-    const isDev = process.env.NODE_ENV !== 'production';
+    const isDev = process.env['NODE_ENV'] !== 'production';
 
     if (isDev) {
       // Development mode - use npm run dev
