@@ -52,6 +52,11 @@
 
 <script setup lang="ts">
 import { onMounted, onUnmounted } from 'vue';
+import { WorkflowLoader } from './services/WorkflowLoader';
+import { FileUploadHandler } from './services/FileUploadHandler';
+import { ErrorHandler } from './utils/ErrorHandler';
+import { PlantUMLRenderer } from './visualization/PlantUMLRenderer';
+import { getRequiredElement } from './utils/DomHelpers';
 
 // Component props
 interface Props {
@@ -454,24 +459,7 @@ function clearSelection(): void {
 
 onMounted(async () => {
   try {
-    // Import the workflow visualizer modules
-    const { WorkflowLoader } = await import(
-      '@workflow-visualizer/services/WorkflowLoader'
-    );
-    const { FileUploadHandler } = await import(
-      '@workflow-visualizer/services/FileUploadHandler'
-    );
-    const { ErrorHandler } = await import(
-      '@workflow-visualizer/utils/ErrorHandler'
-    );
-    const { PlantUMLRenderer } = await import(
-      '@workflow-visualizer/visualization/PlantUMLRenderer'
-    );
-    const { getRequiredElement } = await import(
-      '@workflow-visualizer/utils/DomHelpers'
-    );
-
-    // Initialize the workflow visualizer (simplified version of main.ts logic)
+    // Initialize the workflow visualizer
     const workflowLoader = new WorkflowLoader();
     const errorHandler = new ErrorHandler();
 

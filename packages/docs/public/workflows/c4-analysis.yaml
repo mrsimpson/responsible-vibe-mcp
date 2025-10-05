@@ -1,0 +1,485 @@
+# yaml-language-server: $schema=../state-machine-schema.json
+---
+name: 'c4-analysis'
+description: 'A comprehensive workflow for analyzing legacy systems using C4 methodology. Progressively understand system architecture from context to components, with scope limiting for large codebases.'
+initial_state: 'discovery'
+
+# Enhanced metadata for better discoverability
+metadata:
+  domain: 'architecture'
+  complexity: 'medium'
+  bestFor:
+    - 'Legacy system analysis'
+    - 'System understanding and documentation'
+    - 'Architecture discovery'
+    - 'Modernization planning'
+  useCases:
+    - 'Analyze existing codebase for modernization'
+    - 'Document undocumented legacy systems'
+    - 'Understand system architecture before enhancements'
+  examples:
+    - 'Analyze a legacy Java monolith for microservices migration'
+    - 'Document architecture of inherited Node.js application'
+    - 'Understand legacy system before adding new features'
+  requiresDocumentation: true
+
+# States with default instructions and transitions
+states:
+  discovery:
+    description: 'Initial system discovery and inventory with scope limiting'
+    default_instructions: >
+      You are in the legacy system discovery phase. Create discovery notes file at .vibe/docs/DISCOVERY.md with this exact template content:
+
+      ```markdown
+      # Legacy System Discovery Notes
+
+      *This file serves as long-term memory for the C4 analysis workflow. It contains comprehensive findings and insights that persist across all analysis phases. Progress tracking is handled in the plan file.*
+
+      ## System Overview
+
+      ### Technology Stack
+      <!-- Record the identified technology stack -->
+      - **Primary Language**:
+      - **Framework**:
+      - **Build System**:
+      - **Database**:
+      - **Other Technologies**:
+
+      ### Repository Structure
+      <!-- Map the basic folder structure -->
+      ```
+      project-root/
+      ├── src/                 # Source code
+      ├── docs/               # Documentation (if exists)
+      ├── tests/              # Test files
+      ├── config/             # Configuration files
+      ├── [other folders]     # Other significant folders
+      └── [key files]         # Important root-level files
+      ```
+
+      ### Key Configuration Files
+      <!-- List important configuration files found -->
+      - **package.json / pom.xml / build.gradle**: Build and dependency configuration
+      - **README.md**: Project documentation (if exists)
+      - **[Other config files]**: Purpose and significance
+
+      ## Existing Documentation
+      <!-- Record any existing documentation found -->
+      - **[Document 1]**: Location and content summary
+      - **[Document 2]**: Location and content summary
+      - **Documentation Quality**: Assessment of existing docs
+
+      ## System Architecture Findings
+
+      ### Context Level (C4 Level 1)
+      <!-- System context findings - updated during context analysis phase -->
+
+      #### External Systems
+      - **[External System 1]**: Purpose, communication method, data exchanged
+      - **[External System 2]**: Purpose, communication method, data exchanged
+
+      #### User Types
+      - **[User Type 1]**: Role, needs, interaction patterns
+      - **[User Type 2]**: Role, needs, interaction patterns
+
+      #### System Boundaries
+      - **Inside the system**: Core components and responsibilities
+      - **Outside the system**: External dependencies and interfaces
+
+      ### Container Level (C4 Level 2)
+      <!-- Container architecture findings - updated during container analysis phase -->
+
+      #### Identified Containers
+      - **[Container 1 Name]** - `path/to/container`
+        - **Technology**:
+        - **Purpose**:
+        - **Interfaces**:
+        - **Data Storage**:
+        - **Communication**: How it communicates with other containers
+
+      - **[Container 2 Name]** - `path/to/container`
+        - **Technology**:
+        - **Purpose**:
+        - **Interfaces**:
+        - **Data Storage**:
+        - **Communication**: How it communicates with other containers
+
+      #### Container Interactions
+      - **[Container A] → [Container B]**: Communication method and purpose
+      - **[Container B] → [External System]**: Communication method and purpose
+
+      ### Component Level (C4 Level 3)
+      <!-- Component analysis findings - updated during component analysis phase -->
+
+      #### Container 1 Components
+      - **[Component 1.1]** - `path/to/component`
+        - **Responsibilities**:
+        - **Interfaces**:
+        - **Dependencies**:
+        - **Design Patterns**:
+        - **Key Insights**:
+
+      - **[Component 1.2]** - `path/to/component`
+        - **Responsibilities**:
+        - **Interfaces**:
+        - **Dependencies**:
+        - **Design Patterns**:
+        - **Key Insights**:
+
+      #### Container 2 Components
+      - **[Component 2.1]** - `path/to/component`
+        - **Responsibilities**:
+        - **Interfaces**:
+        - **Dependencies**:
+        - **Design Patterns**:
+        - **Key Insights**:
+
+      - **[Component 2.2]** - `path/to/component`
+        - **Responsibilities**:
+        - **Interfaces**:
+        - **Dependencies**:
+        - **Design Patterns**:
+        - **Key Insights**:
+
+      ## Analysis Insights and Observations
+
+      ### Discovery Phase Insights
+      <!-- Key insights discovered during initial discovery -->
+
+      ### Context Analysis Insights
+      <!-- Important findings about system context and external interfaces -->
+
+      ### Container Analysis Insights
+      <!-- Key architectural insights about container structure and communication -->
+
+      ### Component Analysis Insights
+      <!-- Detailed insights about individual components and their design -->
+
+      ### Cross-Cutting Concerns
+      <!-- Insights that span multiple components or containers -->
+      - **Security**:
+      - **Performance**:
+      - **Data Flow**:
+      - **Error Handling**:
+
+      ## Technical Debt and Improvement Opportunities
+
+      ### Technical Debt Identified
+      <!-- Technical debt discovered during analysis -->
+      - **[Debt Item 1]**: Description, impact, and location
+      - **[Debt Item 2]**: Description, impact, and location
+
+      ### Modernization Opportunities
+      <!-- Areas identified for potential modernization -->
+      - **[Opportunity 1]**: Description, benefits, and approach
+      - **[Opportunity 2]**: Description, benefits, and approach
+
+      ### Architecture Improvements
+      <!-- Potential architectural improvements identified -->
+      - **[Improvement 1]**: Description, benefits, and implementation approach
+      - **[Improvement 2]**: Description, benefits, and implementation approach
+
+      ## API and Integration Analysis
+
+      ### External APIs
+      <!-- External APIs the system uses or provides -->
+      - **[API 1]**: Purpose, technology, testing approach
+      - **[API 2]**: Purpose, technology, testing approach
+
+      ### Internal Interfaces
+      <!-- Internal interfaces between components/containers -->
+      - **[Interface 1]**: Components involved, communication method
+      - **[Interface 2]**: Components involved, communication method
+
+      ### Testing Strategy Recommendations
+      <!-- Recommendations for end-to-end API testing -->
+      - **External API Testing**: Approach and tools
+      - **Internal Interface Testing**: Approach and tools
+      - **Test Data Strategy**: Data management approach
+
+      ## Questions and Unknowns
+
+      ### Open Questions
+      <!-- Questions that arose during analysis and need investigation -->
+      - **[Question 1]**: Description and why it's important
+      - **[Question 2]**: Description and why it's important
+
+      ### Areas Needing Further Investigation
+      <!-- Areas that need deeper analysis -->
+      - **[Area 1]**: What needs investigation and why
+      - **[Area 2]**: What needs investigation and why
+
+      ## Enhancement Readiness Assessment
+
+      ### Current State Assessment
+      - **Documentation Quality**:
+      - **Code Quality**:
+      - **Test Coverage**:
+      - **Development Environment**:
+      - **Deployment Process**:
+
+      ### Enhancement Recommendations
+      - **Immediate Improvements**: Quick wins that would help
+      - **Medium-term Enhancements**: Larger improvements to consider
+      - **Long-term Modernization**: Strategic modernization opportunities
+
+      ---
+
+      ## Instructions for Use
+
+      **Purpose**: This file serves as the comprehensive long-term memory for the C4 analysis workflow. All findings, insights, and discoveries should be recorded here for future reference.
+
+      **For the LLM**:
+      - **During Discovery**: Fill in system overview, technology stack, and initial architecture sketch
+      - **During Context Analysis**: Add context findings to the Context Level section
+      - **During Container Analysis**: Document container findings in the Container Level section
+      - **During Component Analysis**: Add detailed component analysis to the Component Level section
+      - **Throughout**: Add insights, observations, technical debt, and improvement opportunities as discovered
+
+      **Long-term Memory**: This file preserves all analysis findings and serves as the knowledge base for future development work. Unlike the plan file (which tracks progress), this file maintains the comprehensive understanding of the system.
+
+      **Reference**: This file should be referenced throughout the workflow and used as input for the final documentation consolidation phase.
+
+      ---
+
+      *This discovery file was created during C4 legacy system analysis and serves as the comprehensive long-term memory of all findings, insights, and architectural understanding.*
+      ```
+
+      **SCOPE LIMIT**: Focus ONLY on repository root, main config files, and top-level structure.
+
+      Tasks:
+      1. Scan repository root for key files (package.json, pom.xml, build.gradle, README.md, etc.)
+      2. Map basic folder structure (src/, docs/, tests/, config/, etc.)
+      3. Identify technology stack from configuration files
+      4. Look for existing documentation files
+      5. Create hierarchical sketch of potential containers and components from folder structure
+      6. Fill in the DISCOVERY.md template with your findings
+
+      Examples for Java: Look for Maven/Gradle structure, Spring configuration, package organization.
+      Examples for Node.js: Check package.json, identify Express/framework, examine folder structure.
+
+      Update plan file with discovery progress and add discovered containers/components as tasks for later phases.
+    transitions:
+      - trigger: 'continue_discovery'
+        to: 'discovery'
+        instructions: >
+          Continue discovery work. Expand the repository scan, refine the technology stack identification,
+          and enhance the hierarchical sketch of containers/components. Update DISCOVERY.md with new findings.
+          Add newly discovered items to the plan file as tasks for later analysis phases.
+        transition_reason: 'Discovery needs more investigation and refinement'
+
+      - trigger: 'discovery_complete'
+        to: 'context_analysis'
+        additional_instructions: >
+          Discovery is complete! ✅ Now set up project documentation and transition to context analysis.
+
+          1. First, set up project documents for living documentation:
+             setup_project_docs({ architecture: "c4", requirements: "none", design: "comprehensive" })
+
+          2. Read the created $ARCHITECTURE_DOC and $DESIGN_DOC files to understand their structure
+
+          3. Begin enhancing these documents based on DISCOVERY.md findings and continue throughout context analysis.
+
+          Update the plan file with context analysis tasks and mark completed discovery tasks.
+        transition_reason: 'Initial discovery complete, ready for context analysis'
+
+  context_analysis:
+    description: 'System context analysis (C4 Level 1) - boundaries and external interfaces'
+    default_instructions: >
+      You are in the context analysis phase (C4 Level 1). Reference DISCOVERY.md for long-term memory.
+
+      **SCOPE LIMIT**: Focus ONLY on external interfaces and system boundaries.
+
+      Tasks:
+      1. Identify external systems the legacy system communicates with
+      2. Map user types and personas who interact with the system
+      3. Document external dependencies (databases, APIs, services)
+      4. Understand system boundaries and what's inside vs outside
+      5. Map data flows between system and external entities
+      6. **Continuously enhance $ARCHITECTURE_DOC with context findings**
+      7. **Update $DESIGN_DOC with external interface details**
+
+      Examples for Java: Look for database connections, REST clients, message queues, external service calls.
+      Examples for Node.js: Check API endpoints, database connections, external service integrations.
+
+      Document findings in both DISCOVERY.md and the living architecture/design documents. Update plan file with context analysis progress.
+    transitions:
+      - trigger: 'refine_context'
+        to: 'context_analysis'
+        instructions: >
+          Continue context analysis. Investigate more external interfaces, clarify system boundaries,
+          and refine the understanding of external dependencies. Update DISCOVERY.md and plan file.
+        transition_reason: 'Context analysis needs further refinement'
+
+      - trigger: 'need_more_discovery'
+        to: 'discovery'
+        additional_instructions: 'Context analysis revealed gaps in discovery. Focus on the specific areas that need more investigation.'
+        transition_reason: 'Context work revealed need for additional discovery'
+
+      - trigger: 'context_complete'
+        to: 'container_analysis'
+        additional_instructions: >
+          Context analysis is complete! ✅ Now transition to container analysis phase (C4 Level 2).
+          Update the plan file with container analysis tasks and mark completed context tasks.
+          Before you start analyzing the containers, elaborate a plan together with the user how to document the container analysis:
+          - How to structure the files (one file per container or all in one file, shall a folder be created per container in which the components will be included later on?)
+          - How a component factsheet shall look like.
+        transition_reason: 'System context is understood, ready for container analysis'
+
+  container_analysis:
+    description: 'Container analysis (C4 Level 2) - high-level system architecture'
+    default_instructions: >
+      You are in the container analysis phase (C4 Level 2). Reference DISCOVERY.md for container sketch and long-term memory.
+
+      **SCOPE LIMIT**: Focus on major containers/services/modules only.
+
+      Tasks:
+      1. Identify main application containers (web app, API, services)
+      2. Map databases and data stores
+      3. Understand deployment architecture
+      4. Document communication patterns between containers
+      5. **Enhance $ARCHITECTURE_DOC with C4 Level 2 (Container) findings**
+      6. **Update $DESIGN_DOC with container interaction details**
+      7. Update DISCOVERY.md with container analysis findings
+
+      Examples for Java: Identify Spring Boot applications, microservices, database layers, message brokers.
+      Examples for Node.js: Map Express apps, API services, database connections, background workers.
+
+      Document findings in DISCOVERY.md and continuously enhance the living architecture/design documents. Update plan file with container analysis progress and add component analysis tasks.
+    transitions:
+      - trigger: 'continue_container_analysis'
+        to: 'container_analysis'
+        instructions: >
+          Continue container analysis. Investigate more containers, refine communication patterns,
+          and enhance the architectural understanding. Update DISCOVERY.md and plan file.
+        transition_reason: 'Container analysis continues with more containers to analyze'
+
+      - trigger: 'need_context_refinement'
+        to: 'context_analysis'
+        additional_instructions: 'Container analysis revealed issues with context understanding. Refine the system context based on container insights.'
+        transition_reason: 'Container work revealed need to refine context understanding'
+
+      - trigger: 'containers_complete'
+        to: 'component_analysis'
+        additional_instructions: >
+          Container analysis is complete! ✅ Now transition to component analysis phase (C4 Level 3).
+          Before you start analyzing the components, elaborate a plan together with the user how to document the component analysis:
+          - How to structure the files (one file per component or all in one file)
+          - How a component factsheet shall look like.
+          Once this is done,
+          - note the template in the development plan
+          - include instructions how to create and link the files
+        transition_reason: 'Container architecture is understood, ready for detailed component analysis'
+
+  component_analysis:
+    description: 'Component analysis (C4 Level 3) - detailed component-by-component analysis'
+    default_instructions: >
+      You are in the component analysis phase (C4 Level 3). Reference DISCOVERY.md for component information and long-term memory.
+
+      **SCOPE LIMIT**: Analyze ONE component at a time. User selects which components to focus on.
+
+      Tasks:
+      1. Select next component from plan file task list
+      2. Deep dive into component responsibilities and interfaces
+      3. Map internal component relationships and dependencies
+      4. Document component-level design patterns
+      5. **Enhance $DESIGN_DOC with detailed component analysis**
+      6. **Update $ARCHITECTURE_DOC with C4 Level 3 (Component) details**
+      7. Update DISCOVERY.md with component analysis findings
+      8. Mark component as complete in plan file
+      9. Ask user which component to analyze next
+
+      Examples for Java: Analyze Spring components, service classes, repository layers, controllers.
+      Examples for Node.js: Examine route handlers, service modules, data access layers, middleware.
+
+      Document findings in DISCOVERY.md and continuously enhance the living architecture/design documents. Track progress in plan file by marking completed component tasks.
+    transitions:
+      - trigger: 'analyze_next_component'
+        to: 'component_analysis'
+        instructions: >
+          Continue with next component analysis. Select another component from plan file task list,
+          perform detailed analysis, and mark it complete in plan file. Ask user for component priorities.
+        transition_reason: 'Continuing systematic component analysis'
+
+      - trigger: 'need_container_refinement'
+        to: 'container_analysis'
+        additional_instructions: 'Component analysis revealed issues with container understanding. Refine the container architecture based on component insights.'
+        transition_reason: 'Component work revealed need to refine container understanding'
+
+      - trigger: 'components_complete'
+        to: 'documentation_consolidation'
+        additional_instructions: >
+          Component analysis is complete! ✅ Now transition to documentation consolidation phase.
+          Update the plan file with documentation tasks and mark completed component tasks.
+        transition_reason: 'Component analysis complete, ready to consolidate documentation'
+
+  documentation_consolidation:
+    description: 'Consolidate findings into comprehensive documentation'
+    default_instructions: >
+      You are in the documentation consolidation phase. The $ARCHITECTURE_DOC and $DESIGN_DOC have been enhanced throughout the analysis phases.
+
+      Tasks:
+      1. Review DISCOVERY.md for all findings and insights
+      2. **Final review and polish of $ARCHITECTURE_DOC** (already created and enhanced)
+      3. **Final review and polish of $DESIGN_DOC** (already created and enhanced)
+      4. Ensure all C4 levels are comprehensively documented in architecture doc
+      5. Prepare enhancement recommendations based on analysis
+      6. Document modernization opportunities and technical debt
+      7. Finalize API testing strategy recommendations
+
+      The documentation should capture:
+      - System context (C4 Level 1) ✅ Already enhanced during context analysis
+      - Container architecture (C4 Level 2) ✅ Already enhanced during container analysis
+      - Component details (C4 Level 3) ✅ Already enhanced during component analysis
+      - Enhancement recommendations
+      - API testing strategy recommendations
+
+      **Note**: Project documents were set up early and enhanced throughout analysis phases, so focus on final polish and recommendations.
+
+      Update plan file with consolidation progress.
+    transitions:
+      - trigger: 'refine_documentation'
+        to: 'documentation_consolidation'
+        instructions: >
+          Continue refining documentation. Enhance the architecture and design docs,
+          add more detail to recommendations, and improve the consolidation quality.
+        transition_reason: 'Documentation needs further refinement and enhancement'
+
+      - trigger: 'need_more_analysis'
+        to: 'component_analysis'
+        additional_instructions: 'Documentation revealed gaps in component analysis. Focus on the specific components that need more investigation.'
+        transition_reason: 'Documentation work revealed need for additional component analysis'
+
+      - trigger: 'documentation_complete'
+        to: 'analysis_complete'
+        additional_instructions: >
+          Documentation consolidation is complete! ✅ Now transition to analysis complete phase.
+          Update the plan file and mark completed documentation tasks.
+        transition_reason: 'Documentation is complete, analysis finished'
+
+  analysis_complete:
+    description: 'Legacy system analysis complete'
+    default_instructions: >
+      Legacy system analysis is complete! The system has been thoroughly analyzed using C4 methodology.
+
+      Final deliverables:
+      - Comprehensive system documentation (C4-based architecture + design docs)
+      - DISCOVERY.md long-term memory with complete analysis findings
+      - Enhancement recommendations
+      - API testing strategy
+      - Modernization roadmap
+
+      The analysis provides a solid foundation for future development work. If enhancements are needed,
+      consider using other workflows (waterfall, epcc, etc.) with the comprehensive understanding gained.
+    transitions:
+      - trigger: 'analysis_complete'
+        to: 'analysis_complete'
+        instructions: >
+          Analysis is complete! The legacy system is now well-documented and understood.
+          Use the comprehensive documentation and DISCOVERY.md findings for any future development work.
+        transition_reason: 'Analysis complete, ready for future development'
+
+      - trigger: 'refine_analysis'
+        to: 'component_analysis'
+        additional_instructions: 'Need to refine specific aspects of the analysis. Focus on the areas that need additional investigation.'
+        transition_reason: 'Analysis review revealed need for additional component analysis'

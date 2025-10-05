@@ -10,16 +10,16 @@ function getAvailableWorkflows() {
     // Read the BundledWorkflows.ts file and extract workflow names
     const bundledWorkflowsPath = resolve(
       __dirname,
-      '../../workflow-visualizer/src/services/BundledWorkflows.ts'
+      '../../visualizer/src/services/BundledWorkflows.ts'
     );
     const content = readFileSync(bundledWorkflowsPath, 'utf8');
 
-    // Extract workflow names from the BUNDLED_WORKFLOWS object
+    // Extract workflow names from the bundledWorkflows array
     const workflowMatch = content.match(
-      /export const BUNDLED_WORKFLOWS[^{]*{([^}]*)}/s
+      /const bundledWorkflows\s*=\s*\[([^\]]*)\]/s
     );
     if (!workflowMatch) {
-      throw new Error('Could not parse BUNDLED_WORKFLOWS');
+      throw new Error('Could not parse bundledWorkflows');
     }
 
     const workflowsSection = workflowMatch[1];
@@ -27,7 +27,7 @@ function getAvailableWorkflows() {
     const lines = workflowsSection.split('\n');
 
     for (const line of lines) {
-      const match = line.match(/['"]([^'"]+)['"]:\s*/);
+      const match = line.match(/['"]([^'"]+)['"]/);
       if (match) {
         workflows.push(match[1]);
       }

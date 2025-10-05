@@ -1,14 +1,16 @@
 {
-  "name": "responsible-vibe-mcp-docs",
+  "name": "@responsible-vibe/docs",
   "version": "1.0.0",
   "description": "Documentation site for Responsible Vibe MCP",
   "type": "module",
   "scripts": {
-    "dev": "vitepress dev",
-    "build": "vitepress build",
+    "prebuild": "mkdir -p public/workflows && cp ../../resources/workflows/*.yaml public/workflows/",
+    "dev": "npm run prebuild && vitepress dev",
+    "build": "npm run prebuild && vitepress build",
     "preview": "vitepress preview"
   },
   "dependencies": {
+    "@responsible-vibe/visualizer": "workspace:*",
     "d3": "^7.8.5",
     "js-yaml": "^4.1.0",
     "pako": "2.1.0",
@@ -19,9 +21,7 @@
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^20.0.0",
     "@types/pako": "2.0.4",
-    "mermaid": "^11.9.0",
     "typescript": "^5.0.0",
-    "vitepress": "^1.6.3",
-    "vitepress-plugin-mermaid": "^2.0.17"
+    "vitepress": "^1.6.3"
   }
 }
