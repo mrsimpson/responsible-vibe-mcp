@@ -23,21 +23,7 @@ const logger = createLogger('Main');
  * Parse command line arguments and handle special flags
  */
 function parseCliArgs(): { shouldStartServer: boolean } {
-  const args = process.argv.slice(2);
-
-  // Handle help flag
-  if (args.includes('--help') || args.includes('-h')) {
-    console.log('Use responsible-vibe-cli for CLI functionality');
-    return { shouldStartServer: false };
-  }
-
-  // Handle version flag
-  if (args.includes('--version') || args.includes('-v')) {
-    console.log('responsible-vibe-mcp (MCP server)');
-    return { shouldStartServer: false };
-  }
-
-  // No special flags, start server normally
+  // Since routing is handled at root level, always start server when this module is loaded
   return { shouldStartServer: true };
 }
 
