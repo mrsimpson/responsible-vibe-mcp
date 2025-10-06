@@ -23,104 +23,6 @@ vi.mock('@responsible-vibe/core', async () => {
   };
 });
 
-// Mock all dependencies with minimal implementations
-vi.mock('../../src/database', () => ({
-  Database: vi.fn().mockImplementation(() => ({
-    initialize: vi.fn().mockResolvedValue(undefined),
-    close: vi.fn().mockResolvedValue(undefined),
-  })),
-}));
-
-vi.mock('../../src/conversation-manager', () => ({
-  ConversationManager: vi.fn().mockImplementation(() => ({
-    getConversationContext: vi.fn(),
-    createConversationContext: vi.fn().mockResolvedValue({
-      conversationId: 'test-id',
-      projectPath: '/test/path',
-      gitBranch: 'main',
-      currentPhase: 'ideation',
-      planFilePath: '/test/path/.vibe/plan.md',
-      workflowName: 'waterfall',
-    }),
-    updateConversationState: vi.fn().mockResolvedValue(undefined),
-  })),
-}));
-
-vi.mock('../../src/transition-engine', () => ({
-  TransitionEngine: vi.fn().mockImplementation(() => ({
-    analyzePhaseTransition: vi.fn(),
-    handleExplicitTransition: vi
-      .fn()
-      .mockResolvedValue({ newPhase: 'ideation' }),
-    getStateMachine: vi.fn(),
-    setConversationManager: vi.fn(),
-  })),
-}));
-
-vi.mock('../../src/plan-manager', () => ({
-  PlanManager: vi.fn().mockImplementation(() => ({
-    ensurePlanFile: vi.fn().mockResolvedValue('/test/plan.md'),
-    getPlanFileInfo: vi
-      .fn()
-      .mockResolvedValue({ exists: true, path: '/test/plan.md' }),
-    setStateMachine: vi.fn(),
-  })),
-}));
-
-vi.mock('../../src/instruction-generator', () => ({
-  InstructionGenerator: vi.fn().mockImplementation(() => ({
-    generateInstructions: vi
-      .fn()
-      .mockResolvedValue({ instructions: 'Test instructions' }),
-    setStateMachine: vi.fn(),
-  })),
-}));
-
-vi.mock('../../src/workflow-manager', () => ({
-  WorkflowManager: vi.fn().mockImplementation(() => ({
-    validateWorkflowName: vi.fn().mockReturnValue(true),
-    getWorkflowNames: vi.fn().mockReturnValue(['waterfall', 'agile', 'custom']),
-    loadProjectWorkflows: vi.fn(),
-    loadWorkflowForProject: vi.fn().mockReturnValue({
-      name: 'Test Workflow',
-      description: 'Test workflow',
-      initial_state: 'ideation',
-      states: { ideation: { description: 'Ideation state', transitions: [] } },
-    }),
-    getAvailableWorkflows: vi.fn().mockReturnValue([
-      {
-        name: 'waterfall',
-        displayName: 'Waterfall',
-        description: 'Classic waterfall workflow',
-      },
-    ]),
-    getAvailableWorkflowsForProject: vi.fn().mockReturnValue([
-      {
-        name: 'waterfall',
-        displayName: 'Waterfall',
-        description: 'Classic waterfall workflow',
-      },
-    ]),
-  })),
-}));
-
-vi.mock('../../src/interaction-logger', () => ({
-  InteractionLogger: vi.fn().mockImplementation(() => ({
-    logInteraction: vi.fn(),
-  })),
-}));
-
-vi.mock('../../src/system-prompt-generator', () => ({
-  generateSystemPrompt: vi.fn().mockReturnValue('Test system prompt'),
-}));
-
-vi.mock('../../src/git-manager', () => ({
-  GitManager: {
-    isGitRepository: vi.fn().mockReturnValue(false),
-    getCurrentCommitHash: vi.fn().mockReturnValue(null),
-  },
-}));
-
 describe('Project Path Configuration', () => {
   const originalEnv = process.env;
 
@@ -209,29 +111,20 @@ describe('Project Path Configuration', () => {
       // Verify server initialization succeeded with correct project path
       expect(server.getProjectPath()).toBe(testProjectPath);
 
-      const mockConversationManager = server.getConversationManager();
-      const mockCreateConversationContext = vi.fn().mockResolvedValue({
-        conversationId: 'integration-test-id',
-        projectPath: testProjectPath,
-        gitBranch: 'main',
-        currentPhase: 'ideation',
-        planFilePath: `${testProjectPath}/.vibe/plan.md`,
-        workflowName: 'waterfall',
-      });
-
-      // Replace the conversation manager method
-      mockConversationManager.createConversationContext =
-        mockCreateConversationContext;
-
+      // Test that the server uses the custom path for operations
+      // Use 'minor' workflow which doesn't require project documentation
       const result = await server.handleStartDevelopment({
-        workflow: 'waterfall',
+        workflow: 'minor', // use a workflow that doesn't require project docs, else it would fail
         commit_behaviour: 'none',
       });
 
-      // Verify the project path was used correctly
-      expect(result).toHaveProperty('conversation_id', 'integration-test-id');
-      // Environment variable support works at server level, not tool parameter level
-      expect(mockCreateConversationContext).toHaveBeenCalledWith('waterfall');
+      // Debug: log the actual result to see what we get
+      console.log('Result:', JSON.stringify(result, null, 2));
+      console.log('Expected project path:', testProjectPath);
+
+      // Verify the custom project path was used in the plan file path
+      expect(result.plan_file_path).toBeTruthy();
+      expect(result.plan_file_path).toContain(testProjectPath);
 
       // Clean up
       await server.cleanup();
@@ -243,32 +136,39 @@ describe('Project Path Configuration', () => {
 
       // Create a temporary directory structure for testing
       const tempDir = '/tmp/test-custom-workflow-' + Date.now();
-      const vibeDir = `${tempDir}/.vibe`;
+      const vibeDir = `${tempDir}/.vibe/workflows`;
 
       try {
         // Create test directory structure
         await fs.mkdir(tempDir, { recursive: true });
         await fs.mkdir(vibeDir, { recursive: true });
 
-        // Create a custom workflow file
+        // Create a custom workflow file with proper naming
         await fs.writeFile(
-          `${vibeDir}/state-machine.yaml`,
-          `name: custom-test-workflow
-displayName: Custom Test Workflow
-phases:
+          `${vibeDir}/custom.yaml`,
+          `---
+name: 'custom'
+description: 'Custom Test Workflow for testing PROJECT_PATH environment variable'
+initial_state: 'start'
+
+states:
   start:
-    name: Start Phase
-    description: Starting phase for custom workflow
+    description: 'Starting phase for custom workflow'
+    default_instructions: 'This is the start phase of the custom workflow for testing PROJECT_PATH environment variable support.'
     transitions:
-      - middle
+      - trigger: 'start_complete'
+        to: 'middle'
+        transition_reason: 'Start phase completed'
   middle:
-    name: Middle Phase
-    description: Middle phase for custom workflow
+    description: 'Middle phase for custom workflow'
+    default_instructions: 'This is the middle phase of the custom workflow.'
     transitions:
-      - end
+      - trigger: 'middle_complete'
+        to: 'end'
+        transition_reason: 'Middle phase completed'
   end:
-    name: End Phase
-    description: Final phase for custom workflow
+    description: 'Final phase for custom workflow'
+    default_instructions: 'This is the final phase of the custom workflow.'
     transitions: []
 `
         );

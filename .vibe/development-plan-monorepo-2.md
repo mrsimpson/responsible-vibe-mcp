@@ -136,6 +136,8 @@ Migrate the responsible-vibe-mcp project to a proper monorepo structure with inc
   - [x] Fix remaining relative imports in visualizer package (ui-types.ts)
   - [x] Fix VS Code debugging by enabling sourcemaps in TypeScript configs
   - [x] Fix docs SSR issue with visualizer component (document is not defined)
+  - [x] **MAIN ENTRY POINT FIX**: Create root index.js that re-exports from mcp-server package
+  - [x] Update package.json main and bin fields for proper monorepo interface
   - [ ] Test full CI/CD pipeline with monorepo structure
 
 - [x] **Test Migration to Packages** (CRITICAL FOR PROPER MOCKING)
@@ -152,6 +154,10 @@ Migrate the responsible-vibe-mcp project to a proper monorepo structure with inc
   - [x] **CRITICAL FIX**: Update all tests to use factory function instead of direct constructor
   - [x] Fix "Cannot set properties of undefined (setting 'toolRegistry')" errors
   - [x] Update test helpers and e2e setup to use createResponsibleVibeMCPServer
+  - [x] **MCP CONTRACT TESTS FIX**: Update server path from dist/index.js to index.js
+  - [x] All 17 MCP contract tests now passing
+  - [x] **EXCELLENT PROGRESS**: 288/290 tests passing (99.3% success rate)
+  - [x] Fix remaining 2 project-path-configuration test assertions
   - [ ] Move remaining unit tests to appropriate packages
   - [ ] Update root test suite to run package tests
 
