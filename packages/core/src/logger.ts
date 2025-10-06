@@ -18,6 +18,7 @@ export enum LogLevel {
   INFO = 1,
   WARN = 2,
   ERROR = 3,
+  SILENT = 4, // Suppress all logging
 }
 
 export interface LogContext {
@@ -91,7 +92,13 @@ class Logger {
   }
 
   private getCurrentLogLevel(): LogLevel {
-    // Force ERROR level in test environments
+    // Check environment variable first (allows SILENT to override test mode)
+    const envLevel = this.getLogLevelFromEnv();
+    if (envLevel === LogLevel.SILENT) {
+      return LogLevel.SILENT;
+    }
+
+    // Force ERROR level in test environments (unless SILENT)
     if (isTestMode()) {
       return LogLevel.ERROR;
     }
@@ -101,8 +108,7 @@ class Logger {
       return currentLoggingLevel;
     }
 
-    // Check environment variable
-    const envLevel = this.getLogLevelFromEnv();
+    // Use environment variable level
     if (envLevel !== null) {
       return envLevel;
     }
@@ -127,6 +133,8 @@ class Logger {
         return LogLevel.WARN;
       case 'ERROR':
         return LogLevel.ERROR;
+      case 'SILENT':
+        return LogLevel.SILENT;
       default:
         return null;
     }

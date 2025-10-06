@@ -224,7 +224,7 @@ states:
       const vibeDir = path.join(tempProject.projectPath, '.vibe');
       await fs.mkdir(vibeDir, { recursive: true });
 
-      // Create invalid YAML
+      // Create invalid YAML (error logging expected)
       await fs.writeFile(
         path.join(vibeDir, 'workflow.yaml'),
         'invalid: yaml: ['

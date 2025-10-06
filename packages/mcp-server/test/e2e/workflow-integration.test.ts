@@ -11,6 +11,7 @@ import {
 } from '../utils/e2e-test-setup';
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
+import { McpToolResponse } from '../../src/types';
 
 vi.unmock('fs');
 vi.unmock('fs/promises');
@@ -312,12 +313,19 @@ describe('Workflow Integration', () => {
     it('should recover from invalid phase transitions', async () => {
       await client.callTool('whats_next', { user_input: 'start' });
 
-      // Try invalid transition
-      await client.callTool('proceed_to_phase', {
-        target_phase: 'invalid_phase',
-        reason: 'test error handling',
-        review_state: 'not-required',
-      });
+      // Try invalid transition (error logging expected)
+      const result: McpToolResponse = await client.callTool(
+        'proceed_to_phase',
+        {
+          target_phase: 'invalid_phase',
+          reason: 'test error handling',
+          review_state: 'not-required',
+        }
+      );
+
+      // Verify error was handled properly
+      expect(result.error).toBeDefined();
+      expect(result.error).toContain('Invalid target phase');
 
       // Should still be able to continue normally
       const recovery = await client.callTool('whats_next', {
