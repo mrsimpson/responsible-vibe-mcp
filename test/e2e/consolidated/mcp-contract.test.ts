@@ -37,7 +37,7 @@ describe('MCP Contract Validation', () => {
     };
 
     // Build the server if needed
-    const serverPath = path.resolve(__dirname, '../../../dist/index.js');
+    const serverPath = path.resolve(__dirname, '../../../index.js');
     const serverExists = await fs
       .access(serverPath)
       .then(() => true)
