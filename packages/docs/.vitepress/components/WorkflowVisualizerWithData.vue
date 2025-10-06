@@ -28,10 +28,13 @@ const workflows = ref<WorkflowDefinition[]>([]);
 
 // Load workflows from generated manifest
 const loadBundledWorkflows = async () => {
+  // VitePress uses base path in both dev and production
+  const basePath = '/responsible-vibe-mcp/workflows/';
+  
   const workflowList: WorkflowDefinition[] = AVAILABLE_WORKFLOWS.map(workflowName => ({
     name: workflowName,
     displayName: workflowName.charAt(0).toUpperCase() + workflowName.slice(1).replace(/-/g, ' '),
-    path: `/responsible-vibe-mcp/workflows/${workflowName}.yaml`
+    path: `${basePath}${workflowName}.yaml`
   }));
   
   workflows.value = workflowList;

@@ -37,7 +37,7 @@
     "build:ci": "turbo run build",
     "build:visualizer": "cd workflow-visualizer && npm install && npm run build",
     "inspector": "npx @modelcontextprotocol/inspector",
-    "dev": "turbo run dev",
+    "dev": "turbo run dev --filter=@responsible-vibe/core --filter=@responsible-vibe/mcp-server",
     "clean": "turbo run clean:build",
     "prepublishOnly": "npm run build",
     "test": "vitest --run && turbo run test",

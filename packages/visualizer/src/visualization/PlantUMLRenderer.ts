@@ -39,7 +39,7 @@ export class PlantUMLRenderer {
     this.container.style.height = '100%';
 
     const plantUMLCode = this.generatePlantUMLStateMachine(workflow);
-    const diagramUrl = this.createPlantUMLUrl(plantUMLCode);
+    const diagramUrl = await this.createPlantUMLUrl(plantUMLCode);
 
     // Create container with diagram and interactive overlay
     const diagramContainer = document.createElement('div');
@@ -194,16 +194,16 @@ export class PlantUMLRenderer {
   /**
    * Create PlantUML web service URL with proper encoding
    */
-  private createPlantUMLUrl(plantUMLCode: string): string {
+  private async createPlantUMLUrl(plantUMLCode: string): Promise<string> {
     try {
       // Try DEFLATE encoding first (proper PlantUML format)
-      const encoded = encodePlantUML(plantUMLCode);
+      const encoded = await encodePlantUML(plantUMLCode);
       return `https://www.plantuml.com/plantuml/svg/${encoded}`;
     } catch (error) {
       console.warn('DEFLATE encoding failed, trying fallback:', error);
       try {
         // Fallback to base64 with ~1 header
-        const encoded = encodePlantUMLFallback(plantUMLCode);
+        const encoded = await encodePlantUMLFallback(plantUMLCode);
         return `https://www.plantuml.com/plantuml/svg/${encoded}`;
       } catch (fallbackError) {
         console.error('All PlantUML encoding methods failed:', fallbackError);

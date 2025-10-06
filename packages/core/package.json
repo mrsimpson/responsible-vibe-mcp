@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
+    "dev": "tsc --watch",
     "clean:build": "rimraf ./dist",
     "test": "vitest --run",
     "lint": "oxlint .",

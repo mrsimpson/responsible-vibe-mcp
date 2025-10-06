@@ -13,6 +13,7 @@
   ],
   "scripts": {
     "build": "mkdir -p dist && cp -r src/* dist/",
+    "dev": "npm run build && nodemon --watch src --ext ts,vue,js --exec 'npm run build'",
     "clean:build": "rimraf ./dist"
   },
   "dependencies": {
@@ -23,7 +24,8 @@
   "devDependencies": {
     "@types/node": "^20.0.0",
     "typescript": "^5.0.0",
-    "rimraf": "^5.0.0"
+    "rimraf": "^5.0.0",
+    "nodemon": "^3.0.0"
   },
   "peerDependencies": {
     "vue": "^3.4.0"

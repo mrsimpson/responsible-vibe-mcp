@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "prebuild": "mkdir -p public/workflows && cp ../../resources/workflows/*.yaml public/workflows/ && node scripts/generate-workflow-manifest.js",
-    "dev": "npm run prebuild && vitepress dev",
-    "build": "npm run prebuild && vitepress build",
+    "dev": "npm run prebuild && concurrently \"turbo run dev --filter=@responsible-vibe/visualizer\" \"vitepress dev\"",
+    "build": "turbo run build --filter=@responsible-vibe/visualizer && npm run prebuild && vitepress build",
     "preview": "vitepress preview"
   },
   "dependencies": {
@@ -22,6 +22,7 @@
     "@types/node": "^20.0.0",
     "@types/pako": "2.0.4",
     "typescript": "^5.0.0",
-    "vitepress": "^1.6.3"
+    "vitepress": "^1.6.3",
+    "concurrently": "^8.0.0"
   }
 }
