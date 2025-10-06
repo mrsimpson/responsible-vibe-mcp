@@ -101,12 +101,16 @@ export async function initializeServerComponents(
   // Initialize core components
   logger.debug('Initializing core components');
   const database = new Database(projectPath);
-  const conversationManager = new ConversationManager(database, projectPath);
+  const workflowManager = new WorkflowManager();
+  const conversationManager = new ConversationManager(
+    database,
+    workflowManager,
+    projectPath
+  );
   const transitionEngine = new TransitionEngine(projectPath);
   transitionEngine.setConversationManager(conversationManager);
   const planManager = new PlanManager();
   const instructionGenerator = new InstructionGenerator(planManager);
-  const workflowManager = new WorkflowManager();
 
   // Conditionally create interaction logger
   const interactionLogger =

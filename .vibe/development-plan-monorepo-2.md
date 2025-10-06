@@ -135,6 +135,20 @@ Migrate the responsible-vibe-mcp project to a proper monorepo structure with inc
   - [ ] Fix docs SSR issue with visualizer component (document is not defined)
   - [ ] Test full CI/CD pipeline with monorepo structure
 
+- [x] **Test Migration to Packages** (CRITICAL FOR PROPER MOCKING)
+  - [x] Identify mocking issues with @responsible-vibe/core in root tests
+  - [x] Create test structure in packages/core/test/
+  - [x] Move conversation-manager.test.ts to core package
+  - [x] Attempt various mocking strategies (vi.mock, vi.hoisted)
+  - [x] **ISSUE IDENTIFIED**: Current ConversationManager uses `new WorkflowManager()` internally, making mocking difficult
+  - [x] **SOLUTION IMPLEMENTED**: Refactor ConversationManager to use dependency injection
+  - [x] Implement dependency injection pattern for better testability
+  - [x] Update all ConversationManager instantiations to provide dependencies
+  - [x] Fix old test file to use new constructor signature
+  - [x] Validate tests pass with proper mocking
+  - [ ] Move remaining unit tests to appropriate packages
+  - [ ] Update root test suite to run package tests
+
 ### Completed
 - [x] Copied monorepo configuration files (pnpm-workspace.yaml, turbo.json, tsconfig.base.json)
 - [x] Updated root package.json with workspace configuration and turbo
@@ -307,7 +321,36 @@ src/cli/visualization-launcher.js → @responsible-vibe/cli
 - Workflows loaded from public directory at build time
 - Component receives workflows via props injection
 
-This follows the dependency injection pattern and makes the visualizer component much more flexible and maintainable.
+### Test Migration and Dependency Injection Discovery
+
+**Problem Identified:**
+- Moving tests to packages revealed critical mocking issues
+- ConversationManager creates `new WorkflowManager()` internally, making it impossible to mock properly
+- Current architecture makes unit testing difficult due to tight coupling
+
+**Root Cause:**
+- Classes instantiate their dependencies directly instead of receiving them
+- No dependency injection pattern implemented
+- Hard to test in isolation
+
+**Solution Required:**
+- Implement dependency injection pattern for core classes
+- ConversationManager should receive WorkflowManager as constructor parameter
+- This will enable proper mocking and better testability
+
+**Benefits of Moving Tests to Packages:**
+1. **Better Isolation**: Tests can import internal modules directly
+2. **Proper Mocking**: Can mock external package dependencies easily
+3. **Package Independence**: Each package can test its own functionality
+4. **Cleaner Architecture**: Forces better separation of concerns
+
+**Next Steps:**
+1. Refactor ConversationManager to use dependency injection
+2. Apply same pattern to other tightly coupled classes
+3. Move tests to appropriate packages
+4. Update mocking strategies for better test coverage
+
+This discovery validates the monorepo approach and highlights architectural improvements needed for better testability.
 
 ### Monorepo Migration Completion Summary
 

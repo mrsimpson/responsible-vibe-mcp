@@ -20,10 +20,16 @@ const logger = createLogger('ConversationManager');
 export class ConversationManager {
   private database: Database;
   private projectPath: string;
+  private workflowManager: WorkflowManager;
 
-  constructor(database: Database, projectPath?: string) {
+  constructor(
+    database: Database,
+    workflowManager: WorkflowManager,
+    projectPath: string
+  ) {
     this.database = database;
-    this.projectPath = projectPath || process.cwd();
+    this.workflowManager = workflowManager;
+    this.projectPath = projectPath;
   }
 
   /**
@@ -214,8 +220,7 @@ export class ConversationManager {
     const planFilePath = resolve(projectPath, '.vibe', planFileName);
 
     // Get initial state from the appropriate workflow
-    const workflowManager = new WorkflowManager();
-    const stateMachine = workflowManager.loadWorkflowForProject(
+    const stateMachine = this.workflowManager.loadWorkflowForProject(
       projectPath,
       workflowName
     );
