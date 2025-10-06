@@ -30,15 +30,28 @@ import type {
 const logger = createLogger('ResponsibleVibeMCPServer');
 
 /**
+ * Factory function to create a server with real components
+ */
+export async function createResponsibleVibeMCPServer(
+  config: ServerConfig = {}
+): Promise<ResponsibleVibeMCPServer> {
+  const components = await initializeServerComponents(config);
+  return new ResponsibleVibeMCPServer(config, components);
+}
+
+/**
  * Main server class that orchestrates all components
  * Can be used both as a standalone process and in-process for testing
  */
 export class ResponsibleVibeMCPServer {
   private components: ServerComponents | null = null;
 
-  constructor(private config: ServerConfig = {}) {
+  constructor(
+    private config: ServerConfig,
+    private serverComponents: ServerComponents
+  ) {
     logger.debug('ResponsibleVibeMCPServer created', {
-      config: JSON.stringify(config),
+      config: JSON.stringify(this.config),
     });
   }
 
@@ -49,8 +62,8 @@ export class ResponsibleVibeMCPServer {
     logger.debug('Initializing ResponsibleVibeMCPServer');
 
     try {
-      // Initialize core components
-      this.components = await initializeServerComponents(this.config);
+      // Use injected components
+      this.components = this.serverComponents;
 
       // Create registries and renderer
       const toolRegistry = createToolRegistry();

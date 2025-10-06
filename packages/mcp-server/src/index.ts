@@ -8,10 +8,13 @@
  */
 
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import { ResponsibleVibeMCPServer } from './server.js';
+import { createResponsibleVibeMCPServer } from './server.js';
 
 // Re-export for external use
-export { ResponsibleVibeMCPServer };
+export {
+  ResponsibleVibeMCPServer,
+  createResponsibleVibeMCPServer,
+} from './server.js';
 import { createLogger } from '@responsible-vibe/core';
 
 const logger = createLogger('Main');
@@ -55,7 +58,7 @@ async function main() {
     const projectPath = process.env.PROJECT_PATH;
 
     // Create server instance with project path configuration
-    const server = new ResponsibleVibeMCPServer({
+    const server = await createResponsibleVibeMCPServer({
       projectPath: projectPath,
     });
 

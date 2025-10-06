@@ -5,17 +5,23 @@
  * The actual implementation is now in src/server/ with proper separation of concerns.
  */
 
-import { ResponsibleVibeMCPServer as ModularResponsibleVibeMCPServer } from './server-implementation.js';
+import {
+  ResponsibleVibeMCPServer as ModularResponsibleVibeMCPServer,
+  createResponsibleVibeMCPServer as createModularServer,
+} from './server-implementation.js';
 import { ServerConfig as ModularServerConfig } from './types.js';
+
+/**
+ * Factory function for creating server instances (recommended approach)
+ */
+export const createResponsibleVibeMCPServer = createModularServer;
 
 /**
  * Main server class that maintains backward compatibility
  * while using the new modular architecture internally
  */
 export class ResponsibleVibeMCPServer extends ModularResponsibleVibeMCPServer {
-  constructor(config: ModularServerConfig = {}) {
-    super(config);
-  }
+  // This class is kept for backward compatibility but users should use the factory function
 }
 
 // Re-export types for backward compatibility

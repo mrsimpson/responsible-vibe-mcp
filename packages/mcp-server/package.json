@@ -10,7 +10,8 @@
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "clean:build": "rimraf ./dist",
-    "dev": "tsc --watch"
+    "dev": "tsc --watch",
+    "test": "vitest --run"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.17.5",
