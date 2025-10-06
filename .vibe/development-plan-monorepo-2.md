@@ -131,6 +131,7 @@ Migrate the responsible-vibe-mcp project to a proper monorepo structure with inc
   - [x] Update PR validation workflow for monorepo testing
   - [x] Create package-specific build scripts and validation
   - [x] Fix remaining relative imports in visualizer package (ui-types.ts)
+  - [x] Fix VS Code debugging by enabling sourcemaps in TypeScript configs
   - [ ] Fix docs SSR issue with visualizer component (document is not defined)
   - [ ] Test full CI/CD pipeline with monorepo structure
 
