@@ -81,7 +81,7 @@ function showHelp(): void {
 Responsible Vibe CLI Tools
 
 USAGE:
-  responsible-vibe-cli [OPTIONS]
+  responsible-vibe-mcp [OPTIONS]
 
 OPTIONS:
   --help, -h                    Show this help message

@@ -3,9 +3,6 @@
   "version": "3.1.6",
   "description": "CLI tools for responsible-vibe development workflows",
   "type": "module",
-  "bin": {
-    "responsible-vibe-cli": "dist/index.js"
-  },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "clean:build": "rimraf ./dist"
