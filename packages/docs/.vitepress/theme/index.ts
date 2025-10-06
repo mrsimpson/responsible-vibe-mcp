@@ -1,7 +1,7 @@
 import { h } from 'vue';
 import type { Theme } from 'vitepress';
 import DefaultTheme from 'vitepress/theme';
-import WorkflowVisualizer from '../components/WorkflowVisualizer.vue';
+import WorkflowVisualizerWithData from '../components/WorkflowVisualizerWithData.vue';
 
 export default {
   extends: DefaultTheme,
@@ -12,6 +12,6 @@ export default {
   },
   enhanceApp({ app, router: _router, siteData: _siteData }) {
     // Register global components
-    app.component('WorkflowVisualizer', WorkflowVisualizer);
+    app.component('WorkflowVisualizer', WorkflowVisualizerWithData);
   },
 } satisfies Theme;

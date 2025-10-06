@@ -7,7 +7,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "mkdir -p dist && cp -r src/* dist/ && echo 'export { default } from \"./WorkflowVisualizer.vue\";' > dist/index.js",
+    "build": "mkdir -p dist && cp -r src/* dist/",
     "clean:build": "rimraf ./dist"
   },
   "dependencies": {

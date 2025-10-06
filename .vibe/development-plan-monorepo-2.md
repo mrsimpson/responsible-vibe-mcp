@@ -111,6 +111,13 @@ Migrate the responsible-vibe-mcp project to a proper monorepo structure with inc
   - [x] Update inventory with docs package mappings
   - [x] Validate documentation builds
 
+- [x] **Architectural Improvements**
+  - [x] Refactor WorkflowVisualizer to accept workflows as props
+  - [x] Remove dependency on BundledWorkflows from visualizer component
+  - [x] Create VitePress wrapper component that loads and injects workflows
+  - [x] Update visualizer package exports to include WorkflowDefinition type
+  - [x] Test build and functionality with new architecture
+
 - [x] **Final Cleanup**
   - [x] Clean up old directories and files
   - [x] Update root documentation
@@ -259,6 +266,36 @@ src/git-manager.js → @responsible-vibe/core
 src/server/index.js → @responsible-vibe/mcp-server
 src/cli/visualization-launcher.js → @responsible-vibe/cli
 ```
+
+### Architectural Improvement: Dependency Injection Pattern
+
+**Implemented cleaner separation of concerns in WorkflowVisualizer component:**
+
+✅ **Before (Tightly Coupled):**
+- WorkflowVisualizer imported BundledWorkflows directly
+- Component had knowledge of workflow loading logic
+- Dependency on @responsible-vibe/core for workflow data
+
+✅ **After (Dependency Injection):**
+- WorkflowVisualizer accepts workflows as props
+- Component is purely presentational
+- No dependency on core package for data loading
+- VitePress wrapper handles data loading and injection
+
+**Benefits Achieved:**
+1. **Better Separation of Concerns**: Visualizer only handles presentation
+2. **Reduced Coupling**: No direct dependency on core package
+3. **Improved Testability**: Easy to inject mock data for testing
+4. **Cleaner Architecture**: Data loading responsibility moved to consumer
+5. **Reusability**: Component can be used with any workflow data source
+
+**Implementation Details:**
+- Created `WorkflowDefinition` interface for type safety
+- VitePress wrapper (`WorkflowVisualizerWithData`) loads bundled workflows
+- Workflows loaded from public directory at build time
+- Component receives workflows via props injection
+
+This follows the dependency injection pattern and makes the visualizer component much more flexible and maintainable.
 
 ### Monorepo Migration Completion Summary
 

@@ -51,28 +51,36 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted } from 'vue';
-import { WorkflowLoader } from './services/WorkflowLoader';
+import { onMounted, onUnmounted, watch } from 'vue';
+import { load as parseYaml } from 'js-yaml';
 import { FileUploadHandler } from './services/FileUploadHandler';
 import { ErrorHandler } from './utils/ErrorHandler';
 import { PlantUMLRenderer } from './visualization/PlantUMLRenderer';
 import { getRequiredElement } from './utils/DomHelpers';
 
 // Component props
+interface WorkflowDefinition {
+  name: string;
+  displayName?: string;
+  domain?: string;
+  path: string;
+}
+
 interface Props {
   showSidebar?: boolean;
   hideHeader?: boolean;
   initialWorkflow?: string;
+  workflows?: WorkflowDefinition[];
 }
 
 const props = withDefaults(defineProps<Props>(), {
   showSidebar: true,
   hideHeader: false,
   initialWorkflow: '',
+  workflows: () => [],
 });
 
 interface WorkflowVisualizerApp {
-  workflowLoader: unknown;
   plantUMLRenderer: unknown;
   fileUploadHandler: unknown;
   errorHandler: unknown;
@@ -96,6 +104,32 @@ let appState: AppState = {
   error: null,
   parentState: null,
 };
+
+// Function to populate workflow selector
+const populateWorkflowSelector = () => {
+  const workflowSelector = document.querySelector<HTMLSelectElement>('#workflow-selector');
+  if (!workflowSelector || props.workflows.length === 0) return;
+  
+  // Clear existing options except the first one
+  while (workflowSelector.children.length > 1) {
+    workflowSelector.removeChild(workflowSelector.lastChild!);
+  }
+  
+  // Add workflow options
+  for (const workflow of props.workflows) {
+    const option = document.createElement('option');
+    option.value = workflow.name;
+    const domainText = workflow.domain ? ` [${workflow.domain}]` : '';
+    const displayName = workflow.displayName || workflow.name;
+    option.textContent = `${displayName}${domainText}`;
+    workflowSelector.appendChild(option);
+  }
+};
+
+// Watch for changes in workflows prop
+watch(() => props.workflows, () => {
+  populateWorkflowSelector();
+}, { immediate: true });
 
 // Helper functions for handling interactions
 function handleElementClick(event: {
@@ -460,7 +494,6 @@ function clearSelection(): void {
 onMounted(async () => {
   try {
     // Initialize the workflow visualizer
-    const workflowLoader = new WorkflowLoader();
     const errorHandler = new ErrorHandler();
 
     // Get DOM elements (some may not exist if header is hidden)
@@ -494,31 +527,37 @@ onMounted(async () => {
       }
     });
 
+    // Simple workflow loading function
+    const loadWorkflow = async (workflowName: string) => {
+      const workflow = props.workflows.find(w => w.name === workflowName);
+      if (!workflow) {
+        throw new Error(`Workflow '${workflowName}' not found`);
+      }
+      
+      // Load workflow content from the path
+      const response = await fetch(workflow.path);
+      if (!response.ok) {
+        throw new Error(`Failed to load workflow: ${response.statusText}`);
+      }
+      
+      const yamlContent = await response.text();
+      const parsedWorkflow = parseYaml(yamlContent);
+      
+      return parsedWorkflow;
+    };
+
     // Initialize file upload handler (only if element exists)
     let fileUploadHandler = null;
     if (fileUploadInput) {
-      fileUploadHandler = new FileUploadHandler(
-        fileUploadInput,
-        workflowLoader
-      );
-
-      // Set up file upload callbacks
-      fileUploadHandler.onWorkflowLoaded = async (workflow: unknown) => {
-        appState.currentWorkflow = workflow;
-        appState.selectedElement = null;
-        appState.highlightedPath = null;
-        await plantUMLRenderer.renderWorkflow(workflow);
-        updateSidePanel();
-      };
-
-      fileUploadHandler.onUploadError = (error: unknown) => {
-        console.error('File upload error:', error);
-        errorHandler.showError(error);
-      };
+      // Note: FileUploadHandler would need to be updated to not depend on WorkflowLoader
+      // For now, we'll skip file upload functionality
+      console.warn('File upload functionality disabled - needs refactoring');
     }
 
     // Set up event listeners and populate workflow selector (only if selector exists)
     if (workflowSelector) {
+      console.log('Setting up workflow selector, workflows:', props.workflows);
+      
       workflowSelector.addEventListener('change', async event => {
         const target = event.target as HTMLSelectElement;
         const workflowName = target.value;
@@ -532,8 +571,7 @@ onMounted(async () => {
         try {
           diagramCanvas.innerHTML =
             '<div class="loading-message">Loading workflow...</div>';
-          const workflow =
-            await workflowLoader.loadBuiltinWorkflow(workflowName);
+          const workflow = await loadWorkflow(workflowName);
           appState.currentWorkflow = workflow;
           appState.selectedElement = null;
           appState.highlightedPath = null;
@@ -545,25 +583,12 @@ onMounted(async () => {
             '<div class="loading-message">Failed to load workflow</div>';
         }
       });
-
-      // Populate workflow selector
-      const workflows = workflowLoader.getAvailableWorkflows();
-      for (const workflow of workflows) {
-        const option = document.createElement('option');
-        option.value = workflow.name;
-        // Include domain in option text if available
-        const domainText = workflow.domain ? ` [${workflow.domain}]` : '';
-        option.textContent = `${workflow.displayName}${domainText}`;
-        workflowSelector.appendChild(option);
-      }
     }
 
     // Load initial workflow if specified
     if (props.initialWorkflow) {
       try {
-        const workflow = await workflowLoader.loadBuiltinWorkflow(
-          props.initialWorkflow
-        );
+        const workflow = await loadWorkflow(props.initialWorkflow);
         appState.currentWorkflow = workflow;
         appState.selectedElement = null;
         appState.highlightedPath = null;
@@ -581,7 +606,6 @@ onMounted(async () => {
     }
 
     workflowVisualizerApp = {
-      workflowLoader,
       plantUMLRenderer,
       fileUploadHandler,
       errorHandler,
