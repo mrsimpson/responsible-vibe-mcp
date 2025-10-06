@@ -11,7 +11,7 @@ const mockGetConversationContext = vi.fn();
 const mockCreateConversationContext = vi.fn();
 
 // Mock database
-vi.mock('../../src/database', () => {
+vi.mock('@responsible-vibe/core', () => {
   return {
     Database: vi.fn().mockImplementation(() => ({
       initialize: vi.fn().mockResolvedValue(undefined),
@@ -86,7 +86,7 @@ vi.mock('../../src/workflow-manager', () => {
 });
 
 // Mock system prompt generator
-vi.mock('../../src/system-prompt-generator', () => ({
+vi.mock('../../src/system-prompt-generator.js', () => ({
   generateSystemPrompt: vi.fn().mockReturnValue('Test system prompt'),
 }));
 

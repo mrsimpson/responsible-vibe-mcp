@@ -3,8 +3,8 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { ConversationManager } from '@responsible-vibe/core';
-import type { Database } from '@responsible-vibe/core';
+import { ConversationManager } from '../../src/conversation-manager.js';
+import type { Database } from '../../src/database.js';
 
 // Mock WorkflowManager state machine
 const mockStateMachine = {

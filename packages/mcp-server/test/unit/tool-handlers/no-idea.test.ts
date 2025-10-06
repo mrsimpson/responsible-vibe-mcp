@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { NoIdeaHandler } from '../../../packages/mcp-server/src/tool-handlers/no-idea.js';
+import { NoIdeaHandler } from '../../../src/tool-handlers/no-idea.js';
 import { MockContextFactory } from '../../utils/test-helpers.js';
 
 describe('NoIdeaHandler', () => {
