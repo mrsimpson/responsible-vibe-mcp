@@ -9,6 +9,7 @@
 import { vi } from 'vitest';
 import {
   ResponsibleVibeMCPServer,
+  createResponsibleVibeMCPServer,
   ServerConfig,
 } from '../../packages/mcp-server/src/server.js';
 import { TempProject } from './temp-files.js';
@@ -307,7 +308,7 @@ export async function setupE2ETest(
   const { tempProject, serverConfig = {} } = options;
 
   // Create server with test configuration
-  const server = new ResponsibleVibeMCPServer({
+  const server = await createResponsibleVibeMCPServer({
     projectPath: tempProject.projectPath,
     enableLogging: false, // Disable logging in tests
     ...serverConfig,

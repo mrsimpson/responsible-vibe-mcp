@@ -10,6 +10,7 @@ import { join } from 'node:path';
 import { vi, expect } from 'vitest';
 import {
   ResponsibleVibeMCPServer,
+  createResponsibleVibeMCPServer,
   StartDevelopmentResult,
 } from '../../packages/mcp-server/src/server.js';
 import type { ServerContext } from '../../packages/mcp-server/src/types';
@@ -64,7 +65,7 @@ export class ServerTestHelper {
     projectPath: string,
     options: { enableLogging?: boolean } = {}
   ): Promise<ResponsibleVibeMCPServer> {
-    const server = new ResponsibleVibeMCPServer({
+    const server = await createResponsibleVibeMCPServer({
       projectPath,
       enableLogging: options.enableLogging ?? false,
     });
