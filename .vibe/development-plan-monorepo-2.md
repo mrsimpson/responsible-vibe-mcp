@@ -139,7 +139,16 @@ Migrate the responsible-vibe-mcp project to a proper monorepo structure with inc
   - [x] **MAIN ENTRY POINT FIX**: Create root index.js that re-exports from mcp-server package
   - [x] Update package.json main and bin fields for proper monorepo interface
   - [x] **LOCAL CI BUILD VERIFICATION**: Create and test local CI-like build process with version suffix
-  - [ ] Test full CI/CD pipeline with monorepo structure
+  - [x] **PACKAGING FIXES** (CRITICAL FOR PUBLISHED PACKAGE)
+  - [x] Fix root index.js to handle both local and published package modes
+  - [x] Create bundled dist/index.js for MCP server in published packages
+  - [x] Update package.json files array to include bundled dist files
+  - [x] Test MCP server works with published package (✅ WORKING)
+  - [x] Fix CLI forwarding in published package - CLI now serves as main entry point
+  - [x] Create CLI-as-main-entry approach that routes to MCP server (no args) or CLI (with args)
+  - [x] Implement dual import strategy: workspace imports for local, relative imports for published
+  - [x] Test full MCP inspector connection with published package (✅ WORKING)
+  - [x] Clean up old bundled files and commit solution
 
 - [x] **Test Migration to Packages** (CRITICAL FOR PROPER MOCKING)
   - [x] Identify mocking issues with @responsible-vibe/core in root tests
@@ -375,7 +384,27 @@ src/cli/visualization-launcher.js → @responsible-vibe/cli
 3. Move tests to appropriate packages
 4. Update mocking strategies for better test coverage
 
-This discovery validates the monorepo approach and highlights architectural improvements needed for better testability.
+### CLI-as-Main-Entry Packaging Solution
+
+**Problem:** Published packages couldn't resolve `@responsible-vibe/core` imports because Node.js expects packages in `node_modules/@scope/package/` but monorepo structure puts them in `node_modules/main-package/packages/sub-package/`.
+
+**Solution Implemented:**
+1. **CLI Package as Main Entry**: CLI package serves as the main entry point (`packages/cli/dist/index.js`)
+2. **Smart Routing**: No arguments → start MCP server, any arguments → run CLI functionality
+3. **Dual Import Strategy**: 
+   - Local development: Use workspace imports (`@responsible-vibe/core`)
+   - Published package: Use relative imports (`../../core/dist/index.js`)
+4. **Detection Logic**: Check for existence of `../../core/dist/index.js` to determine environment
+
+**Benefits:**
+- ✅ Eliminates need for separate entry package
+- ✅ Logical ownership: CLI owns the routing decision
+- ✅ Works in both local development and published packages
+- ✅ Clean architecture with clear responsibilities
+- ✅ MCP inspector can connect to `npx responsible-vibe-mcp`
+- ✅ CLI functionality works with `npx responsible-vibe-mcp --help`
+
+**Key Insight:** Node.js module resolution in published packages requires different import strategies than workspace development.
 
 ### Monorepo Migration Completion Summary
 

@@ -8,7 +8,8 @@
     "clean:build": "rimraf ./dist"
   },
   "dependencies": {
-    "@responsible-vibe/core": "workspace:*"
+    "@responsible-vibe/core": "workspace:*",
+    "@responsible-vibe/mcp-server": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",

@@ -11,9 +11,6 @@ importers:
       '@modelcontextprotocol/sdk':
         specifier: 1.17.5
         version: 1.17.5
-      '@responsible-vibe/core':
-        specifier: workspace:*
-        version: link:packages/core
       '@types/js-yaml':
         specifier: 4.0.9
         version: 4.0.9
