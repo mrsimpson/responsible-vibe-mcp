@@ -20,29 +20,34 @@ jobs:
         uses: actions/setup-node@v5
         with:
           node-version: '22'
-          cache: 'npm'
+          cache: 'pnpm'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install
 
       - name: Install platform-specific dependencies
         run: |
           # Install platform dependencies for Linux (temporary, not saved to package.json)
-          npm install @oxlint/linux-x64-gnu --no-save || echo "Failed to install oxlint platform dependency, continuing..."
+          pnpm add @oxlint/linux-x64-gnu --save-dev || echo "Failed to install oxlint platform dependency, continuing..."
 
       - name: Check formatting
-        run: npm run format:check
+        run: pnpm run format:check
 
       - name: Run linting
-        run: npm run lint
+        run: pnpm run lint
 
       - name: Build project
         run: |
-          npm install @rollup/rollup-linux-x64-gnu --no-save || echo "Failed to install Rollup platform dependency for visualizer"
-          npm run build
+          pnpm add @rollup/rollup-linux-x64-gnu --save-dev || echo "Failed to install Rollup platform dependency for visualizer"
+          pnpm run build
 
       - name: Run tests
-        run: npm run test:run
+        run: pnpm run test:run
         env:
           INCLUDE_NOISY_TESTS: true
           LOG_LEVEL: ERROR
@@ -68,25 +73,30 @@ jobs:
         uses: actions/setup-node@v5
         with:
           node-version: '22'
-          cache: 'npm'
+          cache: 'pnpm'
           registry-url: 'https://registry.npmjs.org'
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install
 
       - name: Install platform-specific dependencies
         run: |
           # Install platform dependencies for Linux CI environment (temporary, not saved to package.json)
-          npm install @oxlint/linux-x64-gnu --no-save || echo "Failed to install oxlint platform dependency"
+          pnpm add @oxlint/linux-x64-gnu --save-dev || echo "Failed to install oxlint platform dependency"
 
       - name: Build project
-        run: npm run build
+        run: pnpm run build
 
       - name: Build workflow visualizer
         run: |
           cd packages/visualizer
-          npm install
-          npm run build
+          pnpm install
+          pnpm run build
 
       - name: Bump version and create tag
         id: version
@@ -100,14 +110,14 @@ jobs:
         if: steps.version.outputs.new_tag
         run: |
           NEW_VERSION=${{ steps.version.outputs.new_version }}
-          npm version $NEW_VERSION --no-git-tag-version
+          pnpm version $NEW_VERSION --no-git-tag-version
 
           # Ensure no platform-specific dependencies were accidentally saved
-          npm uninstall @rollup/rollup-linux-x64-gnu @oxlint/linux-x64-gnu --no-save 2>/dev/null || true
+          pnpm remove @rollup/rollup-linux-x64-gnu @oxlint/linux-x64-gnu 2>/dev/null || true
 
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add package.json package-lock.json
+          git add package.json pnpm-lock.yaml
           git commit -m "chore: bump version to $NEW_VERSION [skip ci]" || exit 0
           git push
         env:
@@ -127,6 +137,6 @@ jobs:
 
       - name: Publish to npm
         if: steps.version.outputs.new_tag
-        run: npm publish --access public
+        run: pnpm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

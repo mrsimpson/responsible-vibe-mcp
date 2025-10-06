@@ -28,6 +28,7 @@
   "scripts": {
     "build": "turbo run build",
     "build:visualizer": "cd packages/visualizer && npm install && npm run build",
+    "pack:dist": "pnpm pack",
     "inspector": "npx @modelcontextprotocol/inspector",
     "dev": "turbo run dev --filter=@responsible-vibe/core --filter=@responsible-vibe/mcp-server",
     "clean": "turbo run clean:build",
@@ -47,7 +48,6 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.17.5",
-    "@responsible-vibe/core": "workspace:*",
     "@types/js-yaml": "4.0.9",
     "js-yaml": "4.1.0",
     "sqlite3": "^5.1.7",

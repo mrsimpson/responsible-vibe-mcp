@@ -221,10 +221,21 @@ states:
     });
 
     it('should fall back to default state machine on invalid custom configuration', async () => {
+      // Mock logger only for this test to suppress expected error output
+      const { createLogger } = await import('@responsible-vibe/core');
+      const originalCreateLogger = createLogger;
+      const mockCreateLogger = vi.fn().mockReturnValue({
+        debug: vi.fn(),
+        info: vi.fn(),
+        warn: vi.fn(),
+        error: vi.fn(),
+      });
+      vi.mocked(createLogger).mockImplementation(mockCreateLogger);
+
       const vibeDir = path.join(tempProject.projectPath, '.vibe');
       await fs.mkdir(vibeDir, { recursive: true });
 
-      // Create invalid YAML (error logging expected)
+      // Create invalid YAML
       await fs.writeFile(
         path.join(vibeDir, 'workflow.yaml'),
         'invalid: yaml: ['
@@ -244,6 +255,9 @@ states:
       // Should fall back to default state machine
       expect(response.phase).toBeTruthy();
       expect(response.instructions).toBeTruthy();
+
+      // Restore original logger
+      vi.mocked(createLogger).mockImplementation(originalCreateLogger);
     });
 
     it('should use default state machine when no custom configuration exists', async () => {

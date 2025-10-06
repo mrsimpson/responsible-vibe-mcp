@@ -9,7 +9,7 @@ export default defineConfig({
       tsconfig: './tsconfig.build.json',
     },
     env: {
-      LOG_LEVEL: 'ERROR', // Suppress all logs for mcp-server tests
+      LOG_LEVEL: 'ERROR', // Keep ERROR level to catch real issues
       NODE_ENV: 'test',
       VITEST: 'true',
     },

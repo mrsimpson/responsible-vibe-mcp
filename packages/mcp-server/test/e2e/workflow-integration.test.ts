@@ -313,7 +313,7 @@ describe('Workflow Integration', () => {
     it('should recover from invalid phase transitions', async () => {
       await client.callTool('whats_next', { user_input: 'start' });
 
-      // Try invalid transition (error logging expected)
+      // Try invalid transition
       const result: McpToolResponse = await client.callTool(
         'proceed_to_phase',
         {
@@ -335,6 +335,8 @@ describe('Workflow Integration', () => {
 
       expect(recoveryResponse.phase).toBeTruthy();
       expect(recoveryResponse.instructions).toBeTruthy();
+
+      // Note: Error logging is mocked and suppressed for this test
     });
 
     it('should handle file system issues gracefully', async () => {

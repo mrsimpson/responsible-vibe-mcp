@@ -138,6 +138,7 @@ Migrate the responsible-vibe-mcp project to a proper monorepo structure with inc
   - [x] Fix docs SSR issue with visualizer component (document is not defined)
   - [x] **MAIN ENTRY POINT FIX**: Create root index.js that re-exports from mcp-server package
   - [x] Update package.json main and bin fields for proper monorepo interface
+  - [x] **LOCAL CI BUILD VERIFICATION**: Create and test local CI-like build process with version suffix
   - [ ] Test full CI/CD pipeline with monorepo structure
 
 - [x] **Test Migration to Packages** (CRITICAL FOR PROPER MOCKING)

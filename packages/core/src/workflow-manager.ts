@@ -39,6 +39,7 @@ export class WorkflowManager {
   private projectWorkflows: Map<string, YamlStateMachine> = new Map();
   private workflowInfos: Map<string, WorkflowInfo> = new Map();
   private stateMachineLoader: StateMachineLoader;
+  private lastProjectPath: string | null = null; // Track last loaded project path
   private enabledDomains: Set<string>;
 
   constructor() {
@@ -68,6 +69,12 @@ export class WorkflowManager {
    * Load project-specific workflows from .vibe/workflows/
    */
   public loadProjectWorkflows(projectPath: string): void {
+    // Clear project workflows cache if project path changed
+    if (this.lastProjectPath !== projectPath) {
+      this.projectWorkflows.clear();
+      this.lastProjectPath = projectPath;
+    }
+
     // First, migrate any legacy workflow files
     this.migrateLegacyWorkflow(projectPath);
 
