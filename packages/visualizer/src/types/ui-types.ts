@@ -7,7 +7,7 @@ import type {
   YamlStateMachine,
   YamlState,
   YamlTransition,
-} from '../../../src/state-machine-types';
+} from '@responsible-vibe/core';
 
 // Re-export for convenience
 export type { YamlStateMachine, YamlState, YamlTransition };

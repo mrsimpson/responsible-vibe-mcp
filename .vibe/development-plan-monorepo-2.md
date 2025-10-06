@@ -130,6 +130,7 @@ Migrate the responsible-vibe-mcp project to a proper monorepo structure with inc
   - [x] Fix docs deployment workflow for new packages/docs structure
   - [x] Update PR validation workflow for monorepo testing
   - [x] Create package-specific build scripts and validation
+  - [x] Fix remaining relative imports in visualizer package (ui-types.ts)
   - [ ] Fix docs SSR issue with visualizer component (document is not defined)
   - [ ] Test full CI/CD pipeline with monorepo structure
 
