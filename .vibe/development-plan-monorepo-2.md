@@ -123,6 +123,16 @@ Migrate the responsible-vibe-mcp project to a proper monorepo structure with inc
   - [x] Update root documentation
   - [x] Final validation of all packages
 
+- [x] **CI/CD and Packaging Updates** (CRITICAL FOR DEPLOYMENT)
+  - [x] Update root package.json files array for new monorepo structure
+  - [x] Fix GitHub Actions workflows for monorepo builds
+  - [x] Update release workflow to handle package publishing
+  - [x] Fix docs deployment workflow for new packages/docs structure
+  - [x] Update PR validation workflow for monorepo testing
+  - [x] Create package-specific build scripts and validation
+  - [ ] Fix docs SSR issue with visualizer component (document is not defined)
+  - [ ] Test full CI/CD pipeline with monorepo structure
+
 ### Completed
 - [x] Copied monorepo configuration files (pnpm-workspace.yaml, turbo.json, tsconfig.base.json)
 - [x] Updated root package.json with workspace configuration and turbo
@@ -373,6 +383,42 @@ This follows the dependency injection pattern and makes the visualizer component
 - Gradually migrate full visualization logic from old implementation
 - Add PlantUML rendering capabilities
 - Implement workflow loading and interaction features
+
+### CI/CD and Packaging Strategy
+
+**Decided on Single Package Publication Approach:**
+- Keep publishing `responsible-vibe-mcp` as the main package for backward compatibility
+- Updated `files` array to include all built packages: `packages/*/dist/**/*`
+- Excluded `SYSTEM_PROMPT.md` from published files as requested
+- Updated all GitHub Actions workflows to work with monorepo structure
+
+**GitHub Actions Updates:**
+- ✅ **PR Validation**: Updated to use `npm run build` instead of `build:ci`
+- ✅ **Release Workflow**: Fixed build commands and visualizer path references
+- ✅ **Docs Deployment**: Updated paths from `docs/` to `packages/docs/`
+- ✅ **Build Scripts**: Removed obsolete `build:ci` script, updated visualizer build path
+
+**Packaging Structure:**
+```
+responsible-vibe-mcp/
+├── packages/core/dist/          # Core functionality
+├── packages/mcp-server/dist/    # MCP server implementation  
+├── packages/cli/dist/           # CLI tools
+├── packages/visualizer/dist/    # Vue visualization component
+├── packages/docs/.vitepress/dist/ # Documentation site
+└── resources/                   # Workflow definitions
+```
+
+**Benefits:**
+- Maintains backward compatibility for existing users
+- Single npm install gets all functionality
+- Simplified release management
+- All packages built and tested together
+- Consistent versioning across all components
+
+**Known Issues:**
+- Docs build has SSR issue with visualizer component (`document is not defined`)
+- This doesn't affect the main package functionality, only docs deployment
 
 **Key Insight:** Since we only need Vue for visualization, we can eliminate the framework-agnostic layer and Vue wrapper complexity.
 

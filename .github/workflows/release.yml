@@ -39,7 +39,7 @@ jobs:
       - name: Build project
         run: |
           npm install @rollup/rollup-linux-x64-gnu --no-save || echo "Failed to install Rollup platform dependency for visualizer"
-          npm run build:ci
+          npm run build
 
       - name: Run tests
         run: npm run test:run
@@ -84,12 +84,8 @@ jobs:
 
       - name: Build workflow visualizer
         run: |
-          cd workflow-visualizer
-          # Clean install for visualizer to avoid dependency conflicts
-          rm -rf node_modules package-lock.json || true
+          cd packages/visualizer
           npm install
-          # Install Rollup platform dependency needed for Vite build
-          npm install @rollup/rollup-linux-x64-gnu --no-save || echo "Failed to install Rollup platform dependency for visualizer"
           npm run build
 
       - name: Bump version and create tag

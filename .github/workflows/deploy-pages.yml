@@ -39,15 +39,13 @@ jobs:
 
       - name: Build workflow visualizer
         run: |
-          cd workflow-visualizer
-          # Ensure we start completely clean and regenerate package-lock.json
-          rm -rf node_modules package-lock.json
+          cd packages/visualizer
           npm install
           npm run build
 
       - name: Build VitePress site
         run: |
-          cd docs
+          cd packages/docs
           npm ci
           npm run build
           touch .vitepress/dist/.nojekyll
@@ -55,7 +53,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v4
         with:
-          path: docs/.vitepress/dist
+          path: packages/docs/.vitepress/dist
 
   deploy:
     environment:

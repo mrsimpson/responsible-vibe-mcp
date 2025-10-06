@@ -56,7 +56,7 @@ jobs:
           npm install @rollup/rollup-linux-x64-gnu --no-save || echo "Failed to install Rollup platform dependency, continuing..."
 
       - name: Build project (CI - skip visualizer)
-        run: npm run build:ci
+        run: npm run build
 
       - name: Run tests
         run: npm run test:run
