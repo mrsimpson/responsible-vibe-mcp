@@ -534,7 +534,6 @@ onMounted(async () => {
         throw new Error(`Workflow '${workflowName}' not found`);
       }
       
-      // Load workflow content from the path
       const response = await fetch(workflow.path);
       if (!response.ok) {
         throw new Error(`Failed to load workflow: ${response.statusText}`);

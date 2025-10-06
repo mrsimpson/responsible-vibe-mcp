@@ -1,33 +1,55 @@
 /**
  * Browser-compatible PlantUML encoder
- * Uses proper DEFLATE compression like the original plantuml-encoder
+ * Uses native JavaScript compression instead of pako
  */
-
-import * as pako from 'pako';
 
 /**
- * Encode PlantUML code using proper DEFLATE compression
- * This matches the original plantuml-encoder behavior
+ * Encode PlantUML code using native compression
  */
-export function encodePlantUML(plantUMLCode: string): string {
+export async function encodePlantUML(plantUMLCode: string): Promise<string> {
   try {
     // Convert string to UTF-8 bytes
     const utf8Bytes = new TextEncoder().encode(plantUMLCode);
 
-    // Compress using DEFLATE
-    const compressed = pako.deflateRaw(utf8Bytes, { level: 9 });
+    // Use native compression if available
+    if ('CompressionStream' in window) {
+      const stream = new CompressionStream('deflate-raw');
+      const writer = stream.writable.getWriter();
+      const reader = stream.readable.getReader();
 
-    // Convert to PlantUML's custom base64-like encoding
-    return encode64(compressed);
+      writer.write(utf8Bytes);
+      writer.close();
+
+      const chunks = [];
+      let done = false;
+      while (!done) {
+        const { value, done: readerDone } = await reader.read();
+        done = readerDone;
+        if (value) chunks.push(value);
+      }
+
+      const compressed = new Uint8Array(
+        chunks.reduce((acc, chunk) => acc + chunk.length, 0)
+      );
+      let offset = 0;
+      for (const chunk of chunks) {
+        compressed.set(chunk, offset);
+        offset += chunk.length;
+      }
+
+      return encode64(compressed);
+    } else {
+      // Fallback to base64 encoding
+      return encodePlantUMLFallback(plantUMLCode);
+    }
   } catch (error) {
-    console.error('Failed to encode PlantUML with DEFLATE:', error);
-    throw new Error('PlantUML DEFLATE encoding failed');
+    console.error('Failed to encode PlantUML:', error);
+    return encodePlantUMLFallback(plantUMLCode);
   }
 }
 
 /**
  * PlantUML's custom base64-like encoding
- * Based on the original plantuml-encoder implementation
  */
 function encode64(data: Uint8Array): string {
   let r = '';
@@ -86,15 +108,11 @@ function encode6bit(b: number): string {
 
 /**
  * Fallback encoder using base64 with ~1 header
- * Use this if DEFLATE encoding fails
  */
 export function encodePlantUMLFallback(plantUMLCode: string): string {
   try {
-    // Convert to UTF-8 bytes then to base64
     const utf8String = unescape(encodeURIComponent(plantUMLCode));
     const base64 = btoa(utf8String);
-
-    // Add ~1 header for PlantUML
     return '~1' + base64;
   } catch (error) {
     console.error('Failed to encode PlantUML (fallback):', error);

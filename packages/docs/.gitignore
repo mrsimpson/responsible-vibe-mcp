@@ -1,0 +1,8 @@
+# vitepress build output
+.vitepress/dist
+
+# vitepress cache directory
+.vitepress/cache
+
+# build artifacts
+.vitepress/workflow-manifest.js

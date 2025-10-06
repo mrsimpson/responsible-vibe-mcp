@@ -4,7 +4,7 @@
   "description": "Documentation site for Responsible Vibe MCP",
   "type": "module",
   "scripts": {
-    "prebuild": "mkdir -p public/workflows && cp ../../resources/workflows/*.yaml public/workflows/",
+    "prebuild": "mkdir -p public/workflows && cp ../../resources/workflows/*.yaml public/workflows/ && node scripts/generate-workflow-manifest.js",
     "dev": "npm run prebuild && vitepress dev",
     "build": "npm run prebuild && vitepress build",
     "preview": "vitepress preview"
