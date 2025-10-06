@@ -9,13 +9,13 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { mkdirSync, rmSync } from 'node:fs';
-import { ResponsibleVibeMCPServer } from '../packages/mcp-server/src/server.js';
+import { ResponsibleVibeMCPServer } from '@responsible-vibe/mcp-server';
 import {
   GitTestHelper,
   ServerTestHelper,
   MockDocsHelper,
   TestAssertions,
-} from './utils/test-helpers.js';
+} from '../utils/test-helpers.js';
 
 describe('Dynamic Tool Description', () => {
   let tempDir: string;

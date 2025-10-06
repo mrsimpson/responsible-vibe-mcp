@@ -2,13 +2,13 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import {
   TempProject,
   createTempProjectWithDefaultStateMachine,
-} from '../../utils/temp-files';
+} from '../utils/temp-files';
 import {
   DirectServerInterface,
   createSuiteIsolatedE2EScenario,
   assertToolSuccess,
   initializeDevelopment,
-} from '../../utils/e2e-test-setup';
+} from '../utils/e2e-test-setup';
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 

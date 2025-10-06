@@ -6,7 +6,7 @@ import { promises as fs } from 'node:fs';
 import {
   TempProject,
   createTempProjectWithDefaultStateMachine,
-} from '../../utils/temp-files';
+} from '../utils/temp-files';
 
 vi.unmock('fs');
 vi.unmock('fs/promises');
@@ -37,7 +37,7 @@ describe('MCP Contract Validation', () => {
     };
 
     // Build the server if needed
-    const serverPath = path.resolve(__dirname, '../../../index.js');
+    const serverPath = path.resolve(__dirname, '../../../../index.js');
     const serverExists = await fs
       .access(serverPath)
       .then(() => true)
@@ -59,7 +59,7 @@ describe('MCP Contract Validation', () => {
     // which is essential for clean test isolation
     const wrapperScriptPath = path.resolve(
       __dirname,
-      '../../utils/run-server-in-dir.sh'
+      '../utils/run-server-in-dir.sh'
     );
 
     transport = new StdioClientTransport({

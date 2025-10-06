@@ -15,8 +15,8 @@ import {
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { WorkflowManager } from '@responsible-vibe/core';
-import { ListWorkflowsHandler } from '../packages/mcp-server/src/tool-handlers/list-workflows.js';
-import { ServerContext } from '../packages/mcp-server/src/types';
+import { ListWorkflowsHandler } from '../../packages/mcp-server/src/tool-handlers/list-workflows.js';
+import { ServerContext } from '../../packages/mcp-server/src/types.js';
 
 describe('Workflow Configuration', () => {
   let tempDir: string;
@@ -65,7 +65,7 @@ describe('Workflow Configuration', () => {
     it('should include custom workflow when enabled and file exists', () => {
       // Create custom workflow file (copy of minor workflow with custom name)
       const minorWorkflowContent = readFileSync(
-        join(__dirname, '..', 'resources', 'workflows', 'minor.yaml'),
+        join(__dirname, '..', '..', 'resources', 'workflows', 'minor.yaml'),
         'utf8'
       );
       const customWorkflowContent = minorWorkflowContent.replace(

@@ -15,7 +15,7 @@ import { join } from 'node:path';
 import { YamlStateMachine, YamlState } from '@responsible-vibe/core';
 
 describe('Workflow Validation', () => {
-  const workflowsDir = join(__dirname, '..', 'resources', 'workflows');
+  const workflowsDir = join(__dirname, '..', '..', 'resources', 'workflows');
   const workflowFiles = readdirSync(workflowsDir).filter(
     file => file.endsWith('.yaml') || file.endsWith('.yml')
   );

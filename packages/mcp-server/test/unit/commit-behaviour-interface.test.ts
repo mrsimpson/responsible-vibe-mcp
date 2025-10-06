@@ -3,9 +3,9 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { StartDevelopmentHandler } from '../packages/mcp-server/src/tool-handlers/start-development.js';
+import { StartDevelopmentHandler } from '../../packages/mcp-server/src/tool-handlers/start-development.js';
 import * as GitManagerModule from '@responsible-vibe/core';
-import type { ServerContext } from '../packages/mcp-server/src/types';
+import type { ServerContext } from '../../packages/mcp-server/src/types.js';
 
 // Spy on GitManager methods
 const isGitRepositorySpy = vi.spyOn(

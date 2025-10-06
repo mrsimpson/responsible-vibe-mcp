@@ -3,7 +3,7 @@ import { ResponsibleVibeMCPServer } from '../packages/mcp-server/src/server.js';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { mkdtemp, rm, writeFile, mkdir } from 'node:fs/promises';
-import { ServerTestHelper, MockDocsHelper } from './utils/test-helpers.js';
+import { ServerTestHelper, MockDocsHelper } from '../utils/test-helpers.js';
 
 describe('resume_workflow tool', () => {
   let server: ResponsibleVibeMCPServer;

@@ -90,17 +90,6 @@ vi.mock('../../src/system-prompt-generator.js', () => ({
   generateSystemPrompt: vi.fn().mockReturnValue('Test system prompt'),
 }));
 
-// Mock logger
-vi.mock('../../src/logger', () => ({
-  createLogger: () => ({
-    debug: vi.fn(),
-    info: vi.fn(),
-    warn: vi.fn(),
-    error: vi.fn(),
-  }),
-  setMcpServerForLogging: vi.fn(),
-}));
-
 // Create mock handler functions with fixed return values for tests
 const mockHandleWhatsNext = vi.fn().mockImplementation(async _args => {
   // For the error case test

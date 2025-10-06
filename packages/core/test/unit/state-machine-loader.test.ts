@@ -88,8 +88,8 @@ vi.mock('js-yaml', () => {
   };
 });
 
-// Mock logger
-vi.mock('../../src/logger.js', () => ({
+// Silence logger
+vi.mock('../../src/logger.ts', () => ({
   createLogger: () => ({
     debug: vi.fn(),
     info: vi.fn(),
