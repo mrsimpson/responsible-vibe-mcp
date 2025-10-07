@@ -51,7 +51,6 @@
     "@modelcontextprotocol/sdk": "1.17.5",
     "@types/js-yaml": "4.0.9",
     "js-yaml": "4.1.0",
-    "responsible-vibe-mcp": "file:responsible-vibe-mcp-3.1.6.tgz",
     "sqlite3": "^5.1.7",
     "zod": "^3.22.4"
   },

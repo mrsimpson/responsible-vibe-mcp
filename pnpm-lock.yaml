@@ -81,6 +81,9 @@ importers:
       '@responsible-vibe/core':
         specifier: workspace:*
         version: link:../core
+      '@responsible-vibe/mcp-server':
+        specifier: workspace:*
+        version: link:../mcp-server
     devDependencies:
       '@types/node':
         specifier: ^20.0.0
