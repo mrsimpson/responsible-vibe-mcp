@@ -111,14 +111,19 @@ jobs:
         if: steps.version.outputs.new_tag
         run: |
           NEW_VERSION=${{ steps.version.outputs.new_version }}
+
+          # Update root package.json
           pnpm version $NEW_VERSION --no-git-tag-version
+
+          # Update all workspace package versions
+          pnpm -r exec npm version $NEW_VERSION --no-git-tag-version
 
           # Ensure no platform-specific dependencies were accidentally saved
           pnpm remove @rollup/rollup-linux-x64-gnu @oxlint/linux-x64-gnu 2>/dev/null || true
 
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add package.json pnpm-lock.yaml
+          git add package.json packages/*/package.json pnpm-lock.yaml
           git commit -m "chore: bump version to $NEW_VERSION [skip ci]" || exit 0
           git push
         env:
