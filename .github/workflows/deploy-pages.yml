@@ -25,29 +25,30 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
       - name: Setup Node.js
         uses: actions/setup-node@v5
         with:
           node-version: 22
-          cache: npm
+          cache: pnpm
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install
 
-      - name: Build workflow visualizer
-        run: |
-          cd packages/visualizer
-          npm install
-          npm run build
+      - name: Build packages
+        run: pnpm run build
 
       - name: Build VitePress site
         run: |
           cd packages/docs
-          npm ci
-          npm run build
+          pnpm run build
           touch .vitepress/dist/.nojekyll
 
       - name: Upload artifact

@@ -240,8 +240,9 @@ Migrate the responsible-vibe-mcp project to a proper monorepo structure with inc
 - [x] **Lint Fixes**: Fixed non-null assertion in WorkflowVisualizer.vue and Node.js import protocol issues in CLI
 - [x] **Test Summary Fix**: Fixed regex pattern in test-summary.js to properly parse vitest output in CI
 - [x] **Failing Test Handling**: Enhanced test-summary.js to correctly detect and report failing tests with proper exit codes
+- [x] **GitHub Pages Deployment**: Updated deploy-pages.yml workflow for monorepo structure with pnpm and proper build order
 
-**COMMIT PHASE COMPLETE**: The monorepo migration is production-ready with excellent test coverage, clean architecture, consistent tooling, zero lint errors, and robust CI test reporting that handles both passing and failing scenarios.
+**COMMIT PHASE COMPLETE**: The monorepo migration is production-ready with excellent test coverage, clean architecture, consistent tooling, zero lint errors, robust CI test reporting, and proper GitHub Pages deployment.
 
 ## Key Decisions
 
