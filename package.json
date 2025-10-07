@@ -43,7 +43,7 @@
     "generate-system-prompt": "vite-node src/scripts/generate-system-prompt.ts",
     "lint": "pnpm -r exec oxlint .",
     "lint:fix": "pnpm -r exec oxlint --fix .",
-    "format:ckeck": "pnpm -r exec prettier --check .",
+    "format:check": "pnpm -r exec prettier --check .",
     "format": "pnpm -r exec prettier --write .",
     "prepare": "husky"
   },

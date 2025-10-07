@@ -48,7 +48,7 @@ jobs:
           pnpm run build
 
       - name: Run tests
-        run: npm test
+        run: pnpm test
         env:
           INCLUDE_NOISY_TESTS: true
           LOG_LEVEL: ERROR

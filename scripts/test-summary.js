@@ -48,10 +48,10 @@ try {
   let totalTests = 0;
 
   // Extract root test results
-  const rootMatch = rootOutput.match(/Tests?\s+(\d+)\s+passed\s*\(?(\d+)\)?/);
+  const rootMatch = rootOutput.match(/Tests?\s+(\d+)\s+passed/);
   if (rootMatch) {
     const passed = parseInt(rootMatch[1]);
-    const total = parseInt(rootMatch[2]);
+    const total = passed; // In vitest, passed count equals total when all pass
     packageResults.push({ package: 'root', passed, total });
     totalPassed += passed;
     totalTests += total;
@@ -70,10 +70,10 @@ try {
         encoding: 'utf8',
         stdio: 'pipe',
       });
-      const pkgMatch = pkgOutput.match(/Tests?\s+(\d+)\s+passed\s*\(?(\d+)\)?/);
+      const pkgMatch = pkgOutput.match(/Tests?\s+(\d+)\s+passed/);
       if (pkgMatch) {
         const passed = parseInt(pkgMatch[1]);
-        const total = parseInt(pkgMatch[2]);
+        const total = passed; // In vitest, passed count equals total when all pass
         packageResults.push({ package: pkg.name, passed, total });
         totalPassed += passed;
         totalTests += total;
@@ -83,9 +83,33 @@ try {
           pkgOutput.split('\n').slice(-5).join('\n')
         );
       }
-    } catch (_error) {
-      // Package might not have tests, skip silently
-      console.log(`No tests found for ${pkg.fullName}`);
+    } catch (error) {
+      // Tests might have failed, but we still need to parse the output
+      const pkgOutput = error.stdout || '';
+      const failedMatch = pkgOutput.match(
+        /Tests?\s+(\d+)\s+failed\s*\|\s*(\d+)\s+passed\s*\((\d+)\)/
+      );
+      const passedOnlyMatch = pkgOutput.match(/Tests?\s+(\d+)\s+passed/);
+
+      if (failedMatch) {
+        // Some tests failed: "Tests  1 failed | 152 passed (153)"
+        // const failed = parseInt(failedMatch[1]);
+        const passed = parseInt(failedMatch[2]);
+        const total = parseInt(failedMatch[3]);
+        packageResults.push({ package: pkg.name, passed, total });
+        totalPassed += passed;
+        totalTests += total;
+      } else if (passedOnlyMatch) {
+        // All tests passed (shouldn't happen in catch, but just in case)
+        const passed = parseInt(passedOnlyMatch[1]);
+        const total = passed;
+        packageResults.push({ package: pkg.name, passed, total });
+        totalPassed += passed;
+        totalTests += total;
+      } else {
+        // Truly no tests found or other error
+        console.log(`No tests found for ${pkg.fullName}`);
+      }
     }
   }
 
