@@ -8,6 +8,10 @@
 import { execSync } from 'node:child_process';
 import { readdirSync, readFileSync, existsSync } from 'node:fs';
 
+function stripAnsiCodes(str) {
+  return str.replace(/\x1b\[[0-9;]*m/g, '');
+}
+
 console.log('🧪 Running tests across all packages...\n');
 
 // Dynamically detect all packages
@@ -47,13 +51,9 @@ try {
   let totalPassed = 0;
   let totalTests = 0;
 
-  // Extract root test results - try multiple patterns
-  let rootMatch = rootOutput.match(/Tests?\s*(\d+)\s*passed/i);
-  if (!rootMatch) {
-    // Try alternative pattern with parentheses
-    rootMatch = rootOutput.match(/Tests?\s+(\d+)\s+passed\s*\((\d+)\)/i);
-  }
-
+  // Extract root test results - match "Tests" specifically, not "Test Files"
+  const cleanRootOutput = stripAnsiCodes(rootOutput);
+  const rootMatch = cleanRootOutput.match(/^\s*Tests\s+(\d+)\s+passed/m);
   if (rootMatch) {
     const passed = parseInt(rootMatch[1]);
     const total = passed; // In vitest, passed count equals total when all pass
@@ -62,16 +62,8 @@ try {
     totalTests += total;
   } else {
     console.log(
-      'DEBUG: Root regex test:',
-      /Tests?\s*(\d+)\s*passed/i.test(rootOutput)
-    );
-    console.log(
-      'DEBUG: Root match attempt:',
-      rootOutput.match(/Tests?\s*(\d+)\s*passed/i)
-    );
-    console.log(
       'DEBUG: Root output:',
-      rootOutput.split('\n').slice(-5).join('\n')
+      cleanRootOutput.split('\n').slice(-5).join('\n')
     );
   }
 
@@ -83,13 +75,9 @@ try {
         encoding: 'utf8',
         stdio: 'pipe',
       });
-      // Try multiple patterns for package tests
-      let pkgMatch = pkgOutput.match(/Tests?\s*(\d+)\s*passed/i);
-      if (!pkgMatch) {
-        // Try alternative pattern with parentheses
-        pkgMatch = pkgOutput.match(/Tests?\s+(\d+)\s+passed\s*\((\d+)\)/i);
-      }
-
+      // Match "Tests" specifically, not "Test Files"
+      const cleanPkgOutput = stripAnsiCodes(pkgOutput);
+      const pkgMatch = cleanPkgOutput.match(/^\s*Tests\s+(\d+)\s+passed/m);
       if (pkgMatch) {
         const passed = parseInt(pkgMatch[1]);
         const total = passed; // In vitest, passed count equals total when all pass
@@ -98,25 +86,17 @@ try {
         totalTests += total;
       } else {
         console.log(
-          'DEBUG: Package regex test:',
-          /Tests?\s*(\d+)\s*passed/i.test(pkgOutput)
-        );
-        console.log(
-          'DEBUG: Package match attempt:',
-          pkgOutput.match(/Tests?\s*(\d+)\s*passed/i)
-        );
-        console.log(
           `DEBUG: ${pkg.name} output:`,
-          pkgOutput.split('\n').slice(-5).join('\n')
+          cleanPkgOutput.split('\n').slice(-5).join('\n')
         );
       }
     } catch (error) {
       // Tests might have failed, but we still need to parse the output
       const pkgOutput = error.stdout || '';
       const failedMatch = pkgOutput.match(
-        /Tests?\s*(\d+)\s*failed\s*\|\s*(\d+)\s*passed\s*\((\d+)\)/i
+        /(\d+)\s+failed\s*\|\s*(\d+)\s+passed/
       );
-      const passedOnlyMatch = pkgOutput.match(/Tests?\s*(\d+)\s*passed/i);
+      const passedOnlyMatch = pkgOutput.match(/(\d+)\s+passed/);
 
       if (failedMatch) {
         // Some tests failed: "Tests  1 failed | 152 passed (153)"
