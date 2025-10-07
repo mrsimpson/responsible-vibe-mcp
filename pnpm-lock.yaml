@@ -27,6 +27,9 @@ importers:
       '@modelcontextprotocol/inspector':
         specifier: 0.16.8
         version: 0.16.8(@types/node@20.19.17)(typescript@5.9.2)
+      '@responsible-vibe/core':
+        specifier: workspace:*
+        version: link:packages/core
       '@tsconfig/node22':
         specifier: 22.0.2
         version: 22.0.2
