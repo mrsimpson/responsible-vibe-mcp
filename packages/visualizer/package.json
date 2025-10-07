@@ -17,8 +17,8 @@
     "clean:build": "rimraf ./dist",
     "lint": "oxlint .",
     "lint:fix": "oxlint --fix .",
-    "format": "prettier --check .",
-    "format:fix": "prettier --write ."
+    "format:ckeck": "prettier --check .",
+    "format": "prettier --write ."
   },
   "dependencies": {
     "vue": "^3.4.0",

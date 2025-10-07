@@ -10,8 +10,8 @@
     "preview": "vitepress preview",
     "lint": "oxlint .",
     "lint:fix": "oxlint --fix .",
-    "format": "prettier --check .",
-    "format:fix": "prettier --write ."
+    "format:ckeck": "prettier --check .",
+    "format": "prettier --write ."
   },
   "dependencies": {
     "@responsible-vibe/visualizer": "workspace:*",

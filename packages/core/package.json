@@ -11,8 +11,8 @@
     "test": "vitest --run",
     "lint": "oxlint .",
     "lint:fix": "oxlint --fix .",
-    "format": "prettier --check .",
-    "format:fix": "prettier --write ."
+    "format:ckeck": "prettier --check .",
+    "format": "prettier --write ."
   },
   "dependencies": {
     "@types/js-yaml": "4.0.9",
