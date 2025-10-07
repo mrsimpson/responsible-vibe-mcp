@@ -116,7 +116,10 @@ const populateWorkflowSelector = () => {
 
   // Clear existing options except the first one
   while (workflowSelector.children.length > 1) {
-    workflowSelector.removeChild(workflowSelector.lastChild!);
+    const lastChild = workflowSelector.lastChild;
+    if (lastChild) {
+      workflowSelector.removeChild(lastChild);
+    }
   }
 
   // Add workflow options

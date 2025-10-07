@@ -11,7 +11,11 @@
     "build": "tsc -p tsconfig.build.json",
     "clean:build": "rimraf ./dist",
     "dev": "tsc --watch",
-    "test": "vitest --run"
+    "test": "vitest --run",
+    "lint": "oxlint .",
+    "lint:fix": "oxlint --fix .",
+    "format": "prettier --check .",
+    "format:fix": "prettier --write ."
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.17.5",

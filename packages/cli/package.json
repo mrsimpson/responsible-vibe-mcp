@@ -5,7 +5,11 @@
   "type": "module",
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
-    "clean:build": "rimraf ./dist"
+    "clean:build": "rimraf ./dist",
+    "lint": "oxlint .",
+    "lint:fix": "oxlint --fix .",
+    "format": "prettier --check .",
+    "format:fix": "prettier --write ."
   },
   "dependencies": {
     "@responsible-vibe/core": "workspace:*",

@@ -5,9 +5,13 @@
   "type": "module",
   "scripts": {
     "prebuild": "mkdir -p public/workflows && cp ../../resources/workflows/*.yaml public/workflows/ && node scripts/generate-workflow-manifest.js",
-    "dev": "npm run prebuild && concurrently \"turbo run dev --filter=@responsible-vibe/visualizer\" \"vitepress dev\"",
-    "build": "turbo run build --filter=@responsible-vibe/visualizer && npm run prebuild && vitepress build",
-    "preview": "vitepress preview"
+    "dev": "npm run prebuild && concurrently \"cd ../visualizer && npm run dev\" \"vitepress dev\"",
+    "build": "cd ../visualizer && npm run build && cd ../docs && npm run prebuild && vitepress build",
+    "preview": "vitepress preview",
+    "lint": "oxlint .",
+    "lint:fix": "oxlint --fix .",
+    "format": "prettier --check .",
+    "format:fix": "prettier --write ."
   },
   "dependencies": {
     "@responsible-vibe/visualizer": "workspace:*",

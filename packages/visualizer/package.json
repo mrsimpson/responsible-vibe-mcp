@@ -14,7 +14,11 @@
   "scripts": {
     "build": "mkdir -p dist && cp -r src/* dist/",
     "dev": "npm run build && nodemon --watch src --ext ts,vue,js --exec 'npm run build'",
-    "clean:build": "rimraf ./dist"
+    "clean:build": "rimraf ./dist",
+    "lint": "oxlint .",
+    "lint:fix": "oxlint --fix .",
+    "format": "prettier --check .",
+    "format:fix": "prettier --write ."
   },
   "dependencies": {
     "vue": "^3.4.0",
