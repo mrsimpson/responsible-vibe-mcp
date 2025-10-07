@@ -43,8 +43,8 @@
     "generate-system-prompt": "vite-node src/scripts/generate-system-prompt.ts",
     "lint": "turbo run lint",
     "lint:fix": "turbo run lint:fix",
-    "format": "turbo run format",
-    "format:check": "turbo run format",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "prepare": "husky"
   },
   "dependencies": {
