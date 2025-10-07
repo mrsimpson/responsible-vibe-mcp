@@ -41,8 +41,8 @@
     "test:manual": "npm run build && npm run inspector",
     "test:mcp-contract": "[ -f .vibe/state-machine.yml ] || [ -f .vibe/state-machine.yaml ] && echo '⚠️  Skipping MCP contract tests: Custom state machine detected' || vitest run --run test/e2e/consolidated/mcp-contract.test.ts",
     "generate-system-prompt": "vite-node src/scripts/generate-system-prompt.ts",
-    "lint": "turbo run lint",
-    "lint:fix": "turbo run lint:fix",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "prepare": "husky"
