@@ -48,13 +48,18 @@ try {
   let totalTests = 0;
 
   // Extract root test results
-  const rootMatch = rootOutput.match(/Tests\s+(\d+)\s+passed\s+\((\d+)\)/);
+  const rootMatch = rootOutput.match(/Tests?\s+(\d+)\s+passed\s*\(?(\d+)\)?/);
   if (rootMatch) {
     const passed = parseInt(rootMatch[1]);
     const total = parseInt(rootMatch[2]);
     packageResults.push({ package: 'root', passed, total });
     totalPassed += passed;
     totalTests += total;
+  } else {
+    console.log(
+      'DEBUG: Root output:',
+      rootOutput.split('\n').slice(-5).join('\n')
+    );
   }
 
   // Run tests for each workspace package
@@ -65,13 +70,18 @@ try {
         encoding: 'utf8',
         stdio: 'pipe',
       });
-      const pkgMatch = pkgOutput.match(/Tests\s+(\d+)\s+passed\s+\((\d+)\)/);
+      const pkgMatch = pkgOutput.match(/Tests?\s+(\d+)\s+passed\s*\(?(\d+)\)?/);
       if (pkgMatch) {
         const passed = parseInt(pkgMatch[1]);
         const total = parseInt(pkgMatch[2]);
         packageResults.push({ package: pkg.name, passed, total });
         totalPassed += passed;
         totalTests += total;
+      } else {
+        console.log(
+          `DEBUG: ${pkg.name} output:`,
+          pkgOutput.split('\n').slice(-5).join('\n')
+        );
       }
     } catch (_error) {
       // Package might not have tests, skip silently
@@ -103,8 +113,12 @@ try {
   );
   console.log(`   • Packages detected: ${packageResults.length}`);
 
-  // Check if any tests failed
-  if (totalPassed < totalTests) {
+  // Check if any tests failed or if no tests were found at all
+  if (totalTests === 0) {
+    console.log('\n❌ NO TESTS FOUND!');
+    console.log('='.repeat(60));
+    process.exit(1);
+  } else if (totalPassed < totalTests) {
     console.log('\n❌ SOME TESTS FAILED!');
     console.log('='.repeat(60));
     process.exit(1);
