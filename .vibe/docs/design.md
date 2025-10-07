@@ -1,1 +1,1 @@
-../../docs/dev/DEVELOPMENT.md
+../../packages/docs/dev/DEVELOPMENT.md

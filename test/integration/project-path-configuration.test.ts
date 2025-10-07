@@ -118,10 +118,6 @@ describe('Project Path Configuration', () => {
         commit_behaviour: 'none',
       });
 
-      // Debug: log the actual result to see what we get
-      console.log('Result:', JSON.stringify(result, null, 2));
-      console.log('Expected project path:', testProjectPath);
-
       // Verify the custom project path was used in the plan file path
       expect(result.plan_file_path).toBeTruthy();
       expect(result.plan_file_path).toContain(testProjectPath);

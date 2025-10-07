@@ -1,1 +1,1 @@
-../../docs/dev/ARCHITECTURE.md
+../../packages/docs/dev/ARCHITECTURE.md

@@ -52,6 +52,64 @@ Plan File: "[ ] Task 1  [x] Task 2  Decision: chose approach A" (tracking)
 - **✅ Consistent Guidance**: All dynamic instructions come from tool responses
 - **✅ Simple Maintenance**: LLM only updates simple task lists and decisions
 
+## Monorepo Architecture
+
+Responsible-Vibe-MCP is organized as a monorepo with clear package separation and dependency management:
+
+### Package Structure
+
+```
+responsible-vibe-mcp/
+├── packages/
+│   ├── core/                    # @responsible-vibe/core
+│   │   ├── src/                 # Core functionality (state machine, workflow management, database)
+│   │   └── dist/                # Compiled TypeScript output
+│   ├── mcp-server/              # @responsible-vibe/mcp-server
+│   │   ├── src/                 # MCP server implementation and tool handlers
+│   │   └── dist/                # Compiled server with bundled dependencies
+│   ├── cli/                     # @responsible-vibe/cli
+│   │   ├── src/                 # CLI tools and main entry point
+│   │   └── dist/                # CLI executables
+│   ├── visualizer/              # @responsible-vibe/visualizer
+│   │   ├── src/                 # Vue.js workflow visualization component
+│   │   └── dist/                # Built component for reuse
+│   └── docs/                    # @responsible-vibe/docs
+│       ├── .vitepress/          # VitePress documentation site
+│       └── dev/                 # Developer documentation
+├── resources/                   # Workflow definitions and templates
+└── pnpm-workspace.yaml         # Monorepo configuration
+```
+
+### Package Dependencies
+
+```mermaid
+graph TD
+    CLI[CLI Package] --> Core[Core Package]
+    MCP[MCP Server] --> Core
+    Visualizer[Visualizer] --> Core
+    Docs[Documentation] --> Visualizer
+    CLI --> MCP
+```
+
+### Key Architectural Benefits
+
+- **🔧 Separation of Concerns**: Each package has a single, well-defined responsibility
+- **📦 Independent Deployment**: Packages can be built and tested independently
+- **🔄 Workspace Dependencies**: Development uses workspace imports for type safety
+- **📱 Dual Import Strategy**: Published packages use relative imports for Node.js compatibility
+- **🎯 CLI as Main Entry**: CLI package serves as the main entry point, routing to MCP server or CLI functionality
+
+### Build System
+
+- **Turbo**: Orchestrates builds across packages with dependency awareness
+- **TypeScript**: Shared configuration via `tsconfig.base.json`
+- **PNPM Workspaces**: Efficient dependency management and linking
+- **Independent Testing**: Each package can run its own test suite
+
+### Publishing Strategy
+
+The monorepo publishes as a single `responsible-vibe-mcp` package containing all built packages, maintaining backward compatibility while providing the benefits of modular development.
+
 ## Static Architecture
 
 ```mermaid
