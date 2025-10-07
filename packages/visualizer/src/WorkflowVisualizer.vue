@@ -109,15 +109,16 @@ let appState: AppState = {
 const populateWorkflowSelector = () => {
   // Check if we're in browser environment (not SSR)
   if (typeof document === 'undefined') return;
-  
-  const workflowSelector = document.querySelector<HTMLSelectElement>('#workflow-selector');
+
+  const workflowSelector =
+    document.querySelector<HTMLSelectElement>('#workflow-selector');
   if (!workflowSelector || props.workflows.length === 0) return;
-  
+
   // Clear existing options except the first one
   while (workflowSelector.children.length > 1) {
     workflowSelector.removeChild(workflowSelector.lastChild!);
   }
-  
+
   // Add workflow options
   for (const workflow of props.workflows) {
     const option = document.createElement('option');
@@ -130,9 +131,13 @@ const populateWorkflowSelector = () => {
 };
 
 // Watch for changes in workflows prop (only in browser)
-watch(() => props.workflows, () => {
-  populateWorkflowSelector();
-}, { immediate: true });
+watch(
+  () => props.workflows,
+  () => {
+    populateWorkflowSelector();
+  },
+  { immediate: true }
+);
 
 // Helper functions for handling interactions
 function handleElementClick(event: {
@@ -196,7 +201,7 @@ function clearSelectionAndShowMetadata(): void {
 function updateSidePanel(): void {
   // Check if we're in browser environment (not SSR)
   if (typeof document === 'undefined') return;
-  
+
   const sidePanelContent = document.querySelector('.side-panel-content');
   const sidePanelHeader = document.querySelector('.side-panel-header');
 
@@ -233,7 +238,7 @@ function renderStateDetailsWithHeader(
 ): void {
   // Check if we're in browser environment (not SSR)
   if (typeof document === 'undefined') return;
-  
+
   const workflow = appState.currentWorkflow;
   const isInitial = stateId === workflow.initial_state;
   const sidePanelHeader = document.querySelector('.side-panel-header');
@@ -337,7 +342,7 @@ function renderStateDetailsWithHeader(
 function renderTransitionDetailsWithHeader(transitionData: unknown): void {
   // Check if we're in browser environment (not SSR)
   if (typeof document === 'undefined') return;
-  
+
   const sidePanelHeader = document.querySelector('.side-panel-header');
   const sidePanelContent = document.querySelector('.side-panel-content');
 
@@ -425,7 +430,7 @@ function renderTransitionDetailsWithHeader(transitionData: unknown): void {
 function renderMetadataDetails(): void {
   // Check if we're in browser environment (not SSR)
   if (typeof document === 'undefined') return;
-  
+
   const workflow = appState.currentWorkflow as {
     name: string;
     description: string;
@@ -500,7 +505,7 @@ function clearSelection(): void {
 
   // Check if we're in browser environment (not SSR)
   if (typeof document === 'undefined') return;
-  
+
   const sidePanelHeader = document.querySelector('.side-panel-header');
   if (sidePanelHeader) {
     sidePanelHeader.innerHTML = '<h2>Details</h2>';
@@ -551,15 +556,15 @@ onMounted(async () => {
       if (!workflow) {
         throw new Error(`Workflow '${workflowName}' not found`);
       }
-      
+
       const response = await fetch(workflow.path);
       if (!response.ok) {
         throw new Error(`Failed to load workflow: ${response.statusText}`);
       }
-      
+
       const yamlContent = await response.text();
       const parsedWorkflow = parseYaml(yamlContent);
-      
+
       return parsedWorkflow;
     };
 
@@ -574,7 +579,7 @@ onMounted(async () => {
     // Set up event listeners and populate workflow selector (only if selector exists)
     if (workflowSelector) {
       console.log('Setting up workflow selector, workflows:', props.workflows);
-      
+
       workflowSelector.addEventListener('change', async event => {
         const target = event.target as HTMLSelectElement;
         const workflowName = target.value;

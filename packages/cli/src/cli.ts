@@ -4,9 +4,9 @@
  * Handles command line arguments and delegates to appropriate functionality
  */
 
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
-import { existsSync } from 'fs';
+import { fileURLToPath } from 'node:url';
+import { dirname, join } from 'node:path';
+import { existsSync } from 'node:fs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -21,15 +21,19 @@ if (isLocal) {
   // Local development - use workspace imports
   // Node.js can resolve @responsible-vibe/core via pnpm workspace configuration
   const coreModule = await import('@responsible-vibe/core');
-  generateSystemPrompt = coreModule.generateSystemPrompt as (stateMachine: unknown) => string;
+  generateSystemPrompt = coreModule.generateSystemPrompt as (
+    stateMachine: unknown
+  ) => string;
   StateMachineLoader = coreModule.StateMachineLoader as new () => unknown;
 } else {
   // Published package - use relative imports
   // Node.js cannot resolve @responsible-vibe/core from subdirectories in published packages
-  // because it expects packages in node_modules/@responsible-vibe/core/, not 
+  // because it expects packages in node_modules/@responsible-vibe/core/, not
   // node_modules/responsible-vibe-mcp/packages/core/
   const coreModule = await import('../../core/dist/index.js');
-  generateSystemPrompt = coreModule.generateSystemPrompt as (stateMachine: unknown) => string;
+  generateSystemPrompt = coreModule.generateSystemPrompt as (
+    stateMachine: unknown
+  ) => string;
   StateMachineLoader = coreModule.StateMachineLoader as new () => unknown;
 }
 
@@ -136,7 +140,9 @@ MORE INFO:
 function showSystemPrompt(): void {
   try {
     // Load the default state machine for prompt generation
-    const loader = new StateMachineLoader() as any;
+    const loader = new StateMachineLoader() as {
+      loadStateMachine: (cwd: string) => unknown;
+    };
     const stateMachine = loader.loadStateMachine(process.cwd());
 
     // Generate the system prompt

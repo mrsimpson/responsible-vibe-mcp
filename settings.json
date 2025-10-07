@@ -9,14 +9,7 @@
       "Read(./.vibe/**)",
       "Write(./.vibe/**)"
     ],
-    "ask": [
-      "Bash(*)",
-      "Write(**)"
-    ],
-    "deny": [
-      "Read(./.env)",
-      "Read(./.env.*)",
-      "Read(./secrets/**)"
-    ]
+    "ask": ["Bash(*)", "Write(**)"],
+    "deny": ["Read(./.env)", "Read(./.env.*)", "Read(./secrets/**)"]
   }
 }
