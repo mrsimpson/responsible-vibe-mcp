@@ -9,15 +9,19 @@
 
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { createResponsibleVibeMCPServer } from './server.js';
+import { createDualImport } from './dual-import.js';
 
 // Re-export for external use
 export {
   ResponsibleVibeMCPServer,
   createResponsibleVibeMCPServer,
 } from './server.js';
-import { createLogger } from '@responsible-vibe/core';
 
-const logger = createLogger('Main');
+// Lazy loader for core module
+const loadCore = createDualImport<typeof import('@responsible-vibe/core')>(
+  '@responsible-vibe/core',
+  '../../core/dist/index.js'
+);
 
 /**
  * Parse command line arguments and handle special flags
@@ -31,6 +35,9 @@ function parseCliArgs(): { shouldStartServer: boolean } {
  * Main entry point for the MCP server process
  */
 async function main() {
+  const core = await loadCore();
+  const logger = core.createLogger('Main');
+
   // Parse CLI arguments first
   const { shouldStartServer } = parseCliArgs();
 
@@ -86,7 +93,9 @@ const isMainModule =
   process.argv[1]?.endsWith('index.js');
 
 if (isMainModule) {
-  main().catch(error => {
+  main().catch(async error => {
+    const core = await loadCore();
+    const logger = core.createLogger('Main');
     logger.error('Unhandled error in main', error);
     process.exit(1);
   });

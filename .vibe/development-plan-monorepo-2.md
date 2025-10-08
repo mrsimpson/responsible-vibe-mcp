@@ -245,8 +245,9 @@ Migrate the responsible-vibe-mcp project to a proper monorepo structure with inc
 - [x] **ANSI Code Handling**: Fixed CI test parsing by stripping ANSI color codes that were breaking regex matching
 - [x] **Publishing Fix**: Added --no-git-checks flag to pnpm publish command to handle CI git state
 - [x] **Workspace Install Fix**: Removed individual package installs that created package-lock.json files, rely on root workspace install
+- [x] **Dual Import Strategy**: Implemented generic dual import helper for mcp-server package to handle workspace vs published package imports
 
-**COMMIT PHASE COMPLETE**: The monorepo migration is production-ready with excellent test coverage, clean architecture, consistent tooling, zero lint errors, robust CI test reporting that works in all environments including Linux CI with ANSI codes, proper GitHub Pages deployment, working npm publishing workflow, and clean workspace dependency management.
+**COMMIT PHASE COMPLETE**: The monorepo migration is production-ready with excellent test coverage, clean architecture, consistent tooling, zero lint errors, robust CI test reporting that works in all environments including Linux CI with ANSI codes, proper GitHub Pages deployment, working npm publishing workflow, clean workspace dependency management, and proper published package compatibility.
 
 ## Key Decisions
 

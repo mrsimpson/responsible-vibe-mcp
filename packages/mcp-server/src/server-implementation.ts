@@ -5,7 +5,7 @@
  * This replaces the monolithic server.ts with a clean, modular architecture.
  */
 
-import { setMcpServerForLogging, createLogger } from '@responsible-vibe/core';
+import { createDualImport } from './dual-import.js';
 import { ServerConfig } from './types.js';
 import {
   initializeServerComponents,
@@ -13,6 +13,12 @@ import {
   registerMcpResources,
   ServerComponents,
 } from './server-config.js';
+
+// Lazy loader for core module
+const loadCore = createDualImport<typeof import('@responsible-vibe/core')>(
+  '@responsible-vibe/core',
+  '../../core/dist/index.js'
+);
 import { createToolRegistry } from './tool-handlers/index.js';
 import { createResourceRegistry } from './resource-handlers/index.js';
 import { createResponseRenderer } from './response-renderer.js';
@@ -27,16 +33,20 @@ import type {
   ResetDevelopmentResult,
 } from './tool-handlers/index.js';
 
-const logger = createLogger('ResponsibleVibeMCPServer');
-
 /**
  * Factory function to create a server with real components
  */
 export async function createResponsibleVibeMCPServer(
   config: ServerConfig = {}
 ): Promise<ResponsibleVibeMCPServer> {
+  const core = await loadCore();
+  const logger = core.createLogger('ResponsibleVibeMCPServer');
+
+  logger.info('Creating Responsible Vibe MCP Server...');
   const components = await initializeServerComponents(config);
-  return new ResponsibleVibeMCPServer(config, components);
+  const server = new ResponsibleVibeMCPServer(config, components, core);
+  logger.info('Responsible Vibe MCP Server created successfully');
+  return server;
 }
 
 /**
@@ -48,8 +58,10 @@ export class ResponsibleVibeMCPServer {
 
   constructor(
     private config: ServerConfig,
-    private serverComponents: ServerComponents
+    private serverComponents: ServerComponents,
+    private core: typeof import('@responsible-vibe/core')
   ) {
+    const logger = this.core.createLogger('ResponsibleVibeMCPServer');
     logger.debug('ResponsibleVibeMCPServer created', {
       config: JSON.stringify(this.config),
     });
@@ -59,6 +71,7 @@ export class ResponsibleVibeMCPServer {
    * Initialize the server and all its components
    */
   async initialize(): Promise<void> {
+    const logger = this.core.createLogger('ResponsibleVibeMCPServer');
     logger.debug('Initializing ResponsibleVibeMCPServer');
 
     try {
@@ -76,7 +89,7 @@ export class ResponsibleVibeMCPServer {
       this.components.responseRenderer = responseRenderer;
 
       // Register MCP server for logging notifications
-      setMcpServerForLogging(this.components.mcpServer);
+      this.core.setMcpServerForLogging(this.components.mcpServer);
 
       // Register tools and resources with MCP server
       await registerMcpTools(
@@ -259,6 +272,7 @@ export class ResponsibleVibeMCPServer {
    * Cleanup server resources
    */
   public async cleanup(): Promise<void> {
+    const logger = this.core.createLogger('ResponsibleVibeMCPServer');
     logger.debug('Cleaning up server resources');
 
     if (this.components?.database) {
