@@ -8,6 +8,7 @@ import fs from 'node:fs';
 import yaml from 'js-yaml';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { createRequire } from 'node:module';
 import { createLogger } from './logger.js';
 import { YamlStateMachine, YamlTransition } from './state-machine-types.js';
 
@@ -73,27 +74,83 @@ export class StateMachineLoader {
     }
 
     // Fall back to waterfall workflow as default
-    // Use import.meta.url to get the current file's path in ESM
-    const currentFileUrl = import.meta.url;
-    const currentFilePath = fileURLToPath(currentFileUrl);
-    // Go up from packages/core/dist/ to project root (4 levels up)
-    const projectRoot = path.dirname(
-      path.dirname(path.dirname(path.dirname(currentFilePath)))
-    );
-    const defaultFilePath = path.join(
-      projectRoot,
-      'resources',
-      'workflows',
-      'waterfall.yaml'
-    );
+    const defaultFilePath = this.resolveWorkflowPath('waterfall.yaml');
 
     logger.info('Loading default state machine file', { defaultFilePath });
     return this.loadFromFile(defaultFilePath);
   }
 
   /**
-   * Load state machine from specific file path
+   * Resolve workflow path using similar strategy as TemplateManager
    */
+  private resolveWorkflowPath(filename: string): string {
+    const strategies: string[] = [];
+
+    // Strategy 1: Local resources directory (symlinked from root)
+    strategies.push(
+      path.join(
+        path.dirname(fileURLToPath(import.meta.url)),
+        '../resources/workflows',
+        filename
+      )
+    );
+
+    // Strategy 2: From compiled dist directory
+    const currentFileUrl = import.meta.url;
+    if (currentFileUrl.startsWith('file://')) {
+      const currentFilePath = fileURLToPath(currentFileUrl);
+      // From dist/state-machine-loader.js -> ../resources/workflows
+      strategies.push(
+        path.join(
+          path.dirname(currentFilePath),
+          '../resources/workflows',
+          filename
+        )
+      );
+    }
+
+    // Strategy 3: Current working directory (for development)
+    strategies.push(path.join(process.cwd(), 'resources/workflows', filename));
+
+    // Strategy 4: From node_modules
+    strategies.push(
+      path.join(
+        process.cwd(),
+        'node_modules/@codemcp/workflows-core/resources/workflows',
+        filename
+      )
+    );
+
+    // Strategy 5: From package directory (for development)
+    try {
+      const require = createRequire(import.meta.url);
+      const packagePath = require.resolve(
+        '@codemcp/workflows-core/package.json'
+      );
+      const packageDir = path.dirname(packagePath);
+      strategies.push(path.join(packageDir, 'resources/workflows', filename));
+    } catch (_error) {
+      // Ignore if package not found
+    }
+
+    // Find the first existing path
+    for (const strategy of strategies) {
+      try {
+        // This will throw if path doesn't exist
+        fs.accessSync(strategy);
+        logger.debug('Using workflow path', { path: strategy });
+        return strategy;
+      } catch (_error) {
+        // Continue to next strategy
+      }
+    }
+
+    // Fallback to first strategy if none found
+    const fallback = strategies[0];
+    logger.warn('No workflow path found, using fallback', { path: fallback });
+    return fallback;
+  }
+
   public loadFromFile(filePath: string): YamlStateMachine {
     try {
       const yamlContent = fs.readFileSync(path.resolve(filePath), 'utf8');

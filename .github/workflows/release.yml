@@ -2,7 +2,7 @@ name: Release and Publish
 
 on:
   push:
-    branches: [main]
+    branches: [main, fix-build-after-monorepo]
 
 permissions:
   contents: write
@@ -138,8 +138,13 @@ jobs:
       - name: Publish to npm
         if: steps.version.outputs.new_tag
         run: |
-          # Publish core package first
+          # Publish core package as the build will depended on it
           cd packages/core
+          pnpm publish --access public --no-git-checks
+          cd ../..
+
+          # Publish MCP server as standalone package
+          cd packages/mcp-server
           pnpm publish --access public --no-git-checks
           cd ../..
 

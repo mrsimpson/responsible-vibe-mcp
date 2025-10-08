@@ -45,7 +45,12 @@ export class TemplateManager {
   private resolveTemplatesPath(): string {
     const strategies: string[] = [];
 
-    // Strategy 1: From compiled dist directory
+    // Strategy 1: Local resources directory (symlinked from root)
+    strategies.push(
+      join(dirname(fileURLToPath(import.meta.url)), '../resources/templates')
+    );
+
+    // Strategy 2: From compiled dist directory
     const currentFileUrl = import.meta.url;
     if (currentFileUrl.startsWith('file://')) {
       const currentFilePath = fileURLToPath(currentFileUrl);
@@ -53,26 +58,28 @@ export class TemplateManager {
       strategies.push(join(dirname(currentFilePath), '../resources/templates'));
     }
 
-    // Strategy 2: From node_modules
+    // Strategy 3: Current working directory (for development)
+    strategies.push(join(process.cwd(), 'resources/templates'));
+
+    // Strategy 4: From node_modules
     strategies.push(
       join(
         process.cwd(),
-        'node_modules/responsible-vibe-mcp/resources/templates'
+        'node_modules/@codemcp/workflows-core/resources/templates'
       )
     );
 
-    // Strategy 3: From package directory (for development)
+    // Strategy 5: From package directory (for development)
     try {
       const require = createRequire(import.meta.url);
-      const packagePath = require.resolve('responsible-vibe-mcp/package.json');
+      const packagePath = require.resolve(
+        '@codemcp/workflows-core/package.json'
+      );
       const packageDir = dirname(packagePath);
       strategies.push(join(packageDir, 'resources/templates'));
     } catch (_error) {
       // Ignore if package not found
     }
-
-    // Strategy 4: Current working directory (for development)
-    strategies.push(join(process.cwd(), 'resources/templates'));
 
     // Find the first existing path
     for (const strategy of strategies) {
