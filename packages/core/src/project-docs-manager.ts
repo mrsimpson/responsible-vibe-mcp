@@ -381,14 +381,15 @@ export class ProjectDocsManager {
       });
     } catch (error) {
       // File doesn't exist, which is fine
+      const nodeError = error as NodeJS.ErrnoException;
       if (
         error instanceof Error &&
-        'code' in error &&
-        error.code !== 'ENOENT'
+        'code' in nodeError &&
+        nodeError.code !== 'ENOENT'
       ) {
         logger.debug('Failed to remove existing document', {
           documentPath,
-          error: error instanceof Error ? error.message : 'Unknown error',
+          error: nodeError.message,
         });
       }
     }
@@ -422,7 +423,7 @@ export class ProjectDocsManager {
           await mkdir(fileDir, { recursive: true });
 
           // Write file
-          await writeFile(filePath, file.content);
+          await writeFile(filePath, file.content.toString());
         }
       }
 

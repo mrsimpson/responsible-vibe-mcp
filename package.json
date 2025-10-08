@@ -49,9 +49,10 @@
     "prepare": "husky"
   },
   "dependencies": {
-    "@codemcp/workflows-core": "^3.1.14",
+    "@codemcp/workflows-core": "workspace:*",
     "@modelcontextprotocol/sdk": "1.17.5",
     "@types/js-yaml": "4.0.9",
+    "better-sqlite3": "^11.3.0",
     "js-yaml": "4.1.0",
     "zod": "^3.22.4"
   },
@@ -60,8 +61,7 @@
     "@tsconfig/node22": "22.0.2",
     "@tsconfig/strictest": "2.0.6",
     "@types/jsdom": "21.1.7",
-    "@types/node": "^20.0.0",
-    "@types/sqlite3": "^3.1.11",
+    "@types/node": "^18.19.0",
     "glob": "11.0.3",
     "husky": "9.1.7",
     "jsdom": "26.1.0",
