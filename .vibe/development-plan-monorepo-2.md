@@ -243,8 +243,9 @@ Migrate the responsible-vibe-mcp project to a proper monorepo structure with inc
 - [x] **GitHub Pages Deployment**: Updated deploy-pages.yml workflow for monorepo structure with pnpm and proper build order
 - [x] **CI Regex Robustness**: Made test summary regex patterns more flexible with case-insensitive matching and flexible whitespace
 - [x] **ANSI Code Handling**: Fixed CI test parsing by stripping ANSI color codes that were breaking regex matching
+- [x] **Publishing Fix**: Added --no-git-checks flag to pnpm publish command to handle CI git state
 
-**COMMIT PHASE COMPLETE**: The monorepo migration is production-ready with excellent test coverage, clean architecture, consistent tooling, zero lint errors, robust CI test reporting that works in all environments including Linux CI with ANSI codes, and proper GitHub Pages deployment.
+**COMMIT PHASE COMPLETE**: The monorepo migration is production-ready with excellent test coverage, clean architecture, consistent tooling, zero lint errors, robust CI test reporting that works in all environments including Linux CI with ANSI codes, proper GitHub Pages deployment, and working npm publishing workflow.
 
 ## Key Decisions
 

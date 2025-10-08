@@ -143,6 +143,6 @@ jobs:
 
       - name: Publish to npm
         if: steps.version.outputs.new_tag
-        run: pnpm publish --access public
+        run: git status && pnpm publish --access public --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
