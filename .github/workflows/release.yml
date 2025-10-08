@@ -93,12 +93,6 @@ jobs:
       - name: Build project
         run: pnpm run build
 
-      - name: Build workflow visualizer
-        run: |
-          cd packages/visualizer
-          pnpm install
-          pnpm run build
-
       - name: Bump version and create tag
         id: version
         uses: mathieudutour/github-tag-action@v6.2
