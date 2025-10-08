@@ -1,6 +1,6 @@
 {
   "name": "@responsible-vibe/mcp-server",
-  "version": "3.1.8",
+  "version": "3.1.9",
   "description": "MCP server implementation for responsible-vibe",
   "type": "module",
   "main": "dist/index.js",
