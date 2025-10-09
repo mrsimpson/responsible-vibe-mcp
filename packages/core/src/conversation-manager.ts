@@ -377,10 +377,7 @@ export class ConversationManager {
 
     try {
       // Step 1: Soft delete interaction logs
-      await this.database.softDeleteInteractionLogs(
-        context.conversationId,
-        reason
-      );
+      await this.database.softDeleteInteractionLogs(context.conversationId);
       resetItems.push('interaction_logs');
       logger.debug('Interaction logs soft deleted');
 

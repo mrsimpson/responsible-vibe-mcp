@@ -9,6 +9,7 @@ import { z } from 'zod';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { ResourceTemplate } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { SetLevelRequestSchema } from '@modelcontextprotocol/sdk/types.js';
+import * as path from 'node:path';
 
 import { Database } from '@codemcp/workflows-core';
 import { ConversationManager } from '@codemcp/workflows-core';
@@ -100,7 +101,9 @@ export async function initializeServerComponents(
 
   // Initialize core components
   logger.debug('Initializing core components');
-  const database = new Database(projectPath);
+  const database = new Database(
+    path.join(projectPath, '.vibe', 'conversation.sqlite')
+  );
   const workflowManager = new WorkflowManager();
   const conversationManager = new ConversationManager(
     database,

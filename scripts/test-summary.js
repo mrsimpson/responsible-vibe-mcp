@@ -53,10 +53,10 @@ try {
 
   // Extract root test results - match "Tests" specifically, not "Test Files"
   const cleanRootOutput = stripAnsiCodes(rootOutput);
-  const rootMatch = cleanRootOutput.match(/^\s*Tests\s+(\d+)\s+passed/m);
+  const rootMatch = cleanRootOutput.match(/Tests\s+(\d+)\s+passed\s+\((\d+)\)/);
   if (rootMatch) {
     const passed = parseInt(rootMatch[1]);
-    const total = passed; // In vitest, passed count equals total when all pass
+    const total = parseInt(rootMatch[2]);
     packageResults.push({ package: 'root', passed, total });
     totalPassed += passed;
     totalTests += total;
@@ -71,16 +71,18 @@ try {
   for (const pkg of workspacePackages) {
     console.log(`Running ${pkg.fullName} tests...`);
     try {
-      const pkgOutput = execSync(`cd packages/${pkg.name} && npm test --run`, {
+      const pkgOutput = execSync(`cd packages/${pkg.name} && npm test`, {
         encoding: 'utf8',
         stdio: 'pipe',
       });
       // Match "Tests" specifically, not "Test Files"
       const cleanPkgOutput = stripAnsiCodes(pkgOutput);
-      const pkgMatch = cleanPkgOutput.match(/^\s*Tests\s+(\d+)\s+passed/m);
+      const pkgMatch = cleanPkgOutput.match(
+        /Tests\s+(\d+)\s+passed\s+\((\d+)\)/
+      );
       if (pkgMatch) {
         const passed = parseInt(pkgMatch[1]);
-        const total = passed; // In vitest, passed count equals total when all pass
+        const total = parseInt(pkgMatch[2]);
         packageResults.push({ package: pkg.name, passed, total });
         totalPassed += passed;
         totalTests += total;
@@ -93,23 +95,25 @@ try {
     } catch (error) {
       // Tests might have failed, but we still need to parse the output
       const pkgOutput = error.stdout || '';
-      const failedMatch = pkgOutput.match(
-        /(\d+)\s+failed\s*\|\s*(\d+)\s+passed/
+      const testMatch = pkgOutput.match(
+        /Tests\s+(\d+)\s+failed\s+\|\s+(\d+)\s+passed\s+\((\d+)\)/
       );
-      const passedOnlyMatch = pkgOutput.match(/(\d+)\s+passed/);
+      const passedOnlyMatch = pkgOutput.match(
+        /Tests\s+(\d+)\s+passed\s+\((\d+)\)/
+      );
 
-      if (failedMatch) {
-        // Some tests failed: "Tests  1 failed | 152 passed (153)"
-        // const failed = parseInt(failedMatch[1]);
-        const passed = parseInt(failedMatch[2]);
-        const total = parseInt(failedMatch[3]);
-        packageResults.push({ package: pkg.name, passed, total });
+      if (testMatch) {
+        // Some tests failed: "Tests  18 failed | 134 passed (152)"
+        const failed = parseInt(testMatch[1]);
+        const passed = parseInt(testMatch[2]);
+        const total = parseInt(testMatch[3]);
+        packageResults.push({ package: pkg.name, passed, total, failed });
         totalPassed += passed;
         totalTests += total;
       } else if (passedOnlyMatch) {
-        // All tests passed (shouldn't happen in catch, but just in case)
+        // All tests passed
         const passed = parseInt(passedOnlyMatch[1]);
-        const total = passed;
+        const total = parseInt(passedOnlyMatch[2]);
         packageResults.push({ package: pkg.name, passed, total });
         totalPassed += passed;
         totalTests += total;
@@ -127,10 +131,14 @@ try {
   // Display results
   for (const result of packageResults) {
     if (result.package === 'root') {
-      console.log(`✅ Root Tests: ${result.passed}/${result.total} passed`);
-    } else {
+      const status = result.passed === result.total ? '✅' : '❌';
       console.log(
-        `✅ @codemcp/workflows${result.package}: ${result.passed}/${result.total} passed`
+        `${status} Root Tests: ${result.passed}/${result.total} passed`
+      );
+    } else {
+      const status = result.passed === result.total ? '✅' : '❌';
+      console.log(
+        `${status} @codemcp/workflows-${result.package}: ${result.passed}/${result.total} passed`
       );
     }
   }

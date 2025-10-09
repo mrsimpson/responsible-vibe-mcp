@@ -343,7 +343,12 @@ export class WorkflowManager {
     const currentFilePath = fileURLToPath(currentFileUrl);
     const strategies: string[] = [];
 
-    // Strategy 1: Relative to current file (development and direct npm scenarios)
+    // Strategy 1: Local resources directory (symlinked from root)
+    strategies.push(
+      path.join(path.dirname(currentFilePath), '../resources/workflows')
+    );
+
+    // Strategy 2: Relative to current file (development and direct npm scenarios)
     // From packages/core/dist/workflow-manager.js -> ../../../../resources/workflows
     strategies.push(
       path.resolve(
@@ -352,7 +357,7 @@ export class WorkflowManager {
       )
     );
 
-    // Strategy 2: Find package root by looking for package.json with our package name
+    // Strategy 3: Find package root by looking for package.json with our package name
     let currentDir = path.dirname(currentFilePath);
     for (let i = 0; i < 10; i++) {
       // Limit search depth
@@ -362,7 +367,7 @@ export class WorkflowManager {
           const packageJson = JSON.parse(
             fs.readFileSync(packageJsonPath, 'utf-8')
           );
-          if (packageJson.name === 'responsible-vibe-mcp') {
+          if (packageJson.name === '@codemcp/workflows-core') {
             strategies.push(path.join(currentDir, 'resources/workflows'));
             break;
           }
@@ -380,7 +385,7 @@ export class WorkflowManager {
     strategies.push(
       path.join(
         process.cwd(),
-        'node_modules/responsible-vibe-mcp/resources/workflows'
+        'node_modules/@codemcp/workflows-core/resources/workflows'
       )
     );
 
@@ -389,7 +394,7 @@ export class WorkflowManager {
       strategies.push(
         path.join(
           process.env.NODE_PATH,
-          'responsible-vibe-mcp/resources/workflows'
+          '@codemcp/workflows-core/resources/workflows'
         )
       );
     }
@@ -418,11 +423,11 @@ export class WorkflowManager {
                 const possiblePaths = [
                   path.join(
                     entryPath,
-                    'node_modules/responsible-vibe-mcp/resources/workflows'
+                    'node_modules/@codemcp/workflows-core/resources/workflows'
                   ),
                   path.join(
                     entryPath,
-                    'responsible-vibe-mcp/resources/workflows'
+                    '@codemcp/workflows-core/resources/workflows'
                   ),
                 ];
                 strategies.push(...possiblePaths);
