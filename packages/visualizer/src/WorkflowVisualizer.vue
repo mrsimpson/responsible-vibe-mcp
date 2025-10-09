@@ -462,7 +462,6 @@ function renderMetadataDetails(): void {
       metadata
         ? `
       <div class="detail-section">
-        <h4 class="detail-subtitle">Metadata</h4>
         ${Object.entries(metadata)
           .map(
             ([key, value]) => `
@@ -816,6 +815,21 @@ onUnmounted(() => {
   background: var(--color-gray-50);
   display: flex;
   flex-direction: column;
+}
+
+#workflow-visualizer-app .side-panel .metadata-item {
+  margin-bottom: 8px;
+}
+
+#workflow-visualizer-app .side-panel .metadata-item ul {
+  list-style: circle;
+  padding: 0;
+  margin-bottom: var(--spacing-sm);
+}
+
+#workflow-visualizer-app .side-panel .metadata-item ul li {
+  padding-bottom: var(--spacing-sm);
+  margin-left: var(--spacing-lg);
 }
 
 #workflow-visualizer-app .side-panel-header {
