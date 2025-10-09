@@ -49,7 +49,7 @@ abstract class ConfigGenerator {
   }
 
   /**
-   * Get default MCP server configuration
+   * We'll be using the reduced deployable which only contains the mcp server, not the CLI
    * On Windows, npx commands need to be prefixed with "cmd /c"
    */
   protected getDefaultMcpConfig(): object {
@@ -59,7 +59,7 @@ abstract class ConfigGenerator {
       return {
         'responsible-vibe-mcp': {
           command: 'cmd',
-          args: ['/c', 'npx', 'responsible-vibe-mcp'],
+          args: ['/c', 'npx', '@codemcp/workflows@latest'],
         },
       };
     }
@@ -67,7 +67,7 @@ abstract class ConfigGenerator {
     return {
       'responsible-vibe-mcp': {
         command: 'npx',
-        args: ['responsible-vibe-mcp'],
+        args: ['@codemcp/workflows@latest'],
       },
     };
   }
