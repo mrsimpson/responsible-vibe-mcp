@@ -4,10 +4,15 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
+  "files": [
+    "dist/**/*",
+    "resources/**/*"
+  ],
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
+    "build": "tsc -p tsconfig.build.json && pnpm copy-workflows",
+    "copy-workflows": "rm -rf resources && mkdir -p resources && cp -r ../../resources/workflows ../../resources/templates resources/",
     "dev": "tsc --watch",
-    "clean:build": "rimraf ./dist",
+    "clean:build": "rimraf ./dist ./resources",
     "test": "vitest --run",
     "lint": "oxlint .",
     "lint:fix": "oxlint --fix .",
