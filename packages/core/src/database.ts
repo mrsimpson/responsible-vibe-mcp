@@ -2,10 +2,13 @@
  * Database Manager
  *
  * Handles SQLite database operations for conversation state persistence.
- * Uses better-sqlite3 for reliable cross-platform native bindings.
+ * Uses @sqlite.org/sqlite-wasm for reliable cross-platform WebAssembly bindings.
  */
 
-import BetterSqlite3 from 'better-sqlite3';
+import sqlite3InitModule, {
+  type Database as SqliteDatabase,
+  type Sqlite3Static,
+} from '@sqlite.org/sqlite-wasm';
 import { mkdir } from 'node:fs/promises';
 import { dirname } from 'node:path';
 import { createLogger } from './logger.js';
@@ -17,7 +20,8 @@ const logger = createLogger('Database');
  * Database connection and operations manager
  */
 export class Database {
-  private db: BetterSqlite3.Database | null = null;
+  private db: SqliteDatabase | null = null;
+  private sqlite3: Sqlite3Static | null = null;
   private dbPath: string;
 
   constructor(dbPath: string) {
@@ -29,21 +33,111 @@ export class Database {
    */
   async initialize(): Promise<void> {
     try {
-      // Ensure directory exists
-      const dbDir = dirname(this.dbPath);
-      await mkdir(dbDir, { recursive: true });
-      logger.debug('Database directory ensured', { dbDir });
+      // Initialize SQLite WASM
+      this.sqlite3 = await sqlite3InitModule();
 
-      // Create database connection
-      this.db = new BetterSqlite3(this.dbPath);
-      logger.debug('Database connection established');
+      // Always use in-memory database (sqlite-wasm Node.js limitation)
+      this.db = new this.sqlite3.oo1.DB();
+      logger.debug('Database connection established (in-memory)', {
+        originalPath: this.dbPath,
+      });
 
       // Create tables
       await this.createTables();
+
+      // Load existing data from file if it exists
+      if (this.dbPath !== ':memory:' && this.dbPath) {
+        await this.loadFromFile();
+      }
+
       logger.info('Database initialized successfully', { dbPath: this.dbPath });
     } catch (error) {
       logger.error('Failed to initialize database', error as Error);
       throw error;
+    }
+  }
+
+  /**
+   * Load database content from file
+   */
+  private async loadFromFile(): Promise<void> {
+    if (!this.db || !this.dbPath || this.dbPath === ':memory:') {
+      return;
+    }
+
+    try {
+      const { readFile, access } = await import('node:fs/promises');
+      await access(this.dbPath);
+
+      const data = await readFile(this.dbPath);
+      if (data.length > 0) {
+        // Close current in-memory DB and create new one from file data
+        this.db.close();
+        // Create new DB and deserialize data into it
+
+        //eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        this.db = new this.sqlite3!.oo1.DB();
+        if (!this.db.pointer) {
+          throw new Error('Failed to create database');
+        }
+
+        // Convert Buffer to Uint8Array
+        const uint8Data = new Uint8Array(data);
+
+        //eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const wasmPtr = this.sqlite3!.wasm.allocFromTypedArray(uint8Data);
+
+        //eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        this.sqlite3!.capi.sqlite3_deserialize(
+          this.db.pointer,
+          'main',
+          wasmPtr,
+          data.length,
+          data.length,
+          0x01 // SQLITE_DESERIALIZE_FREEONCLOSE
+        );
+        logger.debug('Loaded database from file', {
+          dbPath: this.dbPath,
+          size: data.length,
+        });
+      }
+    } catch {
+      // File doesn't exist - that's OK for new databases
+      logger.debug('No existing database file to load', {
+        dbPath: this.dbPath,
+      });
+    }
+  }
+
+  /**
+   * Save database content to file
+   */
+  private async saveToFile(): Promise<void> {
+    if (!this.db || !this.dbPath || this.dbPath === ':memory:') {
+      return;
+    }
+
+    try {
+      const { writeFile } = await import('node:fs/promises');
+      const dbDir = dirname(this.dbPath);
+      await mkdir(dbDir, { recursive: true });
+
+      // Export database to Uint8Array and save to file
+      if (!this.db.pointer) {
+        throw new Error('Database pointer is invalid');
+      }
+      //eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const data = this.sqlite3!.capi.sqlite3_js_db_export(this.db.pointer);
+      await writeFile(this.dbPath, data);
+      logger.debug('Saved database to file', {
+        dbPath: this.dbPath,
+        size: data.length,
+      });
+    } catch (error) {
+      logger.warn('Failed to save database to file', {
+        error: error as Error,
+        dbPath: this.dbPath,
+      });
     }
   }
 
@@ -79,15 +173,14 @@ export class Database {
         responseData TEXT NOT NULL,
         currentPhase TEXT NOT NULL,
         timestamp TEXT NOT NULL,
-        isReset INTEGER DEFAULT 0,
-        resetAt TEXT,
         FOREIGN KEY (conversationId) REFERENCES conversation_state(conversationId)
       )
     `;
 
     this.db.exec(createConversationStateTable);
     this.db.exec(createInteractionLogTable);
-    logger.debug('Tables created successfully');
+
+    logger.debug('Database tables created');
   }
 
   /**
@@ -98,141 +191,98 @@ export class Database {
       throw new Error('Database not initialized');
     }
 
-    const stmt = this.db.prepare(`
-      INSERT OR REPLACE INTO conversation_state 
-      (conversationId, projectPath, gitBranch, currentPhase, planFilePath, workflowName, 
-       gitCommitConfig, requireReviewsBeforePhaseTransition, createdAt, updatedAt)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `);
+    this.db.exec({
+      sql: `INSERT OR REPLACE INTO conversation_state
+            (conversationId, projectPath, gitBranch, currentPhase, planFilePath, workflowName,
+             gitCommitConfig, requireReviewsBeforePhaseTransition, createdAt, updatedAt)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      bind: [
+        state.conversationId,
+        state.projectPath,
+        state.gitBranch,
+        state.currentPhase,
+        state.planFilePath,
+        state.workflowName,
+        state.gitCommitConfig ? JSON.stringify(state.gitCommitConfig) : null,
+        state.requireReviewsBeforePhaseTransition ? 1 : 0,
+        state.createdAt,
+        state.updatedAt,
+      ],
+    });
 
-    stmt.run(
-      state.conversationId,
-      state.projectPath,
-      state.gitBranch,
-      state.currentPhase,
-      state.planFilePath,
-      state.workflowName,
-      state.gitCommitConfig ? JSON.stringify(state.gitCommitConfig) : null,
-      state.requireReviewsBeforePhaseTransition ? 1 : 0,
-      state.createdAt,
-      state.updatedAt
-    );
+    // Persist to file
+    await this.saveToFile();
 
     logger.debug('Conversation state saved', {
       conversationId: state.conversationId,
-      workflowName: state.workflowName,
       currentPhase: state.currentPhase,
     });
   }
 
   /**
-   * Load conversation state from database
-   */
-  async loadConversationState(
-    conversationId: string
-  ): Promise<ConversationState | null> {
-    if (!this.db) {
-      throw new Error('Database not initialized');
-    }
-
-    const stmt = this.db.prepare(
-      'SELECT * FROM conversation_state WHERE conversationId = ?'
-    );
-    const row = stmt.get(conversationId) as
-      | {
-          conversationId: string;
-          projectPath: string;
-          gitBranch: string;
-          currentPhase: string;
-          planFilePath: string;
-          workflowName: string;
-          gitCommitConfig: string;
-          requireReviewsBeforePhaseTransition: number;
-          createdAt: string;
-          updatedAt: string;
-        }
-      | undefined;
-
-    if (row) {
-      const state: ConversationState = {
-        conversationId: row.conversationId,
-        projectPath: row.projectPath,
-        gitBranch: row.gitBranch,
-        currentPhase: row.currentPhase,
-        planFilePath: row.planFilePath,
-        workflowName: row.workflowName,
-        gitCommitConfig: row.gitCommitConfig
-          ? JSON.parse(row.gitCommitConfig)
-          : undefined,
-        requireReviewsBeforePhaseTransition:
-          row.requireReviewsBeforePhaseTransition === 1,
-        createdAt: row.createdAt,
-        updatedAt: row.updatedAt,
-      };
-
-      logger.debug('Conversation state loaded', {
-        conversationId,
-        workflowName: state.workflowName,
-        currentPhase: state.currentPhase,
-      });
-      return state;
-    }
-
-    logger.debug('No conversation state found', { conversationId });
-    return null;
-  }
-
-  /**
-   * Get conversation state by ID (alias for loadConversationState)
+   * Get conversation state by ID
    */
   async getConversationState(
     conversationId: string
   ): Promise<ConversationState | null> {
-    return this.loadConversationState(conversationId);
-  }
-
-  /**
-   * List all conversation states
-   */
-  async listConversationStates(): Promise<ConversationState[]> {
     if (!this.db) {
       throw new Error('Database not initialized');
     }
 
-    const stmt = this.db.prepare(
-      'SELECT * FROM conversation_state ORDER BY updatedAt DESC'
-    );
-    const rows = stmt.all() as {
-      conversationId: string;
-      projectPath: string;
-      gitBranch: string;
-      currentPhase: string;
-      planFilePath: string;
-      workflowName: string;
-      gitCommitConfig: string;
-      requireReviewsBeforePhaseTransition: number;
-      createdAt: string;
-      updatedAt: string;
-    }[];
+    const result = this.db.exec({
+      sql: 'SELECT * FROM conversation_state WHERE conversationId = ?',
+      bind: [conversationId],
+      returnValue: 'resultRows',
+    });
 
-    const states = rows.map(row => ({
-      conversationId: row.conversationId,
-      projectPath: row.projectPath,
-      gitBranch: row.gitBranch,
-      currentPhase: row.currentPhase,
-      planFilePath: row.planFilePath,
-      workflowName: row.workflowName,
-      gitCommitConfig: row.gitCommitConfig
-        ? JSON.parse(row.gitCommitConfig)
-        : undefined,
-      requireReviewsBeforePhaseTransition:
-        row.requireReviewsBeforePhaseTransition === 1,
-      createdAt: row.createdAt,
-      updatedAt: row.updatedAt,
+    if (!result || result.length === 0) {
+      return null;
+    }
+
+    const row = result[0];
+    return {
+      conversationId: row[0] as string,
+      projectPath: row[1] as string,
+      gitBranch: row[2] as string,
+      currentPhase: row[3] as string,
+      planFilePath: row[4] as string,
+      workflowName: row[5] as string,
+      gitCommitConfig: row[6] ? JSON.parse(row[6] as string) : null,
+      requireReviewsBeforePhaseTransition: Boolean(row[7]),
+      createdAt: row[8] as string,
+      updatedAt: row[9] as string,
+    };
+  }
+
+  /**
+   * Get all conversation states
+   */
+  async getAllConversationStates(): Promise<ConversationState[]> {
+    if (!this.db) {
+      throw new Error('Database not initialized');
+    }
+
+    const result = this.db.exec({
+      sql: 'SELECT * FROM conversation_state ORDER BY updatedAt DESC',
+      returnValue: 'resultRows',
+    });
+
+    if (!result) {
+      return [];
+    }
+
+    return result.map(row => ({
+      conversationId: row[0] as string,
+      projectPath: row[1] as string,
+      gitBranch: row[2] as string,
+      currentPhase: row[3] as string,
+      planFilePath: row[4] as string,
+      workflowName: row[5] as string,
+      gitCommitConfig: row[6] ? JSON.parse(row[6] as string) : null,
+      requireReviewsBeforePhaseTransition: Boolean(row[7]),
+      createdAt: row[8] as string,
+      updatedAt: row[9] as string,
     }));
-
-    logger.debug('Listed conversation states', { count: states.length });
-    return states;
   }
 
   /**
@@ -243,114 +293,125 @@ export class Database {
       throw new Error('Database not initialized');
     }
 
-    const stmt = this.db.prepare(
-      'DELETE FROM conversation_state WHERE conversationId = ?'
-    );
-    const result = stmt.run(conversationId);
+    this.db.exec({
+      sql: 'DELETE FROM conversation_state WHERE conversationId = ?',
+      bind: [conversationId],
+    });
 
-    const deleted = result.changes > 0;
-    logger.debug('Conversation state deletion', { conversationId, deleted });
-    return deleted;
+    // Persist to file
+    await this.saveToFile();
+
+    logger.debug('Conversation state deleted', { conversationId });
+    return true;
   }
 
   /**
-   * Log an interaction to the database
+   * Log interaction
    */
   async logInteraction(log: InteractionLog): Promise<void> {
     if (!this.db) {
       throw new Error('Database not initialized');
     }
 
-    const stmt = this.db.prepare(`
-      INSERT INTO interaction_log 
-      (conversationId, toolName, inputParams, responseData, currentPhase, timestamp, isReset, resetAt)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `);
+    this.db.exec({
+      sql: `INSERT INTO interaction_log
+            (conversationId, toolName, inputParams, responseData, currentPhase, timestamp)
+            VALUES (?, ?, ?, ?, ?, ?)`,
+      bind: [
+        log.conversationId,
+        log.toolName,
+        JSON.stringify(log.inputParams),
+        JSON.stringify(log.responseData),
+        log.currentPhase,
+        log.timestamp,
+      ],
+    });
 
-    stmt.run(
-      log.conversationId,
-      log.toolName,
-      log.inputParams,
-      log.responseData,
-      log.currentPhase,
-      log.timestamp,
-      log.isReset ? 1 : 0,
-      log.resetAt || null
-    );
+    // Persist to file
+    await this.saveToFile();
 
     logger.debug('Interaction logged', {
       conversationId: log.conversationId,
       toolName: log.toolName,
-      timestamp: log.timestamp,
     });
   }
 
   /**
-   * Get interactions by conversation ID
+   * Get interaction logs for a conversation
    */
-  async getInteractionsByConversationId(
-    conversationId: string
-  ): Promise<InteractionLog[]> {
+  async getInteractionLogs(conversationId: string): Promise<InteractionLog[]> {
     if (!this.db) {
       throw new Error('Database not initialized');
     }
 
-    const stmt = this.db.prepare(`
-      SELECT * FROM interaction_log 
-      WHERE conversationId = ? AND (isReset = 0 OR isReset IS NULL)
-      ORDER BY timestamp ASC
-    `);
-    const rows = stmt.all(conversationId) as {
-      id: number;
-      conversationId: string;
-      toolName: string;
-      inputParams: string;
-      responseData: string;
-      currentPhase: string;
-      timestamp: string;
-      isReset: number;
-      resetAt: string;
-    }[];
-
-    const logs = rows.map(row => ({
-      id: row.id,
-      conversationId: row.conversationId,
-      toolName: row.toolName,
-      inputParams: row.inputParams,
-      responseData: row.responseData,
-      currentPhase: row.currentPhase,
-      timestamp: row.timestamp,
-      isReset: row.isReset === 1,
-      resetAt: row.resetAt,
-    }));
-
-    logger.debug('Retrieved interaction logs', {
-      conversationId,
-      count: logs.length,
+    const result = this.db.exec({
+      sql: 'SELECT * FROM interaction_log WHERE conversationId = ? ORDER BY timestamp ASC',
+      bind: [conversationId],
+      returnValue: 'resultRows',
     });
-    return logs;
+
+    if (!result) {
+      return [];
+    }
+
+    return result.map(row => ({
+      id: row[0] as number,
+      conversationId: row[1] as string,
+      toolName: row[2] as string,
+      inputParams: JSON.parse(row[3] as string),
+      responseData: JSON.parse(row[4] as string),
+      currentPhase: row[5] as string,
+      timestamp: row[6] as string,
+    }));
   }
 
   /**
-   * Soft delete interaction logs by marking them as reset
+   * Get interaction logs for a conversation (alias for compatibility)
+   */
+  async getInteractionsByConversationId(
+    conversationId: string
+  ): Promise<InteractionLog[]> {
+    return this.getInteractionLogs(conversationId);
+  }
+
+  /**
+   * Soft delete interaction logs (for compatibility - actually deletes them)
    */
   async softDeleteInteractionLogs(conversationId: string): Promise<void> {
     if (!this.db) {
       throw new Error('Database not initialized');
     }
 
-    const resetAt = new Date().toISOString();
-    const stmt = this.db.prepare(`
-      UPDATE interaction_log 
-      SET isReset = 1, resetAt = ?
-      WHERE conversationId = ? AND (isReset = 0 OR isReset IS NULL)
-    `);
-
-    const result = stmt.run(resetAt, conversationId);
-    logger.debug('Soft deleted interaction logs', {
-      conversationId,
-      affectedRows: result.changes,
+    this.db.exec({
+      sql: 'DELETE FROM interaction_log WHERE conversationId = ?',
+      bind: [conversationId],
     });
+
+    // Persist to file
+    await this.saveToFile();
+
+    logger.debug('Interaction logs deleted', { conversationId });
+  }
+
+  /**
+   * Reset conversation state (for testing)
+   */
+  async resetConversationState(conversationId: string): Promise<void> {
+    if (!this.db) {
+      throw new Error('Database not initialized');
+    }
+
+    const resetAt = new Date().toISOString();
+
+    this.db.exec({
+      sql: 'UPDATE conversation_state SET updatedAt = ? WHERE conversationId = ?',
+      bind: [resetAt, conversationId],
+    });
+
+    // Persist to file
+    await this.saveToFile();
+
+    logger.debug('Conversation state reset', { conversationId, resetAt });
   }
 
   /**
@@ -362,12 +423,5 @@ export class Database {
       this.db = null;
       logger.debug('Database connection closed');
     }
-  }
-
-  /**
-   * Check if database is initialized
-   */
-  isInitialized(): boolean {
-    return this.db !== null;
   }
 }

@@ -35,6 +35,7 @@
     "dev": "turbo run dev --filter=@codemcp/workflows-core --filter=@codemcp/workflows",
     "clean": "turbo run clean:build",
     "prepublishOnly": "npm run build",
+    "lint-staged": "npx lint-staged",
     "test": "node scripts/test-summary.js",
     "test:root": "vitest --run",
     "test:ui": "vitest --ui",
@@ -52,7 +53,7 @@
     "@codemcp/workflows-core": "workspace:*",
     "@modelcontextprotocol/sdk": "1.17.5",
     "@types/js-yaml": "4.0.9",
-    "better-sqlite3": "^11.3.0",
+    "@sqlite.org/sqlite-wasm": "^3.50.4-build1",
     "js-yaml": "4.1.0",
     "zod": "^3.22.4"
   },
