@@ -1,10 +1,12 @@
 <template>
   <WorkflowVisualizer
+    v-if="workflows.length > 0"
     :workflows="workflows"
     :show-sidebar="showSidebar"
     :hide-header="hideHeader"
     :initial-workflow="initialWorkflow"
   />
+  <div v-else class="loading-message">Loading workflows...</div>
 </template>
 
 <script setup lang="ts">
@@ -50,3 +52,14 @@ onMounted(() => {
   loadBundledWorkflows();
 });
 </script>
+
+<style scoped>
+.loading-message {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 400px;
+  color: #64748b;
+  font-style: italic;
+}
+</style>
