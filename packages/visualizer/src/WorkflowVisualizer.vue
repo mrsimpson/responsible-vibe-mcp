@@ -53,10 +53,23 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, watch } from 'vue';
 import { load as parseYaml } from 'js-yaml';
+import { marked } from 'marked';
 import { FileUploadHandler } from './services/FileUploadHandler';
 import { ErrorHandler } from './utils/ErrorHandler';
 import { PlantUMLRenderer } from './visualization/PlantUMLRenderer';
 import { getRequiredElement } from './utils/DomHelpers';
+
+// Configure marked for GitHub Flavored Markdown
+marked.setOptions({
+  gfm: true,
+  breaks: true,
+});
+
+// Render markdown content to HTML
+function renderMarkdown(content: string): string {
+  if (!content) return '';
+  return marked(content);
+}
 
 // Component props
 interface WorkflowDefinition {
@@ -272,7 +285,7 @@ function renderStateDetailsWithHeader(
 
     <div class="detail-section">
       <h4 class="detail-subtitle">Default Instructions</h4>
-      <div class="code-block">${stateData.default_instructions}</div>
+      <div class="code-block">${renderMarkdown(stateData.default_instructions)}</div>
     </div>
 
     <div class="detail-section">
@@ -391,7 +404,7 @@ function renderTransitionDetailsWithHeader(transitionData: unknown): void {
         ? `
       <div class="detail-section">
         <h4 class="detail-subtitle">Instructions</h4>
-        <div class="code-block">${transition.instructions}</div>
+        <div class="code-block">${renderMarkdown(transition.instructions)}</div>
       </div>
     `
         : ''
@@ -402,7 +415,7 @@ function renderTransitionDetailsWithHeader(transitionData: unknown): void {
         ? `
       <div class="detail-section">
         <h4 class="detail-subtitle">Additional Instructions</h4>
-        <div class="code-block">${transition.additional_instructions}</div>
+        <div class="code-block">${renderMarkdown(transition.additional_instructions)}</div>
       </div>
     `
         : ''
