@@ -594,6 +594,9 @@ onMounted(async () => {
     // Set up event listeners and populate workflow selector (only if selector exists)
     if (workflowSelector) {
       console.log('Setting up workflow selector, workflows:', props.workflows);
+      
+      // Populate the workflow selector with available workflows
+      populateWorkflowSelector();
 
       workflowSelector.addEventListener('change', async event => {
         const target = event.target as HTMLSelectElement;

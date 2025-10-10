@@ -28,28 +28,26 @@ const props = withDefaults(defineProps<Props>(), {
   initialWorkflow: '',
 });
 
-const workflows = ref<WorkflowDefinition[]>([]);
-
-// Load workflows from generated manifest
-const loadBundledWorkflows = async () => {
-  // VitePress uses base path in both dev and production
-  const basePath = '/responsible-vibe-mcp/workflows/';
-
-  const workflowList: WorkflowDefinition[] = AVAILABLE_WORKFLOWS.map(
-    workflowName => ({
-      name: workflowName,
-      displayName:
-        workflowName.charAt(0).toUpperCase() +
-        workflowName.slice(1).replace(/-/g, ' '),
-      path: `${basePath}${workflowName}.yaml`,
-    })
-  );
-
-  workflows.value = workflowList;
-};
+// Load workflows directly from manifest
+const workflows = ref<WorkflowDefinition[]>(
+  AVAILABLE_WORKFLOWS.map(workflowName => ({
+    name: workflowName,
+    displayName:
+      workflowName.charAt(0).toUpperCase() +
+      workflowName.slice(1).replace(/-/g, ' '),
+    path: `/responsible-vibe-mcp/workflows/${workflowName}.yaml`,
+  }))
+);
 
 onMounted(() => {
-  loadBundledWorkflows();
+  console.log('WorkflowVisualizerWithData mounted');
+  console.log('AVAILABLE_WORKFLOWS:', AVAILABLE_WORKFLOWS);
+  console.log('workflows.value:', workflows.value);
+  console.log('workflows.value length:', workflows.value.length);
+  console.log('First workflow:', workflows.value[0]);
+  
+  // Make workflows available globally for debugging
+  (window as any).debugWorkflows = workflows.value;
 });
 </script>
 

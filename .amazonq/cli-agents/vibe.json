@@ -6,6 +6,10 @@
     "responsible-vibe-mcp": {
       "command": "npx",
       "args": ["@codemcp/workflows@latest"]
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["@playwright/mcp@latest"]
     }
   },
   "tools": [
@@ -16,11 +20,13 @@
     "knowledge",
     "thinking",
     "use_aws",
+    "@playwright",
     "@responsible-vibe-mcp"
   ],
   "allowedTools": [
     "fs_read",
     "fs_write",
+    "@playwright/*",
     "@responsible-vibe-mcp/whats_next",
     "@responsible-vibe-mcp/conduct_review",
     "@responsible-vibe-mcp/list_workflows",
