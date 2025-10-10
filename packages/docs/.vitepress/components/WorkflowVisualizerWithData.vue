@@ -45,9 +45,11 @@ onMounted(() => {
   console.log('workflows.value:', workflows.value);
   console.log('workflows.value length:', workflows.value.length);
   console.log('First workflow:', workflows.value[0]);
-  
+
   // Make workflows available globally for debugging
-  (window as any).debugWorkflows = workflows.value;
+  (
+    window as unknown as { debugWorkflows: WorkflowDefinition[] }
+  ).debugWorkflows = workflows.value;
 });
 </script>
 
