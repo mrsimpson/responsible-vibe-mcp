@@ -379,7 +379,7 @@ export class StartDevelopmentHandler extends BaseToolHandler<
 
     // Get variable substitutions to derive the mapping
     const variableSubstitutions =
-      this.projectDocsManager.getVariableSubstitutions(projectPath);
+      this.projectDocsManager.getVariableSubstitutions(projectPath, undefined);
 
     // Create reverse mapping from variable to document type
     const variableToDocMap: { [key: string]: string } = {};

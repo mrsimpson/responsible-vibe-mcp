@@ -52,7 +52,7 @@ export class WorkflowManager {
    * Parse enabled domains from environment variable
    */
   private parseEnabledDomains(): Set<string> {
-    const domainsEnv = process.env.VIBE_WORKFLOW_DOMAINS;
+    const domainsEnv = process.env['VIBE_WORKFLOW_DOMAINS'];
     if (!domainsEnv) {
       return new Set(['code']);
     }

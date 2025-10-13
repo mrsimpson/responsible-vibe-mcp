@@ -1,0 +1,464 @@
+# yaml-language-server: $schema=../state-machine-schema.json
+---
+name: 'sdd-greenfield'
+description: 'Specification-driven development for new projects from scratch: Constitution → Specify → Plan → Tasks → Implement → Document'
+initial_state: 'constitution'
+
+# Enhanced metadata for better discoverability
+metadata:
+  domain: 'sdd'
+  complexity: 'high'
+  bestFor:
+    - 'New projects from scratch'
+    - 'Greenfield development'
+    - 'Complex system design'
+    - 'Comprehensive planning needed'
+  useCases:
+    - 'Starting a new application'
+    - 'Building a new service'
+    - 'Creating a new library'
+  examples:
+    - 'Build a new web application'
+    - 'Create a microservice architecture'
+    - 'Develop a new API platform'
+
+# States with default instructions and transitions
+states:
+  constitution:
+    description: 'Establish constitutional framework and project governance'
+    default_instructions: |
+      You are establishing the constitutional framework for this new project. This phase sets the foundational principles that will guide all development decisions.
+
+      **Your tasks:**
+      1. **Create Project Constitution**: Use the template provided to create a `constitution.md` file
+      2. **Customize Principles**: Adapt the principles to your specific project needs
+      3. **Set Quality Gates**: Define what constitutes acceptable quality and when to reject solutions
+      4. **Document Governance**: Establish how these principles will be enforced
+
+      Create a `constitution.md` file in the project root with project-specific governance principles. This will be referenced in all subsequent phases.
+    additional_instructions: |
+      **Constitutional Framework Template:**
+
+      Use this template to create your `constitution.md` file:
+
+      ```markdown
+      # [PROJECT_NAME] Constitution
+
+      ## Core Principles
+
+      ### I. Specifications First
+      Specifications are the source of truth, not code. All development decisions must align with written specifications. Code serves specifications, not the other way around.
+
+      ### II. User Value Drives Decisions
+      Every feature and technical decision must demonstrate clear user value. If it doesn't serve users, it doesn't belong in the project.
+
+      ### III. Simplicity Over Complexity
+      Choose simple solutions over complex ones. Complexity must be justified by significant user benefit. YAGNI (You Aren't Gonna Need It) principles apply.
+
+      ### IV. Testability is Mandatory
+      All functionality must be testable. If it can't be tested, it can't be verified. Test-driven development is preferred.
+
+      ### V. Security by Design
+      Security considerations are built in from the start, not added later. All data handling and user interactions must consider security implications.
+
+      ### VI. Performance Considerations are Explicit
+      Performance requirements are documented and measurable. Performance trade-offs are made consciously and documented.
+
+      ### VII. Maintainability Over Cleverness
+      Code should be readable and maintainable by future developers. Clever solutions that are hard to understand are discouraged.
+
+      ### VIII. Documentation Serves Users
+      Documentation focuses on helping users accomplish their goals, not explaining implementation details to developers.
+
+      ### IX. Dependencies are Minimized and Justified
+      External dependencies are kept to a minimum. Each dependency must provide significant value and be actively maintained.
+
+      ## Quality Gates
+
+      - All specifications must be reviewed and approved before implementation
+      - All code must pass constitutional compliance review
+      - All features must demonstrate measurable user value
+      - All changes must maintain or improve system simplicity
+
+      ## Governance
+
+      This constitution supersedes all other development practices. Amendments require documentation, approval, and migration plan. All development decisions must verify compliance with these principles.
+
+      **Version**: 1.0 | **Ratified**: [DATE] | **Last Amended**: [DATE]
+      ```
+
+      Customize this template for your specific project, replacing [PROJECT_NAME] and [DATE] with appropriate values.
+
+    transitions:
+      - trigger: 'constitution_established'
+        to: 'specify'
+        transition_reason: 'Constitutional framework established, ready to create specifications'
+
+  specify:
+    description: 'Create comprehensive feature specification'
+    default_instructions: |
+      You are creating the feature specification that will be the source of truth for all development.
+
+      **Specification Process:**
+
+      1. **Parse User Requirements**: Extract key concepts from the user's description
+         - Identify: actors, actions, data, constraints
+         - Focus on WHAT users need and WHY, not HOW to implement
+
+      2. **Interactive Requirements Gathering**: Ask clarifying questions about:
+         - **Target Users**: Who will use this system? What are their technical skills?
+         - **Scale & Performance**: How many users? What performance expectations?
+         - **Integration**: Does this need to integrate with existing systems?
+         - **Constraints**: Any specific requirements, compliance needs, or limitations?
+         - **Success Metrics**: How will you measure if this is successful?
+
+      3. **Handle Ambiguities Systematically**:
+         - Make informed guesses based on context and industry standards
+         - Only use [NEEDS CLARIFICATION: specific question] for critical decisions that:
+           - Significantly impact feature scope or user experience
+           - Have multiple reasonable interpretations with different implications
+           - Lack any reasonable default
+         - **LIMIT: Maximum 3 [NEEDS CLARIFICATION] markers total**
+         - Prioritize: scope > security/privacy > user experience > technical details
+
+      4. **Quality Validation**:
+         - No implementation details (languages, frameworks, APIs)
+         - Written for non-technical stakeholders
+         - All requirements are testable
+         - Success criteria are measurable and technology-agnostic
+
+      5. **Handle Clarifications** (if any [NEEDS CLARIFICATION] markers exist):
+         - Present options to user in structured format
+         - Wait for user responses
+         - Update specification with chosen answers
+
+      Create `$VIBE_DIR/specs/$BRANCH_NAME/spec.md` using the template provided.
+    additional_instructions: |
+      **Feature Specification Template:**
+
+      Use this template to create your `spec.md` file:
+
+      ```markdown
+      # Feature Specification: [FEATURE NAME]
+
+      **Created**: [DATE]
+      **Status**: Draft
+
+      ## User Scenarios & Testing *(mandatory)*
+
+      ### User Story 1 - [Brief Title] (Priority: P1)
+
+      [Describe this user journey in plain language]
+
+      **Why this priority**: [Explain the value and why it has this priority level]
+
+      **Independent Test**: [Describe how this can be tested independently]
+
+      **Acceptance Scenarios**:
+      1. **Given** [initial state], **When** [action], **Then** [expected outcome]
+      2. **Given** [initial state], **When** [action], **Then** [expected outcome]
+
+      ---
+
+      ### User Story 2 - [Brief Title] (Priority: P2)
+
+      [Describe this user journey in plain language]
+
+      **Why this priority**: [Explain the value and why it has this priority level]
+
+      **Independent Test**: [Describe how this can be tested independently]
+
+      **Acceptance Scenarios**:
+      1. **Given** [initial state], **When** [action], **Then** [expected outcome]
+
+      ---
+
+      [Add more user stories as needed, each with an assigned priority]
+
+      ### Edge Cases
+
+      - What happens when [boundary condition]?
+      - How does system handle [error scenario]?
+
+      ## Requirements *(mandatory)*
+
+      ### Functional Requirements
+
+      - **FR-001**: System MUST [specific capability]
+      - **FR-002**: System MUST [specific capability]
+      - **FR-003**: Users MUST be able to [key interaction]
+      - **FR-004**: System MUST [data requirement]
+      - **FR-005**: System MUST [behavior]
+
+      ### Key Entities *(include if feature involves data)*
+
+      - **[Entity 1]**: [What it represents, key attributes without implementation]
+      - **[Entity 2]**: [What it represents, relationships to other entities]
+
+      ## Success Criteria *(mandatory)*
+
+      ### Measurable Outcomes
+
+      - **SC-001**: [Measurable metric, e.g., "Users can complete task in under 2 minutes"]
+      - **SC-002**: [Measurable metric, e.g., "System handles 1000 concurrent users"]
+      - **SC-003**: [User satisfaction metric, e.g., "90% task completion rate"]
+      - **SC-004**: [Business metric, e.g., "Reduce support tickets by 50%"]
+
+      ## Assumptions
+
+      - [Document any assumptions made during specification]
+      - [Include reasonable defaults chosen]
+
+      ## Dependencies
+
+      - [External systems or prerequisites]
+      - [Integration requirements]
+      ```
+
+      Fill in all sections with specific details for your feature. Each user story should be independently testable and prioritized.
+
+    transitions:
+      - trigger: 'specification_complete'
+        to: 'plan'
+        transition_reason: 'Feature specification completed and validated, ready for implementation planning'
+
+      - trigger: 'needs_clarification'
+        to: 'specify'
+        instructions: >
+          Specification has unresolved clarifications. Present structured questions to the user,
+          wait for their responses, then update the specification accordingly.
+        transition_reason: 'Specification needs user clarification before proceeding'
+
+  plan:
+    description: 'Generate implementation plan with constitutional compliance'
+    default_instructions: |
+      You are creating the implementation plan with constitutional compliance gates.
+
+      **Planning Process:**
+
+      1. **Load Context**:
+         - Read the feature specification (`$VIBE_DIR/specs/$BRANCH_NAME/spec.md`)
+         - Read the project constitution (`constitution.md`)
+         - Understand the technical requirements
+
+      2. **Interactive Technology Selection**: Ask the user about their preferences:
+         - **Technology Stack**: What programming languages/frameworks do you prefer?
+         - **Architecture Style**: Monolith, microservices, serverless, or hybrid?
+         - **Database**: What type of data storage do you need? (SQL, NoSQL, files)
+         - **Deployment**: Where will this run? (cloud, on-premise, local)
+         - **Experience Level**: What's your experience with different technologies?
+         - **Constraints**: Any technology restrictions or requirements?
+
+      3. **Technical Context Analysis**:
+         - Identify technology stack and architecture decisions based on user input
+         - Map dependencies and integration points
+         - Mark unknowns as "NEEDS CLARIFICATION" for research phase
+
+      4. **Constitutional Compliance Check**:
+         - Evaluate planned approach against each constitutional article
+         - Identify any violations and justify or resolve them
+         - Document compliance decisions
+
+      5. **Phase 0 - Research & Decisions**:
+         - For each unknown in Technical Context → research task
+         - For each technology choice → best practices task
+         - Generate `$VIBE_DIR/specs/$BRANCH_NAME/technology-research.md` with all decisions and rationale
+
+      6. **Phase 1 - High-Level Design**:
+         - Document high-level architecture and component overview
+         - Identify major system boundaries and integration points
+         - Document technology stack decisions and rationale
+
+      7. **Re-evaluate Constitutional Compliance**:
+         - Verify design decisions align with constitutional principles
+         - Document any adjustments needed
+
+      Create `$VIBE_DIR/specs/$BRANCH_NAME/plan.md` with the complete implementation strategy, including technology decisions, architecture, and development phases.
+
+    transitions:
+      - trigger: 'plan_complete'
+        to: 'tasks'
+        transition_reason: 'Implementation plan completed with constitutional compliance, ready to generate tasks'
+
+      - trigger: 'constitutional_violation'
+        to: 'plan'
+        instructions: >
+          Implementation plan violates constitutional principles. Review and revise the approach
+          to align with the established governance framework.
+        transition_reason: 'Plan violates constitutional principles, needs revision'
+
+  tasks:
+    description: 'Generate actionable, dependency-ordered tasks organized by user stories'
+    default_instructions: |
+      You are generating actionable tasks organized by user stories for independent implementation.
+
+      **Task Generation Process:**
+
+      1. **Load Design Documents**:
+         - **Required**: `$VIBE_DIR/specs/$BRANCH_NAME/plan.md` (tech stack, libraries, structure), `$VIBE_DIR/specs/$BRANCH_NAME/spec.md` (user stories with priorities)
+         - **Optional**: `$VIBE_DIR/specs/$BRANCH_NAME/technology-research.md`
+
+      2. **Extract User Stories**: Load user stories with priorities (P1, P2, P3...)
+
+      3. **Generate Tasks Organized by User Story**:
+         - **Setup Phase**: Shared infrastructure needed by all stories
+         - **Foundational Phase**: Prerequisites that must complete before ANY user story
+         - **User Story Phases** (P1, P2, P3...): One phase per story in priority order
+           - Group all tasks needed to complete JUST that story
+           - Include models, services, endpoints, UI components specific to that story
+           - Mark parallelizable tasks with [P]
+           - Each story should be independently testable
+
+      4. **Task Rules**:
+         - Different files = mark [P] for parallel execution
+         - Same file = sequential (no [P])
+         - Number tasks sequentially (T001, T002...)
+         - Each task specific enough for LLM to complete without additional context
+
+      5. **Generate Dependency Graph**: Show user story completion order and parallel opportunities
+
+      6. **Implementation Strategy**: MVP-first approach (typically just User Story 1)
+
+    additional_instructions: |
+      **Document Creation Instructions:**
+
+      Create these documents in the following order:
+
+      **1. Data Model (`$VIBE_DIR/specs/$BRANCH_NAME/data-model.md`)**:
+      - Extract entities from the specification
+      - Define relationships between entities
+      - Include validation rules from requirements
+      - Document state transitions if applicable
+
+      **2. API Contracts (`$VIBE_DIR/specs/$BRANCH_NAME/contracts/`)**:
+      - Generate API contracts from functional requirements
+      - Create OpenAPI/GraphQL schemas based on chosen technology stack
+      - Ensure contracts align with data models
+      - Include error handling and validation
+
+      **3. Development Setup (`$VIBE_DIR/specs/$BRANCH_NAME/quickstart.md`)**:
+      - Project setup instructions based on chosen technology stack
+      - Development environment configuration
+      - Build and run instructions
+      - Testing setup and commands
+
+      **4. Task Breakdown (`$VIBE_DIR/specs/$BRANCH_NAME/tasks.md`)**:
+      Use this structure for the tasks file:
+
+      ```markdown
+      # Implementation Tasks: [FEATURE NAME]
+
+      ## Setup Phase
+      - T001: [Setup task] [P]
+      - T002: [Infrastructure task]
+
+      ## Foundational Phase
+      - T003: [Database setup]
+      - T004: [Core dependencies] [P]
+
+      ## User Story 1 (P1): [Story Title]
+      **Goal**: [What this story achieves]
+      **Independent Test**: [How to test this story alone]
+
+      - T005: [Model for this story] [P]
+      - T006: [Service for this story] [P]
+      - T007: [API endpoint for this story]
+      - T008: [UI component for this story] [P]
+
+      ## User Story 2 (P2): [Story Title]
+      [Continue pattern...]
+
+      ## Dependencies
+      - Story 1 → Story 2 (if applicable)
+      - Parallel opportunities: T001, T002, T004 can run simultaneously
+
+      ## MVP Scope
+      Recommended MVP: User Story 1 only
+      ```
+
+    transitions:
+      - trigger: 'tasks_generated'
+        to: 'implement'
+        transition_reason: 'Tasks generated and organized by user stories, ready for implementation'
+
+  implement:
+    description: 'Execute implementation following the task breakdown'
+    default_instructions: |
+      You are implementing the solution by executing the tasks in the order defined in `$VIBE_DIR/specs/$BRANCH_NAME/tasks.md`.
+
+      **Implementation Guidelines:**
+      1. **Follow Task Order**: Execute tasks in the sequence defined, respecting dependencies
+      2. **Constitutional Compliance**: Ensure all implementation decisions align with the project constitution
+      3. **User Story Focus**: Complete one user story at a time for incremental delivery
+      4. **Quality Gates**: Each user story must meet the success criteria from the specification
+      5. **Testing**: Validate each user story independently before moving to the next
+      6. **Documentation**: Update documentation as you implement
+
+      **Progress Tracking**:
+      - Mark completed tasks with [x] in `$VIBE_DIR/specs/$BRANCH_NAME/tasks.md`
+      - Document any deviations or decisions in the plan file
+      - Update the specification if requirements evolve during implementation
+
+      Focus on delivering working, tested increments that provide user value.
+
+    transitions:
+      - trigger: 'implementation_complete'
+        to: 'document'
+        transition_reason: 'All tasks completed and user stories implemented, ready for final documentation'
+
+      - trigger: 'implementation_blocked'
+        to: 'plan'
+        instructions: >
+          Implementation is blocked by technical issues or missing requirements.
+          Return to planning to resolve the blockers and update the approach.
+        transition_reason: 'Implementation blocked, need to revise plan'
+
+  document:
+    description: 'Create comprehensive project documentation'
+    default_instructions: |
+      You are creating the final project documentation that serves users and maintainers.
+
+      **Documentation Tasks:**
+      1. **User Documentation**:
+         - Installation and setup guide
+         - User manual with examples
+         - API documentation (if applicable)
+         - Troubleshooting guide
+
+      2. **Developer Documentation**:
+         - Architecture overview
+         - Development setup
+         - Contributing guidelines
+         - Code organization
+
+      3. **Project Documentation**:
+         - README with project overview
+         - Changelog
+         - License information
+         - Deployment guide
+
+      **Quality Standards** (from constitution):
+      - Documentation serves users, not developers
+      - Focus on practical examples and common use cases
+      - Keep technical details minimal and focused
+      - Ensure documentation is maintainable
+
+      Create comprehensive documentation that enables users to successfully adopt and use the project.
+
+    transitions:
+      - trigger: 'documentation_complete'
+        to: 'document'
+        instructions: >
+          Project documentation is complete. The specification-driven development process has successfully
+          delivered a working solution with comprehensive documentation. Review all deliverables and
+          ensure they meet the constitutional principles established at the beginning.
+        transition_reason: 'Documentation complete, project ready for delivery'
+
+# Global transitions available from any state
+global_transitions:
+  - trigger: 'abandon_project'
+    to: 'constitution'
+    instructions: >
+      Project abandoned. If you want to restart, you'll begin again with establishing
+      the constitutional framework.
+    transition_reason: 'Project abandoned, restart from beginning'

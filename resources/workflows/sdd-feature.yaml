@@ -1,0 +1,472 @@
+# yaml-language-server: $schema=../state-machine-schema.json
+---
+name: 'sdd-feature'
+description: 'Unified specification-driven feature development and enhancement: Analyze → Specify → Clarify → Plan → Tasks → Implement'
+initial_state: 'analyze'
+
+# Enhanced metadata for better discoverability
+metadata:
+  domain: 'sdd'
+  complexity: 'medium'
+  bestFor:
+    - 'Adding new features'
+    - 'Enhancing existing features'
+    - 'Iterative development'
+    - 'Feature improvements'
+  useCases:
+    - 'Add new functionality to existing project'
+    - 'Improve existing feature capabilities'
+    - 'Extend system functionality'
+  examples:
+    - 'Add user profile management'
+    - 'Enhance search functionality'
+    - 'Improve reporting capabilities'
+
+# States with default instructions and transitions
+states:
+  analyze:
+    description: 'Analyze current state and requirements (optional for new features)'
+    default_instructions: |
+      You are analyzing the current state to understand the context for this feature development.
+
+      **Analysis Tasks:**
+      1. **For New Features**: This phase can be brief - focus on understanding:
+         - How this feature fits into the existing system
+         - Integration points with current functionality
+         - Existing patterns and conventions to follow
+
+      2. **For Enhancements**: Conduct thorough analysis:
+         - Current implementation and its limitations
+         - User pain points and feedback
+         - Performance or usability issues
+         - Technical debt that should be addressed
+
+      3. **Context Gathering**:
+         - Review existing codebase and architecture
+         - Understand current user workflows
+         - Identify constraints and dependencies
+         - Document assumptions about the current state
+
+      **Output**: Create `$VIBE_DIR/specs/$BRANCH_NAME/current-state-analysis.md` documenting your findings. For simple new features, this can be brief. For enhancements, be comprehensive.
+
+      **Skip Option**: If this is a straightforward new feature with clear requirements, you can proceed directly to specification.
+
+    transitions:
+      - trigger: 'analysis_complete'
+        to: 'specify'
+        transition_reason: 'Analysis completed, ready to create feature specification'
+
+      - trigger: 'skip_analysis'
+        to: 'specify'
+        instructions: >
+          Skipping analysis phase for straightforward new feature. Proceed directly to specification
+          creation using the provided requirements.
+        transition_reason: 'Analysis not needed for this feature, proceeding to specification'
+
+  specify:
+    description: 'Create feature specification'
+    default_instructions: |
+      You are creating the feature specification that will guide all development decisions.
+
+      **Specification Process:**
+
+      1. **Parse Requirements**: Extract key concepts from the user's description
+         - Identify: actors, actions, data, constraints
+         - Consider existing system context (from analysis if performed)
+         - Focus on WHAT users need and WHY, not HOW to implement
+
+      2. **Interactive Requirements Gathering**: Ask clarifying questions about:
+         - **Integration Points**: How should this integrate with existing features?
+         - **User Impact**: Which existing users will be affected?
+         - **Data Dependencies**: What existing data does this feature need?
+         - **Performance**: Any specific performance requirements for this feature?
+         - **Compatibility**: Any backward compatibility concerns?
+
+      3. **Handle Ambiguities Systematically**:
+         - Make informed guesses based on context, existing patterns, and industry standards
+         - Only use [NEEDS CLARIFICATION: specific question] for critical decisions that:
+           - Significantly impact feature scope or user experience
+           - Have multiple reasonable interpretations with different implications
+           - Lack any reasonable default
+         - **LIMIT: Maximum 3 [NEEDS CLARIFICATION] markers total**
+         - Prioritize: scope > security/privacy > user experience > technical details
+
+      4. **Quality Validation**:
+         - No implementation details (languages, frameworks, APIs)
+         - Written for non-technical stakeholders
+         - All requirements are testable
+         - Success criteria are measurable and technology-agnostic
+         - Considers existing system constraints
+
+      Create `$VIBE_DIR/specs/$BRANCH_NAME/spec.md` using the template provided below.
+    additional_instructions: |
+      **Feature Specification Template:**
+
+      Use this template to create your `spec.md` file:
+
+      ```markdown
+      # Feature Specification: [FEATURE NAME]
+
+      **Created**: [DATE]
+      **Status**: Draft
+
+      ## User Scenarios & Testing *(mandatory)*
+
+      ### User Story 1 - [Brief Title] (Priority: P1)
+
+      [Describe this user journey in plain language]
+
+      **Why this priority**: [Explain the value and why it has this priority level]
+
+      **Independent Test**: [Describe how this can be tested independently]
+
+      **Acceptance Scenarios**:
+      1. **Given** [initial state], **When** [action], **Then** [expected outcome]
+      2. **Given** [initial state], **When** [action], **Then** [expected outcome]
+
+      ---
+
+      ### User Story 2 - [Brief Title] (Priority: P2)
+
+      [Describe this user journey in plain language]
+
+      **Why this priority**: [Explain the value and why it has this priority level]
+
+      **Independent Test**: [Describe how this can be tested independently]
+
+      **Acceptance Scenarios**:
+      1. **Given** [initial state], **When** [action], **Then** [expected outcome]
+
+      ---
+
+      [Add more user stories as needed, each with an assigned priority]
+
+      ### Edge Cases
+
+      - What happens when [boundary condition]?
+      - How does system handle [error scenario]?
+
+      ## Requirements *(mandatory)*
+
+      ### Functional Requirements
+
+      - **FR-001**: System MUST [specific capability]
+      - **FR-002**: System MUST [specific capability]
+      - **FR-003**: Users MUST be able to [key interaction]
+      - **FR-004**: System MUST [data requirement]
+      - **FR-005**: System MUST [behavior]
+
+      ### Key Entities *(include if feature involves data)*
+
+      - **[Entity 1]**: [What it represents, key attributes without implementation]
+      - **[Entity 2]**: [What it represents, relationships to other entities]
+
+      ## Success Criteria *(mandatory)*
+
+      ### Measurable Outcomes
+
+      - **SC-001**: [Measurable metric, e.g., "Users can complete task in under 2 minutes"]
+      - **SC-002**: [Measurable metric, e.g., "System handles 1000 concurrent users"]
+      - **SC-003**: [User satisfaction metric, e.g., "90% task completion rate"]
+      - **SC-004**: [Business metric, e.g., "Reduce support tickets by 50%"]
+
+      ## Integration Points
+
+      - [How this connects with existing functionality]
+      - [Dependencies on existing components]
+
+      ## Assumptions
+
+      - [Document any assumptions made during specification]
+      - [Include reasonable defaults chosen]
+
+      ## Dependencies
+
+      - [External systems or prerequisites]
+      - [Integration requirements]
+      ```
+
+      Fill in all sections with specific details for your feature. Consider how this integrates with the existing system.
+
+    transitions:
+      - trigger: 'specification_complete'
+        to: 'clarify'
+        transition_reason: 'Feature specification completed, ready for clarification review'
+
+      - trigger: 'needs_clarification'
+        to: 'specify'
+        instructions: >
+          Specification has unresolved clarifications. Present structured questions to the user,
+          wait for their responses, then update the specification accordingly.
+        transition_reason: 'Specification needs user clarification before proceeding'
+
+  clarify:
+    description: 'Review and clarify specification details'
+    default_instructions: |
+      You are reviewing the specification for completeness and clarity.
+
+      **Clarification Process:**
+
+      1. **Specification Review**:
+         - Check for any remaining [NEEDS CLARIFICATION] markers
+         - Verify all functional requirements are testable
+         - Ensure success criteria are measurable
+         - Validate user scenarios are complete
+
+      2. **Handle Remaining Clarifications**:
+         If [NEEDS CLARIFICATION] markers exist:
+         - Extract all markers from the spec
+         - For each clarification (max 3), present options in structured format:
+           ```
+           ## Question [N]: [Topic]
+           **Context**: [Quote relevant spec section]
+           **What we need to know**: [Specific question]
+           **Suggested Answers**:
+           | Option | Answer | Implications |
+           |--------|--------|--------------|
+           | A      | [First option] | [Impact on feature] |
+           | B      | [Second option] | [Impact on feature] |
+           | C      | [Third option] | [Impact on feature] |
+           ```
+         - Wait for user responses
+         - Update specification with chosen answers
+
+      3. **Final Validation**:
+         - Ensure no implementation details leaked in
+         - Verify requirements align with existing system
+         - Confirm specification is ready for planning
+
+      **Output**: Updated `$VIBE_DIR/specs/$BRANCH_NAME/spec.md` with all clarifications resolved and ready for implementation planning.
+
+    transitions:
+      - trigger: 'clarification_complete'
+        to: 'plan'
+        transition_reason: 'All clarifications resolved, specification ready for implementation planning'
+
+      - trigger: 'needs_user_input'
+        to: 'clarify'
+        instructions: >
+          Waiting for user responses to clarification questions. Present the questions clearly
+          and wait for user input before proceeding.
+        transition_reason: 'Waiting for user input on clarification questions'
+
+  plan:
+    description: 'Generate implementation plan with constitutional compliance'
+    default_instructions: |
+      You are creating the implementation plan, considering existing system architecture.
+
+      **Planning Process:**
+
+      1. **Load Context**:
+         - Read the feature specification (`$VIBE_DIR/specs/$BRANCH_NAME/spec.md`)
+         - Read analysis findings (`$VIBE_DIR/specs/$BRANCH_NAME/current-state-analysis.md` if exists)
+         - Review existing project constitution or architectural principles
+         - Understand current system architecture and patterns
+
+      2. **Interactive Integration Planning**: Ask the user about:
+         - **Technology Consistency**: Should this use the same tech stack as existing features?
+         - **Architecture Alignment**: How should this fit into the current architecture?
+         - **Database Changes**: Any new data models or schema changes needed?
+
+      3. **Technical Context Analysis**:
+         - Identify how this feature integrates with existing system
+         - Map dependencies and integration points
+         - Choose appropriate technology stack (consistent with existing)
+         - Mark unknowns as "NEEDS CLARIFICATION" for research
+
+      4. **Constitutional/Architectural Compliance**:
+         - Evaluate approach against existing architectural principles
+         - Ensure consistency with current patterns and conventions
+         - Identify any violations and justify or resolve them
+
+      5. **Phase 0 - Research & Decisions**:
+         - For each unknown → research task
+         - For each integration point → compatibility analysis
+         - Generate `$VIBE_DIR/specs/$BRANCH_NAME/technology-research.md` with decisions and rationale
+
+      6. **Phase 1 - High-Level Integration Design**:
+         - Document how this feature integrates with existing architecture
+         - Identify integration points and dependencies
+         - Plan compatibility and migration requirements
+
+      7. **Integration Strategy**:
+         - Plan how to integrate with existing codebase
+         - Identify migration or compatibility requirements
+         - Document rollout strategy if needed
+
+      Create `$VIBE_DIR/specs/$BRANCH_NAME/plan.md` with complete implementation strategy that respects existing system architecture.
+
+    transitions:
+      - trigger: 'plan_complete'
+        to: 'tasks'
+        transition_reason: 'Implementation plan completed, ready to generate actionable tasks'
+
+      - trigger: 'architectural_conflict'
+        to: 'plan'
+        instructions: >
+          Implementation plan conflicts with existing architecture or principles.
+          Review and revise the approach to ensure proper integration.
+        transition_reason: 'Plan conflicts with existing architecture, needs revision'
+
+  tasks:
+    description: 'Generate actionable, dependency-ordered tasks organized by user stories'
+    default_instructions: |
+      You are generating actionable tasks organized by user stories for independent implementation.
+
+      **Task Generation Process:**
+
+      1. **Load Design Documents**:
+         - **Required**: `$VIBE_DIR/specs/$BRANCH_NAME/plan.md`, `$VIBE_DIR/specs/$BRANCH_NAME/spec.md` (user stories with priorities)
+         - **Optional**: `$VIBE_DIR/specs/$BRANCH_NAME/technology-research.md`, `$VIBE_DIR/specs/$BRANCH_NAME/current-state-analysis.md`
+
+      2. **Extract User Stories**: Load $VIBE_DIR/specs/$BRANCH_NAME/spec.md and extract user stories with priorities (P1, P2, P3...)
+
+      3. **Generate Tasks Organized by User Story**:
+         - **Setup Phase**: Integration setup and shared infrastructure
+         - **Foundational Phase**: Prerequisites for this feature (database changes, etc.)
+         - **User Story Phases** (P1, P2, P3...): One phase per story in priority order
+           - Group all tasks needed to complete JUST that story
+           - Include models, services, endpoints, UI components specific to that story
+           - Consider integration with existing components
+           - Mark parallelizable tasks with [P]
+           - Each story should be independently testable
+
+      4. **Integration Tasks**:
+         - Tasks for connecting with existing system
+         - Migration or compatibility tasks if needed
+         - Testing integration points
+
+      5. **Task Rules**:
+         - Different files/components = mark [P] for parallel execution
+         - Same file = sequential (no [P])
+         - Number tasks sequentially (T001, T002...)
+         - Each task specific enough for LLM to complete
+
+      6. **Rollout Strategy**: Plan for gradual feature rollout if applicable
+
+    additional_instructions: |
+      **Document Creation Instructions:**
+
+      Create these documents in the following order:
+
+      **1. Data Model (`$VIBE_DIR/specs/$BRANCH_NAME/data-model.md`)**:
+      - Extract entities from the specification
+      - Design data models that integrate with existing system
+      - Document relationships with existing entities
+      - Include migration requirements if needed
+
+      **2. API Contracts (`$VIBE_DIR/specs/$BRANCH_NAME/contracts/`)**:
+      - Design API contracts that integrate with existing system
+      - Ensure compatibility with existing data models and APIs
+      - Include versioning strategy if needed
+      - Document integration points
+
+      **3. Development Setup (`$VIBE_DIR/specs/$BRANCH_NAME/quickstart.md`)**:
+      - Feature development setup instructions
+      - Integration testing setup
+      - Local development environment for this feature
+      - Testing instructions specific to this feature
+
+      **4. Task Breakdown (`$VIBE_DIR/specs/$BRANCH_NAME/tasks.md`)**:
+      Use this structure for the tasks file:
+
+      ```markdown
+      # Feature Implementation Tasks: [FEATURE NAME]
+
+      ## Setup Phase
+      - T001: [Integration setup] [P]
+      - T002: [Shared infrastructure]
+
+      ## Foundational Phase
+      - T003: [Database changes for feature]
+      - T004: [Dependencies setup] [P]
+
+      ## User Story 1 (P1): [Story Title]
+      **Goal**: [What this story achieves]
+      **Independent Test**: [How to test this story alone]
+      **Integration Points**: [How this connects to existing system]
+
+      - T005: [Model for this story] [P]
+      - T006: [Service integration] [P]
+      - T007: [API endpoint with existing system]
+      - T008: [UI component integration] [P]
+
+      ## User Story 2 (P2): [Story Title]
+      [Continue pattern...]
+
+      ## Integration Tasks
+      - T0XX: [Connect with existing system]
+      - T0XX: [Migration tasks if needed]
+      - T0XX: [Integration testing]
+
+      ## Dependencies
+      - Story 1 → Story 2 (if applicable)
+      - Integration dependencies with existing features
+
+      ## Rollout Strategy
+      [Plan for gradual feature rollout if applicable]
+      ```
+
+    transitions:
+      - trigger: 'tasks_generated'
+        to: 'implement'
+        transition_reason: 'Tasks generated and organized, ready for implementation'
+
+  implement:
+    description: 'Execute implementation following the task breakdown'
+    default_instructions: |
+      You are implementing the feature by executing the tasks defined in `$VIBE_DIR/specs/$BRANCH_NAME/tasks.md`, ensuring proper integration with the existing system.
+
+      **Implementation Guidelines:**
+      1. **Follow Task Order**: Execute tasks respecting dependencies and integration requirements
+      2. **System Integration**: Ensure new code follows existing patterns and conventions
+      3. **User Story Focus**: Complete one user story at a time for incremental delivery
+      4. **Quality Gates**: Each user story must meet success criteria from specification
+      5. **Testing**: Test both new functionality and integration with existing features
+      6. **Documentation**: Update existing documentation as needed
+
+      **Integration Considerations**:
+      - Follow existing code style and patterns
+      - Respect current architectural decisions
+      - Test integration points thoroughly
+      - Consider backward compatibility
+      - Update relevant configuration or setup
+
+      **Progress Tracking**:
+      - Mark completed tasks with [x] in `$VIBE_DIR/specs/$BRANCH_NAME/tasks.md`
+      - Document any integration challenges or decisions
+      - Update specification if requirements evolve
+
+      Focus on delivering working, tested increments that integrate seamlessly with the existing system.
+
+    transitions:
+      - trigger: 'implementation_complete'
+        to: 'implement'
+        instructions: >
+          Feature implementation completed successfully. All user stories have been implemented,
+          tested, and integrated with the existing system. The feature meets the success criteria
+          defined in the specification.
+        transition_reason: 'Implementation complete, feature ready for use'
+
+      - trigger: 'implementation_blocked'
+        to: 'plan'
+        instructions: >
+          Implementation is blocked by integration issues or technical challenges.
+          Return to planning to resolve the blockers and update the approach.
+        transition_reason: 'Implementation blocked, need to revise plan'
+
+      - trigger: 'integration_issues'
+        to: 'analyze'
+        instructions: >
+          Significant integration issues discovered that require better understanding
+          of the existing system. Return to analysis to gather more context.
+        transition_reason: 'Integration issues require deeper system analysis'
+
+# Global transitions available from any state
+global_transitions:
+  - trigger: 'abandon_feature'
+    to: 'analyze'
+    instructions: >
+      Feature development abandoned. If you want to restart, you'll begin again with
+      analyzing the requirements and current state.
+    transition_reason: 'Feature abandoned, restart from beginning'
