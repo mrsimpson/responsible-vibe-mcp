@@ -440,13 +440,22 @@ export class ProjectDocsManager {
   /**
    * Get variable substitutions for workflow instructions
    */
-  getVariableSubstitutions(projectPath: string): Record<string, string> {
+  getVariableSubstitutions(
+    projectPath: string,
+    gitBranch?: string
+  ): Record<string, string> {
     const paths = this.getDocumentPaths(projectPath);
+
+    // Create branch directory path under .vibe/ (similar to docs structure)
+    const branchDirName = !!gitBranch ? gitBranch : 'main';
+    const vibeDir = join(projectPath, '.vibe');
 
     return {
       $ARCHITECTURE_DOC: paths.architecture,
       $REQUIREMENTS_DOC: paths.requirements,
       $DESIGN_DOC: paths.design,
+      $VIBE_DIR: vibeDir,
+      $BRANCH_NAME: branchDirName,
     };
   }
 

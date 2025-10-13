@@ -58,7 +58,8 @@ export class InstructionGenerator {
     // Apply variable substitution to base instructions
     const substitutedInstructions = this.applyVariableSubstitution(
       baseInstructions,
-      context.conversationContext.projectPath
+      context.conversationContext.projectPath,
+      context.conversationContext.gitBranch
     );
 
     // Get plan file guidance
@@ -91,10 +92,13 @@ export class InstructionGenerator {
    */
   private applyVariableSubstitution(
     instructions: string,
-    projectPath: string
+    projectPath: string,
+    gitBranch?: string
   ): string {
-    const substitutions =
-      this.projectDocsManager.getVariableSubstitutions(projectPath);
+    const substitutions = this.projectDocsManager.getVariableSubstitutions(
+      projectPath,
+      gitBranch
+    );
 
     let result = instructions;
     for (const [variable, value] of Object.entries(substitutions)) {
