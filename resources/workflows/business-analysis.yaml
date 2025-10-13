@@ -47,11 +47,6 @@ states:
     transitions:
       - trigger: 'discovery_complete'
         to: 'documents_consolidation'
-        additional_instructions: >
-          Document discovery is complete! ✅ Now transition to documents consolidation phase.
-
-          Begin systematic document processing using structured summarization technique.
-          Mark completed discovery tasks in plan file.
         transition_reason: 'Documents gathered and Business Capability Modeling structure created, ready for consolidation'
 
   documents_consolidation:
@@ -85,11 +80,6 @@ states:
     transitions:
       - trigger: 'consolidation_complete'
         to: 'business_content_analysis'
-        additional_instructions: >
-          Documents consolidation is complete! ✅ Now transition to business content analysis.
-
-          Begin identifying business-relevant chapters for detailed analysis.
-          Mark completed consolidation tasks in plan file.
         transition_reason: 'Basic document processing complete, ready for business content analysis'
 
   business_content_analysis:
@@ -168,8 +158,6 @@ states:
       - trigger: 'business_analysis_complete'
         to: 'capability_identification'
         additional_instructions: >
-          Business content analysis is complete! ✅ Now transition to capability identification.
-
           Create BUSINESS_ANALYSIS.md with the following template content:
           ```markdown
           # Business Analysis Report
@@ -311,13 +299,10 @@ states:
       - trigger: 'capabilities_identified'
         to: 'capability_decomposition'
         additional_instructions: >
-          Capability identification is complete! ✅ Now transition to capability decomposition.
-
           For each identified capability, add decomposition tasks to plan file:
           "- [ ] Decompose [capability-name] into sub-capabilities using document analysis"
 
           Begin systematic decomposition of capabilities one at a time.
-          Mark completed identification tasks in plan file.
         transition_reason: 'Business capabilities identified, ready for detailed decomposition'
 
   capability_decomposition:
@@ -356,8 +341,6 @@ states:
       - trigger: 'decomposition_complete'
         to: 'actor_analysis'
         additional_instructions: >
-          Capability decomposition is complete! ✅ Now transition to actor analysis.
-
           Create business-actors.md with template:
           ```markdown
           # Business Actors
@@ -429,8 +412,6 @@ states:
       - trigger: 'actor_analysis_complete'
         to: 'process_analysis'
         additional_instructions: >
-          Actor analysis is complete! ✅ Now transition to process analysis.
-
           Create business-processes.md with template:
           ```markdown
           # Business Processes
@@ -496,8 +477,6 @@ states:
       - trigger: 'process_analysis_complete'
         to: 'consistency'
         additional_instructions: >
-          Process analysis is complete! ✅ Now transition to consistency phase.
-
           Present the Business Capability Consistency Framework to user:
           "I'll now validate consistency across all analysis documents using this framework:
 
@@ -510,9 +489,6 @@ states:
 
           This ensures our business capability model is internally consistent before final summary.
           Ready to proceed with consistency validation?"
-
-          Begin systematic consistency validation across all analysis documents.
-          Mark completed process analysis tasks in plan file.
         transition_reason: 'Process analysis complete, ready for consistency validation'
 
   consistency:
@@ -523,7 +499,7 @@ states:
       **Step 1: Re-discover Analysis Documents**
       Scan workspace for all created analysis documents:
       - business-domains.md and detail folders
-      - business-capabilities.md and detail folders  
+      - business-capabilities.md and detail folders
       - business-processes.md and detail folders
       - business-actors.md and detail folders
       - BUSINESS_ANALYSIS.md
@@ -565,7 +541,7 @@ states:
 
       **Step 4: Present Findings to User**
       Show consistency validation results and ask for confirmation:
-      "Consistency validation complete. Found [X] issues, resolved [Y]. 
+      "Consistency validation complete. Found [X] issues, resolved [Y].
       Key findings: [summary of major consistency improvements]
 
       Are you satisfied with the consistency of the business capability model?"
@@ -575,12 +551,10 @@ states:
       - trigger: 'consistency_complete'
         to: 'summary'
         additional_instructions: >
-          Consistency validation is complete! ✅ Now transition to summary phase.
-
           Ask user about illustration format preference:
           "How would you like diagrams and illustrations formatted in the final summary?
           - ASCII diagrams (text-based, simple)
-          - Mermaid diagrams (code-based, rich formatting)  
+          - Mermaid diagrams (code-based, rich formatting)
           - PlantUML diagrams (UML standard, detailed)
           - All three formats (comprehensive)"
 

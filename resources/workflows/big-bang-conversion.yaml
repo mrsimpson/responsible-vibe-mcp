@@ -60,7 +60,6 @@ states:
 
       - trigger: 'planning_complete'
         to: 'target_architecture_design'
-        additional_instructions: 'Conversion planning complete! ✅ Now transition to target architecture design phase.'
         transition_reason: 'Conversion strategy is planned, ready for target architecture design'
 
   target_architecture_design:
@@ -112,7 +111,6 @@ states:
 
       - trigger: 'architecture_complete'
         to: 'behavioral_comparison_setup'
-        additional_instructions: 'Target architecture design complete! ✅ Now transition to behavioral comparison setup phase.'
         transition_reason: 'Target architecture is designed, ready for behavioral comparison setup'
 
   behavioral_comparison_setup:
@@ -163,7 +161,6 @@ states:
 
       - trigger: 'comparison_setup_complete'
         to: 'implementation_strategy'
-        additional_instructions: 'Behavioral comparison setup complete! ✅ Now transition to implementation strategy phase.'
         transition_reason: 'Comparison mechanisms are designed, ready for implementation strategy'
 
   implementation_strategy:
@@ -214,7 +211,6 @@ states:
 
       - trigger: 'strategy_complete'
         to: 'parallel_implementation'
-        additional_instructions: 'Implementation strategy complete! ✅ Now transition to parallel implementation phase.'
         transition_reason: 'Implementation strategy is complete, ready for parallel implementation'
 
   parallel_implementation:
@@ -264,9 +260,7 @@ states:
 
       - trigger: 'implementation_complete'
         to: 'conversion_readiness'
-        additional_instructions: >
-          Parallel implementation is complete! ✅ Now create the CONVERSION_PLAN.md file and transition to conversion readiness phase.
-
+        additional_instructions: |
           Create the CONVERSION_PLAN.md file at .vibe/CONVERSION_PLAN.md with this exact template content:
 
           ```markdown
@@ -455,13 +449,13 @@ states:
 
           **Purpose**: This document provides actionable guidance for executing the big-bang conversion in production environments outside of development conversations.
 
-          **For Operations Teams**: 
+          **For Operations Teams**:
           - Use this as a checklist during conversion execution
           - Follow phases sequentially and validate each step
           - Have rollback procedures ready at all times
           - Maintain communication throughout the process
 
-          **For Management**: 
+          **For Management**:
           - Use this to understand conversion scope and risks
           - Monitor progress through defined checkpoints
           - Be prepared for go/no-go decisions

@@ -39,10 +39,6 @@ states:
     transitions:
       - trigger: ideation_complete
         to: structure
-        additional_instructions: |
-          Ideation complete! ✅ You have a clear presentation concept, defined audience, and established goals.
-
-          Update the plan file with structural planning tasks and mark completed ideation work.
         transition_reason: 'Presentation concept and goals clearly defined, ready for content structuring'
 
       - trigger: abandon_presentation

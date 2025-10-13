@@ -40,10 +40,6 @@ states:
     transitions:
       - trigger: discovery_complete
         to: story
-        additional_instructions: |
-          Discovery complete! ✅ You have clear format decision, unique angle, and research foundation.
-
-          Update the plan file with story development tasks and mark completed discovery work.
         transition_reason: 'Topic researched and format decided, ready for story structure development'
 
       - trigger: abandon_post
@@ -190,7 +186,6 @@ states:
     transitions:
       - trigger: distribution_complete
         to: discovery
-        additional_instructions: 'Post successfully published. Ready for next post project.'
         transition_reason: 'Post publishing completed successfully, ready for new projects'
 
       - trigger: need_final_review

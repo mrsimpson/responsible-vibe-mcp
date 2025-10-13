@@ -270,17 +270,13 @@ states:
 
       - trigger: 'discovery_complete'
         to: 'context_analysis'
-        additional_instructions: >
-          Discovery is complete! ✅ Now set up project documentation and transition to context analysis.
-
-          1. First, set up project documents for living documentation:
+        additional_instructions: |
+          Set up project documents for living documentation:
              setup_project_docs({ architecture: "c4", requirements: "none", design: "comprehensive" })
 
           2. Read the created $ARCHITECTURE_DOC and $DESIGN_DOC files to understand their structure
 
           3. Begin enhancing these documents based on DISCOVERY.md findings and continue throughout context analysis.
-
-          Update the plan file with context analysis tasks and mark completed discovery tasks.
         transition_reason: 'Initial discovery complete, ready for context analysis'
 
   context_analysis:
@@ -318,9 +314,7 @@ states:
 
       - trigger: 'context_complete'
         to: 'container_analysis'
-        additional_instructions: >
-          Context analysis is complete! ✅ Now transition to container analysis phase (C4 Level 2).
-          Update the plan file with container analysis tasks and mark completed context tasks.
+        additional_instructions: |
           Before you start analyzing the containers, elaborate a plan together with the user how to document the container analysis:
           - How to structure the files (one file per container or all in one file, shall a folder be created per container in which the components will be included later on?)
           - How a component factsheet shall look like.
@@ -362,7 +356,6 @@ states:
       - trigger: 'containers_complete'
         to: 'component_analysis'
         additional_instructions: >
-          Container analysis is complete! ✅ Now transition to component analysis phase (C4 Level 3).
           Before you start analyzing the components, elaborate a plan together with the user how to document the component analysis:
           - How to structure the files (one file per component or all in one file)
           - How a component factsheet shall look like.
@@ -408,9 +401,6 @@ states:
 
       - trigger: 'components_complete'
         to: 'documentation_consolidation'
-        additional_instructions: >
-          Component analysis is complete! ✅ Now transition to documentation consolidation phase.
-          Update the plan file with documentation tasks and mark completed component tasks.
         transition_reason: 'Component analysis complete, ready to consolidate documentation'
 
   documentation_consolidation:
@@ -452,9 +442,6 @@ states:
 
       - trigger: 'documentation_complete'
         to: 'analysis_complete'
-        additional_instructions: >
-          Documentation consolidation is complete! ✅ Now transition to analysis complete phase.
-          Update the plan file and mark completed documentation tasks.
         transition_reason: 'Documentation is complete, analysis finished'
 
   analysis_complete:
