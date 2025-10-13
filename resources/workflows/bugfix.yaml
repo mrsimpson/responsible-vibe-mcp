@@ -37,7 +37,6 @@ states:
     transitions:
       - trigger: 'bug_reproduced'
         to: 'analyze'
-        additional_instructions: 'Bug successfully reproduced! ✅ Now transition to analysis phase.'
         transition_reason: 'Bug reproduced successfully, ready to analyze root cause'
 
       - trigger: 'bug_not_reproducible'
@@ -64,7 +63,7 @@ states:
 
       - trigger: 'root_cause_identified'
         to: 'fix'
-        additional_instructions: 'Root cause identified! ✅ Now transition to fix phase. Document the fix approach in the plan file.'
+        additional_instructions: 'Document the root cause approach in the plan file.'
         transition_reason: 'Root cause identified, ready to implement fix'
         review_perspectives:
           - perspective: 'architect'
@@ -92,7 +91,7 @@ states:
 
       - trigger: 'fix_implemented'
         to: 'verify'
-        additional_instructions: 'Fix implemented! ✅ Now transition to verification phase. Document verification results in the plan file.'
+        additional_instructions: 'Document the fix approach in the plan file.'
         transition_reason: 'Fix implemented, ready for verification'
         review_perspectives:
           - perspective: 'senior_software_developer'
@@ -121,7 +120,6 @@ states:
 
       - trigger: 'bug_fixed'
         to: 'finalize'
-        additional_instructions: 'Bug successfully fixed and verified! ✅ Now transition to finalization phase. Mark all verification tasks complete. Clean up verification work and prepare for new bug reports.'
         transition_reason: 'Bug fix complete and verified, ready for next issue'
 
       - trigger: 'abandon_bug'
@@ -176,7 +174,6 @@ states:
 
       - trigger: 'finalization_complete'
         to: 'reproduce'
-        additional_instructions: 'Bug fix complete and finalized! Clean up finalization work and prepare for new bug reports.'
         transition_reason: 'Bug fix complete and finalized, ready for next issue'
 
       - trigger: 'abandon_bug'

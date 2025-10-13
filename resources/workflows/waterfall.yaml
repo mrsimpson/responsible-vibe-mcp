@@ -39,7 +39,6 @@ states:
     transitions:
       - trigger: 'requirements_complete'
         to: 'design'
-        additional_instructions: 'Requirements are complete! ✅ Now transition to design phase. Mark completed requirements tasks.'
         transition_reason: 'All requirements tasks completed, moving to technical design'
         review_perspectives:
           - perspective: 'business_analyst'
@@ -63,7 +62,6 @@ states:
 
       - trigger: 'design_complete'
         to: 'implementation'
-        additional_instructions: 'Design is complete! ✅ Now transition to implementation phase. Mark completed design tasks.'
         transition_reason: 'Technical design is complete, ready for implementation'
         review_perspectives:
           - perspective: 'architect'
@@ -91,7 +89,6 @@ states:
 
       - trigger: 'implementation_complete'
         to: 'qa'
-        additional_instructions: 'Implementation is complete! ✅ Now transition to quality assurance phase.'
         transition_reason: 'Core implementation is complete, ready for quality assurance'
         review_perspectives:
           - perspective: 'senior_software_developer'
@@ -115,7 +112,6 @@ states:
 
       - trigger: 'qa_complete'
         to: 'testing'
-        additional_instructions: 'Quality assurance is complete! ✅ Now transition to testing phase. Mark completed QA tasks.'
         transition_reason: 'Quality assurance is complete, ready for comprehensive testing'
 
   testing:
@@ -134,7 +130,6 @@ states:
 
       - trigger: 'testing_complete'
         to: 'finalize'
-        additional_instructions: 'Testing is complete! ✅ All tests pass and the feature is validated. Transition to finalization phase. Mark all testing tasks as complete.'
         transition_reason: 'All testing is complete, feature is ready for delivery'
         review_perspectives:
           - perspective: 'business_analyst'
@@ -191,5 +186,4 @@ states:
 
       - trigger: 'finalization_complete'
         to: 'requirements'
-        additional_instructions: 'Feature is complete and finalized! All work is finished and ready for delivery. Prepare to gather requirements for the next feature or iteration.'
         transition_reason: 'Feature delivery complete, beginning new development cycle'

@@ -36,7 +36,6 @@ states:
     transitions:
       - trigger: 'exploration_complete'
         to: 'implement'
-        additional_instructions: 'Analysis and design complete! ✅ Now transition to implementation phase. You have a clear understanding of the problem and a solid design approach. Keep the scope focused on the minor enhancement. Mark completed exploration tasks.'
         transition_reason: 'Analysis and design complete, ready for streamlined implementation'
 
       - trigger: 'abandon_feature'
@@ -59,7 +58,6 @@ states:
 
       - trigger: 'implementation_complete'
         to: 'finalize'
-        additional_instructions: 'Implementation is complete! Clean up code and finalize documentation to ensure everything is ready for delivery. Mark all implementation tasks as complete.'
         transition_reason: 'Implementation complete, ready for finalization'
 
       - trigger: 'abandon_feature'
@@ -67,7 +65,7 @@ states:
         instructions: >
           Minor enhancement abandoned during implementation. Clean up any incomplete code and return to exploration.
           The plan file and any completed work will remain for future reference.
-        additional_instructions: 'Minor enhancement abandoned during implementation. Clean up any incomplete code and prepare for new tasks.'
+        additional_instructions: 'Clean up any incomplete code and prepare for new tasks.'
         transition_reason: 'User decided to abandon minor enhancement during implementation'
 
   finalize:
@@ -118,10 +116,9 @@ states:
 
       - trigger: 'finalization_complete'
         to: 'explore'
-        additional_instructions: 'Minor enhancement is complete and finalized! All work is finished and ready for delivery. Prepare for the next development task.'
         transition_reason: 'Minor enhancement delivery complete, ready for next task'
 
       - trigger: 'abandon_feature'
         to: 'explore'
-        additional_instructions: 'Minor enhancement abandoned during finalization. Clean up any finalization artifacts and prepare for new tasks.'
+        additional_instructions: 'Clean up any finalization artifacts and prepare for new tasks.'
         transition_reason: 'User decided to abandon minor enhancement during finalization'

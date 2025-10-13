@@ -165,40 +165,6 @@ ${baseInstructions}
   }
 
   /**
-   * Get phase-specific contextual information based on state machine
-   */
-  private getPhaseSpecificContext(phase: string): string {
-    if (this.stateMachine) {
-      const phaseDefinition = this.stateMachine.states[phase];
-      if (phaseDefinition) {
-        return `**Context**: ${phaseDefinition.description}`;
-      }
-    }
-
-    throw new Error(
-      `State machine not set or unknown phase: ${phase}. This should not happen as state machine is always loaded.`
-    );
-  }
-
-  /**
-   * Get default phase context for standard phases
-  /**
-   * Get phase-specific reminders and best practices based on state machine
-   */
-  private getPhaseReminders(phase: string): string {
-    if (this.stateMachine) {
-      const phaseDefinition = this.stateMachine.states[phase];
-      if (phaseDefinition) {
-        return `**Remember**: \n- Focus on: ${phaseDefinition.description}\n- Update plan file with ${phase} progress\n- Mark completed tasks with [x]\n- Stay focused on current phase objectives`;
-      }
-    }
-
-    throw new Error(
-      `State machine not set or unknown phase: ${phase}. This should not happen as state machine is always loaded.`
-    );
-  }
-
-  /**
    * Capitalize phase name for display
    */
   private capitalizePhase(phase: string): string {

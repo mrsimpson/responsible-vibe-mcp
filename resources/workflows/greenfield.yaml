@@ -38,7 +38,6 @@ states:
     transitions:
       - trigger: 'ideation_complete'
         to: 'architecture'
-        additional_instructions: 'Ideation is complete! ✅ Present the PRD to the user. Mark completed ideation tasks.'
         transition_reason: 'PRD is complete with clear requirements, ready for technical architecture design'
         review_perspectives:
           - perspective: 'business_analyst'
@@ -65,7 +64,7 @@ states:
 
       - trigger: 'architecture_complete'
         to: 'plan'
-        additional_instructions: 'Architecture is complete! ✅ You have a solid technical foundation with clear tech stack choices and architectural decisions. Present the implementation plan to the user and document it thoroughly. Mark completed architecture tasks.'
+        additional_instructions: 'Present the implementation plan to the user and document it thoroughly.'
         transition_reason: 'Technical architecture is complete, ready for implementation planning'
         review_perspectives:
           - perspective: 'architect'
@@ -119,7 +118,6 @@ states:
 
       - trigger: 'code_complete'
         to: 'finalize'
-        additional_instructions: 'Implementation is complete! ✅ Now transition to finalization phase. Mark completed implementation tasks.'
         transition_reason: 'Core implementation is complete, ready for comprehensive documentation'
 
       - trigger: 'abandon_project'
@@ -180,7 +178,6 @@ states:
 
       - trigger: 'finalization_complete'
         to: 'ideation'
-        additional_instructions: 'Greenfield project is complete and ready for delivery! All phases successfully finished. Prepare for the next greenfield project.'
         transition_reason: 'Project delivery complete with finalized code and documentation, ready for next greenfield project'
 
       - trigger: 'abandon_project'
