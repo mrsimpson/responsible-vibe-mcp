@@ -60,11 +60,17 @@ export class WorkflowResourceHandler implements ResourceHandler {
       // From dist/server/resource-handlers/workflow-resource.js -> project root
       let projectRoot: string;
       if (currentFilePath.includes('/dist/')) {
-        // Running from compiled code - dist is one level down from project root
-        projectRoot = path.resolve(path.dirname(currentFilePath), '../../../');
+        // Running from compiled code - from packages/mcp-server/dist/resource-handlers/ to project root is 4 levels up
+        projectRoot = path.resolve(
+          path.dirname(currentFilePath),
+          '../../../../'
+        );
       } else {
-        // Running from source (development) - src is one level down from project root
-        projectRoot = path.resolve(path.dirname(currentFilePath), '../../../');
+        // Running from source (development) - src is 4 levels down from project root
+        projectRoot = path.resolve(
+          path.dirname(currentFilePath),
+          '../../../../'
+        );
       }
 
       const workflowFile = path.join(
