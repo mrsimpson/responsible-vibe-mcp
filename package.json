@@ -80,7 +80,7 @@
       "prettier --write",
       "oxlint --fix"
     ],
-    "*.{json,md,yml,yaml}": [
+    "*.{json,md,yml,yaml,vue}": [
       "prettier --write"
     ]
   },
