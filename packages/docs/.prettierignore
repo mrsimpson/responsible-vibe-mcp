@@ -1,0 +1,3 @@
+dist/
+.vitepress/dist/
+node_modules/
