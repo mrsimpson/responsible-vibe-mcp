@@ -589,7 +589,7 @@ onMounted(async () => {
       // Simple file upload handler that matches the new architecture
       fileUploadHandler = {
         setupEventListeners: () => {
-          fileUploadInput.addEventListener('change', async (event) => {
+          fileUploadInput.addEventListener('change', async event => {
             const target = event.target as HTMLInputElement;
             const files = target.files;
 
@@ -603,16 +603,22 @@ onMounted(async () => {
               // Validate file type
               const validExtensions = ['.yaml', '.yml'];
               const fileName = file.name.toLowerCase();
-              const isValidType = validExtensions.some(ext => fileName.endsWith(ext));
-              
+              const isValidType = validExtensions.some(ext =>
+                fileName.endsWith(ext)
+              );
+
               if (!isValidType) {
-                throw new Error('Invalid file type. Please select a .yaml or .yml file.');
+                throw new Error(
+                  'Invalid file type. Please select a .yaml or .yml file.'
+                );
               }
 
               // Validate file size (1MB limit)
               const maxSizeBytes = 1024 * 1024;
               if (file.size > maxSizeBytes) {
-                throw new Error(`File too large. Maximum size is ${maxSizeBytes / 1024 / 1024}MB.`);
+                throw new Error(
+                  `File too large. Maximum size is ${maxSizeBytes / 1024 / 1024}MB.`
+                );
               }
 
               if (file.size === 0) {
@@ -620,39 +626,44 @@ onMounted(async () => {
               }
 
               // Read file content
-              const yamlContent = await new Promise<string>((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                  if (e.target?.result) {
-                    resolve(e.target.result as string);
-                  } else {
-                    reject(new Error('Failed to read file content'));
-                  }
-                };
-                reader.onerror = () => reject(new Error('Error reading file'));
-                reader.readAsText(file);
-              });
+              const yamlContent = await new Promise<string>(
+                (resolve, reject) => {
+                  const reader = new FileReader();
+                  reader.onload = e => {
+                    if (e.target?.result) {
+                      resolve(e.target.result as string);
+                    } else {
+                      reject(new Error('Failed to read file content'));
+                    }
+                  };
+                  reader.onerror = () =>
+                    reject(new Error('Error reading file'));
+                  reader.readAsText(file);
+                }
+              );
 
               if (!yamlContent.trim()) {
                 throw new Error('Uploaded file is empty');
               }
 
               // Parse and render the workflow
-              diagramCanvas.innerHTML = '<div class="loading-message">Loading uploaded workflow...</div>';
+              diagramCanvas.innerHTML =
+                '<div class="loading-message">Loading uploaded workflow...</div>';
               const workflow = parseYaml(yamlContent);
               appState.currentWorkflow = workflow;
               appState.selectedElement = null;
               appState.highlightedPath = null;
               await plantUMLRenderer.renderWorkflow(workflow);
-              
+
               // Clear workflow selector since this is an uploaded workflow
               if (workflowSelector) {
                 workflowSelector.value = '';
               }
-              
-              updateSidePanel();
-              console.log(`Successfully loaded uploaded workflow: ${workflow.name || 'Unnamed'}`);
 
+              updateSidePanel();
+              console.log(
+                `Successfully loaded uploaded workflow: ${workflow.name || 'Unnamed'}`
+              );
             } catch (error) {
               console.error('Failed to load uploaded workflow:', error);
               diagramCanvas.innerHTML = `<div class="loading-message">Failed to load workflow: ${error.message}</div>`;
@@ -661,9 +672,9 @@ onMounted(async () => {
               target.value = '';
             }
           });
-        }
+        },
       };
-      
+
       fileUploadHandler.setupEventListeners();
     }
 

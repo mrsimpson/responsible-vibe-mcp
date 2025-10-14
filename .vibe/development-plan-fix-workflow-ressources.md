@@ -60,9 +60,12 @@ Fix regression where loading workflow resources via MCP fails with error "Workfl
 - [x] Verify both dist and source cases work correctly
 - [x] Confirm workflow files are found correctly
 - [x] Clean up debug files
+- [x] Fix CI formatting issues by adding .vue files to lint-staged
+- [x] Add .prettierignore files to exclude dist directories from formatting checks
 
 ### Completed
 - [x] Fix verified to work correctly for both dist and source cases
+- [x] CI formatting issues resolved
 
 ### Completed
 *None yet*
