@@ -18,15 +18,23 @@ export default defineConfig({
 
     sidebar: [
       {
-        text: 'Getting Started',
+        text: 'User Guide',
         items: [
           { text: 'Overview', link: '/' },
           { text: 'How It Works', link: '/user/how-it-works' },
+          { text: 'Agent Setup', link: '/user/agent-setup' },
+          { text: 'Vibe Engineering', link: '/user/advanced-engineering' },
+          { text: 'Long-Term Memory', link: '/user/long-term-memory' },
+          { text: 'Tutorial', link: '/user/tutorial' },
         ],
       },
       {
-        text: 'Interactive Workflows',
-        items: [{ text: 'Explore All Workflows', link: '/workflows' }],
+        text: 'Workflows',
+        items: [
+          { text: 'Workflow-Selection', link: '/user/workflow-selection' },
+          { text: 'Explore All Workflows', link: '/workflows' },
+          { text: 'Custom Workflows', link: '/user/custom-workflows' },
+        ],
       },
     ],
   },
