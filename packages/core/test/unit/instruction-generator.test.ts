@@ -134,7 +134,7 @@ describe('InstructionGenerator', () => {
       );
       expect(
         mockProjectDocsManager.getVariableSubstitutions
-      ).toHaveBeenCalledWith(testProjectPath);
+      ).toHaveBeenCalledWith(testProjectPath, 'main');
     });
 
     it('should handle all three document variables', async () => {
@@ -241,7 +241,7 @@ describe('InstructionGenerator', () => {
       expect(result.instructions).toContain('Work on general tasks.');
       expect(
         mockProjectDocsManager.getVariableSubstitutions
-      ).toHaveBeenCalledWith(testProjectPath);
+      ).toHaveBeenCalledWith(testProjectPath, 'main');
     });
   });
 });
