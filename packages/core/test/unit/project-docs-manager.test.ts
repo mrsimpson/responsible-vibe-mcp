@@ -279,6 +279,8 @@ describe('ProjectDocsManager', () => {
           'requirements.md'
         ),
         $DESIGN_DOC: join(testProjectPath, '.vibe', 'docs', 'design.md'),
+        $BRANCH_NAME: 'main',
+        $VIBE_DIR: join(testProjectPath, '.vibe'),
       });
     });
   });

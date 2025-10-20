@@ -41,7 +41,7 @@ describe('Workflow Validation', () => {
     it('should load ALL workflow files from resources directory', () => {
       // Temporarily disable domain filtering for this test
       const originalEnv = process.env.VIBE_WORKFLOW_DOMAINS;
-      process.env.VIBE_WORKFLOW_DOMAINS = 'code,architecture,office';
+      process.env.VIBE_WORKFLOW_DOMAINS = 'code,architecture,office,sdd';
 
       try {
         // Create manager after setting env var to include all domains
