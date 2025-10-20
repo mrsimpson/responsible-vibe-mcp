@@ -135,6 +135,9 @@ export async function initializeServerComponents(
   // Initialize database
   await database.initialize();
 
+  // Load project workflows before tool registration
+  workflowManager.loadProjectWorkflows(projectPath);
+
   logger.info('Server components initialized successfully');
 
   return {
