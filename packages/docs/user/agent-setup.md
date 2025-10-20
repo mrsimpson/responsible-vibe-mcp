@@ -285,8 +285,5 @@ For production use, the agent will automatically spawn the server as needed.
 Once your agent is set up:
 
 1. **Read [How It Works](./how-it-works.md)** to understand the development flow
-2. **Try a simple feature**: Ask your agent to help implement something small
-3. **Explore workflows**: Use `list_workflows` to see available development approaches
-4. **Check examples**: Review the comprehensive examples in the documentation
-
-The agent will guide you through structured development workflows, maintaining project context and helping you build features systematically.
+2. **Try a simple feature**: Ask your agent to help implement something small. You can follow along the [tutorial](./tutorial.md) or make yourself familiar with [more features](./advanced-engineering.md) how Responsible Vibe MCP helps engineering.
+3. **Explore workflows**: Use `list_workflows` to see available development approaches or look at the [graphical visualizer](/workflows.md)
