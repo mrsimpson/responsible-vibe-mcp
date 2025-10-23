@@ -447,7 +447,7 @@ export class ProjectDocsManager {
     const paths = this.getDocumentPaths(projectPath);
 
     // Create branch directory path under .vibe/ (similar to docs structure)
-    const branchDirName = !!gitBranch ? gitBranch : 'main';
+    const branchDirName = gitBranch || 'main';
     const vibeDir = join(projectPath, '.vibe');
 
     return {

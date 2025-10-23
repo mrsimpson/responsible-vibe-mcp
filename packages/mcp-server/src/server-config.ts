@@ -406,55 +406,13 @@ export async function registerMcpTools(
     )
   );
 
-  // Register install_workflow tool
-  mcpServer.registerTool(
-    'install_workflow',
-    {
-      description:
-        'Install a workflow to .vibe/workflows/ directory. Source can be a predefined workflow name (from unloaded workflows) or URL. Installed workflows become available and override predefined ones with the same name.',
-      inputSchema: {
-        source: z
-          .string()
-          .describe(
-            'Source workflow name. Use "list_workflows" with "include_unloaded=true" tool to see options.'
-          ),
-        name: z
-          .string()
-          .optional()
-          .describe(
-            'Custom name for installed workflow (defaults to source name)'
-          ),
-      },
-      annotations: {
-        title: 'Workflow Installation Tool',
-        readOnlyHint: false,
-        destructiveHint: false,
-        idempotentHint: false,
-        openWorldHint: false,
-      },
-    },
-    createToolHandler(
-      'install_workflow',
-      toolRegistry,
-      responseRenderer,
-      context
-    )
-  );
-
   // Register list_workflows tool
   mcpServer.registerTool(
     'list_workflows',
     {
       description:
-        'Get an overview of available workflows. By default returns only loaded workflows (respecting domain filtering). Use include_unloaded=true to see all workflows regardless of domain filtering.',
-      inputSchema: {
-        include_unloaded: z
-          .boolean()
-          .optional()
-          .describe(
-            'Include workflows not loaded due to domain filtering. Default: false'
-          ),
-      },
+        'Get an overview of available workflows. Returns only loaded workflows (respecting domain filtering).',
+      inputSchema: {},
       annotations: {
         title: 'Workflow Overview Tool',
         readOnlyHint: true,

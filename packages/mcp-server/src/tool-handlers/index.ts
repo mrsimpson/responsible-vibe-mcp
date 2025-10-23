@@ -12,7 +12,7 @@ import { ConductReviewHandler } from './conduct-review.js';
 import { StartDevelopmentHandler } from './start-development.js';
 import { ResumeWorkflowHandler } from './resume-workflow.js';
 import { ResetDevelopmentHandler } from './reset-development.js';
-import { InstallWorkflowHandler } from './install-workflow.js';
+
 import { ListWorkflowsHandler } from './list-workflows.js';
 import { GetToolInfoHandler } from './get-tool-info.js';
 import { SetupProjectDocsHandler } from './setup-project-docs.js';
@@ -57,7 +57,6 @@ export function createToolRegistry(): ToolRegistry {
   registry.register('start_development', new StartDevelopmentHandler());
   registry.register('resume_workflow', new ResumeWorkflowHandler());
   registry.register('reset_development', new ResetDevelopmentHandler());
-  registry.register('install_workflow', new InstallWorkflowHandler());
   registry.register('list_workflows', new ListWorkflowsHandler());
   registry.register('get_tool_info', new GetToolInfoHandler());
   registry.register('setup_project_docs', new SetupProjectDocsHandler());
@@ -77,7 +76,6 @@ export { ConductReviewHandler } from './conduct-review.js';
 export { StartDevelopmentHandler } from './start-development.js';
 export { ResumeWorkflowHandler } from './resume-workflow.js';
 export { ResetDevelopmentHandler } from './reset-development.js';
-export { InstallWorkflowHandler } from './install-workflow.js';
 export { ListWorkflowsHandler } from './list-workflows.js';
 export { GetToolInfoHandler } from './get-tool-info.js';
 export { SetupProjectDocsHandler } from './setup-project-docs.js';

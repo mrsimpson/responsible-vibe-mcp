@@ -172,7 +172,7 @@ export class WorkflowManager {
   public getAllAvailableWorkflows(): WorkflowInfo[] {
     // Create a temporary manager with all domains enabled
     const originalEnv = process.env.VIBE_WORKFLOW_DOMAINS;
-    process.env.VIBE_WORKFLOW_DOMAINS = 'code,architecture,office';
+    process.env.VIBE_WORKFLOW_DOMAINS = 'code,architecture,office,sdd';
 
     try {
       const tempManager = new WorkflowManager();

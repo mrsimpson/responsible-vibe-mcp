@@ -6,7 +6,8 @@
 
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
-import { existsSync } from 'node:fs';
+import { existsSync, mkdirSync, writeFileSync, readFileSync } from 'node:fs';
+import { WorkflowManager } from '@codemcp/workflows-core';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -58,6 +59,32 @@ function parseCliArgs(): { shouldExit: boolean } {
     return { shouldExit: true };
   }
 
+  // Handle workflow commands
+  const workflowIndex = args.findIndex(arg => arg === 'workflow');
+  if (workflowIndex !== -1) {
+    const subcommand = args[workflowIndex + 1];
+    if (subcommand === 'list') {
+      handleWorkflowList();
+      return { shouldExit: true };
+    } else if (subcommand === 'copy') {
+      const sourceWorkflow = args[workflowIndex + 2];
+      const customName = args[workflowIndex + 3];
+      if (!sourceWorkflow || !customName) {
+        console.error(
+          '❌ Error: workflow copy requires source workflow and custom name'
+        );
+        console.error('Usage: workflow copy <source-workflow> <custom-name>');
+        process.exit(1);
+      }
+      handleWorkflowCopy(sourceWorkflow, customName);
+      return { shouldExit: true };
+    } else {
+      console.error('❌ Unknown workflow subcommand:', subcommand);
+      console.error('Available: workflow list, workflow copy <custom-name>');
+      process.exit(1);
+    }
+  }
+
   // Handle generate config flag
   const generateConfigIndex = args.findIndex(
     arg => arg === '--generate-config'
@@ -91,6 +118,118 @@ function parseCliArgs(): { shouldExit: boolean } {
 }
 
 /**
+ * Handle workflow list command
+ */
+function handleWorkflowList(): void {
+  try {
+    const workflowManager = new WorkflowManager();
+    const workflows = workflowManager.getAvailableWorkflowsForProject(
+      process.cwd()
+    );
+
+    console.log('📋 Available workflows:');
+    for (const w of workflows) {
+      console.log(`  ${w.name.padEnd(12)} - ${w.description}`);
+    }
+  } catch (error) {
+    console.error('Error listing workflows:', error);
+    process.exit(1);
+  }
+}
+
+/**
+ * Handle workflow copy command
+ */
+function handleWorkflowCopy(sourceWorkflow: string, customName: string): void {
+  try {
+    // Get all available workflows (including unloaded domains)
+    const workflowManager = new WorkflowManager();
+    const allWorkflows = workflowManager.getAllAvailableWorkflows();
+
+    // Validate source workflow exists
+    const validWorkflow = allWorkflows.find(w => w.name === sourceWorkflow);
+    if (!validWorkflow) {
+      console.error(`❌ Invalid source workflow: ${sourceWorkflow}`);
+      console.error(
+        `Available workflows: ${allWorkflows.map(w => w.name).join(', ')}`
+      );
+      process.exit(1);
+    }
+
+    // Find source workflow file
+    const possibleSourcePaths = [
+      join(
+        __dirname,
+        '..',
+        '..',
+        '..',
+        'resources',
+        'workflows',
+        `${sourceWorkflow}.yaml`
+      ),
+      join(
+        __dirname,
+        '..',
+        '..',
+        'core',
+        'resources',
+        'workflows',
+        `${sourceWorkflow}.yaml`
+      ),
+      join(process.cwd(), 'resources', 'workflows', `${sourceWorkflow}.yaml`),
+    ];
+
+    let sourceContent = null;
+    for (const sourcePath of possibleSourcePaths) {
+      if (existsSync(sourcePath)) {
+        sourceContent = readFileSync(sourcePath, 'utf8');
+        break;
+      }
+    }
+
+    if (!sourceContent) {
+      console.error(`❌ Could not find source workflow: ${sourceWorkflow}`);
+      process.exit(1);
+    }
+
+    // Create .vibe/workflows directory if it doesn't exist
+    const vibeDir = join(process.cwd(), '.vibe');
+    const workflowsDir = join(vibeDir, 'workflows');
+
+    if (!existsSync(vibeDir)) {
+      mkdirSync(vibeDir, { recursive: true });
+    }
+    if (!existsSync(workflowsDir)) {
+      mkdirSync(workflowsDir, { recursive: true });
+    }
+
+    // Update workflow name in content
+    const customContent = sourceContent.replace(
+      new RegExp(`name: '${sourceWorkflow}'`, 'g'),
+      `name: '${customName}'`
+    );
+
+    const workflowPath = join(workflowsDir, `${customName}.yaml`);
+
+    if (existsSync(workflowPath)) {
+      console.error(
+        `❌ Workflow '${customName}' already exists at ${workflowPath}`
+      );
+      process.exit(1);
+    }
+
+    writeFileSync(workflowPath, customContent);
+    console.log(
+      `✅ Copied '${sourceWorkflow}' workflow to '${customName}' at ${workflowPath}`
+    );
+    console.log('💡 Edit the file to customize your workflow');
+  } catch (error) {
+    console.error('Error copying workflow:', error);
+    process.exit(1);
+  }
+}
+
+/**
  * Handle generate config command
  */
 async function handleGenerateConfig(agent: string): Promise<void> {
@@ -111,12 +250,17 @@ Responsible Vibe CLI Tools
 
 USAGE:
   responsible-vibe-mcp [OPTIONS]
+  responsible-vibe-mcp workflow <SUBCOMMAND>
 
 OPTIONS:
   --help, -h                    Show this help message
   --system-prompt               Show the system prompt for LLM integration
   --visualize, --viz            Start the interactive workflow visualizer (default)
   --generate-config <agent>     Generate configuration files for AI coding agents
+
+WORKFLOW COMMANDS:
+  workflow list                 List available workflows
+  workflow copy <source> <name> Copy a workflow with custom name
 
 SUPPORTED AGENTS:
   amazonq-cli                   Generate .amazonq/cli-agents/vibe.json
