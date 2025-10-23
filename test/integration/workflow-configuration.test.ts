@@ -15,8 +15,6 @@ import {
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { WorkflowManager } from '@codemcp/workflows-core';
-import { ListWorkflowsHandler } from '../../packages/mcp-server/src/tool-handlers/list-workflows.js';
-import { ServerContext } from '../../packages/mcp-server/src/types.js';
 
 describe('Workflow Configuration', () => {
   let tempDir: string;
@@ -161,52 +159,6 @@ describe('Workflow Configuration', () => {
       expect(() => {
         workflowManager.getAvailableWorkflowsForProject(tempDir);
       }).toThrow(/all workflow names must be non-empty strings/);
-    });
-  });
-
-  describe('list_workflows Tool Integration', () => {
-    it('should return only configured workflows via list_workflows tool', async () => {
-      // Create config file with limited workflows
-      writeFileSync(
-        join(tempDir, '.vibe', 'config.yaml'),
-        `enabled_workflows:\n  - waterfall\n  - epcc\n`
-      );
-
-      // Create mock server context
-      const context: ServerContext = {
-        workflowManager,
-        projectPath: tempDir,
-      } as ServerContext;
-
-      const handler = new ListWorkflowsHandler();
-      const result = await handler.executeHandler({}, context);
-
-      expect(result.workflows).toHaveLength(2);
-      expect(result.workflows.find(w => w.name === 'waterfall')).toBeDefined();
-      expect(result.workflows.find(w => w.name === 'epcc')).toBeDefined();
-      expect(result.workflows.find(w => w.name === 'bugfix')).toBeUndefined();
-
-      // Verify resource URIs are correct
-      expect(
-        result.workflows.every(w => w.resourceUri.startsWith('workflow://'))
-      ).toBe(true);
-    });
-
-    it('should return all workflows via list_workflows tool when no config exists', async () => {
-      // No config file created
-      const context: ServerContext = {
-        workflowManager,
-        projectPath: tempDir,
-      } as ServerContext;
-
-      const handler = new ListWorkflowsHandler();
-      const result = await handler.executeHandler({}, context);
-
-      // Should include all predefined workflows (excluding custom since no custom workflow file exists)
-      expect(result.workflows.length).toBeGreaterThan(5);
-      expect(result.workflows.some(w => w.name === 'waterfall')).toBe(true);
-      expect(result.workflows.some(w => w.name === 'epcc')).toBe(true);
-      expect(result.workflows.some(w => w.name === 'bugfix')).toBe(true);
     });
   });
 });

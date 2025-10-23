@@ -168,7 +168,7 @@ export class GetToolInfoHandler extends BaseToolHandler<
       {
         name: 'list_workflows',
         description:
-          'Get an overview of all available workflows with descriptions',
+          'Get an overview of available workflows (respecting domain filtering)',
         parameters: [],
         schema: {
           required: [],
