@@ -104,16 +104,28 @@ transitions:
 
 ## Installing Workflows
 
-### From Unloaded Workflows
+### Using CLI
 
-Use the `install_workflow` tool to install workflows from the broader ecosystem:
+The CLI provides convenient commands to list and copy workflows:
 
 ```bash
-# Your AI can call this or you can request it
-"Install the TDD workflow for test-driven development"
+# List all available workflows
+npx responsible-vibe-mcp workflow list
+
+# Copy a built-in workflow to customize it
+npx responsible-vibe-mcp workflow copy waterfall my-custom-waterfall
+
+# Copy any available workflow
+npx responsible-vibe-mcp workflow copy epcc my-team-process
 ```
 
-This installs workflows to `.vibe/workflows/` where they become available for your project.
+This copies the workflow to `.vibe/workflows/my-custom-waterfall.yaml` where you can customize it for your needs.
+
+The copied workflow will have:
+
+- Updated `name` field to match your custom name
+- All original states and transitions
+- Metadata you can modify (description, complexity, etc.)
 
 ### From URLs or Files
 
