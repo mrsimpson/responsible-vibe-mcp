@@ -14,6 +14,10 @@ export default defineConfig({
     nav: [
       { text: 'Documentation', link: '/' },
       { text: 'Workflows', link: '/workflows' },
+      {
+        text: 'Github',
+        link: 'https://github.com/mrsimpson/responsible-vibe-mcp',
+      },
     ],
 
     sidebar: [

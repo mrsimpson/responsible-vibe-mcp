@@ -4,6 +4,10 @@ Most AI coding tools are like having a really fast intern – they'll do exactly
 
 Responsible Vibe flips this around. Instead of your AI waiting for instructions, it actively guides the development process using proven engineering methodologies.
 
+Want to know more? There is also a recorded session on ["how to tame your stubborn software agent"](https://www.youtube.com/watch?v=qKTdqmlnXMg) as part of the video podcast [Software-Architektur.tv](https://software-architektur.tv/) (German, auto-translated subtitles are okay-ish) which gives a more detailed insight into the basic ideas and how it's supposed to work.
+
+Next, we'll look into the components that make up Responsible Vibe and how they work together.
+
 ## The MCP Architecture
 
 ```mermaid

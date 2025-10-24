@@ -57,6 +57,8 @@ And since may developers tend to through structured processing off the cliff onc
 
 Check the 📖 **[Complete Documentation →](https://mrsimpson.github.io/responsible-vibe-mcp/user/how-it-works.html)**
 
+There is also a recorded session on ["how to tame your stubborn software agent"](https://www.youtube.com/watch?v=qKTdqmlnXMg) as part of the video podcast [Software-Architektur.tv](https://software-architektur.tv/) (German, auto-translated subtitles are okay-ish) which gives a more detailed insight into the basic ideas and how it's supposed to work.
+
 ---
 
 **[Open Source](LICENSE.md)** | **[Issues](https://github.com/mrsimpson/vibe-feature-mcp/issues)**
