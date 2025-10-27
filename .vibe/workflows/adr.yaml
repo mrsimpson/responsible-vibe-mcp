@@ -1,0 +1,133 @@
+name: adr
+description: 'Architecture Decision Records workflow: Context → Research → Decide → Commit - structured process for documenting architectural decisions'
+initial_state: context
+
+metadata:
+  domain: 'architecture'
+  complexity: 'medium'
+  bestFor:
+    - 'Documenting architectural decisions'
+    - 'Recording design choices'
+    - 'Technology selection decisions'
+    - 'System design decisions'
+  useCases:
+    - 'Choosing between architectural patterns'
+    - 'Selecting technology stack components'
+    - 'Documenting design trade-offs'
+  examples:
+    - 'Document database selection decision'
+    - 'Record API design approach'
+    - 'Document deployment strategy choice'
+
+states:
+  context:
+    description: 'Define the architectural problem or decision that needs to be made'
+    default_instructions: |
+      You are starting an Architecture Decision Record (ADR) workflow.
+
+      **Your tasks:**
+      1. Check if $ARCHITECTURE_DOC exists to determine ADR storage location
+      2. Look for existing ADRs to understand current format/numbering
+      3. Help user clearly define the architectural problem or decision needed
+      4. Identify key stakeholders who should be involved
+      5. Document the context and problem statement
+      6. Create initial ADR structure using existing format or template above
+
+      Focus on understanding WHAT decision needs to be made and WHY it's important.
+      Don't make the decision yet - that happens in the decide phase.
+
+    additional_instructions: |
+      **ADR Template (use if no existing ADRs found):**
+      ```
+      # ADR-XXX: [Decision Title]
+
+      ## Status
+      Proposed
+
+      ## Context
+      [Describe the architectural problem or decision that needs to be made]
+
+      ## Decision
+      [The decision that was made - to be filled in decide phase]
+
+      ## Consequences
+      ### Positive
+      - [Benefits of this decision]
+
+      ### Negative
+      - [Drawbacks or risks of this decision]
+
+      ## Alternatives Considered
+      - [Other options that were evaluated]
+      ```
+
+    transitions:
+      - trigger: context_complete
+        to: research
+        transition_reason: 'Architectural problem clearly defined, ready to research options'
+
+      - trigger: abandon_adr
+        to: context
+        transition_reason: 'User decided to abandon current ADR'
+
+  research:
+    description: 'Investigate options, gather information, and analyze alternatives'
+    default_instructions: |
+      You are in the research phase for the ADR.
+
+      **Your tasks:**
+      1. Research available options and alternatives for the decision
+      2. Gather technical information, constraints, and requirements
+      3. Analyze trade-offs between different approaches
+      4. Consider non-functional requirements (performance, security, maintainability)
+      5. Document findings in the "Alternatives Considered" section
+      6. Identify pros and cons for each option
+
+      Work with the user to thoroughly understand all viable options before making a decision.
+      Update the ADR with research findings but don't make the final decision yet.
+
+  decide:
+    description: 'Make the architectural decision and document the rationale'
+    default_instructions: |
+      You are in the decide phase for the ADR.
+
+      **Your tasks:**
+      1. Help user make the final architectural decision based on research
+      2. Document the chosen option in the "Decision" section
+      3. Provide clear rationale for why this option was selected
+      4. Document positive consequences (benefits) of the decision
+      5. Document negative consequences (drawbacks/risks) of the decision
+      6. Ensure the decision is specific and actionable
+      7. Update ADR status to "Accepted" (or "Proposed" if needs approval)
+
+      Focus on making a clear, well-reasoned decision with documented rationale.
+      The decision should be based on the research conducted in the previous phase.
+
+    transitions:
+      - trigger: decision_complete
+        to: commit
+        transition_reason: 'Decision made and documented, ready for finalization'
+        review_perspectives:
+          - perspective: 'architect'
+            prompt: 'Review the ADR for architectural soundness, completeness, and alignment with system design principles. Ensure the decision is well-reasoned and consequences are thoroughly documented.'
+          - perspective: 'stakeholder'
+            prompt: 'Review the ADR from a business/project perspective. Ensure the decision addresses stakeholder needs, considers business impact, and is clearly communicated.'
+          - perspective: 'implementer'
+            prompt: 'Review the ADR from an implementation perspective. Ensure the decision is practical, actionable, and considers development/operational implications.'
+
+  commit:
+    description: 'Finalize the ADR with validation and cleanup'
+    default_instructions: |
+      You are in the commit phase for the ADR.
+
+      **Your tasks:**
+      1. Review ADR completeness and quality
+      2. Ensure proper formatting and structure
+      3. Verify all sections are filled appropriately
+      4. Check that consequences (positive and negative) are documented
+      5. Ensure alternatives considered are listed
+      6. Finalize ADR numbering if needed
+      7. Update ADR status to final state (Accepted/Approved)
+      8. Save/integrate ADR into $ARCHITECTURE_DOC or appropriate location
+
+      This is the final validation and cleanup phase before the ADR is complete.
