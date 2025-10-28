@@ -12,6 +12,8 @@ const mocks = vi.hoisted(() => ({
   join: vi.fn(),
   dirname: vi.fn(),
   fileURLToPath: vi.fn(),
+  spawn: vi.fn(),
+  generateConfig: vi.fn(),
 }));
 
 vi.mock('@codemcp/workflows-core', () => ({
@@ -34,6 +36,14 @@ vi.mock('node:path', () => ({
 
 vi.mock('node:url', () => ({
   fileURLToPath: mocks.fileURLToPath,
+}));
+
+vi.mock('node:child_process', () => ({
+  spawn: mocks.spawn,
+}));
+
+vi.mock('../src/config-generator.js', () => ({
+  generateConfig: mocks.generateConfig,
 }));
 
 describe('CLI', () => {
@@ -96,6 +106,23 @@ describe('CLI', () => {
     mocks.dirname.mockReturnValue('/mock/dirname');
     mocks.fileURLToPath.mockReturnValue('/mock/filename.js');
 
+    // Mock spawn to prevent actual process spawning in tests
+    mocks.spawn.mockReturnValue({
+      on: vi.fn((event, callback) => {
+        if (event === 'close') {
+          // Simulate successful process completion
+          setTimeout(() => callback(0), 0);
+        }
+        return this;
+      }),
+      stdout: { on: vi.fn() },
+      stderr: { on: vi.fn() },
+      kill: vi.fn(),
+    } as unknown);
+
+    // Mock generateConfig to prevent actual file generation
+    mocks.generateConfig.mockResolvedValue(undefined);
+
     // Import from source
     const module = await import('../src/cli.js');
     runCli = module.runCli;
@@ -144,11 +171,7 @@ describe('CLI', () => {
     it('should handle --generate-config with valid agent', () => {
       process.argv = ['node', 'cli.js', '--generate-config', 'amazonq-cli'];
 
-      // Mock the generateConfig function to avoid actual file operations
-      vi.doMock('../src/config-generator.js', () => ({
-        generateConfig: vi.fn().mockResolvedValue(undefined),
-      }));
-
+      // generateConfig is already mocked in beforeEach
       runCli();
 
       // Should not show error or help
@@ -319,11 +342,7 @@ describe('CLI', () => {
     it('should start visualization tool by default', () => {
       process.argv = ['node', 'cli.js'];
 
-      // Mock the visualization launcher to avoid actual tool startup
-      vi.doMock('../src/visualization-launcher.js', () => ({
-        startVisualizationTool: vi.fn(),
-      }));
-
+      // spawn is already mocked in beforeEach, so no actual processes will be spawned
       runCli();
 
       // Should not show error
@@ -333,11 +352,7 @@ describe('CLI', () => {
     it('should start visualization tool with --visualize flag', () => {
       process.argv = ['node', 'cli.js', '--visualize'];
 
-      // Mock the visualization launcher
-      vi.doMock('../src/visualization-launcher.js', () => ({
-        startVisualizationTool: vi.fn(),
-      }));
-
+      // spawn is already mocked in beforeEach, so no actual processes will be spawned
       runCli();
 
       expect(consoleErrorSpy).not.toHaveBeenCalled();
@@ -346,11 +361,7 @@ describe('CLI', () => {
     it('should start visualization tool with --viz flag', () => {
       process.argv = ['node', 'cli.js', '--viz'];
 
-      // Mock the visualization launcher
-      vi.doMock('../src/visualization-launcher.js', () => ({
-        startVisualizationTool: vi.fn(),
-      }));
-
+      // spawn is already mocked in beforeEach, so no actual processes will be spawned
       runCli();
 
       expect(consoleErrorSpy).not.toHaveBeenCalled();
