@@ -34,7 +34,7 @@ states:
       6. Create initial ADR structure using existing format or template above
 
       Focus on understanding WHAT decision needs to be made and WHY it's important.
-      Don't make the decision yet - that happens in the decide phase.
+      Don't evaluate technical options or make the decision yet - that happens in the decide phase.
 
     additional_instructions: |
       **ADR Template (use if no existing ADRs found):**
@@ -66,10 +66,6 @@ states:
         to: research
         transition_reason: 'Architectural problem clearly defined, ready to research options'
 
-      - trigger: abandon_adr
-        to: context
-        transition_reason: 'User decided to abandon current ADR'
-
   research:
     description: 'Investigate options, gather information, and analyze alternatives'
     default_instructions: |
@@ -85,6 +81,11 @@ states:
 
       Work with the user to thoroughly understand all viable options before making a decision.
       Update the ADR with research findings but don't make the final decision yet.
+
+    transitions:
+      - trigger: research_complete
+        to: decide
+        transition_reason: 'Research completed, ready to make architectural decision'
 
   decide:
     description: 'Make the architectural decision and document the rationale'
@@ -131,3 +132,8 @@ states:
       8. Save/integrate ADR into $ARCHITECTURE_DOC or appropriate location
 
       This is the final validation and cleanup phase before the ADR is complete.
+
+    transitions:
+      - trigger: need_decision_changes
+        to: decide
+        transition_reason: 'Final review found problems with the decision documentation'
