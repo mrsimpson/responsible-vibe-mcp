@@ -1,6 +1,6 @@
 {
   "name": "responsible-vibe-mcp",
-  "version": "3.5.1",
+  "version": "3.6.1",
   "description": "A Model Context Protocol server that acts as an intelligent conversation state manager and development guide for LLMs, featuring comprehensive long-term memory with persistent project artifacts",
   "type": "module",
   "main": "packages/cli/dist/index.js",
@@ -51,17 +51,17 @@
   "dependencies": {
     "@codemcp/workflows-core": "workspace:*",
     "@modelcontextprotocol/sdk": "1.17.5",
+    "@sqlite.org/sqlite-wasm": "3.50.4-build1",
     "@types/js-yaml": "4.0.9",
-    "@sqlite.org/sqlite-wasm": "^3.50.4-build1",
     "js-yaml": "4.1.0",
-    "zod": "^3.22.4"
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@modelcontextprotocol/inspector": "0.16.8",
     "@tsconfig/node22": "22.0.2",
     "@tsconfig/strictest": "2.0.6",
     "@types/jsdom": "21.1.7",
-    "@types/node": "^18.19.0",
+    "@types/node": "^18.19.130",
     "glob": "11.0.3",
     "husky": "9.1.7",
     "jsdom": "26.1.0",
@@ -69,9 +69,9 @@
     "oxlint": "1.16.0",
     "prettier": "3.6.2",
     "tsx": "4.20.5",
-    "turbo": "^2.3.3",
-    "typescript": "^5.0.0",
-    "vitepress": "^1.6.3",
+    "turbo": "^2.5.8",
+    "typescript": "^5.9.3",
+    "vitepress": "^1.6.4",
     "vitest": "3.2.4"
   },
   "lint-staged": {

@@ -1,6 +1,6 @@
 {
   "name": "@codemcp/workflows",
-  "version": "3.5.1",
+  "version": "3.6.1",
   "description": "MCP server implementation for responsible-vibe",
   "type": "module",
   "main": "dist/index.js",
@@ -18,12 +18,12 @@
     "format": "prettier --write ."
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "1.17.5",
-    "@codemcp/workflows-core": "workspace:*"
+    "@codemcp/workflows-core": "workspace:*",
+    "@modelcontextprotocol/sdk": "1.17.5"
   },
   "devDependencies": {
-    "@types/node": "^20.0.0",
-    "typescript": "^5.0.0",
+    "@types/node": "^20.19.23",
+    "typescript": "^5.9.3",
     "vitest": "3.2.4"
   }
 }
