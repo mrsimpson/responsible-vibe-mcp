@@ -5,6 +5,7 @@ export default defineConfig({
     setupFiles: ['../../test/setup.ts'],
     environment: 'node',
     globals: true,
+    include: ['test/**/*.test.ts'],
     typecheck: {
       tsconfig: './tsconfig.build.json',
     },
