@@ -30,8 +30,10 @@ states:
       2. Look for existing ADRs to understand current format/numbering
       3. Help user clearly define the architectural problem or decision needed
       4. Identify key stakeholders who should be involved
-      5. Document the context and problem statement
-      6. Create initial ADR structure using existing format or template above
+      5. IMPORTANT: Gather information about the quality attributes (non-functional requirements)
+      that are relevant to this decision (e.g., performance, security, maintainability)
+      6. Document the context and problem statement
+      7. Create initial ADR structure using existing format or template above
 
       Focus on understanding WHAT decision needs to be made and WHY it's important.
       Don't evaluate technical options or make the decision yet - that happens in the decide phase.
@@ -69,15 +71,17 @@ states:
   research:
     description: 'Investigate options, gather information, and analyze alternatives'
     default_instructions: |
-      You are in the research phase for the ADR.
+      You are in the research phase for the ADR. This is the most important phase of the workflow.
 
       **Your tasks:**
       1. Research available options and alternatives for the decision
       2. Gather technical information, constraints, and requirements
-      3. Analyze trade-offs between different approaches
-      4. Consider non-functional requirements (performance, security, maintainability)
-      5. Document findings in the "Alternatives Considered" section
-      6. Identify pros and cons for each option
+      3. Analyze trade-offs between different approaches:
+        - Evaluate each option based on the defined quality attributes
+        - Many solutions will require knowledge about a particular technology. Query the user about his experience with it.
+        - Don't jump to judgments: Consider the user's perspective on the decision-making process
+      4. Document findings in the "Alternatives Considered" section
+      5. Identify pros and cons for each option
 
       Work with the user to thoroughly understand all viable options before making a decision.
       Update the ADR with research findings but don't make the final decision yet.
