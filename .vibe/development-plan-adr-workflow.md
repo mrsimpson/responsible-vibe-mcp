@@ -97,6 +97,8 @@ Create a structured workflow for writing Architecture Decision Records (ADRs) th
 - [x] Multi-perspective review validation added to decide→commit transition
 - [x] Template integration with $ARCHITECTURE_DOC location detection
 - [x] Workflow tested and confirmed working in responsible-vibe-mcp
+- [x] Added CLI validation command using existing StateMachineLoader
+- [x] Fixed workflow validation issues (missing transitions in commit state)
 
 ## Commit
 

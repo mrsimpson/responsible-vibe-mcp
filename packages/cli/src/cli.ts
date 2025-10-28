@@ -101,6 +101,19 @@ function parseCliArgs(): { shouldExit: boolean } {
     return { shouldExit: true };
   }
 
+  // Handle validate workflow flag
+  const validateIndex = args.findIndex(arg => arg === '--validate');
+  if (validateIndex !== -1) {
+    const workflowPath = args[validateIndex + 1];
+    if (!workflowPath) {
+      console.error('❌ Error: --validate requires a workflow file path');
+      console.error('Usage: --validate <workflow-file.yaml>');
+      process.exit(1);
+    }
+    handleValidateWorkflow(workflowPath);
+    return { shouldExit: true };
+  }
+
   // Handle visualization flag (default behavior)
   if (
     args.includes('--visualize') ||
@@ -115,6 +128,43 @@ function parseCliArgs(): { shouldExit: boolean } {
   console.error('❌ Unknown arguments:', args.join(' '));
   showHelp();
   return { shouldExit: true };
+}
+
+/**
+ * Handle workflow validation
+ */
+function handleValidateWorkflow(workflowPath: string): void {
+  try {
+    console.log(`🔍 Validating workflow: ${workflowPath}`);
+
+    const loader = new StateMachineLoader() as {
+      loadFromFile: (path: string) => unknown;
+    };
+    const workflow = loader.loadFromFile(workflowPath) as {
+      name: string;
+      description: string;
+      initial_state: string;
+      states: Record<string, unknown>;
+      metadata?: { domain?: string; complexity?: string };
+    };
+
+    console.log('✅ Workflow validation successful!');
+    console.log(`📋 Workflow: ${workflow.name}`);
+    console.log(`📝 Description: ${workflow.description}`);
+    console.log(`🏁 Initial state: ${workflow.initial_state}`);
+    console.log(`🔄 States: ${Object.keys(workflow.states).join(', ')}`);
+
+    if (workflow.metadata) {
+      console.log(`🏷️  Domain: ${workflow.metadata.domain || 'not specified'}`);
+      console.log(
+        `⚡ Complexity: ${workflow.metadata.complexity || 'not specified'}`
+      );
+    }
+  } catch (error) {
+    console.error('❌ Workflow validation failed:');
+    console.error((error as Error).message);
+    process.exit(1);
+  }
 }
 
 /**
@@ -257,6 +307,7 @@ OPTIONS:
   --system-prompt               Show the system prompt for LLM integration
   --visualize, --viz            Start the interactive workflow visualizer (default)
   --generate-config <agent>     Generate configuration files for AI coding agents
+  --validate <workflow.yaml>    Validate a workflow file
 
 WORKFLOW COMMANDS:
   workflow list                 List available workflows
