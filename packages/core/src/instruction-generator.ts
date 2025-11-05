@@ -165,6 +165,11 @@ ${baseInstructions}
         '\n\n**Note**: Plan file will be created when you first update it.';
     }
 
+    // Add continuity and task management instructions
+    enhanced += `\n\n**Important Reminders:**
+- Use ONLY the development plan for task management - do not use your own task management tools
+- Call whats_next() after the next user message to maintain the development workflow`;
+
     return enhanced;
   }
 

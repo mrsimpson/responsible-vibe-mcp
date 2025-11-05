@@ -239,7 +239,7 @@ export async function registerMcpTools(
     'proceed_to_phase',
     {
       description:
-        'Move to a specific development phase when the current phase is complete. Use this tool to explicitly transition between phases. Check your plan file to see available phases for the current workflow. Only transition when current phase tasks are finished and user confirms readiness.',
+        'Move to a specific development phase when the current phase is complete. Use this tool to explicitly transition between phases. Check your plan file to see available phases for the current workflow. Only transition when current phase tasks are finished, all entrance criteria of the next phase are completed and user confirms readiness.',
       inputSchema: {
         target_phase: z
           .string()

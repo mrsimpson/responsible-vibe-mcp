@@ -40,6 +40,24 @@ export class WhatsNextHandler extends ConversationRequiredToolHandler<
   WhatsNextArgs,
   WhatsNextResult
 > {
+  protected override async executeHandler(
+    args: WhatsNextArgs,
+    context: ServerContext
+  ): Promise<WhatsNextResult> {
+    let conversationContext;
+
+    try {
+      conversationContext = await this.getConversationContext(context);
+    } catch (_error) {
+      // Return MCP error with resolution instructions
+      throw new Error(
+        'No development session found. Call start_development() to begin a new development session.'
+      );
+    }
+
+    return this.executeWithConversation(args, context, conversationContext);
+  }
+
   protected async executeWithConversation(
     args: WhatsNextArgs,
     context: ServerContext,
