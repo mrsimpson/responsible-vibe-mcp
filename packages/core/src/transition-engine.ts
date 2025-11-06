@@ -75,21 +75,6 @@ export class TransitionEngine {
   private async isFirstCallFromInitialState(
     context: TransitionContext
   ): Promise<boolean> {
-    // Get workflow name from conversation state
-    const conversationState =
-      await this.conversationManager?.getConversationState(
-        context.conversationId
-      );
-    const workflowName = conversationState?.workflowName;
-
-    const stateMachine = this.workflowManager.loadWorkflowForProject(
-      context.projectPath,
-      workflowName
-    );
-    const isInitialState = context.currentPhase === stateMachine.initial_state;
-
-    if (!isInitialState) return false;
-
     // Check database for any previous interactions in this conversation
     if (!this.conversationManager) {
       logger.warn('ConversationManager not set, assuming first call');
@@ -101,7 +86,6 @@ export class TransitionEngine {
     );
 
     logger.debug('Checking first call from initial state', {
-      isInitialState,
       hasInteractions,
       conversationId: context.conversationId,
       currentPhase: context.currentPhase,
