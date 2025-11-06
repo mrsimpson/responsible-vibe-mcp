@@ -49,10 +49,8 @@ export class WhatsNextHandler extends ConversationRequiredToolHandler<
     try {
       conversationContext = await this.getConversationContext(context);
     } catch (_error) {
-      // Return MCP error with resolution instructions
-      throw new Error(
-        'No development session found. Call start_development() to begin a new development session.'
-      );
+      // Use standard CONVERSATION_NOT_FOUND error
+      throw new Error('CONVERSATION_NOT_FOUND');
     }
 
     return this.executeWithConversation(args, context, conversationContext);
