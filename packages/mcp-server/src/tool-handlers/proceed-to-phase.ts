@@ -69,6 +69,15 @@ export class ProceedToPhaseHandler extends ConversationRequiredToolHandler<
       );
     }
 
+    // Validate agent role for crowd workflows
+    await this.validateAgentRole(
+      currentPhase,
+      target_phase,
+      conversationContext.workflowName,
+      conversationContext.projectPath,
+      context
+    );
+
     // Ensure state machine is loaded for this project
     this.ensureStateMachineForProject(context, conversationContext.projectPath);
 
@@ -200,6 +209,74 @@ export class ProceedToPhaseHandler extends ConversationRequiredToolHandler<
     } else {
       // No review perspectives defined - transition proceeds normally
       // Note: No error thrown when hasReviewPerspectives is false, as per user feedback
+    }
+  }
+
+  /**
+   * Validate that the agent's role allows this phase transition (for crowd workflows)
+   */
+  private async validateAgentRole(
+    currentPhase: string,
+    targetPhase: string,
+    workflowName: string,
+    projectPath: string,
+    context: ServerContext
+  ): Promise<void> {
+    // Get agent role from environment
+    const agentRole = process.env['VIBE_ROLE'];
+
+    // If no role specified, skip validation (single-agent mode)
+    if (!agentRole) {
+      return;
+    }
+
+    // Load workflow to check if it's a collaborative workflow
+    const stateMachine = context.workflowManager.loadWorkflowForProject(
+      projectPath,
+      workflowName
+    );
+
+    // If workflow doesn't have collaboration enabled, skip validation
+    if (!stateMachine.metadata?.collaboration) {
+      return;
+    }
+
+    // Get current state definition
+    const currentState = stateMachine.states[currentPhase];
+    if (!currentState) {
+      throw new Error(`Invalid current phase: ${currentPhase}`);
+    }
+
+    // Find the transition for this agent's role
+    const agentTransition = currentState.transitions.find(
+      t => t.to === targetPhase && (t.role === agentRole || !t.role)
+    );
+
+    if (!agentTransition) {
+      throw new Error(
+        `Agent with role '${agentRole}' cannot proceed from ${currentPhase} to ${targetPhase}. ` +
+          `No transition available for this role.`
+      );
+    }
+
+    // Check if agent will be responsible in target phase
+    // Look at target state's outgoing transitions to determine responsibility
+    const targetState = stateMachine.states[targetPhase];
+    if (targetState) {
+      const isResponsibleInTarget = targetState.transitions.some(
+        t =>
+          t.role === agentRole &&
+          t.additional_instructions?.includes('RESPONSIBLE')
+      );
+
+      if (!isResponsibleInTarget) {
+        // Agent is not responsible in target phase
+        // This is allowed (agent can transition to consultation mode)
+        this.logger.debug('Agent transitioning to consultative role', {
+          agentRole,
+          phase: targetPhase,
+        });
+      }
     }
   }
 }

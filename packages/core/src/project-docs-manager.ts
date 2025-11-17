@@ -450,12 +450,16 @@ export class ProjectDocsManager {
     const branchDirName = gitBranch || 'main';
     const vibeDir = join(projectPath, '.vibe');
 
+    // Get agent role from environment variable for crowd workflows
+    const agentRole = process.env['VIBE_ROLE'] || '';
+
     return {
       $ARCHITECTURE_DOC: paths.architecture,
       $REQUIREMENTS_DOC: paths.requirements,
       $DESIGN_DOC: paths.design,
       $VIBE_DIR: vibeDir,
       $BRANCH_NAME: branchDirName,
+      $VIBE_ROLE: agentRole,
     };
   }
 
