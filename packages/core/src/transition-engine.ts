@@ -367,4 +367,21 @@ Once you've defined these criteria, we can begin development. Throughout the pro
       .map(word => word.charAt(0).toUpperCase() + word.slice(1))
       .join(' ');
   }
+
+  /**
+   * Filter transitions based on agent role (for crowd workflows)
+   * Returns transitions applicable to the current agent
+   */
+  filterTransitionsByRole<T extends { role?: string }>(
+    transitions: T[],
+    agentRole?: string
+  ): T[] {
+    // If no role specified, return all transitions (single-agent mode)
+    if (!agentRole) {
+      return transitions;
+    }
+
+    // Filter transitions: include if no role specified OR role matches
+    return transitions.filter(t => !t.role || t.role === agentRole);
+  }
 }

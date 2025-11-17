@@ -28,6 +28,9 @@ export interface YamlTransition {
     perspective: string;
     prompt: string;
   }>;
+
+  /** Optional role targeting for crowd workflows (e.g., 'business-analyst', 'architect', 'developer') */
+  role?: string;
 }
 
 /**
@@ -68,5 +71,9 @@ export interface YamlStateMachine {
     useCases?: string[];
     examples?: string[];
     requiresDocumentation?: boolean;
+    /** Indicates this workflow supports multi-agent collaboration */
+    collaboration?: boolean;
+    /** Required agent roles for this collaborative workflow */
+    requiredRoles?: string[];
   };
 }

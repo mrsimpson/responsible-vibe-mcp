@@ -1,0 +1,328 @@
+# yaml-language-server: $schema=../../state-machine-schema.json
+---
+name: 'sdd-greenfield-crowd'
+description: 'Collaborative greenfield project development: Team establishes constitution → Business Analyst specifies → Architect plans → Developer implements → Team documents'
+initial_state: 'constitution'
+
+# Enhanced metadata for better discoverability
+metadata:
+  domain: 'sdd-crowd'
+  complexity: 'high'
+  collaboration: true
+  requiredRoles:
+    - business-analyst
+    - architect
+    - developer
+  bestFor:
+    - 'Team-based new projects from scratch'
+    - 'Collaborative greenfield development'
+    - 'Complex system design with specialized roles'
+  useCases:
+    - 'Team builds new application from scratch'
+    - 'Collaborative creation of new service'
+  examples:
+    - 'Team builds new web application'
+    - 'Collaborative microservice architecture creation'
+
+# States with default instructions and role-specific transitions
+states:
+  constitution:
+    description: 'Establish constitutional framework and project governance'
+    default_instructions: |
+      **Team Collaboration Mode**
+
+      You are $VIBE_ROLE working in a collaborative team starting a new project.
+      Current phase: CONSTITUTION
+
+      All team members collaborate on establishing project principles.
+
+    transitions:
+      # All agents participate in constitution (no single responsible agent)
+      # Architect typically leads this as it's about technical governance
+      - trigger: 'constitution_established'
+        to: 'specify'
+        role: architect
+        transition_reason: 'Constitutional framework established, moving to specification'
+        additional_instructions: |
+          **You are LEADING the constitution phase.**
+
+          Work with the full team to establish the constitutional framework.
+
+          **Constitution Tasks:**
+          1. Create `constitution.md` in project root
+          2. Define core principles for the project
+          3. Establish quality gates and governance
+
+          **Collaboration:**
+          - Use send_message to business-analyst: "What are the key business principles?"
+          - Use send_message to developer: "What are essential development practices?"
+          - Build consensus on project values
+
+          **Template sections**:
+          - Core Principles (Specifications First, User Value, Simplicity, etc.)
+          - Quality Gates
+          - Governance
+
+          **Handoff to Business-Analyst:**
+
+          Before proceeding:
+          1. Use send_message to business-analyst: "Constitution established. Please take the lead for specification phase."
+          2. Use send_message to developer: "Constitution ready, specification will begin next"
+          3. Use send_message_to_operator: "Constitution complete, handing off to business-analyst"
+          4. Call proceed_to_phase
+
+      - trigger: 'constitution_established'
+        to: 'specify'
+        role: business-analyst
+        transition_reason: 'Constitutional framework established, preparing to specify'
+        additional_instructions: |
+          **You are CONTRIBUTING to the constitution phase.**
+
+          Work with architect to establish project principles.
+
+          **Your Contributions:**
+          - Provide input on business values and user-centric principles
+          - Suggest quality standards for specifications
+          - Define what "done" means from business perspective
+
+          **Handoff Notice:**
+          - When constitution is complete, YOU become RESPONSIBLE
+          - You will take the lead in specify phase
+          - Prepare to create the feature specification
+
+      - trigger: 'constitution_established'
+        to: 'specify'
+        role: developer
+        transition_reason: 'Constitutional framework established, transitioning to specification'
+        additional_instructions: |
+          **You are CONTRIBUTING to the constitution phase.**
+
+          Work with architect to establish project principles.
+
+          **Your Contributions:**
+          - Provide input on code quality and maintainability principles
+          - Suggest development and testing practices
+          - Share experience with what works in practice
+
+  specify:
+    description: 'Create comprehensive feature specification'
+    default_instructions: |
+      **Team Collaboration Mode**
+
+      You are $VIBE_ROLE working in a collaborative team on this new project.
+      Current phase: SPECIFY
+
+      Business-analyst is responsible. Architect and developer are consulted.
+
+    transitions:
+      # Business Analyst is RESPONSIBLE for specify phase
+      - trigger: 'specification_complete'
+        to: 'plan'
+        role: business-analyst
+        transition_reason: 'Feature specification completed, handing off to architect'
+        additional_instructions: |
+          **You are RESPONSIBLE for the specify phase.**
+
+          Create the project specification following greenfield specification process.
+          (Instructions similar to sdd-feature-crowd specify phase)
+
+          **Handoff to Architect:**
+
+          Before proceeding:
+          1. Use send_message to architect: "Specification complete. Please take the lead for plan phase."
+          2. Use send_message_to_operator: "Specification complete, handing off to architect"
+          3. Call proceed_to_phase
+
+      - trigger: 'specification_complete'
+        to: 'plan'
+        role: architect
+        transition_reason: 'Specification completed, preparing to plan'
+        additional_instructions: |
+          **You are CONSULTED during the specify phase.**
+
+          (Consultative instructions similar to sdd-feature-crowd)
+
+          **Handoff Notice:**
+          - When complete, YOU become RESPONSIBLE in plan phase
+
+      - trigger: 'specification_complete'
+        to: 'plan'
+        role: developer
+        transition_reason: 'Specification completed, architect will plan'
+        additional_instructions: |
+          **You are CONSULTED during the specify phase.**
+
+          (Consultative instructions similar to sdd-feature-crowd)
+
+  plan:
+    description: 'Generate implementation plan with constitutional compliance'
+    default_instructions: |
+      **Team Collaboration Mode**
+
+      You are $VIBE_ROLE working in a collaborative team on this new project.
+      Current phase: PLAN
+
+      Architect is responsible for technology decisions and architecture.
+
+    transitions:
+      - trigger: 'plan_complete'
+        to: 'tasks'
+        role: architect
+        transition_reason: 'Implementation plan completed, moving to tasks'
+        additional_instructions: |
+          **You are RESPONSIBLE for the plan phase.**
+
+          **Planning includes:**
+          - Technology stack selection (ask user for preferences)
+          - Architecture design
+          - Constitutional compliance check
+          - High-level design documentation
+
+          **You remain RESPONSIBLE in tasks phase**
+
+      - trigger: 'plan_complete'
+        to: 'tasks'
+        role: business-analyst
+        transition_reason: 'Plan completed, architect moving to tasks'
+        additional_instructions: |
+          **You are CONSULTED during the plan phase.**
+          (Consultative instructions)
+
+      - trigger: 'plan_complete'
+        to: 'tasks'
+        role: developer
+        transition_reason: 'Plan completed, architect moving to tasks'
+        additional_instructions: |
+          **You are CONSULTED during the plan phase.**
+          (Consultative instructions)
+
+  tasks:
+    description: 'Generate actionable, dependency-ordered tasks'
+    default_instructions: |
+      **Team Collaboration Mode**
+
+      You are $VIBE_ROLE working in a collaborative team on this new project.
+      Current phase: TASKS
+
+      Architect creates task breakdown.
+
+    transitions:
+      - trigger: 'tasks_generated'
+        to: 'implement'
+        role: architect
+        transition_reason: 'Tasks generated, handing off to developer'
+        additional_instructions: |
+          **You are RESPONSIBLE for the tasks phase.**
+
+          Generate comprehensive task breakdown organized by user stories.
+
+          **Handoff to Developer:**
+          Before proceeding, send handoff messages to developer.
+
+      - trigger: 'tasks_generated'
+        to: 'implement'
+        role: developer
+        transition_reason: 'Tasks generated, preparing to implement'
+        additional_instructions: |
+          **You are CONSULTED during tasks phase.**
+
+          **Handoff Notice:** YOU become RESPONSIBLE in implement phase.
+
+      - trigger: 'tasks_generated'
+        to: 'implement'
+        role: business-analyst
+        transition_reason: 'Tasks generated, developer will implement'
+        additional_instructions: |
+          **You are INFORMED during tasks phase.**
+
+  implement:
+    description: 'Execute implementation following task breakdown'
+    default_instructions: |
+      **Team Collaboration Mode**
+
+      You are $VIBE_ROLE working in a collaborative team on this new project.
+      Current phase: IMPLEMENT
+
+      Developer drives implementation.
+
+    transitions:
+      - trigger: 'implementation_complete'
+        to: 'document'
+        role: developer
+        transition_reason: 'Implementation complete, team will document'
+        additional_instructions: |
+          **You are RESPONSIBLE for the implement phase.**
+
+          Execute implementation following task breakdown.
+          (Instructions similar to sdd-feature-crowd)
+
+          **Handoff to Team Documentation:**
+          All team members contribute to documentation phase.
+
+      - trigger: 'implementation_complete'
+        to: 'document'
+        role: architect
+        transition_reason: 'Implementation complete, moving to documentation'
+        additional_instructions: |
+          **You are CONSULTED during implement phase.**
+
+      - trigger: 'implementation_complete'
+        to: 'document'
+        role: business-analyst
+        transition_reason: 'Implementation complete, moving to documentation'
+        additional_instructions: |
+          **You are CONSULTED during implement phase.**
+
+  document:
+    description: 'Create comprehensive project documentation'
+    default_instructions: |
+      **Team Collaboration Mode**
+
+      You are $VIBE_ROLE working in a collaborative team on this new project.
+      Current phase: DOCUMENT
+
+      All team members contribute to documentation.
+
+    transitions:
+      - trigger: 'documentation_complete'
+        to: 'document'
+        role: developer
+        transition_reason: 'Documentation complete, project ready'
+        additional_instructions: |
+          **You are RESPONSIBLE for finalizing documentation.**
+
+          Coordinate with team to create:
+          - User documentation
+          - Developer documentation
+          - Project documentation (README, changelog, etc.)
+
+          **Collaborate:**
+          - Business-analyst creates user guides
+          - Architect creates architecture documentation
+          - You create developer setup guides
+
+      - trigger: 'documentation_complete'
+        to: 'document'
+        role: architect
+        transition_reason: 'Documentation complete'
+        additional_instructions: |
+          **You CONTRIBUTE architecture documentation.**
+
+          Create architecture overview, deployment guide, and technical docs.
+
+      - trigger: 'documentation_complete'
+        to: 'document'
+        role: business-analyst
+        transition_reason: 'Documentation complete'
+        additional_instructions: |
+          **You CONTRIBUTE user documentation.**
+
+          Create user manual, examples, and user-focused guides.
+
+# Global transitions
+global_transitions:
+  - trigger: 'abandon_project'
+    to: 'constitution'
+    transition_reason: 'Project abandoned, restart from beginning'
+    additional_instructions: |
+      Project abandoned. If you want to restart, begin again with establishing the constitutional framework.

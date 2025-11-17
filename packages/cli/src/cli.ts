@@ -6,7 +6,13 @@
 
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
-import { existsSync, mkdirSync, writeFileSync, readFileSync } from 'node:fs';
+import {
+  existsSync,
+  mkdirSync,
+  writeFileSync,
+  readFileSync,
+  readdirSync,
+} from 'node:fs';
 import { WorkflowManager } from '@codemcp/workflows-core';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -81,6 +87,27 @@ function parseCliArgs(): { shouldExit: boolean } {
     } else {
       console.error('❌ Unknown workflow subcommand:', subcommand);
       console.error('Available: workflow list, workflow copy <custom-name>');
+      process.exit(1);
+    }
+  }
+
+  // Handle agents commands
+  const agentsIndex = args.findIndex(arg => arg === 'agents');
+  if (agentsIndex !== -1) {
+    const subcommand = args[agentsIndex + 1];
+    if (subcommand === 'list') {
+      handleAgentsList();
+      return { shouldExit: true };
+    } else if (subcommand === 'copy') {
+      // Check for --output-dir flag
+      const outputDirIndex = args.findIndex(arg => arg === '--output-dir');
+      const outputDir =
+        outputDirIndex !== -1 ? args[outputDirIndex + 1] : undefined;
+      handleAgentsCopy(outputDir);
+      return { shouldExit: true };
+    } else {
+      console.error('❌ Unknown agents subcommand:', subcommand);
+      console.error('Available: agents list, agents copy [--output-dir DIR]');
       process.exit(1);
     }
   }
@@ -280,6 +307,140 @@ function handleWorkflowCopy(sourceWorkflow: string, customName: string): void {
 }
 
 /**
+ * Handle agents list command
+ */
+function handleAgentsList(): void {
+  try {
+    // Find agents directory
+    const possibleAgentsPaths = [
+      join(__dirname, '..', '..', '..', 'resources', 'agents'),
+      join(__dirname, '..', '..', 'core', 'resources', 'agents'),
+    ];
+
+    let agentsDir: string | null = null;
+    for (const path of possibleAgentsPaths) {
+      if (existsSync(path)) {
+        agentsDir = path;
+        break;
+      }
+    }
+
+    if (!agentsDir) {
+      console.error('❌ Could not find agents directory');
+      process.exit(1);
+    }
+
+    const files = readdirSync(agentsDir).filter(
+      (f: string) => f.endsWith('.yaml') || f.endsWith('.yml')
+    );
+
+    if (files.length === 0) {
+      console.log('📋 No agent configurations found');
+      return;
+    }
+
+    console.log('📋 Available agent configurations:\n');
+    for (const file of files) {
+      const agentPath = join(agentsDir, file);
+      const content = readFileSync(agentPath, 'utf8');
+
+      // Extract name and displayName from YAML
+      const nameMatch = content.match(/^name:\s*(.+)$/m);
+      const displayNameMatch = content.match(/^displayName:\s*(.+)$/m);
+      const name = nameMatch
+        ? (nameMatch[1]?.trim() ?? file.replace(/\.ya?ml$/, ''))
+        : file.replace(/\.ya?ml$/, '');
+      const displayName = displayNameMatch?.[1]?.trim() ?? name;
+
+      console.log(`  ${name.padEnd(18)} ${displayName}`);
+    }
+
+    console.log(
+      '\n💡 Use "agents copy" to copy these configurations to your project'
+    );
+  } catch (error) {
+    console.error('Error listing agents:', error);
+    process.exit(1);
+  }
+}
+
+/**
+ * Handle agents copy command
+ */
+function handleAgentsCopy(outputDir?: string): void {
+  try {
+    // Find source agents directory
+    const possibleAgentsPaths = [
+      join(__dirname, '..', '..', '..', 'resources', 'agents'),
+      join(__dirname, '..', '..', 'core', 'resources', 'agents'),
+    ];
+
+    let sourceAgentsDir: string | null = null;
+    for (const path of possibleAgentsPaths) {
+      if (existsSync(path)) {
+        sourceAgentsDir = path;
+        break;
+      }
+    }
+
+    if (!sourceAgentsDir) {
+      console.error('❌ Could not find source agents directory');
+      process.exit(1);
+    }
+
+    // Determine target directory
+    const targetDir = outputDir || join(process.cwd(), '.crowd', 'agents');
+
+    // Create target directory if it doesn't exist
+    if (!existsSync(targetDir)) {
+      mkdirSync(targetDir, { recursive: true });
+    }
+
+    // Read all agent files
+    const files = readdirSync(sourceAgentsDir).filter(
+      (f: string) => f.endsWith('.yaml') || f.endsWith('.yml')
+    );
+
+    if (files.length === 0) {
+      console.error('❌ No agent configurations found to copy');
+      process.exit(1);
+    }
+
+    console.log(
+      `📋 Copying ${files.length} agent configuration(s) to ${targetDir}\n`
+    );
+
+    // Copy each file
+    let copiedCount = 0;
+    let skippedCount = 0;
+
+    for (const file of files) {
+      const sourcePath = join(sourceAgentsDir, file);
+      const targetPath = join(targetDir, file);
+
+      if (existsSync(targetPath)) {
+        console.log(`⏭️  ${file} (already exists, skipping)`);
+        skippedCount++;
+      } else {
+        const content = readFileSync(sourcePath, 'utf8');
+        writeFileSync(targetPath, content);
+        console.log(`✅ ${file}`);
+        copiedCount++;
+      }
+    }
+
+    console.log(
+      `\n🎉 Copied ${copiedCount} agent configuration(s)${skippedCount > 0 ? ` (skipped ${skippedCount} existing)` : ''}`
+    );
+    console.log(`\n💡 Agent configurations are now in: ${targetDir}`);
+    console.log('💡 Configure these agents in your crowd-mcp setup');
+  } catch (error) {
+    console.error('Error copying agents:', error);
+    process.exit(1);
+  }
+}
+
+/**
  * Handle generate config command
  */
 async function handleGenerateConfig(agent: string): Promise<void> {
@@ -301,6 +462,7 @@ Responsible Vibe CLI Tools
 USAGE:
   responsible-vibe-mcp [OPTIONS]
   responsible-vibe-mcp workflow <SUBCOMMAND>
+  responsible-vibe-mcp agents <SUBCOMMAND>
 
 OPTIONS:
   --help, -h                    Show this help message
@@ -312,6 +474,10 @@ OPTIONS:
 WORKFLOW COMMANDS:
   workflow list                 List available workflows
   workflow copy <source> <name> Copy a workflow with custom name
+
+AGENTS COMMANDS:
+  agents list                   List available agent configurations
+  agents copy [--output-dir]    Copy agent configs to .crowd/agents/
 
 SUPPORTED AGENTS:
   amazonq-cli                   Generate .amazonq/cli-agents/vibe.json
