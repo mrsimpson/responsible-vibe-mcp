@@ -55,6 +55,16 @@ You can explore:
 - **Greenfield**: Comprehensive planning for new projects
 - **Minor**: Streamlined approach for small changes
 
+### Collaborative Workflows (Multi-Agent)
+
+Work with teams of specialized AI agents using [crowd-mcp](https://github.com/mrsimpson/crowd-mcp):
+
+- **sdd-feature-crowd**: Collaborative feature development (business-analyst, architect, developer)
+- **sdd-bugfix-crowd**: Team-based bug fixing with systematic approach
+- **sdd-greenfield-crowd**: Collaborative new project development
+
+See **[Crowd MCP Integration Guide](./crowd-mcp-integration.md)** for multi-agent setup and usage.
+
 ## Why This Matters
 
 Most development tools force you into one approach. Responsible Vibe recognizes that **different problems need different methodologies**.

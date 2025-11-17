@@ -1,0 +1,736 @@
+# yaml-language-server: $schema=../../state-machine-schema.json
+---
+name: 'sdd-feature-crowd'
+description: 'Collaborative specification-driven feature development: Business Analyst → Architect → Developer working as a team'
+initial_state: 'analyze'
+
+# Enhanced metadata for better discoverability
+metadata:
+  domain: 'sdd-crowd'
+  complexity: 'medium'
+  collaboration: true
+  requiredRoles:
+    - business-analyst
+    - architect
+    - developer
+  bestFor:
+    - 'Team-based feature development'
+    - 'Multi-agent collaboration'
+    - 'Specification-driven development with specialized roles'
+  useCases:
+    - 'Add new functionality with separate BA, architect, and developer agents'
+    - 'Enhance existing features with collaborative team'
+  examples:
+    - 'Team builds user profile management system'
+    - 'Collaborative search functionality implementation'
+
+# States with default instructions and role-specific transitions
+states:
+  analyze:
+    description: 'Analyze current state and requirements'
+    default_instructions: |
+      **Team Collaboration Mode**
+
+      You are $VIBE_ROLE working in a collaborative team on this feature development.
+      Current phase: ANALYZE
+
+      Your team members can help you at any time through messaging.
+
+    transitions:
+      # Business Analyst is RESPONSIBLE for analyze phase
+      - trigger: 'analysis_complete'
+        to: 'specify'
+        role: business-analyst
+        transition_reason: 'Analysis completed, moving to specification'
+        additional_instructions: |
+          **You are RESPONSIBLE for the analyze phase.**
+
+          You have exclusive control during this phase:
+          - Only you can edit the plan file
+          - Only you can proceed to the next phase
+
+          **Analysis Tasks:**
+          1. **For New Features**: Brief analysis focusing on:
+             - How this feature fits into the existing system
+             - Integration points with current functionality
+             - Existing patterns and conventions to follow
+
+          2. **For Enhancements**: Thorough analysis of:
+             - Current implementation and its limitations
+             - User pain points and feedback
+             - Performance or usability issues
+             - Technical debt that should be addressed
+
+          3. **Context Gathering**:
+             - Review existing codebase and architecture
+             - Understand current user workflows
+             - Identify constraints and dependencies
+             - Document assumptions about the current state
+
+          **Collaboration:**
+          - Use send_message to ask architect about existing architecture constraints
+          - Use send_message to ask developer about current implementation details
+          - They are available to answer your questions
+
+          **Output**: Create `$VIBE_DIR/specs/$BRANCH_NAME/current-state-analysis.md`
+
+          **Before proceeding to specify phase:**
+          1. Use send_message_to_operator to report analysis completion
+          2. You remain RESPONSIBLE in specify phase (continue driving the work)
+          3. Only you can call proceed_to_phase
+
+      # Architect is CONSULTED during analyze phase
+      - trigger: 'analysis_complete'
+        to: 'specify'
+        role: architect
+        transition_reason: 'Analysis completed, transitioning to specification'
+        additional_instructions: |
+          **You are CONSULTED during the analyze phase.**
+
+          Business-analyst is driving this work. You are in consultative mode.
+
+          **Your Responsibilities:**
+          - Monitor your messages for questions from business-analyst
+          - Respond when asked about:
+            * Existing architecture constraints
+            * System integration points
+            * Technical feasibility concerns
+
+          **Important Constraints:**
+          - Do NOT edit the plan file (only business-analyst can)
+          - Do NOT attempt to proceed to next phase
+          - Wait for business-analyst to ask questions
+
+          **How to Help:**
+          - Use get_my_messages to check for questions
+          - Provide clear, actionable feedback about architecture
+          - Share knowledge about existing system patterns
+
+      # Developer is CONSULTED during analyze phase
+      - trigger: 'analysis_complete'
+        to: 'specify'
+        role: developer
+        transition_reason: 'Analysis completed, transitioning to specification'
+        additional_instructions: |
+          **You are CONSULTED during the analyze phase.**
+
+          Business-analyst is driving this work. You are in consultative mode.
+
+          **Your Responsibilities:**
+          - Monitor your messages for questions from business-analyst
+          - Respond when asked about:
+            * Current implementation details
+            * Existing code patterns
+            * Technical complexity estimates
+
+          **Important Constraints:**
+          - Do NOT edit the plan file (only business-analyst can)
+          - Do NOT attempt to proceed to next phase
+          - Wait for business-analyst to ask questions
+
+          **How to Help:**
+          - Use get_my_messages to check for questions
+          - Provide insights about existing codebase
+          - Share implementation challenges and patterns
+
+      # Skip analysis option (all agents can use this)
+      - trigger: 'skip_analysis'
+        to: 'specify'
+        transition_reason: 'Analysis not needed, proceeding to specification'
+        additional_instructions: |
+          Skipping analysis phase for straightforward new feature.
+          Proceeding directly to specification using provided requirements.
+
+  specify:
+    description: 'Create feature specification'
+    default_instructions: |
+      **Team Collaboration Mode**
+
+      You are $VIBE_ROLE working in a collaborative team on this feature development.
+      Current phase: SPECIFY
+
+      Business-analyst is responsible. Architect and developer are consulted.
+
+    transitions:
+      # Business Analyst is RESPONSIBLE for specify phase
+      - trigger: 'specification_complete'
+        to: 'clarify'
+        role: business-analyst
+        transition_reason: 'Specification completed, ready for clarification'
+        additional_instructions: |
+          **You are RESPONSIBLE for the specify phase.**
+
+          You have exclusive control during this phase:
+          - Only you can edit the plan file
+          - Only you can proceed to the next phase
+
+          **Specification Tasks:**
+
+          1. **Parse Requirements**: Extract key concepts from user's description
+             - Identify: actors, actions, data, constraints
+             - Consider existing system context (from analysis if performed)
+             - Focus on WHAT users need and WHY, not HOW to implement
+
+          2. **Interactive Requirements Gathering**: Ask clarifying questions about:
+             - Integration points with existing features
+             - User impact and affected users
+             - Data dependencies
+             - Performance requirements
+             - Backward compatibility concerns
+
+          3. **Handle Ambiguities**:
+             - Make informed guesses based on context and industry standards
+             - Only use [NEEDS CLARIFICATION: question] for critical decisions (max 3)
+             - Prioritize: scope > security/privacy > user experience > technical details
+
+          4. **Collaboration:**
+             - Use send_message to ask architect: "Is this technically feasible?"
+             - Use send_message to ask developer: "How complex is this to implement?"
+             - They will provide feedback to improve your specification
+
+          **Output**: Create `$VIBE_DIR/specs/$BRANCH_NAME/spec.md` with:
+          - User scenarios and testing
+          - Functional requirements
+          - Success criteria
+          - Integration points
+
+          **Before proceeding to clarify phase:**
+          1. Use send_message to ask architect and developer to review spec.md
+          2. Wait for their feedback and address concerns
+          3. Use send_message_to_operator: "Specification complete, moving to clarification"
+          4. You remain RESPONSIBLE in clarify phase
+          5. Only you can call proceed_to_phase
+
+      # Architect is CONSULTED during specify phase
+      - trigger: 'specification_complete'
+        to: 'clarify'
+        role: architect
+        transition_reason: 'Specification completed, transitioning to clarification'
+        additional_instructions: |
+          **You are CONSULTED during the specify phase.**
+
+          Business-analyst is driving this work. You are in consultative mode.
+
+          **Your Responsibilities:**
+          - Monitor messages for review requests from business-analyst
+          - Provide feedback on:
+            * Technical feasibility of requirements
+            * Architecture constraints and integration concerns
+            * System scalability and performance implications
+            * Technology stack compatibility
+
+          **Important Constraints:**
+          - Do NOT edit the plan file (only business-analyst can)
+          - Do NOT attempt to proceed to next phase
+
+          **How to Help:**
+          - Use get_my_messages to check for review requests
+          - Use send_message to provide detailed feedback
+          - Ask clarifying questions if requirements are unclear
+          - Suggest alternatives if requirements are problematic
+
+      # Developer is CONSULTED during specify phase
+      - trigger: 'specification_complete'
+        to: 'clarify'
+        role: developer
+        transition_reason: 'Specification completed, transitioning to clarification'
+        additional_instructions: |
+          **You are CONSULTED during the specify phase.**
+
+          Business-analyst is driving this work. You are in consultative mode.
+
+          **Your Responsibilities:**
+          - Monitor messages for review requests from business-analyst
+          - Provide feedback on:
+            * Implementation complexity and effort
+            * Technical challenges and risks
+            * Compatibility with existing codebase
+            * Testing requirements
+
+          **Important Constraints:**
+          - Do NOT edit the plan file (only business-analyst can)
+          - Do NOT attempt to proceed to next phase
+
+          **How to Help:**
+          - Use get_my_messages to check for review requests
+          - Use send_message to provide honest complexity estimates
+          - Highlight potential implementation challenges
+          - Suggest simplifications if requirements are too complex
+
+      # For needs_clarification loop
+      - trigger: 'needs_clarification'
+        to: 'specify'
+        role: business-analyst
+        transition_reason: 'Specification needs user clarification'
+        additional_instructions: |
+          Specification has unresolved clarifications. Present structured questions to the user,
+          wait for their responses, then update the specification accordingly.
+
+  clarify:
+    description: 'Review and clarify specification details'
+    default_instructions: |
+      **Team Collaboration Mode**
+
+      You are $VIBE_ROLE working in a collaborative team on this feature development.
+      Current phase: CLARIFY
+
+      Business-analyst is responsible. Architect is consulted.
+
+    transitions:
+      # Business Analyst is RESPONSIBLE for clarify phase
+      - trigger: 'clarification_complete'
+        to: 'plan'
+        role: business-analyst
+        transition_reason: 'All clarifications resolved, handing off to architect'
+        additional_instructions: |
+          **You are RESPONSIBLE for the clarify phase.**
+
+          You have exclusive control during this phase:
+          - Only you can edit the plan file
+          - Only you can proceed to the next phase
+
+          **Clarification Tasks:**
+
+          1. **Specification Review**:
+             - Check for any remaining [NEEDS CLARIFICATION] markers
+             - Verify all functional requirements are testable
+             - Ensure success criteria are measurable
+             - Validate user scenarios are complete
+
+          2. **Handle Remaining Clarifications**:
+             If [NEEDS CLARIFICATION] markers exist:
+             - Extract all markers from the spec (max 3)
+             - For each, present structured questions with options
+             - Wait for user responses
+             - Update specification with chosen answers
+
+          3. **Final Validation**:
+             - Ensure no implementation details leaked in
+             - Verify requirements align with existing system
+             - Use send_message to ask architect for final spec review
+
+          **Handoff to Architect:**
+
+          Before proceeding to plan phase:
+          1. Use send_message to architect: "Specification is complete and clarified. Please take the lead for the plan phase. Review: $VIBE_DIR/specs/$BRANCH_NAME/spec.md"
+          2. Use send_message to developer: "Specification finalized, architect will create the plan next"
+          3. Use send_message_to_operator: "Clarification complete, handing off to architect for planning"
+          4. Call proceed_to_phase - you transition to CONSULTED role in plan phase
+
+      # Architect is CONSULTED during clarify phase
+      - trigger: 'clarification_complete'
+        to: 'plan'
+        role: architect
+        transition_reason: 'Clarifications resolved, preparing to take lead in plan phase'
+        additional_instructions: |
+          **You are CONSULTED during the clarify phase.**
+
+          Business-analyst is finalizing clarifications. You are in consultative mode.
+
+          **Your Responsibilities:**
+          - Monitor messages for final review requests
+          - Validate specification is ready for technical planning
+          - Provide feedback on any remaining technical concerns
+
+          **Important Constraints:**
+          - Do NOT edit the plan file (only business-analyst can)
+          - Do NOT attempt to proceed to next phase
+
+          **Handoff Notice:**
+          - When business-analyst completes clarify phase, YOU become RESPONSIBLE
+          - You will take the lead in the plan phase
+          - Prepare to design the system architecture and create implementation plan
+
+      # Developer is INFORMED during clarify phase
+      - trigger: 'clarification_complete'
+        to: 'plan'
+        role: developer
+        transition_reason: 'Clarifications resolved, architect taking lead for planning'
+        additional_instructions: |
+          **You are INFORMED during the clarify phase.**
+
+          Business-analyst is finalizing clarifications. You are in monitoring mode.
+
+          **Your Responsibilities:**
+          - Stay aware of specification updates
+          - Prepare to be consulted during planning phase
+          - No active work required in this phase
+
+          **Next Phase:**
+          - Architect will take the lead in plan phase
+          - You will be CONSULTED during planning
+          - Be ready to provide implementation feedback when architect asks
+
+      # For needs_user_input loop
+      - trigger: 'needs_user_input'
+        to: 'clarify'
+        role: business-analyst
+        transition_reason: 'Waiting for user responses to clarification questions'
+        additional_instructions: |
+          Waiting for user responses to clarification questions. Present the questions clearly
+          and wait for user input before proceeding.
+
+  plan:
+    description: 'Generate implementation plan with constitutional compliance'
+    default_instructions: |
+      **Team Collaboration Mode**
+
+      You are $VIBE_ROLE working in a collaborative team on this feature development.
+      Current phase: PLAN
+
+      Architect is responsible. Business-analyst and developer are consulted.
+
+    transitions:
+      # Business Analyst is CONSULTED during plan phase
+      - trigger: 'plan_complete'
+        to: 'tasks'
+        role: business-analyst
+        transition_reason: 'Plan completed, architect moving to tasks'
+        additional_instructions: |
+          **You are CONSULTED during the plan phase.**
+
+          Architect is driving technical planning. You are in consultative mode.
+
+          **Your Responsibilities:**
+          - Monitor messages for questions from architect
+          - Validate plan aligns with specification requirements
+          - Clarify any requirements that are unclear
+          - Approve or suggest adjustments to technical approach
+
+          **Important Constraints:**
+          - Do NOT edit the plan file (only architect can)
+          - Do NOT attempt to proceed to next phase
+
+          **How to Help:**
+          - Use get_my_messages to check for architect's questions
+          - Use send_message to validate alignment with spec
+          - Raise concerns if plan doesn't meet business requirements
+          - Clarify user needs when architect asks
+
+      # Architect is RESPONSIBLE for plan phase
+      - trigger: 'plan_complete'
+        to: 'tasks'
+        role: architect
+        transition_reason: 'Implementation plan completed, moving to task breakdown'
+        additional_instructions: |
+          **You are RESPONSIBLE for the plan phase.**
+
+          You have exclusive control during this phase:
+          - Only you can edit the plan file
+          - Only you can proceed to the next phase
+
+          **Planning Tasks:**
+
+          1. **Load Context**:
+             - Read specification: `$VIBE_DIR/specs/$BRANCH_NAME/spec.md`
+             - Read analysis: `$VIBE_DIR/specs/$BRANCH_NAME/current-state-analysis.md` (if exists)
+             - Review existing project patterns and conventions
+
+          2. **Collaborate on Technical Approach**:
+             - Use send_message to business-analyst: "Does this approach align with requirements?"
+             - Use send_message to developer: "Is this implementation strategy sound?"
+             - Wait for feedback and incorporate it
+
+          3. **Technical Context Analysis**:
+             - Identify integration with existing system
+             - Map dependencies and integration points
+             - Choose appropriate technology stack
+             - Mark unknowns for research
+
+          4. **Create Plan**: Document in `$VIBE_DIR/specs/$BRANCH_NAME/plan.md`:
+             - High-level architecture
+             - Technology decisions
+             - Integration strategy
+             - Implementation phases
+
+          **You remain RESPONSIBLE in tasks phase** (continue driving technical work)
+
+          **Before proceeding:**
+          1. Use send_message_to_operator: "Planning complete, moving to task breakdown"
+          2. Only you can call proceed_to_phase
+
+      # Developer is CONSULTED during plan phase
+      - trigger: 'plan_complete'
+        to: 'tasks'
+        role: developer
+        transition_reason: 'Plan completed, architect moving to tasks'
+        additional_instructions: |
+          **You are CONSULTED during the plan phase.**
+
+          Architect is driving technical planning. You are in consultative mode.
+
+          **Your Responsibilities:**
+          - Monitor messages for questions from architect
+          - Provide feedback on:
+            * Implementation feasibility and complexity
+            * Existing code patterns and conventions
+            * Potential technical challenges
+            * Testing requirements and strategies
+
+          **Important Constraints:**
+          - Do NOT edit the plan file (only architect can)
+          - Do NOT attempt to proceed to next phase
+
+          **How to Help:**
+          - Use get_my_messages to check for architect's questions
+          - Use send_message to provide honest implementation feedback
+          - Suggest alternative approaches if needed
+          - Raise concerns about technical risks
+
+      # For architectural_conflict loop
+      - trigger: 'architectural_conflict'
+        to: 'plan'
+        role: architect
+        transition_reason: 'Plan conflicts with existing architecture, needs revision'
+        additional_instructions: |
+          Implementation plan conflicts with existing architecture or principles.
+          Review and revise the approach to ensure proper integration.
+
+  tasks:
+    description: 'Generate actionable, dependency-ordered tasks'
+    default_instructions: |
+      **Team Collaboration Mode**
+
+      You are $VIBE_ROLE working in a collaborative team on this feature development.
+      Current phase: TASKS
+
+      Architect is responsible. Business-analyst is informed. Developer is consulted.
+
+    transitions:
+      # Business Analyst is INFORMED during tasks phase
+      - trigger: 'tasks_generated'
+        to: 'implement'
+        role: business-analyst
+        transition_reason: 'Tasks generated, developer taking lead for implementation'
+        additional_instructions: |
+          **You are INFORMED during the tasks phase.**
+
+          Architect is creating the task breakdown. You are in monitoring mode.
+
+          **Your Responsibilities:**
+          - Stay aware of task structure
+          - Be ready to clarify requirements during implementation
+          - No active work required in this phase
+
+          **Next Phase:**
+          - Developer will take the lead in implement phase
+          - You will be CONSULTED during implementation
+          - Be ready to clarify requirements when developer asks
+
+      # Architect is RESPONSIBLE for tasks phase
+      - trigger: 'tasks_generated'
+        to: 'implement'
+        role: architect
+        transition_reason: 'Tasks generated, handing off to developer'
+        additional_instructions: |
+          **You are RESPONSIBLE for the tasks phase.**
+
+          You have exclusive control during this phase:
+          - Only you can edit the plan file
+          - Only you can proceed to the next phase
+
+          **Task Generation:**
+
+          1. **Load Design Documents**:
+             - Required: `$VIBE_DIR/specs/$BRANCH_NAME/plan.md`, `$VIBE_DIR/specs/$BRANCH_NAME/spec.md`
+             - Optional: `$VIBE_DIR/specs/$BRANCH_NAME/technology-research.md`
+
+          2. **Extract User Stories**: From spec.md with priorities (P1, P2, P3...)
+
+          3. **Generate Task Breakdown**:
+             - Setup Phase: Integration and shared infrastructure
+             - Foundational Phase: Prerequisites for the feature
+             - User Story Phases (P1, P2, P3...): One phase per story
+             - Mark parallelizable tasks with [P]
+
+          4. **Collaborate with Developer**:
+             - Use send_message to developer: "Please review task breakdown for implementability"
+             - Wait for feedback and adjust
+
+          5. **Create Documents**:
+             - `$VIBE_DIR/specs/$BRANCH_NAME/data-model.md`
+             - `$VIBE_DIR/specs/$BRANCH_NAME/contracts/` (API contracts)
+             - `$VIBE_DIR/specs/$BRANCH_NAME/quickstart.md`
+             - `$VIBE_DIR/specs/$BRANCH_NAME/tasks.md`
+
+          **Handoff to Developer:**
+
+          Before proceeding to implement phase:
+          1. Use send_message to developer: "Task breakdown complete. Please take the lead for implementation phase. See: $VIBE_DIR/specs/$BRANCH_NAME/tasks.md"
+          2. Use send_message to business-analyst: "Implementation will begin, you'll be consulted for requirement clarifications"
+          3. Use send_message_to_operator: "Tasks ready, handing off to developer"
+          4. Call proceed_to_phase - you transition to CONSULTED role in implement phase
+
+      # Developer is CONSULTED during tasks phase
+      - trigger: 'tasks_generated'
+        to: 'implement'
+        role: developer
+        transition_reason: 'Tasks generated, preparing to take lead for implementation'
+        additional_instructions: |
+          **You are CONSULTED during the tasks phase.**
+
+          Architect is creating the task breakdown. You are in consultative mode.
+
+          **Your Responsibilities:**
+          - Monitor messages for review requests from architect
+          - Provide feedback on:
+            * Task granularity and completeness
+            * Implementation order and dependencies
+            * Complexity estimates
+            * Testing approach
+
+          **Important Constraints:**
+          - Do NOT edit the plan file (only architect can)
+          - Do NOT attempt to proceed to next phase
+
+          **Handoff Notice:**
+          - When architect completes tasks phase, YOU become RESPONSIBLE
+          - You will take the lead in the implement phase
+          - Review the tasks.md and prepare to begin implementation
+
+  implement:
+    description: 'Execute implementation following the task breakdown'
+    default_instructions: |
+      **Team Collaboration Mode**
+
+      You are $VIBE_ROLE working in a collaborative team on this feature development.
+      Current phase: IMPLEMENT
+
+      Developer is responsible. Architect and business-analyst are consulted.
+
+    transitions:
+      # Business Analyst is CONSULTED during implement phase
+      - trigger: 'implementation_complete'
+        to: 'implement'
+        role: business-analyst
+        transition_reason: 'Implementation complete'
+        additional_instructions: |
+          **You are CONSULTED during the implement phase.**
+
+          Developer is driving implementation. You are in consultative mode.
+
+          **Your Responsibilities:**
+          - Monitor messages for questions from developer
+          - Provide clarification on:
+            * Requirements interpretation
+            * User story acceptance criteria
+            * Business rules and constraints
+            * Success criteria validation
+
+          **Important Constraints:**
+          - Do NOT edit the plan file (only developer can)
+          - Do NOT attempt to proceed to next phase
+
+          **How to Help:**
+          - Use get_my_messages to check for developer's questions
+          - Use send_message to clarify requirements quickly
+          - Validate implementation against specification when asked
+          - Approve acceptance criteria when developer completes features
+
+      # Architect is CONSULTED during implement phase
+      - trigger: 'implementation_complete'
+        to: 'implement'
+        role: architect
+        transition_reason: 'Implementation complete'
+        additional_instructions: |
+          **You are CONSULTED during the implement phase.**
+
+          Developer is driving implementation. You are in consultative mode.
+
+          **Your Responsibilities:**
+          - Monitor messages for questions from developer
+          - Provide guidance on:
+            * Architecture decisions and patterns
+            * Design patterns and best practices
+            * Integration approaches
+            * Technical trade-offs
+
+          **Important Constraints:**
+          - Do NOT edit the plan file (only developer can)
+          - Do NOT attempt to proceed to next phase
+
+          **How to Help:**
+          - Use get_my_messages to check for developer's questions
+          - Use send_message to provide architecture guidance
+          - Review code against architecture plan when asked
+          - Help resolve technical blockers
+
+      # Developer is RESPONSIBLE for implement phase
+      - trigger: 'implementation_complete'
+        to: 'implement'
+        role: developer
+        transition_reason: 'Implementation complete, feature ready'
+        additional_instructions: |
+          **You are RESPONSIBLE for the implement phase.**
+
+          You have exclusive control during this phase:
+          - Only you can edit the plan file
+          - Only you can proceed (mark complete)
+
+          **Implementation Tasks:**
+
+          1. **Follow Task Breakdown**: Execute tasks from `$VIBE_DIR/specs/$BRANCH_NAME/tasks.md`
+             - Work through tasks in order
+             - Mark completed tasks with [x] in plan file
+             - Focus on one user story at a time
+
+          2. **Collaborate When Needed:**
+             - Use send_message to architect when design questions arise
+             - Use send_message to business-analyst when requirements unclear
+             - They are available to unblock you
+
+          3. **Quality Standards:**
+             - Follow existing code patterns
+             - Write tests for new functionality
+             - Ensure integration with existing system
+             - Handle errors appropriately
+
+          4. **Progress Tracking:**
+             - Update plan file with completed tasks
+             - Document any deviations or decisions
+             - Keep implementation aligned with specification
+
+          **Final Validation:**
+
+          Before marking complete:
+          1. Use send_message to architect: "Please review implementation against architecture plan"
+          2. Use send_message to business-analyst: "Please validate implementation meets specification"
+          3. Wait for their reviews and address any concerns
+          4. Run all tests and ensure they pass
+          5. Use send_message_to_operator: "Implementation complete and reviewed by team"
+          6. This is a terminal state - feature is complete
+
+      # Implementation blocked - return to plan phase
+      - trigger: 'implementation_blocked'
+        to: 'plan'
+        role: developer
+        transition_reason: 'Implementation blocked, need to revise plan'
+        additional_instructions: |
+          Implementation is blocked by technical issues. Notify the team:
+
+          1. Use send_message to architect: "Implementation blocked: [explain issue]. Need to revise plan."
+          2. Use send_message to business-analyst: "Implementation blocked, may need requirement changes: [explain]"
+          3. Use send_message_to_operator: "Implementation blocked, returning to plan phase"
+          4. Call proceed_to_phase - architect will take lead again in plan phase
+
+      # Integration issues - return to analyze
+      - trigger: 'integration_issues'
+        to: 'analyze'
+        role: developer
+        transition_reason: 'Integration issues require deeper system analysis'
+        additional_instructions: |
+          Significant integration issues discovered. Notify the team:
+
+          1. Use send_message to business-analyst: "Integration issues found: [explain]. Need deeper analysis."
+          2. Use send_message to architect: "Integration problems require re-analysis: [explain]"
+          3. Use send_message_to_operator: "Integration issues, returning to analyze phase"
+          4. Call proceed_to_phase - business-analyst will take lead in analyze phase
+
+# Global transitions available from any state
+global_transitions:
+  - trigger: 'abandon_feature'
+    to: 'analyze'
+    transition_reason: 'Feature abandoned, restart from beginning'
+    additional_instructions: |
+      Feature development abandoned. If you want to restart, begin again with
+      analyzing the requirements and current state.

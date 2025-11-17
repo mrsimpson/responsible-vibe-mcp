@@ -90,6 +90,7 @@ Watch your agent start with architecture decisions instead of jumping straight i
 - **[Quick Setup](./user/agent-setup.md)** – Get your agent configured in 2 minutes
 - **[Hands-On Tutorial](./user/tutorial.md)** – Learn by building (todo app → enhancement → bugfix)
 - **[Interactive Workflows](./workflows)** – Explore all available methodologies
+- **[Crowd MCP Integration](./user/crowd-mcp-integration.md)** – Multi-agent collaboration with specialized roles
 
 ---
 

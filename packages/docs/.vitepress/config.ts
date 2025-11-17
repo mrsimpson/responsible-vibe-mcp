@@ -38,6 +38,10 @@ export default defineConfig({
           { text: 'Workflow-Selection', link: '/user/workflow-selection' },
           { text: 'Explore All Workflows', link: '/workflows' },
           { text: 'Custom Workflows', link: '/user/custom-workflows' },
+          {
+            text: 'Crowd MCP Integration',
+            link: '/user/crowd-mcp-integration',
+          },
         ],
       },
     ],
