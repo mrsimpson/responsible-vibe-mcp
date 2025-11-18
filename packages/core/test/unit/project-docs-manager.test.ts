@@ -281,6 +281,7 @@ describe('ProjectDocsManager', () => {
         $DESIGN_DOC: join(testProjectPath, '.vibe', 'docs', 'design.md'),
         $BRANCH_NAME: 'main',
         $VIBE_DIR: join(testProjectPath, '.vibe'),
+        $VIBE_ROLE: '', // Added for collaborative workflow support
       });
     });
   });

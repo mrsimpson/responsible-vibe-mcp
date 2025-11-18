@@ -194,6 +194,9 @@ describe('CLI', () => {
 
   describe('System Prompt Command', () => {
     it('should handle --system-prompt flag', () => {
+      // Don't throw on process.exit for this test
+      processExitSpy.mockImplementation(() => undefined as never);
+
       process.argv = ['node', 'cli.js', '--system-prompt'];
 
       runCli();
