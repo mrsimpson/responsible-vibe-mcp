@@ -115,11 +115,9 @@ export async function initializeServerComponents(
   const planManager = new PlanManager();
   const instructionGenerator = new InstructionGenerator(planManager);
 
-  // Conditionally create interaction logger
-  const interactionLogger =
-    config.enableLogging !== false
-      ? new InteractionLogger(database)
-      : undefined;
+  // Always create interaction logger as it's critical for transition engine logic
+  // (determining first call from initial state)
+  const interactionLogger = new InteractionLogger(database);
 
   // Create server context
   const context: ServerContext = {
