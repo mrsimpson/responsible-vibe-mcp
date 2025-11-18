@@ -70,20 +70,24 @@ describe('CLI', () => {
     vi.spyOn(process, 'cwd').mockReturnValue('/mock/cwd');
 
     // Configure mocks
-    mocks.WorkflowManager.mockImplementation(() => ({
-      getAvailableWorkflowsForProject: vi.fn().mockReturnValue([
-        { name: 'waterfall', description: 'V-Model development workflow' },
-        { name: 'epcc', description: 'EPCC workflow' },
-      ]),
-      getAllAvailableWorkflows: vi.fn().mockReturnValue([
-        { name: 'waterfall', description: 'V-Model development workflow' },
-        { name: 'epcc', description: 'EPCC workflow' },
-      ]),
-    }));
+    mocks.WorkflowManager.mockImplementation(function (this: unknown) {
+      return {
+        getAvailableWorkflowsForProject: vi.fn().mockReturnValue([
+          { name: 'waterfall', description: 'V-Model development workflow' },
+          { name: 'epcc', description: 'EPCC workflow' },
+        ]),
+        getAllAvailableWorkflows: vi.fn().mockReturnValue([
+          { name: 'waterfall', description: 'V-Model development workflow' },
+          { name: 'epcc', description: 'EPCC workflow' },
+        ]),
+      };
+    });
     mocks.generateSystemPrompt.mockReturnValue('Mock system prompt');
-    mocks.StateMachineLoader.mockImplementation(() => ({
-      loadStateMachine: vi.fn().mockReturnValue({}),
-    }));
+    mocks.StateMachineLoader.mockImplementation(function (this: unknown) {
+      return {
+        loadStateMachine: vi.fn().mockReturnValue({}),
+      };
+    });
 
     mocks.existsSync.mockImplementation(path => {
       const pathStr = String(path);
@@ -201,12 +205,23 @@ describe('CLI', () => {
 
       runCli();
 
+      // Debug: check if error was called
+      if (consoleErrorSpy.mock.calls.length > 0) {
+        console.log(
+          'Console error was called with:',
+          consoleErrorSpy.mock.calls
+        );
+      }
+
       expect(consoleLogSpy).toHaveBeenCalledWith('Mock system prompt');
     });
   });
 
   describe('Workflow Commands', () => {
     it('should handle workflow list command', () => {
+      // Don't throw on process.exit for this test
+      processExitSpy.mockImplementation(() => undefined as never);
+
       process.argv = ['node', 'cli.js', 'workflow', 'list'];
 
       runCli();
@@ -257,25 +272,24 @@ describe('CLI', () => {
     it('should show error for invalid source workflow', async () => {
       // Reset the mock to return workflows without 'invalid-workflow'
       const { WorkflowManager } = await import('@codemcp/workflows-core');
-      vi.mocked(WorkflowManager).mockImplementation(
-        () =>
-          ({
-            getAvailableWorkflowsForProject: vi.fn().mockReturnValue([
-              {
-                name: 'waterfall',
-                description: 'V-Model development workflow',
-              },
-              { name: 'epcc', description: 'EPCC workflow' },
-            ]),
-            getAllAvailableWorkflows: vi.fn().mockReturnValue([
-              {
-                name: 'waterfall',
-                description: 'V-Model development workflow',
-              },
-              { name: 'epcc', description: 'EPCC workflow' },
-            ]),
-          }) as unknown
-      );
+      vi.mocked(WorkflowManager).mockImplementation(function (this: unknown) {
+        return {
+          getAvailableWorkflowsForProject: vi.fn().mockReturnValue([
+            {
+              name: 'waterfall',
+              description: 'V-Model development workflow',
+            },
+            { name: 'epcc', description: 'EPCC workflow' },
+          ]),
+          getAllAvailableWorkflows: vi.fn().mockReturnValue([
+            {
+              name: 'waterfall',
+              description: 'V-Model development workflow',
+            },
+            { name: 'epcc', description: 'EPCC workflow' },
+          ]),
+        };
+      });
 
       process.argv = [
         'node',

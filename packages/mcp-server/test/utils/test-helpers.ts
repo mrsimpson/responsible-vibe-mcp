@@ -12,8 +12,8 @@ import {
   ResponsibleVibeMCPServer,
   createResponsibleVibeMCPServer,
   StartDevelopmentResult,
-} from '../../packages/mcp-server/src/server.js';
-import type { ServerContext } from '../../packages/mcp-server/src/types';
+} from '../../src/server.js';
+import type { ServerContext } from '../../src/types';
 import { TempProject } from './temp-files.js';
 
 /**
