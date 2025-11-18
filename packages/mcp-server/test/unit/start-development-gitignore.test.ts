@@ -15,7 +15,7 @@ import {
 import { resolve } from 'node:path';
 import { TestAccess } from '../utils/test-access.js';
 import { tmpdir } from 'node:os';
-import { StartDevelopmentHandler } from '../../packages/mcp-server/src/tool-handlers/start-development.js';
+import { StartDevelopmentHandler } from '../../src/tool-handlers/start-development.js';
 
 describe('StartDevelopment .gitignore management', () => {
   let tempDir: string;

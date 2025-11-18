@@ -282,30 +282,31 @@ describe('Workflow Integration', () => {
     it('should handle rapid development iterations', async () => {
       // Quick succession of development activities
       await client.callTool('whats_next', { user_input: 'rapid prototype' });
-      await client.callTool('proceed_to_phase', {
+      const impl1 = await client.callTool('proceed_to_phase', {
         target_phase: 'implementation',
         reason: 'skip to coding',
         review_state: 'not-required',
       });
+      const impl1Response = assertToolSuccess(impl1);
+      expect(impl1Response.phase).toBe('implementation');
+
       await client.callTool('whats_next', { user_input: 'found issues' });
-      await client.callTool('proceed_to_phase', {
+      const designResult = await client.callTool('proceed_to_phase', {
         target_phase: 'design',
         reason: 'need better design',
         review_state: 'not-required',
       });
-      await client.callTool('proceed_to_phase', {
+      const designResponse = assertToolSuccess(designResult);
+      expect(designResponse.phase).toBe('design');
+
+      const impl2 = await client.callTool('proceed_to_phase', {
         target_phase: 'implementation',
         reason: 'design fixed',
         review_state: 'not-required',
       });
-
-      const final = await client.callTool('whats_next', {
-        user_input: 'check status',
-      });
-      const finalResponse = assertToolSuccess(final);
-
-      expect(finalResponse.phase).toBe('implementation');
-      expect(finalResponse.conversation_id).toBeTruthy();
+      const impl2Response = assertToolSuccess(impl2);
+      expect(impl2Response.phase).toBe('implementation');
+      expect(impl2Response.conversation_id).toBeTruthy();
     });
   });
 

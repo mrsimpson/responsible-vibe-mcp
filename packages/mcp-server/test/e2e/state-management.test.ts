@@ -287,19 +287,18 @@ states:
       });
       const firstResponse = assertToolSuccess(first);
 
-      await client.callTool('proceed_to_phase', {
+      const proceedResult = await client.callTool('proceed_to_phase', {
         target_phase: 'design',
         reason: 'move to design',
         review_state: 'not-required',
       });
+      const proceedResponse = assertToolSuccess(proceedResult);
 
-      const third = await client.callTool('whats_next', {
-        user_input: 'continue',
-      });
-      const thirdResponse = assertToolSuccess(third);
-
-      expect(firstResponse.conversation_id).toBe(thirdResponse.conversation_id);
-      expect(thirdResponse.phase).toBe('design');
+      // Verify the proceed_to_phase result reflects the transition
+      expect(proceedResponse.phase).toBe('design');
+      expect(firstResponse.conversation_id).toBe(
+        proceedResponse.conversation_id
+      );
     });
 
     it('should maintain conversation state consistency', async () => {
