@@ -61,7 +61,9 @@ describe('resume_workflow tool', () => {
     const result = await server.handleResumeWorkflow({});
 
     expect(result.system_prompt).toBeTypeOf('string');
-    expect(result.system_prompt.length).toBeGreaterThan(1000);
+    // Streamlined prompt is ~400-600 chars (was 2000+ before)
+    expect(result.system_prompt.length).toBeGreaterThan(200);
+    expect(result.system_prompt.length).toBeLessThan(1000);
     expect(result.system_prompt).toContain('responsible-vibe-mcp');
   });
 

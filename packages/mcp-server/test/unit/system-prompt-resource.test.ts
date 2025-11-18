@@ -24,23 +24,24 @@ describe('System Prompt Resource', () => {
     expect(result.success).toBe(true);
     expect(result.data).toBeDefined();
 
-    const data = result.data;
+    const data = result.data!;
     expect(data.uri).toBe('system-prompt://');
     expect(data.mimeType).toBe('text/plain');
     expect(data.text).toBeDefined();
     expect(typeof data.text).toBe('string');
 
-    // Verify content contains expected system prompt elements
+    // Verify content contains expected system prompt elements (streamlined version)
     expect(data.text).toContain(
       'You are an AI assistant that helps users develop software features'
     );
     expect(data.text).toContain('responsible-vibe-mcp');
     expect(data.text).toContain('whats_next()');
-    expect(data.text).toContain('proceed_to_phase({');
-    expect(data.text).toContain('Core Workflow');
+    expect(data.text).toContain('instructions');
+    expect(data.text).toContain('development plan');
 
-    // Verify it's a substantial prompt (not empty or truncated)
-    expect(data.text.length).toBeGreaterThan(1000);
+    // Verify it's concise but not empty (streamlined prompt is ~400 chars)
+    expect(data.text.length).toBeGreaterThan(200);
+    expect(data.text.length).toBeLessThan(1000);
   });
 
   it('should be workflow-independent and consistent', async () => {
@@ -66,17 +67,17 @@ describe('System Prompt Resource', () => {
     expect(result3.success).toBe(true);
 
     // All should be identical
-    expect(result1.data.text).toBe(result2.data.text);
-    expect(result2.data.text).toBe(result3.data.text);
+    expect(result1.data!.text).toBe(result2.data!.text);
+    expect(result2.data!.text).toBe(result3.data!.text);
 
-    // Verify the prompt contains standard elements
-    expect(result1.data.text).toContain('You are an AI assistant');
-    expect(result1.data.text).toContain('whats_next()');
-    expect(result1.data.text).toContain('Development Workflow');
-    expect(result1.data.text).toContain('start_development()');
+    // Verify the prompt contains standard elements (streamlined version)
+    expect(result1.data!.text).toContain('You are an AI assistant');
+    expect(result1.data!.text).toContain('whats_next()');
+    expect(result1.data!.text).toContain('development');
+    expect(result1.data!.text).toContain('instructions');
   });
 
-  it('should use default waterfall workflow for system prompt', async () => {
+  it('should use streamlined system prompt', async () => {
     const handler = new SystemPromptResourceHandler();
 
     const result = await handler.handle(
@@ -86,16 +87,16 @@ describe('System Prompt Resource', () => {
 
     expect(result.success).toBe(true);
 
-    // The system prompt should be generated using the default workflow
-    // and should contain workflow-agnostic instructions
-    expect(result.data.text).toContain(
-      'The responsible-vibe-mcp server will guide you through development phases'
+    // The streamlined system prompt should be concise and focused
+    // It relies on tool responses for detailed phase instructions
+    expect(result.data!.text).toContain(
+      'You are an AI assistant that helps users develop software features'
     );
-    expect(result.data.text).toContain(
-      'available phases and their descriptions will be provided'
-    );
-    expect(result.data.text).toContain(
-      'tool responses from start_development() and resume_workflow()'
-    );
+    expect(result.data!.text).toContain('whats_next()');
+    expect(result.data!.text).toContain('instructions');
+    expect(result.data!.text).toContain('development plan');
+
+    // Streamlined prompt should be concise (~400 chars vs old 2000+)
+    expect(result.data!.text.length).toBeLessThan(1000);
   });
 });
