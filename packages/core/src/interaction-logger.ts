@@ -4,7 +4,7 @@
  * Handles logging of tool interactions to the database for auditing and debugging.
  */
 
-import { Database } from './database.js';
+import type { IPersistence } from './persistence-interface.js';
 import { createLogger } from './logger.js';
 
 import type { InteractionLog } from './types.js';
@@ -15,14 +15,14 @@ const logger = createLogger('InteractionLogger');
  * Handles logging of tool interactions to the database
  */
 export class InteractionLogger {
-  private database: Database;
+  private database: IPersistence;
 
   /**
    * Create a new InteractionLogger
    *
-   * @param database - Database instance to use for logging
+   * @param database - Persistence instance to use for logging
    */
-  constructor(database: Database) {
+  constructor(database: IPersistence) {
     this.database = database;
     logger.debug('InteractionLogger initialized');
   }

@@ -10,7 +10,7 @@ import { execSync } from 'node:child_process';
 import { resolve } from 'node:path';
 import { existsSync } from 'node:fs';
 import { createLogger } from './logger.js';
-import { Database } from './database.js';
+import type { IPersistence } from './persistence-interface.js';
 import type { ConversationState, ConversationContext } from './types.js';
 import { WorkflowManager } from './workflow-manager.js';
 import { PlanManager } from './plan-manager.js';
@@ -18,12 +18,12 @@ import { PlanManager } from './plan-manager.js';
 const logger = createLogger('ConversationManager');
 
 export class ConversationManager {
-  private database: Database;
+  private database: IPersistence;
   private projectPath: string;
   private workflowManager: WorkflowManager;
 
   constructor(
-    database: Database,
+    database: IPersistence,
     workflowManager: WorkflowManager,
     projectPath: string
   ) {
@@ -271,7 +271,7 @@ export class ConversationManager {
       .replace(/^-|-$/g, '');
 
     // For tests, use a deterministic ID
-    if (process.env.NODE_ENV === 'test') {
+    if (process.env['NODE_ENV'] === 'test') {
       return `${projectName}-${cleanBranch}-p423k1`;
     }
 

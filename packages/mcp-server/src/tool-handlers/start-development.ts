@@ -633,22 +633,20 @@ ${templateOptionsText}
       }
 
       // Content for .vibe/.gitignore
-      const gitignoreContent = `# Exclude SQLite database files
+      const gitignoreContent = `# Exclude conversation state files
+conversations/
+# Legacy SQLite files (for migration compatibility)
 *.sqlite
 *.sqlite-*
-conversation-state.sqlite*
 `;
 
       // Check if .gitignore already exists and has the right content
       if (existsSync(gitignorePath)) {
         try {
           const existingContent = readFileSync(gitignorePath, 'utf-8');
-          if (
-            existingContent.includes('*.sqlite') &&
-            existingContent.includes('conversation-state.sqlite')
-          ) {
+          if (existingContent.includes('conversations/')) {
             this.logger.debug(
-              '.vibe/.gitignore already exists with SQLite exclusions',
+              '.vibe/.gitignore already exists with conversation exclusions',
               { gitignorePath }
             );
             return;
@@ -667,10 +665,13 @@ conversation-state.sqlite*
       // Write the .gitignore file
       writeFileSync(gitignorePath, gitignoreContent, 'utf-8');
 
-      this.logger.info('Created .vibe/.gitignore to exclude SQLite files', {
-        projectPath,
-        gitignorePath,
-      });
+      this.logger.info(
+        'Created .vibe/.gitignore to exclude conversation files',
+        {
+          projectPath,
+          gitignorePath,
+        }
+      );
     } catch (error) {
       // Log warning but don't fail development start
       this.logger.warn(
