@@ -84,9 +84,12 @@ export class FileStorage implements IPersistence {
 
   /**
    * Write data atomically using temp file + rename
+   * Uses unique temp file names to prevent concurrent write collisions
    */
   private async writeAtomic(filePath: string, data: string): Promise<void> {
-    const tempPath = `${filePath}.tmp`;
+    // Use timestamp + random suffix to ensure unique temp file names for concurrent operations
+    const uniqueSuffix = `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+    const tempPath = `${filePath}.tmp.${uniqueSuffix}`;
     try {
       await fs.writeFile(tempPath, data, 'utf-8');
       await fs.rename(tempPath, filePath);
