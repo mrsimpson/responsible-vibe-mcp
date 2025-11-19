@@ -12,6 +12,7 @@ import {
   safeExecute,
   logHandlerExecution,
   logHandlerCompletion,
+  createConversationNotFoundResult,
 } from '../server-helpers.js';
 
 /**
@@ -41,6 +42,14 @@ export abstract class BaseToolHandler<TArgs = unknown, TResult = unknown>
       () => this.executeHandler(args, context),
       `${handlerName} execution failed`
     );
+
+    // Check if this is a CONVERSATION_NOT_FOUND error and provide helpful guidance
+    if (!result.success && result.error?.includes('CONVERSATION_NOT_FOUND')) {
+      const availableWorkflows = context.workflowManager.getWorkflowNames();
+      const helpfulError = createConversationNotFoundResult(availableWorkflows);
+      logHandlerCompletion(handlerName, helpfulError);
+      return helpfulError as HandlerResult<TResult>;
+    }
 
     logHandlerCompletion(handlerName, result);
     return result;

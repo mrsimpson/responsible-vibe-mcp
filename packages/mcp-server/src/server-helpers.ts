@@ -113,17 +113,16 @@ export function createConversationNotFoundResult(
       'No development conversation has been started for this project and no workflows are available. Please adjust the VIBE_WORKFLOW_DOMAINS environment variable or copy a workflow to .vibe/workflows/ directory.',
       {
         suggestion:
-          'Set VIBE_WORKFLOW_DOMAINS=code,architecture,office or copy a workflow file to .vibe/workflows/ – ',
+          'Set VIBE_WORKFLOW_DOMAINS=code,architecture,office or copy a workflow file to .vibe/workflows/',
         availableWorkflows: [],
       }
     );
   }
 
-  const firstWorkflow = availableWorkflows[0];
   return createErrorResult(
     'No development conversation has been started for this project. Please use the start_development tool first to initialize development with a workflow.',
     {
-      suggestion: `start_development({ workflow: "${firstWorkflow}" })`,
+      suggestion: 'Use the start_development tool to begin',
       availableWorkflows,
     }
   );
