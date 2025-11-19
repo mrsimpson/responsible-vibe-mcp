@@ -13,13 +13,15 @@ import { mkdir } from 'node:fs/promises';
 import { dirname } from 'node:path';
 import { createLogger } from './logger.js';
 import type { ConversationState, InteractionLog } from './types.js';
+import type { IPersistence } from './persistence-interface.js';
 
 const logger = createLogger('Database');
 
 /**
  * Database connection and operations manager
+ * @deprecated Use FileStorage for new implementations. This class will be removed in a future version.
  */
-export class Database {
+export class Database implements IPersistence {
   private db: SqliteDatabase | null = null;
   private sqlite3: Sqlite3Static | null = null;
   private dbPath: string;
@@ -240,6 +242,10 @@ export class Database {
     }
 
     const row = result[0];
+    if (!row) {
+      return null;
+    }
+
     return {
       conversationId: row[0] as string,
       projectPath: row[1] as string,

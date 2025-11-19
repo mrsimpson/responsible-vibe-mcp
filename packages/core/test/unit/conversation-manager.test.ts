@@ -4,7 +4,8 @@
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { ConversationManager } from '../../src/conversation-manager.js';
-import type { Database } from '../../src/database.js';
+import type { IPersistence } from '../../src/persistence-interface.js';
+import type { WorkflowManager } from '../../src/workflow-manager.js';
 
 // Mock WorkflowManager state machine
 const mockStateMachine = {
@@ -27,6 +28,11 @@ describe('ConversationManager', () => {
   const mockSaveConversationState = vi.fn();
   const mockDeleteConversationState = vi.fn();
   const mockSoftDeleteInteractionLogs = vi.fn();
+  const mockGetAllConversationStates = vi.fn();
+  const mockLogInteraction = vi.fn();
+  const mockGetInteractionLogs = vi.fn();
+  const mockGetInteractionsByConversationId = vi.fn();
+  const mockResetConversationState = vi.fn();
   const mockInitialize = vi.fn();
   const mockClose = vi.fn();
 
@@ -52,14 +58,19 @@ describe('ConversationManager', () => {
       saveConversationState: mockSaveConversationState,
       deleteConversationState: mockDeleteConversationState,
       softDeleteInteractionLogs: mockSoftDeleteInteractionLogs,
+      getAllConversationStates: mockGetAllConversationStates,
+      logInteraction: mockLogInteraction,
+      getInteractionLogs: mockGetInteractionLogs,
+      getInteractionsByConversationId: mockGetInteractionsByConversationId,
+      resetConversationState: mockResetConversationState,
       initialize: mockInitialize,
       close: mockClose,
     };
 
     // Create conversation manager with dependency injection
     conversationManager = new ConversationManager(
-      mockDb as Database,
-      mockWorkflowManager,
+      mockDb as IPersistence,
+      mockWorkflowManager as unknown as WorkflowManager,
       '/test/project/path'
     );
   });

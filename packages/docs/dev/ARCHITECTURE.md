@@ -119,7 +119,7 @@ graph TB
         TM[Transition Engine]
         IM[Instruction Generator]
         PM[Plan Manager]
-        DB[(SQLite Database)]
+        FS[(FileStorage)]
     end
 
     subgraph "Development Phases"
@@ -133,7 +133,8 @@ graph TB
     end
 
     subgraph "Persistent Storage"
-        DBFILE[~/.responsible-vibe-mcp/db.sqlite]
+        STATEFILE[.vibe/conversations/{id}/state.json]
+        LOGFILE[.vibe/conversations/{id}/interactions.jsonl]
         PF[Project Plan Files]
         GIT[Git Repository Context]
     end
@@ -146,12 +147,13 @@ graph TB
 
     USER --> LLM
     LLM --> CM
-    CM --> DB
+    CM --> FS
     CM --> TM
     TM --> IM
     IM --> PM
 
-    DB --> DBFILE
+    FS --> STATEFILE
+    FS --> LOGFILE
     PM --> PF
     CM --> GIT
 
@@ -246,21 +248,44 @@ The Plan Manager handles the creation, updating, and maintenance of project deve
 - **Branch-Aware Plans**: Separate plan files for different git branches when needed
 - **Template Management**: Consistent plan file structure across projects
 
-### 5. **SQLite Database**
+### 5. **File-Based Persistence**
 
-The database provides persistent storage for conversation state and metadata.
+The persistence layer provides transparent, human-readable storage for conversation state and interaction logs.
 
-**Schema Design:**
+**Storage Structure:**
 
-- **conversation_states**: Core conversation metadata and current state
-- **Indexes**: Optimized for project path + branch lookups
+```
+.vibe/
+  conversations/
+    {conversationId}/
+      state.json          - Conversation state (JSON)
+      interactions.jsonl  - Interaction logs (one JSON per line)
+```
+
+**State File Format (state.json):**
+
+- **conversationId**: Unique identifier based on project path + git branch
+- **projectPath**: Absolute path to the project
+- **gitBranch**: Current git branch name
+- **currentPhase**: Current workflow phase
+- **planFilePath**: Path to the development plan file
+- **workflowName**: Name of the active workflow
+- **gitCommitConfig**: Git commit behavior configuration (optional)
+- **requireReviewsBeforePhaseTransition**: Review requirements flag
+- **createdAt**, **updatedAt**: Timestamps
 
 **Key Features:**
 
+- **Transparent Storage**: Human-readable JSON files for easy inspection
 - **Persistent State**: Survives server restarts and system reboots
-- **Multi-User Support**: Stored in user's home directory (~/.responsible-vibe-mcp/)
-- **Lightweight Storage**: Minimal overhead for state management
-- **Atomic Updates**: Ensures data consistency during concurrent operations
+- **Graceful Degradation**: Handles user file manipulation (edits, deletions)
+- **Atomic Writes**: Uses temp file + rename pattern for data safety
+- **Automatic Migration**: Detects and migrates legacy SQLite databases on first run
+- **Isolated Storage**: Each conversation has its own directory
+
+**Migration Support:**
+
+The system automatically detects legacy SQLite databases (`conversation.sqlite` or `conversation-state.sqlite`) and migrates them to the file-based structure on first initialization. Original SQLite files are backed up with timestamps before migration.
 
 ## Dynamic Behavior
 
@@ -270,18 +295,18 @@ sequenceDiagram
     participant LLM as LLM
     participant SM as State Manager
     participant CM as Conversation Manager
-    participant DB as SQLite Database
+    participant FS as FileStorage
     participant TM as Transition Engine
     participant IM as Instruction Generator
     participant PM as Plan Manager
-    participant FS as File System
+    participant Files as File System
 
     User->>LLM: "implement auth"
     LLM->>CM: whats_next(context, user_input, conversation_summary, recent_messages)
     Note over LLM,CM: Server stores NO message history - LLM provides context
-    CM->>FS: detect project path + git branch
-    CM->>DB: lookup/create conversation state
-    DB-->>CM: conversation state (phase, plan path only)
+    CM->>Files: detect project path + git branch
+    CM->>FS: lookup/create conversation state
+    FS-->>CM: conversation state (phase, plan path only)
 
     CM->>TM: analyze phase transition
     TM->>TM: analyze LLM-provided context
@@ -289,19 +314,19 @@ sequenceDiagram
     TM-->>CM: phase decision
 
     CM->>IM: generate instructions
-    IM->>DB: get project context
+    IM->>FS: get project context
     IM-->>CM: phase-specific instructions
 
     CM->>PM: update plan file path
     PM-->>CM: plan file location
 
-    CM->>DB: update conversation state (phase only)
+    CM->>FS: update conversation state (phase only)
     CM-->>LLM: instructions + metadata
 
     LLM->>User: follow instructions
-    LLM->>FS: update plan file
+    LLM->>Files: update plan file
 
-    Note over User,FS: Cycle continues with each user interaction
+    Note over User,Files: Cycle continues with each user interaction
 ```
 
 ## Data Flow Architecture
@@ -309,13 +334,13 @@ sequenceDiagram
 ### 1. **Conversation Identification Flow**
 
 ```
-User Input → Project Detection → Git Branch Detection → Conversation ID Generation → Database Lookup
+User Input → Project Detection → Git Branch Detection → Conversation ID Generation → FileStorage Lookup
 ```
 
 ### 2. **State Management Flow**
 
 ```
-Conversation ID → State Retrieval → Context Analysis → Phase Determination → State Update → Persistence
+Conversation ID → State Retrieval → Context Analysis → Phase Determination → State Update → File Persistence
 ```
 
 ### 3. **Instruction Generation Flow**
@@ -340,9 +365,10 @@ Project Path → Branch Detection → Plan File Path → Content Generation → 
 
 ### 2. **Persistent State Management**
 
-- SQLite database ensures state survives server restarts
+- File-based storage ensures state survives server restarts
 - Conversation history enables context-aware decision making
-- Database stored in user home directory for portability
+- Storage isolated per conversation in `.vibe/conversations/` directory
+- Automatic migration from legacy SQLite databases
 
 ### 3. **Phase-Driven Workflow**
 
@@ -452,7 +478,8 @@ LOG_LEVEL=INFO node dist/index.js
 ### Log Components
 
 - **Server**: Main server operations and tool handlers
-- **Database**: SQLite operations and state persistence
+- **FileStorage**: File operations and state persistence
+- **Migration**: SQLite to file-based migration operations
 - **ConversationManager**: Conversation context management
 - **TransitionEngine**: Phase transition analysis
 - **PlanManager**: Plan file operations
@@ -461,7 +488,7 @@ For detailed logging documentation, see [LOGGING.md](./LOGGING.md).
 
 ## Interaction Logging
 
-Vibe Feature MCP includes a comprehensive interaction logging system that records all tool calls and responses for debugging and analysis purposes:
+Responsible Vibe MCP includes a comprehensive interaction logging system that records all tool calls and responses for debugging and analysis purposes:
 
 ### Logged Information
 
@@ -474,10 +501,25 @@ Vibe Feature MCP includes a comprehensive interaction logging system that record
 
 ### Data Storage
 
-All interaction logs are stored in the local SQLite database in the `.vibe` directory of your project. The data is stored without masking or filtering, as it is kept locally on your system.
+All interaction logs are stored in JSONL format (one JSON object per line) in the `.vibe/conversations/{conversationId}/interactions.jsonl` file within your project. The data is stored without masking or filtering, as it is kept locally on your system.
+
+**File Location**: `.vibe/conversations/{conversationId}/interactions.jsonl`
 
 ### Querying Logs
 
-Logs can be queried by conversation ID for analysis and debugging purposes. No UI is provided in the current implementation, but the database can be accessed directly using SQLite tools.
+Logs can be accessed directly as JSONL files at `.vibe/conversations/{conversationId}/interactions.jsonl`. Each line is a valid JSON object representing one interaction. You can use standard text tools (`cat`, `grep`, `jq`) to analyze the logs.
+
+**Example:**
+
+```bash
+# View all interactions for a conversation
+cat .vibe/conversations/my-project-main-abc123/interactions.jsonl
+
+# Filter by tool name
+grep "whats_next" .vibe/conversations/my-project-main-abc123/interactions.jsonl
+
+# Pretty-print with jq
+cat .vibe/conversations/my-project-main-abc123/interactions.jsonl | jq .
+```
 
 **Note**: All interaction data is stored locally on your system and is never transmitted to external services.

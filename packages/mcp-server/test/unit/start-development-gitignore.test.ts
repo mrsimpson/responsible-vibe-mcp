@@ -75,11 +75,11 @@ describe('StartDevelopment .gitignore management', () => {
       expect(existsSync(vibeGitignorePath)).toBe(true);
 
       const content = readFileSync(vibeGitignorePath, 'utf-8');
+      expect(content).toContain('conversations/');
       expect(content).toContain('*.sqlite');
-      expect(content).toContain('conversation-state.sqlite');
 
       expect(mockLogger.info).toHaveBeenCalledWith(
-        'Created .vibe/.gitignore to exclude SQLite files',
+        'Created .vibe/.gitignore to exclude conversation files',
         { projectPath: tempDir, gitignorePath: vibeGitignorePath }
       );
     });
@@ -103,15 +103,15 @@ describe('StartDevelopment .gitignore management', () => {
       expect(existsSync(vibeGitignorePath)).toBe(true);
     });
 
-    it('should skip when .vibe/.gitignore already exists with SQLite exclusions', () => {
+    it('should skip when .vibe/.gitignore already exists with conversation exclusions', () => {
       // Create .git directory
       mkdirSync(resolve(tempDir, '.git'));
 
-      // Create .vibe directory and .gitignore with existing SQLite exclusions
+      // Create .vibe directory and .gitignore with existing conversation exclusions
       const vibeDir = resolve(tempDir, '.vibe');
       mkdirSync(vibeDir, { recursive: true });
       const vibeGitignorePath = resolve(vibeDir, '.gitignore');
-      const existingContent = '*.sqlite\nconversation-state.sqlite*\n';
+      const existingContent = 'conversations/\n*.sqlite\n';
       writeFileSync(vibeGitignorePath, existingContent);
 
       // Call the method
@@ -122,7 +122,7 @@ describe('StartDevelopment .gitignore management', () => {
       expect(content).toBe(existingContent);
 
       expect(mockLogger.debug).toHaveBeenCalledWith(
-        '.vibe/.gitignore already exists with SQLite exclusions',
+        '.vibe/.gitignore already exists with conversation exclusions',
         { gitignorePath: vibeGitignorePath }
       );
     });
@@ -141,13 +141,13 @@ describe('StartDevelopment .gitignore management', () => {
       // Call the method
       TestAccess.callMethod(handler, 'ensureGitignoreEntry', tempDir);
 
-      // Check that content was updated to include SQLite exclusions
+      // Check that content was updated to include conversation exclusions
       const content = readFileSync(vibeGitignorePath, 'utf-8');
+      expect(content).toContain('conversations/');
       expect(content).toContain('*.sqlite');
-      expect(content).toContain('conversation-state.sqlite');
 
       expect(mockLogger.info).toHaveBeenCalledWith(
-        'Created .vibe/.gitignore to exclude SQLite files',
+        'Created .vibe/.gitignore to exclude conversation files',
         { projectPath: tempDir, gitignorePath: vibeGitignorePath }
       );
     });

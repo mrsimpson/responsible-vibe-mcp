@@ -11,7 +11,8 @@ import { ResourceTemplate } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { SetLevelRequestSchema } from '@modelcontextprotocol/sdk/types.js';
 import * as path from 'node:path';
 
-import { Database } from '@codemcp/workflows-core';
+import { FileStorage } from '@codemcp/workflows-core';
+import type { IPersistence } from '@codemcp/workflows-core';
 import { ConversationManager } from '@codemcp/workflows-core';
 import { TransitionEngine } from '@codemcp/workflows-core';
 import { InstructionGenerator } from '@codemcp/workflows-core';
@@ -44,7 +45,7 @@ const logger = createLogger('ServerConfig');
  */
 export interface ServerComponents {
   mcpServer: McpServer;
-  database: Database;
+  database: IPersistence;
   context: ServerContext;
   toolRegistry: ToolRegistry;
   resourceRegistry: ResourceRegistry;
@@ -101,7 +102,7 @@ export async function initializeServerComponents(
 
   // Initialize core components
   logger.debug('Initializing core components');
-  const database = new Database(
+  const database = new FileStorage(
     path.join(projectPath, '.vibe', 'conversation.sqlite')
   );
   const workflowManager = new WorkflowManager();
