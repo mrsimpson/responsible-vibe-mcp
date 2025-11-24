@@ -50,7 +50,7 @@ import { generateConfig } from './config-generator.js';
 /**
  * Parse command line arguments and handle CLI commands
  */
-function parseCliArgs(): { shouldExit: boolean } {
+async function parseCliArgs(): Promise<{ shouldExit: boolean }> {
   const args = process.argv.slice(2);
 
   // Handle help flag
@@ -121,10 +121,12 @@ function parseCliArgs(): { shouldExit: boolean } {
     if (!agent) {
       console.error('❌ Error: --generate-config requires an agent parameter');
       console.error('Usage: --generate-config <agent>');
-      console.error('Supported agents: amazonq-cli, claude, gemini, opencode');
+      console.error(
+        'Supported agents: amazonq-cli, claude, gemini, opencode, vscode'
+      );
       process.exit(1);
     }
-    handleGenerateConfig(agent);
+    await handleGenerateConfig(agent);
     return { shouldExit: true };
   }
 
@@ -519,8 +521,8 @@ function showSystemPrompt(): void {
 /**
  * Main CLI entry point
  */
-export function runCli() {
-  const { shouldExit } = parseCliArgs();
+export async function runCli() {
+  const { shouldExit } = await parseCliArgs();
 
   if (shouldExit) {
     return;
