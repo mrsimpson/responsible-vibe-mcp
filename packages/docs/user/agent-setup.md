@@ -208,18 +208,10 @@ npx responsible-vibe-mcp --generate-config opencode
 
 ### VS Code (GitHub Copilot)
 
-**Automated Setup**:
-
-```bash
-npx responsible-vibe-mcp --generate-config vscode
-```
-
 **Manual Setup**:
 
 1. Create `.vscode/mcp.json` with MCP server configuration
-2. Create `.github/copilot-instructions.md` with workflow instructions
-3. VS Code will automatically detect the MCP server configuration
-4. GitHub Copilot will apply the instructions from copilot-instructions.md
+2. Create `.github/copilot-instructions.md` with the system-prompt
 
 ## Custom Project Path
 
