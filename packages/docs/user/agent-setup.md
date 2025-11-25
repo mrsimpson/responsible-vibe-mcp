@@ -51,7 +51,7 @@ _Limitation: Until [`#1961`](https://github.com/sst/opencode/issues/1961) is res
 ### VS Code (GitHub Copilot)
 
 ```bash
-npx responsible-vibe-mcp --generate-config vscode
+npx responsible-vibe-mcp --generate-config copilot-vscode
 ```
 
 **Creates**: `.vscode/mcp.json`, `.github/copilot-instructions.md`
