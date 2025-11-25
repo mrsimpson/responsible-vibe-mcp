@@ -1,6 +1,6 @@
 {
   "name": "@codemcp/workflows-cli",
-  "version": "4.1.3",
+  "version": "4.2.0",
   "description": "CLI tools for responsible-vibe development workflows",
   "type": "module",
   "scripts": {
