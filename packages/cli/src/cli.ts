@@ -122,7 +122,7 @@ async function parseCliArgs(): Promise<{ shouldExit: boolean }> {
       console.error('❌ Error: --generate-config requires an agent parameter');
       console.error('Usage: --generate-config <agent>');
       console.error(
-        'Supported agents: amazonq-cli, claude, gemini, opencode, vscode'
+        'Supported agents: amazonq-cli, claude, gemini, opencode, copilot-vscode'
       );
       process.exit(1);
     }
