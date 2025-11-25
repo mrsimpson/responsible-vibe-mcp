@@ -317,7 +317,7 @@ class ConfigGeneratorFactory {
         return new GeminiConfigGenerator();
       case 'opencode':
         return new OpencodeConfigGenerator();
-      case 'vscode':
+      case 'copilot-vscode':
         return new VSCodeConfigGenerator();
       default:
         throw new Error(
