@@ -42,7 +42,7 @@ describe('Workflow Validation', () => {
       // Temporarily disable domain filtering for this test
       const originalEnv = process.env.VIBE_WORKFLOW_DOMAINS;
       process.env.VIBE_WORKFLOW_DOMAINS =
-        'code,architecture,office,sdd,sdd-crowd';
+        'code,architecture,office,sdd,sdd-crowd,children';
 
       try {
         // Create manager after setting env var to include all domains
