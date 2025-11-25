@@ -298,48 +298,8 @@ class VSCodeConfigGenerator extends ConfigGenerator {
     const githubDir = join(outputDir, '.github');
     await mkdir(githubDir, { recursive: true });
 
-    const copilotInstructions = `# Responsible Vibe Development Workflow
-
-${systemPrompt}
-
-## Available MCP Tools
-
-The following tools are available via the responsible-vibe-mcp server. Reference them using the \`#\` syntax:
-
-- \`#responsible-vibe-mcp_whats_next\` - Get guidance for current development phase and next steps
-- \`#responsible-vibe-mcp_start_development\` - Initialize new development project with structured workflow
-- \`#responsible-vibe-mcp_proceed_to_phase\` - Transition to next development phase
-- \`#responsible-vibe-mcp_conduct_review\` - Review current phase before proceeding
-- \`#responsible-vibe-mcp_list_workflows\` - List available development workflows
-- \`#responsible-vibe-mcp_get_tool_info\` - Get comprehensive information about available tools
-- \`#responsible-vibe-mcp_resume_workflow\` - Continue development after a break
-- \`#responsible-vibe-mcp_reset_development\` - Start over with clean slate
-- \`#responsible-vibe-mcp_setup_project_docs\` - Create project documentation artifacts
-
-## Workflow Guidelines
-
-1. **Always start** by calling \`#responsible-vibe-mcp_whats_next\` to understand current state
-2. **Follow the plan** documented in \`.vibe/development-plan-*.md\`
-3. **Ask before transitions** - use \`#responsible-vibe-mcp_proceed_to_phase\` only after user confirmation
-4. **Document progress** in the plan file with [x] for completed tasks
-5. **Review regularly** using \`#responsible-vibe-mcp_conduct_review\` before phase transitions
-
-## Tool Usage Patterns
-
-- Starting new work → \`#responsible-vibe-mcp_start_development\`
-- Unsure what to do next → \`#responsible-vibe-mcp_whats_next\`
-- Phase complete → \`#responsible-vibe-mcp_conduct_review\` then \`#responsible-vibe-mcp_proceed_to_phase\`
-- See available workflows → \`#responsible-vibe-mcp_list_workflows\`
-- After a break → \`#responsible-vibe-mcp_resume_workflow\`
-
-## Project Context
-
-This agent is configured to work with the responsible-vibe-mcp server for structured development workflows.
-The MCP server provides state management and phase-based guidance for various development tasks.
-`;
-
     const instructionsPath = join(githubDir, 'copilot-instructions.md');
-    await this.writeFile(instructionsPath, copilotInstructions);
+    await this.writeFile(instructionsPath, systemPrompt);
   }
 }
 
