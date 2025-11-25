@@ -77,7 +77,7 @@ Works with any agent that supports the Model Context Protocol. Amazon Q CLI, Cla
 
 ```bash
 # Setup your coding agent (works with any MCP-compatible agent)
-npx responsible-vibe-mcp --generate-config amazonq-cli  # or claude, gemini, opencode, vscode
+npx responsible-vibe-mcp --generate-config amazonq-cli  # or claude, gemini, opencode, copilot-vscode
 ```
 
 Head to an empty directory and try: _"Build a simple todo app with a terminal interface"_
