@@ -258,6 +258,57 @@ describe('ProjectDocsManager', () => {
         projectDocsManager.createProjectDocs(testProjectPath)
       ).rejects.toThrow('Template not found');
     });
+
+    it('should create only standard document names regardless of template names', async () => {
+      // Test with templates that have different names (like game-architecture, game-requirements, etc.)
+      const options = {
+        architecture: 'game-architecture' as const,
+        requirements: 'game-requirements' as const,
+        design: 'game-design' as const,
+      };
+
+      const result = await projectDocsManager.createProjectDocs(
+        testProjectPath,
+        options
+      );
+
+      // Should create standard names, not template names
+      expect(result.created).toEqual([
+        'architecture.md',
+        'requirements.md',
+        'design.md',
+      ]);
+      expect(result.skipped).toEqual([]);
+
+      // Verify template manager was called with the specified template names
+      expect(mockTemplateManager.loadTemplate).toHaveBeenCalledWith(
+        'architecture',
+        'game-architecture'
+      );
+      expect(mockTemplateManager.loadTemplate).toHaveBeenCalledWith(
+        'requirements',
+        'game-requirements'
+      );
+      expect(mockTemplateManager.loadTemplate).toHaveBeenCalledWith(
+        'design',
+        'game-design'
+      );
+
+      // Verify only standard filenames exist, not template names
+      const docsPath = join(testProjectPath, '.vibe', 'docs');
+      const archContent = await readFile(
+        join(docsPath, 'architecture.md'),
+        'utf-8'
+      );
+      expect(archContent).toContain(
+        'Test architecture template (game-architecture)'
+      );
+
+      // Verify template-named files don't exist
+      await expect(
+        readFile(join(docsPath, 'game-architecture.md'), 'utf-8')
+      ).rejects.toThrow();
+    });
   });
 
   describe('getVariableSubstitutions', () => {

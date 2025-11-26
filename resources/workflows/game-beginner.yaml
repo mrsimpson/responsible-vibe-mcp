@@ -89,8 +89,7 @@ states:
       - trigger: 'docs_ready'
         to: 'imagine'
         additional_instructions: |
-          Great! Your project is set up! 🎮
-          Now let's dream up an awesome game idea!
+          Translate all created documents completely into the children's language
         transition_reason: 'Project documentation initialized, ready to imagine the game'
 
   imagine:
@@ -218,10 +217,9 @@ states:
       **Step 2: Update $DESIGN_DOC with detailed Feature Designs** - For each major feature:
          - What it does (player perspective)
          - How it works (technical)
-         - State/Mechanics/Presentation breakdown
-         - Edge cases to handle
+         - State/Mechanics/Presentation separation
 
-         **IMPORTANT: Don't code in this phase! Just plan!**
+         **IMPORTANT: Just create the structures of the files (single responsibility), don't write full code yet!**
 
       **Explain to Child:**
 
