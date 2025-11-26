@@ -1,0 +1,23 @@
+// Auto-generated workflow list
+export const workflowList = [
+  'adr',
+  'big-bang-conversion',
+  'boundary-testing',
+  'bugfix',
+  'business-analysis',
+  'c4-analysis',
+  'epcc',
+  'game-beginner',
+  'greenfield',
+  'minor',
+  'posts',
+  'sdd-bugfix',
+  'sdd-bugfix-crowd',
+  'sdd-feature',
+  'sdd-feature-crowd',
+  'sdd-greenfield',
+  'sdd-greenfield-crowd',
+  'slides',
+  'tdd',
+  'waterfall',
+];
