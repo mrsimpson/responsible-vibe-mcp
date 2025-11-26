@@ -1,12 +1,7 @@
-// Bundled workflows configuration
-const bundledWorkflows = [
-  'waterfall',
-  'epcc',
-  'tdd',
-  'bugfix',
-  'minor',
-  'greenfield',
-];
+import { workflowList } from './workflow-list';
+
+// Bundled workflows configuration - imported from generated list
+const bundledWorkflows = workflowList;
 
 export function getBundledWorkflowNames(): string[] {
   return bundledWorkflows;

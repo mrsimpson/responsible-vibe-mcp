@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { readdirSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -7,35 +7,15 @@ const __dirname = dirname(__filename);
 
 function getAvailableWorkflows() {
   try {
-    // Read the BundledWorkflows.ts file and extract workflow names
-    const bundledWorkflowsPath = resolve(
-      __dirname,
-      '../../visualizer/src/services/BundledWorkflows.ts'
-    );
-    const content = readFileSync(bundledWorkflowsPath, 'utf8');
+    const workflowsDir = resolve(__dirname, '../../../resources/workflows');
+    const files = readdirSync(workflowsDir);
 
-    // Extract workflow names from the bundledWorkflows array
-    const workflowMatch = content.match(
-      /const bundledWorkflows\s*=\s*\[([^\]]*)\]/s
-    );
-    if (!workflowMatch) {
-      throw new Error('Could not parse bundledWorkflows');
-    }
-
-    const workflowsSection = workflowMatch[1];
-    const workflows = [];
-    const lines = workflowsSection.split('\n');
-
-    for (const line of lines) {
-      const match = line.match(/['"]([^'"]+)['"]/);
-      if (match) {
-        workflows.push(match[1]);
-      }
-    }
-
-    return workflows;
+    return files
+      .filter(file => file.endsWith('.yaml'))
+      .map(file => file.replace('.yaml', ''))
+      .sort();
   } catch (error) {
-    console.error('Failed to parse BundledWorkflows.ts:', error);
+    console.error('Failed to discover workflows:', error);
     return [];
   }
 }
