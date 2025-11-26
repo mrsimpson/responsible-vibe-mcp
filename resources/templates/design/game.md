@@ -16,8 +16,6 @@ Think of it like a construction plan:
 - **Architecture** = The main parts and their jobs
 - **Design** (this doc) = How to organize the construction
 
-**No code here - just the plan!** Actual code examples come during implementation.
-
 ---
 
 ## Core Concepts We'll Use
@@ -50,9 +48,8 @@ Be concrete - list actual file names or sprite names.
 Explain WHAT goes in each file and WHY.
 
 IMPORTANT:
-- Don't put everything in one file!
+- Maintain single responsibility principle!
 - Keep it object-oriented (one building block = one file)
-- Match the building blocks from architecture.md
 -->
 
 ### File Structure for [PLATFORM]
