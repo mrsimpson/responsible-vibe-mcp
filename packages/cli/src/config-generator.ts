@@ -277,7 +277,7 @@ class OpencodeConfigGenerator extends ConfigGenerator {
 
 /**
  * VS Code Configuration Generator
- * Generates .vscode/mcp.json and .github/copilot-instructions.md for GitHub Copilot
+ * Generates .vscode/mcp.json and .github/agents/Vibe.agent.md for GitHub Copilot Vibe mode
  */
 class VSCodeConfigGenerator extends ConfigGenerator {
   async generate(outputDir: string): Promise<void> {
@@ -294,12 +294,20 @@ class VSCodeConfigGenerator extends ConfigGenerator {
     const mcpJsonPath = join(vscodeDir, 'mcp.json');
     await this.writeFile(mcpJsonPath, JSON.stringify(mcpConfig, null, 2));
 
-    // Generate .github/copilot-instructions.md (System instructions for GitHub Copilot)
-    const githubDir = join(outputDir, '.github');
-    await mkdir(githubDir, { recursive: true });
+    // Generate .github/agents/Vibe.agent.md (Agent configuration for GitHub Copilot Vibe mode)
+    const githubAgentsDir = join(outputDir, '.github', 'agents');
+    await mkdir(githubAgentsDir, { recursive: true });
 
-    const instructionsPath = join(githubDir, 'copilot-instructions.md');
-    await this.writeFile(instructionsPath, systemPrompt);
+    const agentContent = `---
+description: AI assistant that helps users develop software features using the responsible-vibe-mcp server.
+tools: ['edit', 'runNotebooks', 'search', 'new', 'runCommands', 'runTasks', 'responsible-vibe-mcp/*', 'usages', 'vscodeAPI', 'problems', 'changes', 'testFailure', 'openSimpleBrowser', 'fetch', 'githubRepo', 'extensions', 'runSubagent']
+---
+
+${systemPrompt}
+`;
+
+    const agentPath = join(githubAgentsDir, 'Vibe.agent.md');
+    await this.writeFile(agentPath, agentContent);
   }
 }
 
