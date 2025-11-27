@@ -325,11 +325,12 @@ class ConfigGeneratorFactory {
         return new GeminiConfigGenerator();
       case 'opencode':
         return new OpencodeConfigGenerator();
+      case 'vscode':
       case 'copilot-vscode':
         return new VSCodeConfigGenerator();
       default:
         throw new Error(
-          `Unsupported agent: ${agent}. Supported agents: amazonq-cli, claude, gemini, opencode, copilot-vscode`
+          `Unsupported agent: ${agent}. Supported agents: amazonq-cli, claude, gemini, opencode, vscode`
         );
     }
   }
