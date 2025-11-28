@@ -54,7 +54,7 @@ _Limitation: Until [`#1961`](https://github.com/sst/opencode/issues/1961) is res
 npx responsible-vibe-mcp --generate-config copilot-vscode
 ```
 
-**Creates**: `.vscode/mcp.json`, `.github/copilot-instructions.md`
+**Creates**: `.vscode/mcp.json`, `.github/agents/Vibe.agent.md`
 
 ## Manual Setup
 
@@ -211,7 +211,7 @@ npx responsible-vibe-mcp --generate-config opencode
 **Manual Setup**:
 
 1. Create `.vscode/mcp.json` with MCP server configuration
-2. Create `.github/copilot-instructions.md` with the system-prompt
+2. Either create `.github/copilot-instructions.md` or an agent definition `.github/agents/Vibe.agent.md` with the system-prompt
 
 ## Custom Project Path
 
