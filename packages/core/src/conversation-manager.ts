@@ -212,10 +212,12 @@ export class ConversationManager {
     const timestamp = new Date().toISOString();
 
     // Generate a plan file path based on the branch name
+    // Sanitize branch name by replacing slashes and other special characters
+    const sanitizedBranch = gitBranch.replace(/[/\\]/g, '-');
     const planFileName =
       gitBranch === 'main' || gitBranch === 'master'
         ? 'development-plan.md'
-        : `development-plan-${gitBranch}.md`;
+        : `development-plan-${sanitizedBranch}.md`;
 
     const planFilePath = resolve(projectPath, '.vibe', planFileName);
 
