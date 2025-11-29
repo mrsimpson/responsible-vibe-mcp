@@ -115,6 +115,78 @@ describe('Git Branch Detection', () => {
       console.log('Plan file path:', response.plan_file_path);
     });
 
+    it('should detect branch name even without commits', async () => {
+      // Create a temp project on a feature branch WITHOUT any commits
+      const scenario = await createSuiteIsolatedE2EScenario({
+        suiteName: 'git-branch-no-commits',
+        tempProjectFactory: baseDir => {
+          const project = new TempProject({
+            projectName: `no-commits-test-${Date.now()}`,
+            gitBranch: 'feature/no-commits',
+            baseDirectory: baseDir,
+          });
+
+          // Remove fake .git directory and initialize real git repo
+          const { rmSync } = require('node:fs');
+          const gitPath = path.join(project.projectPath, '.git');
+          rmSync(gitPath, { recursive: true, force: true });
+
+          try {
+            execSync('git init', { cwd: project.projectPath, stdio: 'pipe' });
+            execSync('git config user.email "test@example.com"', {
+              cwd: project.projectPath,
+              stdio: 'pipe',
+            });
+            execSync('git config user.name "Test User"', {
+              cwd: project.projectPath,
+              stdio: 'pipe',
+            });
+            // Create branch but DO NOT make any commits
+            execSync('git checkout -b feature/no-commits', {
+              cwd: project.projectPath,
+              stdio: 'pipe',
+            });
+
+            // Verify the branch was created
+            const currentBranch = execSync('git symbolic-ref --short HEAD', {
+              cwd: project.projectPath,
+              encoding: 'utf-8',
+              stdio: 'pipe',
+            }).trim();
+            console.log(
+              'Git repo initialized without commits. Current branch:',
+              currentBranch
+            );
+          } catch (error) {
+            console.error('Failed to initialize git repo for test:', error);
+            throw error;
+          }
+
+          project.addMockProjectDocs();
+          return project;
+        },
+      });
+
+      client = scenario.client;
+      cleanup = scenario.cleanup;
+
+      const result = await client.callTool('start_development', {
+        workflow: 'waterfall',
+        commit_behaviour: 'none',
+      });
+
+      const response = assertToolSuccess(result);
+
+      // Should detect the branch name even without commits
+      expect(response.plan_file_path).toBeTruthy();
+      expect(response.plan_file_path).toContain('feature-no-commits');
+      expect(response.plan_file_path).not.toContain(
+        'development-plan-default.md'
+      );
+
+      console.log('Plan file path (no commits):', response.plan_file_path);
+    });
+
     it('should use "default" in plan file name when not in a git repository', async () => {
       // Create a temp project WITHOUT git initialization
       const scenario = await createSuiteIsolatedE2EScenario({
