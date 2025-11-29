@@ -583,7 +583,8 @@ ${templateOptionsText}
       }
 
       // Get current branch name
-      const branch = execSync('git rev-parse --abbrev-ref HEAD', {
+      // Use symbolic-ref which works even without commits (unlike rev-parse --abbrev-ref HEAD)
+      const branch = execSync('git symbolic-ref --short HEAD', {
         cwd: projectPath,
         encoding: 'utf-8',
         stdio: ['ignore', 'pipe', 'ignore'], // Suppress stderr
