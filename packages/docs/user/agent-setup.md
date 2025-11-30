@@ -48,6 +48,14 @@ npx responsible-vibe-mcp --generate-config opencode
 
 _Limitation: Until [`#1961`](https://github.com/sst/opencode/issues/1961) is resolved, permissions to ask the user before executing proceed_to_phase will not be respected. Thus, RV MCP in OpenCode is currently a bit ... stressful_
 
+### VS Code (GitHub Copilot)
+
+```bash
+npx responsible-vibe-mcp --generate-config copilot-vscode
+```
+
+**Creates**: `.vscode/mcp.json`, `.github/agents/Vibe.agent.md`
+
 ## Manual Setup
 
 If you prefer manual configuration or use a different agent:
@@ -197,6 +205,13 @@ npx responsible-vibe-mcp --generate-config opencode
 1. Create `opencode.json` with MCP server configuration
 2. System prompt is automatically provided via MCP
 3. Tool permissions are configured to prevent automatic phase transitions
+
+### VS Code (GitHub Copilot)
+
+**Manual Setup**:
+
+1. Create `.vscode/mcp.json` with MCP server configuration
+2. Either create `.github/copilot-instructions.md` or an agent definition `.github/agents/Vibe.agent.md` with the system-prompt
 
 ## Custom Project Path
 

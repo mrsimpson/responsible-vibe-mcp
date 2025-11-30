@@ -28,5 +28,5 @@ if (args.length === 0) {
 } else {
   // Any arguments, run CLI
   const { runCli } = await import('./cli.js');
-  runCli();
+  await runCli();
 }
