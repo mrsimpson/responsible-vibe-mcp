@@ -69,7 +69,7 @@
     "lint-staged": "16.1.6",
     "oxlint": "1.16.0",
     "prettier": "3.6.2",
-    "tsx": "4.20.5",
+    "tsx": "4.21.0",
     "turbo": "^2.5.8",
     "typescript": "^5.9.3",
     "vitepress": "^1.6.4",
