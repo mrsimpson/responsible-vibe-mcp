@@ -50,7 +50,7 @@ import { generateConfig } from './config-generator.js';
 /**
  * Parse command line arguments and handle CLI commands
  */
-async function parseCliArgs(): Promise<{ shouldExit: boolean }> {
+function parseCliArgs(): { shouldExit: boolean } {
   const args = process.argv.slice(2);
 
   // Handle help flag
@@ -126,7 +126,7 @@ async function parseCliArgs(): Promise<{ shouldExit: boolean }> {
       );
       process.exit(1);
     }
-    await handleGenerateConfig(agent);
+    handleGenerateConfig(agent);
     return { shouldExit: true };
   }
 
@@ -521,8 +521,8 @@ function showSystemPrompt(): void {
 /**
  * Main CLI entry point
  */
-export async function runCli() {
-  const { shouldExit } = await parseCliArgs();
+export function runCli() {
+  const { shouldExit } = parseCliArgs();
 
   if (shouldExit) {
     return;

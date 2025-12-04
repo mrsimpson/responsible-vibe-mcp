@@ -191,7 +191,7 @@ describe('CLI', () => {
         '❌ Error: --generate-config requires an agent parameter'
       );
       expect(consoleErrorSpy).toHaveBeenCalledWith(
-        'Supported agents: amazonq-cli, claude, gemini, opencode'
+        'Supported agents: amazonq-cli, claude, gemini, opencode, copilot-vscode'
       );
     });
   });
