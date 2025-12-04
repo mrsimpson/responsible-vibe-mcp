@@ -20,7 +20,7 @@ Use the automated configuration generator for your preferred agent:
 npx responsible-vibe-mcp --generate-config amazonq-cli
 ```
 
-**Creates**: `.amazonq/cli-agents/vibe.json`
+**Creates/Updates**: `.amazonq/cli-agents/vibe.json`
 
 ### Claude Code
 
@@ -28,7 +28,7 @@ npx responsible-vibe-mcp --generate-config amazonq-cli
 npx responsible-vibe-mcp --generate-config claude
 ```
 
-**Creates**: `CLAUDE.md`, `.mcp.json`, `settings.json`
+**Creates/Updates**: `CLAUDE.md`, `.mcp.json`, `settings.json`
 
 ### Gemini CLI
 
@@ -36,7 +36,7 @@ npx responsible-vibe-mcp --generate-config claude
 npx responsible-vibe-mcp --generate-config gemini
 ```
 
-**Creates**: `settings.json`, `GEMINI.md`
+**Creates/Updates**: `settings.json`, `GEMINI.md`
 
 ### OpenCode CLI
 
@@ -44,7 +44,7 @@ npx responsible-vibe-mcp --generate-config gemini
 npx responsible-vibe-mcp --generate-config opencode
 ```
 
-**Creates**: `opencode.json`
+**Creates/Updates**: `opencode.json`
 
 _Limitation: Until [`#1961`](https://github.com/sst/opencode/issues/1961) is resolved, permissions to ask the user before executing proceed_to_phase will not be respected. Thus, RV MCP in OpenCode is currently a bit ... stressful_
 

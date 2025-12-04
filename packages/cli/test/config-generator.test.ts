@@ -1,5 +1,12 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { mkdtempSync, rmSync, readFileSync, existsSync } from 'node:fs';
+import {
+  mkdtempSync,
+  rmSync,
+  readFileSync,
+  existsSync,
+  writeFileSync,
+  mkdirSync,
+} from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 
@@ -130,6 +137,172 @@ describe('Config Generator', () => {
       await expect(generateConfig('unsupported', tempDir)).rejects.toThrow(
         'Unsupported agent: unsupported'
       );
+    });
+  });
+
+  describe('Configuration Merging', () => {
+    describe('OpenCode', () => {
+      it('should merge with existing opencode.json', async () => {
+        const configPath = join(tempDir, 'opencode.json');
+
+        // Create existing config with custom content
+        const existingConfig = {
+          $schema: 'https://opencode.ai/config.json',
+          mcp: {
+            'custom-server': {
+              command: ['node', 'server.js'],
+              type: 'local',
+              enabled: true,
+            },
+          },
+          agent: {
+            'custom-agent': {
+              description: 'My custom agent',
+              mode: 'secondary',
+            },
+          },
+          customField: 'should be preserved',
+        };
+        writeFileSync(configPath, JSON.stringify(existingConfig, null, 2));
+
+        // Generate config
+        await generateConfig('opencode', tempDir);
+
+        // Read result
+        const config = JSON.parse(readFileSync(configPath, 'utf-8'));
+
+        // Verify merge
+        expect(config.customField).toBe('should be preserved');
+        expect(config.mcp['custom-server']).toBeDefined();
+        expect(config.mcp['responsible-vibe-mcp']).toBeDefined();
+        expect(config.agent['custom-agent']).toBeDefined();
+        expect(config.agent.vibe).toBeDefined();
+      });
+
+      it('should handle invalid JSON gracefully', async () => {
+        const configPath = join(tempDir, 'opencode.json');
+        writeFileSync(configPath, '{ invalid json');
+
+        await expect(generateConfig('opencode', tempDir)).rejects.toThrow(
+          /contains invalid JSON/
+        );
+      });
+
+      it('should create new file when none exists', async () => {
+        await generateConfig('opencode', tempDir);
+
+        const configPath = join(tempDir, 'opencode.json');
+        expect(existsSync(configPath)).toBe(true);
+      });
+    });
+
+    describe('Amazon Q', () => {
+      it('should merge with existing vibe.json', async () => {
+        const configDir = join(tempDir, '.amazonq', 'cli-agents');
+        mkdirSync(configDir, { recursive: true });
+        const configPath = join(configDir, 'vibe.json');
+
+        // Create existing config
+        const existingConfig = {
+          name: 'vibe',
+          customField: 'preserved',
+          tools: ['custom-tool'],
+        };
+        writeFileSync(configPath, JSON.stringify(existingConfig, null, 2));
+
+        // Generate config
+        await generateConfig('amazonq-cli', tempDir);
+
+        // Read result
+        const config = JSON.parse(readFileSync(configPath, 'utf-8'));
+
+        // Verify merge
+        expect(config.customField).toBe('preserved');
+        expect(config.tools).toContain('@responsible-vibe-mcp');
+        expect(config.name).toBe('vibe');
+      });
+    });
+
+    describe('Claude', () => {
+      it('should merge .mcp.json with existing servers', async () => {
+        const mcpPath = join(tempDir, '.mcp.json');
+
+        // Create existing .mcp.json
+        const existingMcp = {
+          mcpServers: {
+            'custom-server': {
+              command: 'custom',
+              args: ['arg1'],
+            },
+          },
+        };
+        writeFileSync(mcpPath, JSON.stringify(existingMcp, null, 2));
+
+        // Generate config
+        await generateConfig('claude', tempDir);
+
+        // Read result
+        const mcpConfig = JSON.parse(readFileSync(mcpPath, 'utf-8'));
+
+        // Verify merge
+        expect(mcpConfig.mcpServers['custom-server']).toBeDefined();
+        expect(mcpConfig.mcpServers['responsible-vibe-mcp']).toBeDefined();
+      });
+
+      it('should merge settings.json with existing permissions', async () => {
+        const settingsPath = join(tempDir, 'settings.json');
+
+        // Create existing settings
+        const existingSettings = {
+          permissions: {
+            allow: ['CustomTool(*)'],
+            customField: 'preserved',
+          },
+        };
+        writeFileSync(settingsPath, JSON.stringify(existingSettings, null, 2));
+
+        // Generate config
+        await generateConfig('claude', tempDir);
+
+        // Read result
+        const settings = JSON.parse(readFileSync(settingsPath, 'utf-8'));
+
+        // Verify merge
+        expect(settings.permissions.customField).toBe('preserved');
+        expect(settings.permissions.allow).toContain(
+          'MCP(responsible-vibe-mcp:whats_next)'
+        );
+      });
+    });
+
+    describe('Gemini', () => {
+      it('should merge settings.json with existing config', async () => {
+        const settingsPath = join(tempDir, 'settings.json');
+
+        // Create existing settings
+        const existingSettings = {
+          theme: 'Custom',
+          customField: 'preserved',
+          mcpServers: {
+            'existing-server': {
+              command: 'test',
+            },
+          },
+        };
+        writeFileSync(settingsPath, JSON.stringify(existingSettings, null, 2));
+
+        // Generate config
+        await generateConfig('gemini', tempDir);
+
+        // Read result
+        const settings = JSON.parse(readFileSync(settingsPath, 'utf-8'));
+
+        // Verify merge - theme should be updated to Default, but customField preserved
+        expect(settings.theme).toBe('Default');
+        expect(settings.customField).toBe('preserved');
+        expect(settings.mcpServers['existing-server']).toBeDefined();
+        expect(settings.mcpServers['responsible-vibe-mcp']).toBeDefined();
+      });
     });
   });
 });
