@@ -6,11 +6,56 @@
  * Each agent has its own generator class with single responsibility.
  */
 
-import { writeFile, mkdir } from 'node:fs/promises';
+import { writeFile, mkdir, readFile } from 'node:fs/promises';
 import { join } from 'node:path';
+import { existsSync } from 'node:fs';
 import { generateSystemPrompt } from '@codemcp/workflows-core';
 import { StateMachineLoader } from '@codemcp/workflows-core';
 import {} from '@codemcp/workflows-core';
+
+/**
+ * Deep merge two objects, with values from source taking precedence
+ * Arrays are replaced, not merged
+ */
+function deepMerge(
+  target: Record<string, unknown>,
+  source: Record<string, unknown>
+): Record<string, unknown> {
+  if (!source || typeof source !== 'object') {
+    return source;
+  }
+
+  if (!target || typeof target !== 'object') {
+    return source;
+  }
+
+  const result: Record<string, unknown> = { ...target };
+
+  for (const key of Object.keys(source)) {
+    const sourceValue = source[key];
+    const targetValue = target[key];
+
+    if (
+      sourceValue &&
+      typeof sourceValue === 'object' &&
+      !Array.isArray(sourceValue) &&
+      targetValue &&
+      typeof targetValue === 'object' &&
+      !Array.isArray(targetValue)
+    ) {
+      // Recursively merge nested objects
+      result[key] = deepMerge(
+        targetValue as Record<string, unknown>,
+        sourceValue as Record<string, unknown>
+      );
+    } else {
+      // For primitives, arrays, or null values, use source value
+      result[key] = sourceValue;
+    }
+  }
+
+  return result;
+}
 
 /**
  * Abstract base class for configuration generators
@@ -49,6 +94,36 @@ abstract class ConfigGenerator {
   }
 
   /**
+   * Read and merge with existing JSON config file if it exists
+   * Returns merged config with new config taking precedence
+   */
+  protected async mergeWithExistingConfig(
+    filePath: string,
+    newConfig: Record<string, unknown>
+  ): Promise<Record<string, unknown>> {
+    if (!existsSync(filePath)) {
+      return newConfig;
+    }
+
+    try {
+      const existingContent = await readFile(filePath, 'utf-8');
+      const existingConfig = JSON.parse(existingContent) as Record<
+        string,
+        unknown
+      >;
+      console.log('✓ Merged with existing configuration');
+      return deepMerge(existingConfig, newConfig);
+    } catch (error) {
+      if (error instanceof SyntaxError) {
+        throw new Error(
+          `Existing ${filePath} contains invalid JSON. Please fix the file or remove it to generate a new configuration. Error: ${error.message}`
+        );
+      }
+      throw error;
+    }
+  }
+
+  /**
    * We'll be using the reduced deployable which only contains the mcp server, not the CLI
    * On Windows, npx commands need to be prefixed with "cmd /c"
    */
@@ -83,13 +158,14 @@ abstract class ConfigGenerator {
 /**
  * Amazon Q Configuration Generator
  * Generates a single comprehensive JSON file
+ * Merges with existing configuration instead of overwriting
  */
 class AmazonQConfigGenerator extends ConfigGenerator {
   async generate(outputDir: string): Promise<void> {
     const systemPrompt = this.getSystemPrompt();
     const mcpServers = this.getDefaultMcpConfig();
 
-    const config = {
+    const newConfig: Record<string, unknown> = {
       name: 'vibe',
       description: 'Responsible vibe development',
       prompt: systemPrompt,
@@ -137,32 +213,41 @@ class AmazonQConfigGenerator extends ConfigGenerator {
     await mkdir(amazonqDir, { recursive: true });
 
     const configPath = join(amazonqDir, 'vibe.json');
-    await this.writeFile(configPath, JSON.stringify(config, null, 2));
+    const finalConfig = await this.mergeWithExistingConfig(
+      configPath,
+      newConfig
+    );
+    await this.writeFile(configPath, JSON.stringify(finalConfig, null, 2));
   }
 }
 
 /**
  * Claude Code Configuration Generator
  * Generates multiple files: CLAUDE.md, .mcp.json, settings.json
+ * Merges with existing configuration instead of overwriting
  */
 class ClaudeConfigGenerator extends ConfigGenerator {
   async generate(outputDir: string): Promise<void> {
     const systemPrompt = this.getSystemPrompt();
     const mcpServers = this.getDefaultMcpConfig();
 
-    // Generate CLAUDE.md (system prompt)
+    // Generate CLAUDE.md (system prompt) - always overwrite as it's generated content
     const claudeMdPath = join(outputDir, 'CLAUDE.md');
     await this.writeFile(claudeMdPath, systemPrompt);
 
-    // Generate .mcp.json (MCP server configuration)
-    const mcpConfig = {
+    // Generate .mcp.json (MCP server configuration) - merge with existing
+    const mcpConfig: Record<string, unknown> = {
       mcpServers: mcpServers,
     };
     const mcpJsonPath = join(outputDir, '.mcp.json');
-    await this.writeFile(mcpJsonPath, JSON.stringify(mcpConfig, null, 2));
+    const finalMcpConfig = await this.mergeWithExistingConfig(
+      mcpJsonPath,
+      mcpConfig
+    );
+    await this.writeFile(mcpJsonPath, JSON.stringify(finalMcpConfig, null, 2));
 
-    // Generate settings.json (permissions and security)
-    const settings = {
+    // Generate settings.json (permissions and security) - merge with existing
+    const settings: Record<string, unknown> = {
       permissions: {
         allow: [
           'MCP(responsible-vibe-mcp:whats_next)',
@@ -178,13 +263,18 @@ class ClaudeConfigGenerator extends ConfigGenerator {
       },
     };
     const settingsPath = join(outputDir, 'settings.json');
-    await this.writeFile(settingsPath, JSON.stringify(settings, null, 2));
+    const finalSettings = await this.mergeWithExistingConfig(
+      settingsPath,
+      settings
+    );
+    await this.writeFile(settingsPath, JSON.stringify(finalSettings, null, 2));
   }
 }
 
 /**
  * Gemini CLI Configuration Generator
  * Generates settings.json and GEMINI.md
+ * Merges with existing configuration instead of overwriting
  */
 class GeminiConfigGenerator extends ConfigGenerator {
   async generate(outputDir: string): Promise<void> {
@@ -192,8 +282,8 @@ class GeminiConfigGenerator extends ConfigGenerator {
     const mcpServers = this.getDefaultMcpConfig();
     const allowedTools = this.getDefaultAllowedTools();
 
-    // Generate settings.json (comprehensive configuration)
-    const settings = {
+    // Generate settings.json (comprehensive configuration) - merge with existing
+    const settings: Record<string, unknown> = {
       contextFileName: 'GEMINI.md',
       autoAccept: false,
       theme: 'Default',
@@ -213,9 +303,13 @@ class GeminiConfigGenerator extends ConfigGenerator {
       hideBanner: false,
     };
     const settingsPath = join(outputDir, 'settings.json');
-    await this.writeFile(settingsPath, JSON.stringify(settings, null, 2));
+    const finalSettings = await this.mergeWithExistingConfig(
+      settingsPath,
+      settings
+    );
+    await this.writeFile(settingsPath, JSON.stringify(finalSettings, null, 2));
 
-    // Generate GEMINI.md (context/prompt file)
+    // Generate GEMINI.md (context/prompt file) - always overwrite as it's generated content
     const geminiMdContent = `# Vibe Development Agent
 
 ${systemPrompt}
@@ -237,13 +331,15 @@ ${allowedTools.map(tool => `- ${tool}`).join('\n')}
 /**
  * OpenCode Configuration Generator
  * Generates opencode.json with agent configuration and MCP server setup
+ * Merges with existing configuration instead of overwriting
  */
 class OpencodeConfigGenerator extends ConfigGenerator {
   async generate(outputDir: string): Promise<void> {
     const systemPrompt = this.getSystemPrompt();
+    const configPath = join(outputDir, 'opencode.json');
 
-    // Generate opencode.json configuration with correct MCP format
-    const config = {
+    // Generate new config structure
+    const newConfig: Record<string, unknown> = {
       $schema: 'https://opencode.ai/config.json',
       mcp: {
         'responsible-vibe-mcp': {
@@ -270,8 +366,11 @@ class OpencodeConfigGenerator extends ConfigGenerator {
       },
     };
 
-    const configPath = join(outputDir, 'opencode.json');
-    await this.writeFile(configPath, JSON.stringify(config, null, 2));
+    const finalConfig = await this.mergeWithExistingConfig(
+      configPath,
+      newConfig
+    );
+    await this.writeFile(configPath, JSON.stringify(finalConfig, null, 2));
   }
 }
 
@@ -311,3 +410,8 @@ export async function generateConfig(
 
   console.log(`✅ Configuration generated successfully for ${agent}`);
 }
+
+/**
+ * Export deepMerge for testing
+ */
+export { deepMerge };
