@@ -30,6 +30,11 @@ states:
     default_instructions: |
       You are helping a young game developer (ages 8-12) start their game development journey!
 
+      Check whether the project documentation is already set up (.vib/docs/ requirements.md, architecture.md and design.md exists).
+      If they do, it's not the first time the child is doing this, so it knows about the importance of taking notes. Directly proceed to the imagine phase!
+
+      If not, proceed with the following steps.
+
       Explain that before we start, we need to set up some documents that help us to remain organized.
 
       **Step 1: Set Up Project Documentation (REQUIRED)**
@@ -199,8 +204,8 @@ states:
       - trigger: 'architecture_complete'
         to: 'design'
         additional_instructions: |
-          Great! We know HOW to build it! 🏗️
-          Now let's plan out WHAT features to build and in what order!
+          Great! We have set the foundation for your game! 🏗️
+          Now let's plan out how we're going to build it!
         transition_reason: 'Technical architecture complete, ready for detailed design'
 
   design:
@@ -208,7 +213,7 @@ states:
     default_instructions: |
       Now we create a detailed plan for building the game!
 
-      Read $REQUIREMENTS_DOC and $ARCHITECTURE_DOC to understand what we're building and how.
+      Read $REQUIREMENTS_DOC and $ARCHITECTURE_DOC to understand what we're building and the architectural foundation.
 
       **Step 1: Pick Libraries**
       E. g. physics, platformer engines, etc. based on requirements.
@@ -223,14 +228,11 @@ states:
 
       **Explain to Child:**
 
-      "I made a plan for building your game!
+      "We have selected the technologies which we'll be using to build your game.
 
-      We'll focus on the very basics first. We captured additional ideas, but for now,
-      we'll build a simple version that works well.
-      After each step, we'll test and play what you built!"
-
-      Ask: "Do you see how we're breaking this into small pieces? Each step is something we can
-      finish and test! Does this make sense? Ready to start coding?"
+      Ask: "This may sound a bit technical, but once you get experienced, you will find out it's getting easier to pick the right tech.
+      For, now, I helped you pick make these decisions because my creator told me what works best for beginners like you!"
+      Still, you may want to look at the design.md in the .vibe/docs folder to see what we picked and why."
 
       WAIT for confirmation.
 
