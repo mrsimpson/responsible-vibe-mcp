@@ -325,6 +325,12 @@ export async function registerMcpTools(
           .describe(
             'Whether to require reviews before phase transitions. When enabled, use conduct_review tool before proceeding to next phase.'
           ),
+        project_path: z
+          .string()
+          .optional()
+          .describe(
+            'Project directory path. Pass the .vibe subdirectory path if a .vibe directory exists in your project, otherwise pass the project root directory. The implementation will automatically detect and use the correct project root.'
+          ),
       },
       annotations: {
         title: 'Development Initializer',
@@ -480,6 +486,12 @@ export async function registerMcpTools(
           .default('freestyle')
           .describe(
             `Design documentation: template name (${availableTemplates.design.join(', ')}, none) OR file path to existing document`
+          ),
+        project_path: z
+          .string()
+          .optional()
+          .describe(
+            'Project directory path. Pass the .vibe subdirectory path if a .vibe directory exists in your project, otherwise pass the project root directory. The implementation will automatically detect and use the correct project root.'
           ),
       },
       annotations: {

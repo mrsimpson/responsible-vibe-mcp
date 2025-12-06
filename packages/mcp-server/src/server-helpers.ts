@@ -222,3 +222,24 @@ export function logHandlerCompletion(
     hasError: !!result.error,
   });
 }
+
+/**
+ * Strip /.vibe suffix from project path if present
+ *
+ * @param providedPath - Optional project path provided by user
+ * @param defaultPath - Default project path from context
+ * @returns Normalized project root path
+ */
+export function stripVibePathSuffix(
+  providedPath: string | undefined,
+  defaultPath: string
+): string {
+  if (!providedPath) {
+    return defaultPath;
+  }
+
+  // Strip /.vibe suffix if present to get project root
+  return providedPath.endsWith('/.vibe')
+    ? providedPath.slice(0, -6) // Remove '/.vibe'
+    : providedPath;
+}
