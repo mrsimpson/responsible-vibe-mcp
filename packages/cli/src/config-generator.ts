@@ -411,27 +411,129 @@ ${systemPrompt}
 }
 
 /**
+ * Metadata for a configuration generator
+ */
+interface GeneratorMetadata {
+  /** Primary identifier for the generator */
+  name: string;
+  /** Human-readable description */
+  description: string;
+  /** Alternative names that can be used to reference this generator */
+  aliases?: string[];
+  /** The generator class constructor */
+  generatorClass: new () => ConfigGenerator;
+}
+
+/**
+ * Registry for configuration generators
+ * Provides discovery, validation, and instantiation of generators
+ */
+class GeneratorRegistry {
+  private static generators = new Map<string, GeneratorMetadata>();
+
+  /**
+   * Register a generator with its metadata
+   */
+  static register(metadata: GeneratorMetadata): void {
+    // Register with primary name
+    this.generators.set(metadata.name.toLowerCase(), metadata);
+
+    // Register aliases
+    if (metadata.aliases) {
+      for (const alias of metadata.aliases) {
+        this.generators.set(alias.toLowerCase(), metadata);
+      }
+    }
+  }
+
+  /**
+   * Create a generator instance by name or alias
+   */
+  static createGenerator(name: string): ConfigGenerator {
+    const metadata = this.generators.get(name.toLowerCase());
+    if (!metadata) {
+      const available = this.getGeneratorNames().join(', ');
+      throw new Error(
+        `Unsupported agent: ${name}. Supported agents: ${available}`
+      );
+    }
+    return new metadata.generatorClass();
+  }
+
+  /**
+   * Get all unique registered generators (without duplicates from aliases)
+   */
+  static getAllGenerators(): GeneratorMetadata[] {
+    const unique = new Map<string, GeneratorMetadata>();
+    for (const metadata of this.generators.values()) {
+      unique.set(metadata.name, metadata);
+    }
+    return Array.from(unique.values());
+  }
+
+  /**
+   * Get list of primary generator names
+   */
+  static getGeneratorNames(): string[] {
+    return this.getAllGenerators().map(g => g.name);
+  }
+
+  /**
+   * Get formatted help text for all generators
+   */
+  static getHelpText(): string {
+    return this.getAllGenerators()
+      .map(g => `  ${g.name.padEnd(20)} ${g.description}`)
+      .join('\n');
+  }
+
+  /**
+   * Check if a generator exists by name or alias
+   */
+  static exists(name: string): boolean {
+    return this.generators.has(name.toLowerCase());
+  }
+}
+
+// Register all available generators
+GeneratorRegistry.register({
+  name: 'amazonq-cli',
+  description: 'Generate .amazonq/cli-agents/vibe.json',
+  generatorClass: AmazonQConfigGenerator,
+});
+
+GeneratorRegistry.register({
+  name: 'claude',
+  description: 'Generate CLAUDE.md, .mcp.json, settings.json',
+  generatorClass: ClaudeConfigGenerator,
+});
+
+GeneratorRegistry.register({
+  name: 'gemini',
+  description: 'Generate settings.json, GEMINI.md',
+  generatorClass: GeminiConfigGenerator,
+});
+
+GeneratorRegistry.register({
+  name: 'opencode',
+  description: 'Generate opencode.json',
+  generatorClass: OpencodeConfigGenerator,
+});
+
+GeneratorRegistry.register({
+  name: 'copilot-vscode',
+  description: 'Generate .vscode/mcp.json, .github/agents/Vibe.agent.md',
+  aliases: ['vscode'],
+  generatorClass: VSCodeConfigGenerator,
+});
+
+/**
  * Factory class for creating configuration generators
+ * @deprecated Use GeneratorRegistry.createGenerator() instead
  */
 class ConfigGeneratorFactory {
   static createGenerator(agent: string): ConfigGenerator {
-    switch (agent.toLowerCase()) {
-      case 'amazonq-cli':
-        return new AmazonQConfigGenerator();
-      case 'claude':
-        return new ClaudeConfigGenerator();
-      case 'gemini':
-        return new GeminiConfigGenerator();
-      case 'opencode':
-        return new OpencodeConfigGenerator();
-      case 'vscode':
-      case 'copilot-vscode':
-        return new VSCodeConfigGenerator();
-      default:
-        throw new Error(
-          `Unsupported agent: ${agent}. Supported agents: amazonq-cli, claude, gemini, opencode, vscode`
-        );
-    }
+    return GeneratorRegistry.createGenerator(agent);
   }
 }
 
@@ -449,6 +551,11 @@ export async function generateConfig(
 
   console.log(`✅ Configuration generated successfully for ${agent}`);
 }
+
+/**
+ * Export GeneratorRegistry for CLI usage
+ */
+export { GeneratorRegistry };
 
 /**
  * Export deepMerge for testing
