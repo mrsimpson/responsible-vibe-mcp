@@ -375,6 +375,42 @@ class OpencodeConfigGenerator extends ConfigGenerator {
 }
 
 /**
+ * VS Code Configuration Generator
+ * Generates .vscode/mcp.json and .github/agents/Vibe.agent.md for GitHub Copilot Vibe mode
+ */
+class VSCodeConfigGenerator extends ConfigGenerator {
+  async generate(outputDir: string): Promise<void> {
+    const systemPrompt = this.getSystemPrompt();
+    const mcpServers = this.getDefaultMcpConfig();
+
+    // Generate .vscode/mcp.json (MCP server configuration for VS Code)
+    const vscodeDir = join(outputDir, '.vscode');
+    await mkdir(vscodeDir, { recursive: true });
+
+    const mcpConfig = {
+      servers: mcpServers,
+    };
+    const mcpJsonPath = join(vscodeDir, 'mcp.json');
+    await this.writeFile(mcpJsonPath, JSON.stringify(mcpConfig, null, 2));
+
+    // Generate .github/agents/Vibe.agent.md (Agent configuration for GitHub Copilot Vibe mode)
+    const githubAgentsDir = join(outputDir, '.github', 'agents');
+    await mkdir(githubAgentsDir, { recursive: true });
+
+    const agentContent = `---
+description: AI assistant that helps users develop software features using the responsible-vibe-mcp server.
+tools: ['edit', 'runNotebooks', 'search', 'new', 'runCommands', 'runTasks', 'responsible-vibe-mcp/*', 'usages', 'vscodeAPI', 'problems', 'changes', 'testFailure', 'openSimpleBrowser', 'fetch', 'githubRepo', 'extensions', 'runSubagent']
+---
+
+${systemPrompt}
+`;
+
+    const agentPath = join(githubAgentsDir, 'Vibe.agent.md');
+    await this.writeFile(agentPath, agentContent);
+  }
+}
+
+/**
  * Factory class for creating configuration generators
  */
 class ConfigGeneratorFactory {
@@ -388,9 +424,12 @@ class ConfigGeneratorFactory {
         return new GeminiConfigGenerator();
       case 'opencode':
         return new OpencodeConfigGenerator();
+      case 'vscode':
+      case 'copilot-vscode':
+        return new VSCodeConfigGenerator();
       default:
         throw new Error(
-          `Unsupported agent: ${agent}. Supported agents: amazonq-cli, claude, gemini, opencode`
+          `Unsupported agent: ${agent}. Supported agents: amazonq-cli, claude, gemini, opencode, vscode`
         );
     }
   }

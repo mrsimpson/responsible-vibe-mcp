@@ -121,7 +121,9 @@ function parseCliArgs(): { shouldExit: boolean } {
     if (!agent) {
       console.error('❌ Error: --generate-config requires an agent parameter');
       console.error('Usage: --generate-config <agent>');
-      console.error('Supported agents: amazonq-cli, claude, gemini, opencode');
+      console.error(
+        'Supported agents: amazonq-cli, claude, gemini, opencode, copilot-vscode'
+      );
       process.exit(1);
     }
     handleGenerateConfig(agent);

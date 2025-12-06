@@ -102,6 +102,36 @@ describe('Config Generator', () => {
     });
   });
 
+  describe('VS Code Configuration', () => {
+    it('should generate VS Code configuration files', async () => {
+      await generateConfig('vscode', tempDir);
+
+      // Check .vscode/mcp.json
+      const mcpJsonPath = join(tempDir, '.vscode', 'mcp.json');
+      expect(existsSync(mcpJsonPath)).toBe(true);
+      const mcpConfig = JSON.parse(readFileSync(mcpJsonPath, 'utf-8'));
+      expect(mcpConfig.servers['responsible-vibe-mcp']).toBeDefined();
+
+      // Check .github/agents/Vibe.agent.md
+      const agentPath = join(tempDir, '.github', 'agents', 'Vibe.agent.md');
+      expect(existsSync(agentPath)).toBe(true);
+      const agentContent = readFileSync(agentPath, 'utf-8');
+
+      // Check YAML frontmatter
+      expect(agentContent).toContain('---');
+      expect(agentContent).toContain(
+        'description: AI assistant that helps users develop software features using the responsible-vibe-mcp server.'
+      );
+      expect(agentContent).toContain(
+        "tools: ['edit', 'runNotebooks', 'search', 'new', 'runCommands', 'runTasks', 'responsible-vibe-mcp/*'"
+      );
+
+      // Check system prompt content
+      expect(agentContent).toContain('responsible-vibe-mcp');
+      expect(agentContent).toContain('whats_next()');
+    });
+  });
+
   describe('Error Handling', () => {
     it('should throw error for unsupported agent', async () => {
       await expect(generateConfig('unsupported', tempDir)).rejects.toThrow(

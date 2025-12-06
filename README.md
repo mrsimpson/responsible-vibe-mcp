@@ -10,7 +10,7 @@ Transform any AI coding agent into a structured development partner with battle-
 
 ```bash
 # Setup your coding agent
-npx responsible-vibe-mcp --generate-config amazonq-cli  # or claude, gemini, opencode
+npx responsible-vibe-mcp --generate-config amazonq-cli  # or claude, gemini, opencode, copilot-vscode
 # OR manually configure any MCP agent with our system prompt, check the docs for that
 ```
 
