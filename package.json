@@ -58,7 +58,7 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
-    "@modelcontextprotocol/inspector": "0.16.8",
+    "@modelcontextprotocol/inspector": "0.17.5",
     "@tsconfig/node22": "22.0.5",
     "@tsconfig/strictest": "2.0.8",
     "@types/jsdom": "27.0.0",
