@@ -91,12 +91,14 @@ export class ConversationManager {
    * create a new conversation with a selected workflow.
    *
    * @param workflowName - The workflow to use for this conversation
+   * @param projectPathOverride - Optional project path override
    * @returns The newly created conversation context
    */
   async createConversationContext(
-    workflowName: string
+    workflowName: string,
+    projectPathOverride?: string
   ): Promise<ConversationContext> {
-    const projectPath = this.getProjectPath();
+    const projectPath = projectPathOverride || this.getProjectPath();
     const gitBranch = this.getGitBranch(projectPath);
 
     logger.debug('Creating conversation context', {

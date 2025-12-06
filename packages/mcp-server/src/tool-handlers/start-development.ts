@@ -6,7 +6,10 @@
  */
 
 import { BaseToolHandler } from './base-tool-handler.js';
-import { validateRequiredArgs } from '../server-helpers.js';
+import {
+  validateRequiredArgs,
+  stripVibePathSuffix,
+} from '../server-helpers.js';
 import { basename } from 'node:path';
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -23,6 +26,7 @@ export interface StartDevelopmentArgs {
   workflow: string;
   commit_behaviour?: 'step' | 'phase' | 'end' | 'none';
   require_reviews?: boolean;
+  project_path?: string;
 }
 
 /**
@@ -61,8 +65,14 @@ export class StartDevelopmentHandler extends BaseToolHandler<
     const selectedWorkflow = args.workflow;
     const requireReviews = args.require_reviews ?? false;
 
+    // Normalize project path - strip /.vibe suffix if present
+    const projectPath = stripVibePathSuffix(
+      args.project_path,
+      context.projectPath
+    );
+
     // Process git commit configuration
-    const isGitRepository = GitManager.isGitRepository(context.projectPath);
+    const isGitRepository = GitManager.isGitRepository(projectPath);
 
     // Translate commit_behaviour to internal git config
     const commitBehaviour =
@@ -77,22 +87,22 @@ export class StartDevelopmentHandler extends BaseToolHandler<
         commitBehaviour === 'phase',
       initialMessage: 'Development session',
       startCommitHash:
-        GitManager.getCurrentCommitHash(context.projectPath) || undefined,
+        GitManager.getCurrentCommitHash(projectPath) || undefined,
     };
 
     this.logger.debug('Processing start_development request', {
       selectedWorkflow,
-      projectPath: context.projectPath,
+      projectPath: projectPath,
       commitBehaviour,
       gitCommitConfig,
     });
 
     // Validate workflow selection (ensure project workflows are loaded first)
-    context.workflowManager.loadProjectWorkflows(context.projectPath);
+    context.workflowManager.loadProjectWorkflows(projectPath);
     if (
       !context.workflowManager.validateWorkflowName(
         selectedWorkflow,
-        context.projectPath
+        projectPath
       )
     ) {
       const availableWorkflows = context.workflowManager.getWorkflowNames();
@@ -103,7 +113,7 @@ export class StartDevelopmentHandler extends BaseToolHandler<
 
     // Check for project documentation artifacts and guide setup if needed
     const artifactGuidance = await this.checkProjectArtifacts(
-      context.projectPath,
+      projectPath,
       selectedWorkflow,
       context
     );
@@ -112,7 +122,7 @@ export class StartDevelopmentHandler extends BaseToolHandler<
     }
 
     // Check if user is on main/master branch and prompt for branch creation
-    const currentBranch = this.getCurrentGitBranch(context.projectPath);
+    const currentBranch = this.getCurrentGitBranch(projectPath);
     if (currentBranch === 'main' || currentBranch === 'master') {
       const suggestedBranchName = this.generateBranchSuggestion();
       const branchPromptResponse: StartDevelopmentResult = {
@@ -137,7 +147,8 @@ export class StartDevelopmentHandler extends BaseToolHandler<
     // Create or get conversation context with the selected workflow
     const conversationContext =
       await context.conversationManager.createConversationContext(
-        selectedWorkflow
+        selectedWorkflow,
+        args.project_path ? projectPath : undefined
       );
     const currentPhase = conversationContext.currentPhase;
 
@@ -163,7 +174,7 @@ export class StartDevelopmentHandler extends BaseToolHandler<
       await context.transitionEngine.handleExplicitTransition(
         currentPhase,
         targetPhase,
-        conversationContext.projectPath,
+        projectPath,
         'Development initialization',
         selectedWorkflow
       );
@@ -185,12 +196,12 @@ export class StartDevelopmentHandler extends BaseToolHandler<
     // Ensure plan file exists
     await context.planManager.ensurePlanFile(
       conversationContext.planFilePath,
-      conversationContext.projectPath,
+      projectPath,
       conversationContext.gitBranch
     );
 
     // Ensure .vibe/.gitignore exists to exclude SQLite files for git repositories
-    this.ensureGitignoreEntry(conversationContext.projectPath);
+    this.ensureGitignoreEntry(projectPath);
 
     // Generate workflow documentation URL
     const workflowDocumentationUrl =

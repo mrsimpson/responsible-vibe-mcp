@@ -7,6 +7,7 @@
  */
 
 import { BaseToolHandler } from './base-tool-handler.js';
+import { stripVibePathSuffix } from '../server-helpers.js';
 import { ProjectDocsManager } from '@codemcp/workflows-core';
 import { TemplateOptions } from '@codemcp/workflows-core';
 import { PathValidationUtils } from '@codemcp/workflows-core';
@@ -16,6 +17,7 @@ export interface SetupProjectDocsArgs {
   architecture: string; // Template name OR file path
   requirements: string; // Template name OR file path
   design: string; // Template name OR file path
+  project_path?: string; // Optional project path override
 }
 
 export interface SetupProjectDocsResult {
@@ -46,7 +48,11 @@ export class SetupProjectDocsHandler extends BaseToolHandler<
     args: SetupProjectDocsArgs,
     context: ServerContext
   ): Promise<SetupProjectDocsResult> {
-    const projectPath = context.projectPath || process.cwd();
+    // Normalize project path - strip /.vibe suffix if present
+    const projectPath = stripVibePathSuffix(
+      args.project_path,
+      context.projectPath || process.cwd()
+    );
 
     this.logger.info(
       'Setting up project docs with enhanced file linking support',
