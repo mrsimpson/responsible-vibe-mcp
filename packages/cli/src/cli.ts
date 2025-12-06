@@ -45,7 +45,7 @@ if (isLocal) {
 }
 
 import { startVisualizationTool } from './visualization-launcher.js';
-import { generateConfig } from './config-generator.js';
+import { generateConfig, GeneratorRegistry } from './config-generator.js';
 
 /**
  * Parse command line arguments and handle CLI commands
@@ -122,7 +122,7 @@ function parseCliArgs(): { shouldExit: boolean } {
       console.error('❌ Error: --generate-config requires an agent parameter');
       console.error('Usage: --generate-config <agent>');
       console.error(
-        'Supported agents: amazonq-cli, claude, gemini, opencode, copilot-vscode'
+        `Supported agents: ${GeneratorRegistry.getGeneratorNames().join(', ')}`
       );
       process.exit(1);
     }
@@ -482,10 +482,7 @@ AGENTS COMMANDS:
   agents copy [--output-dir]    Copy agent configs to .crowd/agents/
 
 SUPPORTED AGENTS:
-  amazonq-cli                   Generate .amazonq/cli-agents/vibe.json
-  claude                        Generate CLAUDE.md, .mcp.json, settings.json
-  gemini                        Generate settings.json, GEMINI.md
-  opencode                      Generate opencode.json
+${GeneratorRegistry.getHelpText()}
 
 DESCRIPTION:
   CLI tools for the responsible-vibe development workflow system.

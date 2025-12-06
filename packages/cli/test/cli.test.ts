@@ -14,6 +14,23 @@ const mocks = vi.hoisted(() => ({
   fileURLToPath: vi.fn(),
   spawn: vi.fn(),
   generateConfig: vi.fn(),
+  GeneratorRegistry: {
+    getGeneratorNames: vi.fn(() => [
+      'amazonq-cli',
+      'claude',
+      'gemini',
+      'opencode',
+      'copilot-vscode',
+    ]),
+    getHelpText: vi.fn(
+      () =>
+        `  amazonq-cli          Generate .amazonq/cli-agents/vibe.json
+  claude               Generate CLAUDE.md, .mcp.json, settings.json
+  gemini               Generate settings.json, GEMINI.md
+  opencode             Generate opencode.json
+  copilot-vscode       Generate .vscode/mcp.json, .github/agents/Vibe.agent.md`
+    ),
+  },
 }));
 
 vi.mock('@codemcp/workflows-core', () => ({
@@ -44,6 +61,7 @@ vi.mock('node:child_process', () => ({
 
 vi.mock('../src/config-generator.js', () => ({
   generateConfig: mocks.generateConfig,
+  GeneratorRegistry: mocks.GeneratorRegistry,
 }));
 
 describe('CLI', () => {
