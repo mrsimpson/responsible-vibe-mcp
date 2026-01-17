@@ -115,6 +115,21 @@ export class ConversationManager {
       await this.database.getConversationState(conversationId);
 
     if (existingState) {
+      // Check if user is trying to change workflow
+      if (existingState.workflowName !== workflowName) {
+        const errorMessage = `Development conversation already exists with workflow '${existingState.workflowName}'. Cannot change to '${workflowName}'. Use reset_development() first to start with a new workflow.`;
+        logger.error(
+          'Attempted workflow change on existing conversation',
+          new Error(errorMessage),
+          {
+            existingWorkflow: existingState.workflowName,
+            requestedWorkflow: workflowName,
+            conversationId,
+          }
+        );
+        throw new Error(errorMessage);
+      }
+
       logger.debug('Conversation already exists, returning existing context', {
         conversationId,
       });

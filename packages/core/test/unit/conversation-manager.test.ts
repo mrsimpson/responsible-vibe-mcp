@@ -153,8 +153,8 @@ describe('ConversationManager', () => {
       expect(savedState.currentPhase).toBe('idle');
     });
 
-    it('should return existing conversation when one already exists', async () => {
-      // Mock existing conversation state
+    it('should return existing conversation when one already exists with same workflow', async () => {
+      // Mock existing conversation state with same workflow
       const mockState = {
         conversationId: 'test-conversation-id',
         projectPath: '/test/project/path',
@@ -168,10 +168,11 @@ describe('ConversationManager', () => {
 
       mockGetConversationState.mockResolvedValue(mockState);
 
-      // Call the method with a different workflow
-      const result = await conversationManager.createConversationContext(
-        'mock-different-workflow'
-      );
+      // Call the method with the SAME workflow
+      const result =
+        await conversationManager.createConversationContext(
+          'existing-workflow'
+        );
 
       // Verify result is the existing conversation
       expect(result).toEqual({
@@ -182,6 +183,32 @@ describe('ConversationManager', () => {
         planFilePath: '/test/project/path/.vibe/development-plan.md',
         workflowName: 'existing-workflow',
       });
+
+      // Verify database was NOT called to save a new state
+      expect(mockSaveConversationState).not.toHaveBeenCalled();
+    });
+
+    it('should throw error when trying to change workflow on existing conversation', async () => {
+      // Mock existing conversation state with different workflow
+      const mockState = {
+        conversationId: 'test-conversation-id',
+        projectPath: '/test/project/path',
+        gitBranch: 'main',
+        currentPhase: 'idle',
+        planFilePath: '/test/project/path/.vibe/development-plan.md',
+        workflowName: 'existing-workflow',
+        createdAt: '2025-06-25T00:00:00.000Z',
+        updatedAt: '2025-06-25T00:00:00.000Z',
+      };
+
+      mockGetConversationState.mockResolvedValue(mockState);
+
+      // Call the method with a DIFFERENT workflow - should throw
+      await expect(
+        conversationManager.createConversationContext('different-workflow')
+      ).rejects.toThrow(
+        "Development conversation already exists with workflow 'existing-workflow'. Cannot change to 'different-workflow'. Use reset_development() first to start with a new workflow."
+      );
 
       // Verify database was NOT called to save a new state
       expect(mockSaveConversationState).not.toHaveBeenCalled();
