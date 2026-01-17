@@ -38,7 +38,9 @@ IMPORTANT: Call whats_next() after each user message to get phase-specific instr
 
 Each tool call returns a JSON response with an "instructions" field. Follow these instructions immediately after you receive them.
 
-Do not use your own task management tools. Use the development plan which you will retrieve via whats_next() for all task tracking and project management.`;
+Use the development plan which you will retrieve via whats_next() to record important insights and decisions as per the structure of the plan.
+
+Do not use your own task management tools.`;
 
   logger.info('System prompt generated successfully', {
     promptLength: systemPrompt.length,
