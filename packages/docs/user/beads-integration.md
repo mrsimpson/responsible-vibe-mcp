@@ -131,20 +131,50 @@ Tasks are managed via beads. Use beads tools to create and manage tasks for this
 
 ### Task Hierarchy
 
-Beads creates a hierarchical task structure:
+Beads creates a hierarchical task structure with sequential phase dependencies:
 
 ```
 Project Epic: "responsible-vibe Development: My Project" (bd-a1b2)
 ├── Explore Phase: "Explore Phase" (bd-a1b2.1)
 │   ├── Task: "Analyze current issues" (bd-a1b2.1.1)
 │   └── Task: "Research alternatives" (bd-a1b2.1.2)
-├── Plan Phase: "Plan Phase" (bd-a1b2.2)
+├── Plan Phase: "Plan Phase" (bd-a1b2.2) [depends on: Explore]
 │   ├── Task: "Design architecture" (bd-a1b2.2.1)
 │   └── Task: "Create roadmap" (bd-a1b2.2.2)
-└── Code Phase: "Code Phase" (bd-a1b2.3)
-    ├── Task: "Implement feature" (bd-a1b2.3.1)
-    └── Task: "Write tests" (bd-a1b2.3.2)
+├── Code Phase: "Code Phase" (bd-a1b2.3) [depends on: Plan]
+│   ├── Task: "Implement feature" (bd-a1b2.3.1)
+│   └── Task: "Write tests" (bd-a1b2.3.2)
+└── Commit Phase: "Commit Phase" (bd-a1b2.4) [depends on: Code]
+    ├── Task: "Review and cleanup" (bd-a1b2.4.1)
+    └── Task: "Final validation" (bd-a1b2.4.2)
 ```
+
+### Sequential Phase Dependencies
+
+**New Feature**: Responsible-vibe-mcp automatically creates sequential dependencies between workflow phases to ensure proper execution order.
+
+**How it works**:
+
+- Each phase automatically blocks the next phase in sequence
+- Explore phase must be completed before Plan phase can begin
+- Plan phase must be completed before Code phase can begin
+- Code phase must be completed before Commit phase can begin
+
+**Dependency Commands**:
+
+```bash
+# Dependencies are automatically created during start_development()
+bd dep bd-a1b2.1 --blocks bd-a1b2.2  # Explore blocks Plan
+bd dep bd-a1b2.2 --blocks bd-a1b2.3  # Plan blocks Code
+bd dep bd-a1b2.3 --blocks bd-a1b2.4  # Code blocks Commit
+```
+
+**Benefits**:
+
+- Ensures proper workflow sequence
+- Prevents agents from jumping ahead to later phases
+- Maintains development discipline and quality
+- Leverages beads' native dependency management
 
 ### Using whats_next() with Beads
 
@@ -156,13 +186,18 @@ When beads backend is active, `whats_next()` responses include beads-specific in
 Current phase task: `bd-a1b2.1` (Explore Phase)
 
 Use beads tools for task management in this phase:
-- Create sub-tasks: `bd create 'Task title' --parent bd-a1b2.1 -p 2`
-- List phase tasks: `bd list --parent bd-a1b2.1`
-- Mark task complete: `bd ready <task-id>`
+- Create sub-tasks: `bd create 'Task title' --parent bd-a1b2.1 --description 'Detailed context explaining what, why, and how' --priority 2`
+- List phase tasks: `bd list --parent bd-a1b2.1 --status open`
+- Mark task complete: `bd close <task-id>`
 - Show task details: `bd show <task-id>`
 - Update task: `bd update <task-id> --status in_progress`
 
-**Important**: Create all tasks as children of the current phase task (bd-a1b2.1) to maintain proper hierarchy.
+**Enhanced Task Creation**: Always include --description with detailed context:
+- **What**: Clearly state what needs to be done
+- **Why**: Explain the purpose and context
+- **How**: Outline the approach or key steps
+
+**Example**: `bd create 'Fix authentication bug' --parent bd-a1b2.3 --description 'Resolve login failure when users have special characters in passwords. Issue occurs in validateCredentials() method. Need to update regex pattern and add proper input sanitization.' --priority 1`
 ```
 
 ### Common Beads Commands
@@ -190,7 +225,7 @@ bd show bd-a1b2.3.1
 bd update bd-a1b2.3.1 --status in_progress
 
 # Mark task as complete
-bd ready bd-a1b2.3.1
+bd close bd-a1b2.3.1
 
 # Add dependencies
 bd update bd-a1b2.3.2 --blocks bd-a1b2.3.1

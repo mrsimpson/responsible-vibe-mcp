@@ -175,7 +175,7 @@ ${isBeadsMode ? '<!-- beads-phase-id: TBD -->' : ''}
 ### Tasks
 ${
   isBeadsMode
-    ? '**🔧 TASK MANAGEMENT VIA CLI TOOL bd**\n\nTasks are managed via bd CLI tool. Use bd commands to create and manage tasks with proper hierarchy:\n\n- `bd list --parent <phase-task-id>`\n- `bd create "Task title" --parent <phase-task-id> -p 2`\n- `bd ready <task-id>`\n\n**Never use [ ] or [x] checkboxes - use bd commands only!**'
+    ? '**🔧 TASK MANAGEMENT VIA CLI TOOL bd**\n\nTasks are managed via bd CLI tool. Use bd commands to create and manage tasks with proper hierarchy:\n\n- `bd list --parent <phase-task-id>`\n- `bd create "Task title" --parent <phase-task-id> -p 2`\n- `bd close <task-id>`\n\n**Never use [ ] or [x] checkboxes - use bd commands only!**'
     : '- [ ] *Tasks will be added as they are identified*'
 }
 
@@ -192,7 +192,7 @@ ${isBeadsMode ? '<!-- beads-phase-id: TBD -->' : ''}
 ### Tasks
 ${
   isBeadsMode
-    ? '**🔧 TASK MANAGEMENT VIA CLI TOOL bd**\n\nTasks are managed via bd CLI tool. Use bd commands to create and manage tasks with proper hierarchy:\n\n- `bd list --parent <phase-task-id>`\n- `bd create "Task title" --parent <phase-task-id> -p 2`\n- `bd ready <task-id>`\n\n**Never use [ ] or [x] checkboxes - use bd commands only!**'
+    ? '**🔧 TASK MANAGEMENT VIA CLI TOOL bd**\n\nTasks are managed via bd CLI tool. Use bd commands to create and manage tasks with proper hierarchy:\n\n- `bd list --parent <phase-task-id>`\n- `bd create "Task title" --parent <phase-task-id> -p 2`\n- `bd close <task-id>`\n\n**Never use [ ] or [x] checkboxes - use bd commands only!**'
     : '- [ ] *To be added when this phase becomes active*'
 }
 
