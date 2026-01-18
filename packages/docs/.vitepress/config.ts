@@ -29,6 +29,7 @@ export default defineConfig({
           { text: 'Agent Setup', link: '/user/agent-setup' },
           { text: 'Vibe Engineering', link: '/user/advanced-engineering' },
           { text: 'Long-Term Memory', link: '/user/long-term-memory' },
+          { text: 'Beads-Integration', link: '/user/beads-integration' },
           { text: 'Tutorial', link: '/user/tutorial' },
         ],
       },
