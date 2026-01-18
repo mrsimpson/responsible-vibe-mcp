@@ -30,8 +30,8 @@ states:
       You are in the exploration phase for minor enhancement.
       This phase should be efficient since it's a minor enhancement.
       Understand the problem, analyze existing patterns, and design your approach.
-      Consider the scope and impact of the change. If $REQUIREMENTS_DOC exists, document requirements there, otherwise document them in the plan file. If $DESIGN_DOC exists, respect the design approach in $DESIGN_DOC.
-      Document your analysis and design decisions in the plan file.
+       Consider the scope and impact of the change. If $REQUIREMENTS_DOC exists, document requirements there, otherwise document them in your task management system. If $DESIGN_DOC exists, respect the design approach in $DESIGN_DOC.
+       Document your analysis and design decisions and create tasks as needed.
       Focus on analysis and design only - do not write any code yet.
     transitions:
       - trigger: 'exploration_complete'
@@ -43,13 +43,13 @@ states:
         instructions: >
           Minor enhancement abandoned. Revert potentially made changes.
           Return to exploration state for new tasks.
-          The plan file will remain for future reference if needed.
+          Task history will remain for future reference if needed.
         additional_instructions: 'Minor enhancement development abandoned. Clean up any analysis work and prepare for new tasks.'
         transition_reason: 'User decided to abandon current minor enhancement'
 
   implement:
     description: 'Combined implementation phase - code, test, and commit'
-    default_instructions: "You are in the implementation phase for minor enhancement. This phase combines coding, testing, and commit preparation. If $DESIGN_DOC exists, follow your design from $DESIGN_DOC. If $REQUIREMENTS_DOC exists, ensure the relevant requirements from $REQUIREMENTS_DOC are met, otherwise ensure plan file requirements are met. Write clean, focused code for the minor enhancement. Test your changes to ensure they work correctly and don't break existing functionality. Prepare documentation and commit when ready. Update progress in the plan file."
+    default_instructions: "This phase combines coding, testing, and commit preparation. If $DESIGN_DOC exists, follow your design from $DESIGN_DOC. If $REQUIREMENTS_DOC exists, ensure the relevant requirements from $REQUIREMENTS_DOC are met, otherwise ensure existing requirements are met based on your task context. Write clean, focused code for the minor enhancement. Test your changes to ensure they work correctly and don't break existing functionality. Prepare documentation and commit when ready. Update task progress as needed."
     transitions:
       - trigger: 'need_more_analysis'
         to: 'explore'
@@ -64,7 +64,7 @@ states:
         to: 'explore'
         instructions: >
           Minor enhancement abandoned during implementation. Clean up any incomplete code and return to exploration.
-          The plan file and any completed work will remain for future reference.
+          Task history and any completed work will remain for future reference.
         additional_instructions: 'Clean up any incomplete code and prepare for new tasks.'
         transition_reason: 'User decided to abandon minor enhancement during implementation'
 
@@ -107,7 +107,7 @@ states:
       - Verify documentation accuracy with a final review
       - Ensure minor enhancement is ready for delivery
 
-      Update the plan file with finalization progress and mark completed tasks.
+       Update task progress and mark completed work as you finalize the minor enhancement.
     transitions:
       - trigger: 'need_implementation_changes'
         to: 'implement'

@@ -489,7 +489,7 @@ DESCRIPTION:
   By default, starts the interactive workflow visualizer.
 
 MORE INFO:
-  GitHub: https://github.com/mrsimpson/vibe-feature-mcp
+  GitHub: https://github.com/mrsimpson/responsible-vibe-mcp
   npm: https://www.npmjs.com/package/responsible-vibe-mcp
 `);
 }

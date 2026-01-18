@@ -31,19 +31,19 @@ states:
       Your main objective now is to gather context about what needs to be developed. Focus on the WHY and WHAT, not the HOW.
       Research the codebase, understand existing patterns,
       If you are not certain about conventions or rules, ask the user about them.
-      Read relevant files and documentation. If $REQUIREMENTS_DOC exists, understand and document requirements there, otherwise document them in the plan file.
-      Don't write code or tests yet - focus on understanding. Document your findings in the plan file.
+       Read relevant files and documentation. If $REQUIREMENTS_DOC exists, understand and document requirements there, otherwise document them in your task management system.
+       Don't write code or tests yet - focus on understanding. Document your findings and create tasks as needed.
     transitions:
       - trigger: 'exploration_complete'
         to: 'red'
-        additional_instructions: 'Mark completed exploration tasks.'
+        additional_instructions: 'Update task progress as you complete exploration work.'
         transition_reason: 'Sufficient understanding gained, ready to start TDD cycle with failing test'
 
       - trigger: 'abandon_feature'
         to: 'explore'
         instructions: >
           Feature development abandoned. Return to exploration state for new tasks.
-          The plan file will remain for future reference if needed.
+          Task history will remain for future reference if needed.
         additional_instructions: 'Clean up any work in progress and prepare for new tasks.'
         transition_reason: 'User decided to abandon current feature development'
 
@@ -62,11 +62,11 @@ states:
       - Is specific and focused on one aspect of the functionality
       - Uses appropriate assertions (not assert(true) or similar meaningless checks)
 
-      Run the test to confirm it fails for the right reason. Document the test in the plan file.
+       Run the test to confirm it fails for the right reason. Document the test and update task progress as needed.
     transitions:
       - trigger: 'test_written_and_failing'
         to: 'green'
-        additional_instructions: 'Mark completed test tasks.'
+        additional_instructions: 'Update task progress as you complete test writing work.'
         transition_reason: 'Failing test successfully written and validated, ready to implement'
 
       - trigger: 'need_more_exploration'
@@ -96,11 +96,11 @@ states:
       - Implementing proper logic, not shortcuts
       - Running the test to confirm it passes
 
-      Document your implementation approach in the plan file.
+       Document your implementation approach and update task progress as needed.
     transitions:
       - trigger: 'test_passing'
         to: 'refactor'
-        additional_instructions: 'Mark completed implementation tasks.'
+        additional_instructions: 'Update task progress as you complete implementation work.'
         transition_reason: 'Test passes with proper implementation, ready for refactoring'
 
       - trigger: 'need_different_test'
@@ -135,11 +135,11 @@ states:
       - Make small, incremental improvements
       - Stop when code is clean and no obvious improvements remain
 
-      Document significant refactoring decisions in the plan file.
+       Document significant refactoring decisions and update task progress as needed.
     transitions:
       - trigger: 'refactoring_complete'
         to: 'red'
-        additional_instructions: 'Mark completed refactoring tasks.'
+        additional_instructions: 'Update task progress as you complete refactoring work.'
         transition_reason: 'Code cleanup complete, ready for next TDD cycle'
 
       - trigger: 'need_different_approach'
@@ -148,7 +148,7 @@ states:
 
       - trigger: 'feature_complete'
         to: 'explore'
-        additional_instructions: 'Mark feature as complete in plan file.'
+        additional_instructions: 'Update task progress to reflect feature completion.'
         transition_reason: 'Feature fully implemented and cleaned up, ready for new tasks'
 
       - trigger: 'abandon_feature'

@@ -33,7 +33,7 @@ states:
         • What error messages, logs, or stack traces are available?
         • Does this happen every time or intermittently?
         • How many users are affected and what is the business impact?
-      Create test cases that demonstrate the problem. Document your findings in the plan file.
+       Create test cases that demonstrate the problem. Document your findings and create tasks as needed.
     transitions:
       - trigger: 'bug_reproduced'
         to: 'analyze'
@@ -54,7 +54,7 @@ states:
 
   analyze:
     description: 'Analyze the bug and identify root cause'
-    default_instructions: 'You are in the bug analysis phase. Examine the code paths involved in the bug, identify the root cause, and understand why the issue occurs. Use debugging tools, add logging, and trace through the problematic code. Document your analysis in the plan file.'
+    default_instructions: 'You are in the bug analysis phase. Examine the code paths involved in the bug, identify the root cause, and understand why the issue occurs. Use debugging tools, add logging, and trace through the problematic code. Document your analysis and create tasks as needed.'
     transitions:
       - trigger: 'need_more_reproduction'
         to: 'reproduce'
@@ -63,7 +63,7 @@ states:
 
       - trigger: 'root_cause_identified'
         to: 'fix'
-        additional_instructions: 'Document the root cause approach in the plan file.'
+        additional_instructions: 'Document the root cause approach and update task progress.'
         transition_reason: 'Root cause identified, ready to implement fix'
         review_perspectives:
           - perspective: 'architect'
@@ -91,7 +91,7 @@ states:
 
       - trigger: 'fix_implemented'
         to: 'verify'
-        additional_instructions: 'Document the fix approach in the plan file.'
+        additional_instructions: 'Document the fix approach and update task progress.'
         transition_reason: 'Fix implemented, ready for verification'
         review_perspectives:
           - perspective: 'senior_software_developer'
@@ -165,7 +165,7 @@ states:
       - Verify documentation accuracy with a final review
       - Ensure bug fix is ready for production
 
-      Update the plan file with finalization progress and mark completed tasks.
+       Update task progress and mark completed work as you finalize the bug fix.
     transitions:
       - trigger: 'need_fix_changes'
         to: 'fix'
