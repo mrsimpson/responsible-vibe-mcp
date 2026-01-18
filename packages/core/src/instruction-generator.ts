@@ -11,6 +11,7 @@ import type { ConversationContext } from './types.js';
 import { PlanManager } from './plan-manager.js';
 import { ProjectDocsManager } from './project-docs-manager.js';
 import type { YamlStateMachine } from './state-machine-types.js';
+import { TaskBackendManager, type TaskBackendConfig } from './task-backend.js';
 
 export interface InstructionContext {
   phase: string;
@@ -32,20 +33,24 @@ export interface GeneratedInstructions {
 }
 
 export class InstructionGenerator {
-  private planManager: PlanManager;
   private projectDocsManager: ProjectDocsManager;
-  private stateMachine: YamlStateMachine | null = null;
+  private taskBackendDetector: () => TaskBackendConfig;
 
-  constructor(planManager: PlanManager) {
-    this.planManager = planManager;
+  constructor(
+    _planManager: PlanManager,
+    taskBackendDetector: () => TaskBackendConfig = TaskBackendManager.detectTaskBackend
+  ) {
+    // planManager parameter kept for API compatibility but not stored since unused
     this.projectDocsManager = new ProjectDocsManager();
+    this.taskBackendDetector = taskBackendDetector;
   }
 
   /**
    * Set the state machine definition for dynamic instruction generation
    */
-  setStateMachine(stateMachine: YamlStateMachine): void {
-    this.stateMachine = stateMachine;
+  setStateMachine(_stateMachine: YamlStateMachine): void {
+    // stateMachine parameter kept for API compatibility but not stored since unused
+    return;
   }
 
   /**
@@ -62,21 +67,16 @@ export class InstructionGenerator {
       context.conversationContext.gitBranch
     );
 
-    // Get plan file guidance
-    const planFileGuidance = this.planManager.generatePlanFileGuidance(
-      context.phase
-    );
-
     // Enhance base instructions with context-specific guidance
     const enhancedInstructions = await this.enhanceInstructions(
       substitutedInstructions,
-      context,
-      planFileGuidance
+      context
     );
 
     return {
       instructions: enhancedInstructions,
-      planFileGuidance,
+      planFileGuidance:
+        'Task management guidance is now included in main instructions',
       metadata: {
         phase: context.phase,
         planFilePath: context.conversationContext.planFilePath,
@@ -124,8 +124,7 @@ export class InstructionGenerator {
    */
   private async enhanceInstructions(
     baseInstructions: string,
-    context: InstructionContext,
-    _planFileGuidance: string
+    context: InstructionContext
   ): Promise<string> {
     const {
       phase,
@@ -135,17 +134,42 @@ export class InstructionGenerator {
       planFileExists,
     } = context;
 
-    // Build plan-file-referential instructions
-    let enhanced = `Check your plan file at \`${conversationContext.planFilePath}\` and focus on the "${this.capitalizePhase(phase)}" section.
+    // Generate task-backend-specific guidance
+    const taskBackendConfig = this.taskBackendDetector();
+    const taskGuidance = this.generateTaskManagementGuidance(taskBackendConfig);
+
+    let enhanced: string;
+
+    // Different instruction structure for beads vs markdown
+    if (
+      taskBackendConfig.backend === 'beads' &&
+      taskBackendConfig.isAvailable
+    ) {
+      // Beads mode: Focus on bd CLI task management, not plan file
+      enhanced = `You are in the ${phase} phase.
+${baseInstructions}
+
+**Plan File Guidance:**
+Use the plan file as memory for the current objective
+- Update the "Key Decisions" section with important choices made
+- Add relevant notes to help maintain context
+- Do NOT enter tasks in the plan file, follow the below instructions for plan file management
+
+**Task Management Guidance:**
+${taskGuidance}
+        `;
+    } else {
+      // Markdown mode: Traditional plan file approach
+      enhanced = `Check your plan file at \`${conversationContext.planFilePath}\` and focus on the "${this.capitalizePhase(phase)}" section.
 
 ${baseInstructions}
 
 **Plan File Guidance:**
 - Work on the tasks listed in the ${this.capitalizePhase(phase)} section
-- Mark completed tasks with [x] as you finish them
-- Add new tasks as they are identified during your work with the user
+${taskGuidance}
 - Update the "Key Decisions" section with important choices made
 - Add relevant notes to help maintain context`;
+    }
 
     // Add project context
     enhanced += `\n\n**Project Context:**
@@ -166,11 +190,40 @@ ${baseInstructions}
     }
 
     // Add continuity and task management instructions
+    const taskReminder =
+      taskBackendConfig.backend === 'beads' && taskBackendConfig.isAvailable
+        ? 'Use ONLY bd CLI tool for task management - do not use your own task management tools'
+        : 'Use ONLY the development plan for task management - do not use your own task management tools';
+
     enhanced += `\n\n**Important Reminders:**
-- Use ONLY the development plan for task management - do not use your own task management tools
+- ${taskReminder}
 - Call whats_next() after the next user message to maintain the development workflow`;
 
     return enhanced;
+  }
+
+  /**
+   * Generate task management guidance based on active backend
+   */
+  private generateTaskManagementGuidance(
+    taskBackendConfig: TaskBackendConfig
+  ): string {
+    if (
+      taskBackendConfig.backend === 'beads' &&
+      taskBackendConfig.isAvailable
+    ) {
+      return `- Use bd CLI tool exclusively
+- **Start by listing ready tasks**: \`bd list --parent <phase-task-id> --status open\`
+- **Create new tasks**: \`bd create 'Task title' --parent <phase-task-id> -p 2\`
+- **Update status when working**: \`bd update <task-id> --status in_progress\`
+- **Complete tasks**: \`bd ready <task-id>\`
+- **Focus on ready tasks first** - let beads handle dependencies
+- Add new tasks as they are identified during your work with the user`;
+    } else {
+      // Default markdown backend
+      return `- Mark completed tasks with [x] as you finish them
+- Add new tasks as they are identified during your work with the user`;
+    }
   }
 
   /**

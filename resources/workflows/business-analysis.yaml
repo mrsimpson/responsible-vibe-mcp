@@ -40,10 +40,10 @@ states:
       IMPORTANT: In this phase, do not read the documents yet!
 
       **Step 2: Create Document Processing Tasks**
-      For each gathered document, add task to plan file:
+      For each gathered document, create a processing task:
       "- [ ] Summarize [document-name] using structured chapter-by-chapter approach"
 
-      Update plan file with discovery progress and processing tasks.
+      Update task progress and create document processing tasks.
     transitions:
       - trigger: 'discovery_complete'
         to: 'documents_consolidation'
@@ -61,7 +61,7 @@ states:
       2. Maintain original hierarchical structure
       3. Condense content while preserving key information
       4. Create [document-name]-processed.md file
-      5. Mark task complete in plan file
+      5. Update task progress as complete
 
       **Summarization Guidelines:**
       - Create structured summary based exclusively on source document information
@@ -97,10 +97,10 @@ states:
       - Business rules and policies
 
       **Step 2: Create Business Analysis Tasks**
-      For each business-relevant chapter identified, add a task to the plan file:
-      "- [ ] Create detailed business analysis of [document-name] Chapter [X]: [chapter-title]"
+      For each business-relevant chapter identified, create a task:
+      "- [ ] Extract business capabilities from [chapter-name]"
 
-      IMPORTANT: You MUST add these tasks to the plan file before proceeding.
+      IMPORTANT: You MUST create these tasks before proceeding.
 
       **Step 3: Execute Business Analysis Tasks**
       For each business analysis task:
@@ -111,7 +111,7 @@ states:
          - Who (roles/actors) performs the work
          - Why (business value/purpose) it exists
       3. Create detailed business summary emphasizing WHAT, WHY, WHO (not HOW)
-      4. Mark task complete in plan file
+      4. Update task progress as complete
 
       **Step 4: Update Bibliography**
       Update BIBLIOGRAPHY.md with business terms found during detailed analysis:
@@ -252,7 +252,7 @@ states:
             - business-analysis/business-actors/ (folder for details)
 
           Begin analyzing processed documents to identify business capabilities and domains.
-          Mark completed business analysis tasks in plan file.
+          Update task progress as you complete business analysis work.
         transition_reason: 'Business content analysis complete, ready for capability identification'
 
   capability_identification:
@@ -299,7 +299,7 @@ states:
       - trigger: 'capabilities_identified'
         to: 'capability_decomposition'
         additional_instructions: >
-          For each identified capability, add decomposition tasks to plan file:
+          For each identified capability, create decomposition tasks:
           "- [ ] Decompose [capability-name] into sub-capabilities using document analysis"
 
           Begin systematic decomposition of capabilities one at a time.
@@ -362,11 +362,11 @@ states:
           <!-- Key organizational units and their responsibilities -->
           ```
 
-          For each capability, add actor analysis tasks to plan file:
+          For each capability, create actor analysis tasks:
           "- [ ] Analyze business actors for [capability-name] using document analysis"
 
           Begin systematic actor analysis one capability at a time.
-          Mark completed decomposition tasks in plan file.
+          Update task progress as you complete decomposition work.
         transition_reason: 'Capability decomposition complete, ready for actor analysis'
 
   actor_analysis:
@@ -375,7 +375,7 @@ states:
       You are in the actor analysis phase. Identify WHO performs each capability using Business Capability Modeling approach.
 
       **Step 1: Select Next Capability for Actor Analysis**
-      From plan file, select the next capability to analyze for business actors.
+      From current tasks, select the next capability to analyze for business actors.
 
       **Step 2: Analyze Documents for Business Actors**
       Review processed documents to identify:
@@ -403,7 +403,7 @@ states:
 
       **Step 5: Refine and Document**
       Update business-actors.md with capability-actor mappings.
-      Mark task complete in plan file.
+      Update task progress as complete.
 
       Focus on capability ownership and role accountability, not just organizational structure.
 
@@ -429,11 +429,11 @@ states:
           <!-- How processes relate to the actors identified -->
           ```
 
-          For each capability, add process analysis tasks to plan file:
+          For each capability, create process analysis tasks:
           "- [ ] Analyze business processes for [capability-name] using document analysis and actor context"
 
           Begin systematic process analysis one capability at a time.
-          Mark completed actor analysis tasks in plan file.
+          Update task progress as you complete actor analysis work.
         transition_reason: 'Actor analysis complete, ready for process analysis'
 
   process_analysis:
@@ -442,7 +442,7 @@ states:
       You are in the process analysis phase. Create process analysis tasks for systematic processing.
 
       **Step 1: Select Next Process Analysis Task**
-      From plan file process analysis tasks, select the next capability to process.
+      From current process analysis tasks, select the next capability to process.
 
       **Step 2: Analyze Documents for Process Information**
       Review processed documents for process information:
@@ -470,7 +470,7 @@ states:
 
       **Step 5: Refine and Document**
       Update business-processes-detailed.md and detail folder.
-      Mark task complete in plan file.
+      Update task progress as complete.
 
       Process one capability's processes at a time.
     transitions:
@@ -559,7 +559,7 @@ states:
           - All three formats (comprehensive)"
 
           Begin creating consolidated summaries and illustrations.
-          Mark completed consistency tasks in plan file.
+          Update task progress as you complete consistency work.
         transition_reason: 'Consistency validation complete, ready for final summary creation'
 
   summary:
@@ -620,7 +620,7 @@ states:
           - Navigation guides and cross-references
 
           The analysis provides complete business architecture understanding using Business Capability Modeling methodology.
-          Mark completed summary tasks in plan file.
+          Update task progress as you complete summary work.
         transition_reason: 'Summary creation complete, analysis finished'
 
   analysis_complete:

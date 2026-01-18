@@ -17,6 +17,7 @@ import { GitCommitConfig } from '@codemcp/workflows-core';
 import { GitManager } from '@codemcp/workflows-core';
 import type { YamlStateMachine } from '@codemcp/workflows-core';
 import { ProjectDocsManager, ProjectDocsInfo } from '@codemcp/workflows-core';
+import { TaskBackendManager, BeadsIntegration } from '@codemcp/workflows-core';
 import { ServerContext } from '../types.js';
 
 /**
@@ -61,6 +62,9 @@ export class StartDevelopmentHandler extends BaseToolHandler<
   ): Promise<StartDevelopmentResult> {
     // Validate required arguments
     validateRequiredArgs(args, ['workflow']);
+
+    // Validate task backend configuration
+    const taskBackendConfig = TaskBackendManager.validateTaskBackend();
 
     const selectedWorkflow = args.workflow;
     const requireReviews = args.require_reviews ?? false;
@@ -193,12 +197,27 @@ export class StartDevelopmentHandler extends BaseToolHandler<
     // Set state machine on plan manager before creating plan file
     context.planManager.setStateMachine(stateMachine);
 
+    // Set task backend configuration if supported (for backwards compatibility)
+    if (typeof context.planManager.setTaskBackend === 'function') {
+      context.planManager.setTaskBackend(taskBackendConfig);
+    }
+
     // Ensure plan file exists
     await context.planManager.ensurePlanFile(
       conversationContext.planFilePath,
       projectPath,
       conversationContext.gitBranch
     );
+
+    // Handle beads integration if beads backend is configured
+    if (taskBackendConfig.backend === 'beads') {
+      await this.setupBeadsIntegration(
+        projectPath,
+        stateMachine,
+        selectedWorkflow,
+        conversationContext.planFilePath
+      );
+    }
 
     // Ensure .vibe/.gitignore exists to exclude SQLite files for git repositories
     this.ensureGitignoreEntry(projectPath);
@@ -619,6 +638,119 @@ ${templateOptionsText}
   private generateBranchSuggestion(): string {
     const timestamp = new Date().toISOString().slice(0, 10).replace(/-/g, '');
     return `feature/development-${timestamp}`;
+  }
+
+  /**
+   * Setup beads integration - create project epic and phase tasks
+   */
+  private async setupBeadsIntegration(
+    projectPath: string,
+    stateMachine: YamlStateMachine,
+    workflowName: string,
+    planFilePath: string
+  ): Promise<void> {
+    try {
+      const beadsIntegration = new BeadsIntegration(projectPath);
+      const projectName = projectPath.split('/').pop() || 'Unknown Project';
+
+      // Create project epic
+      const epicId = await beadsIntegration.createProjectEpic(
+        projectName,
+        workflowName
+      );
+
+      // Create phase tasks for all workflow phases
+      const phases = Object.keys(stateMachine.states);
+      const phaseTasks = await beadsIntegration.createPhaseTasks(
+        epicId,
+        phases,
+        workflowName
+      );
+
+      // Update plan file with phase task IDs
+      await this.updatePlanFileWithPhaseTaskIds(planFilePath, phaseTasks);
+
+      this.logger.info('Beads integration setup complete', {
+        projectPath,
+        epicId,
+        phaseCount: phaseTasks.length,
+        planFilePath,
+      });
+    } catch (error) {
+      this.logger.error(
+        'Failed to setup beads integration',
+        error instanceof Error ? error : new Error(String(error)),
+        {
+          projectPath,
+          workflowName,
+        }
+      );
+      throw new Error(
+        `Failed to setup beads integration: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
+  }
+
+  /**
+   * Update plan file to include beads phase task IDs in comments
+   */
+  private async updatePlanFileWithPhaseTaskIds(
+    planFilePath: string,
+    phaseTasks: Array<{ phaseId: string; phaseName: string; taskId: string }>
+  ): Promise<void> {
+    try {
+      const { readFile, writeFile } = await import('node:fs/promises');
+      let content = await readFile(planFilePath, 'utf-8');
+
+      // Replace TBD placeholders with actual task IDs
+      for (const phaseTask of phaseTasks) {
+        const phaseHeader = `## ${phaseTask.phaseName}`;
+        const placeholderPattern = new RegExp(
+          `(${phaseHeader.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*\n)<!-- beads-phase-id: TBD -->`,
+          'g'
+        );
+        content = content.replace(
+          placeholderPattern,
+          `$1<!-- beads-phase-id: ${phaseTask.taskId} -->`
+        );
+      }
+
+      // Validate that all TBD placeholders were replaced
+      const remainingTBDs = content.match(/<!-- beads-phase-id: TBD -->/g);
+      if (remainingTBDs && remainingTBDs.length > 0) {
+        throw new Error(
+          `Failed to replace ${remainingTBDs.length} TBD placeholder(s) in plan file. ` +
+            `This indicates that phase names in the plan file don't match the workflow phases, ` +
+            `or the beads task creation process failed for some phases.`
+        );
+      }
+
+      await writeFile(planFilePath, content, 'utf-8');
+
+      this.logger.info(
+        'Successfully updated plan file with beads phase task IDs',
+        {
+          planFilePath,
+          phaseTaskCount: phaseTasks.length,
+          replacedTasks: phaseTasks.map(
+            task => `${task.phaseName}: ${task.taskId}`
+          ),
+        }
+      );
+    } catch (error) {
+      this.logger.error(
+        'Failed to update plan file with phase task IDs',
+        error instanceof Error ? error : new Error(String(error)),
+        {
+          planFilePath,
+        }
+      );
+      // For beads integration, TBD replacement failure is critical
+      throw new Error(
+        `Failed to update plan file with beads task IDs: ${error instanceof Error ? error.message : String(error)}. ` +
+          `This indicates beads integration setup is incomplete. Check that beads CLI is working and task IDs were created successfully.`
+      );
+    }
   }
 
   /**

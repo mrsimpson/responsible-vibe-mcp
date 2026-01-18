@@ -12,6 +12,7 @@ import { mkdir } from 'node:fs/promises';
 import { createLogger } from './logger.js';
 
 import type { YamlStateMachine } from './state-machine-types.js';
+import type { TaskBackendConfig } from './task-backend.js';
 
 const logger = createLogger('PlanManager');
 
@@ -23,6 +24,7 @@ export interface PlanFileInfo {
 
 export class PlanManager {
   private stateMachine: YamlStateMachine | null = null;
+  private taskBackend: TaskBackendConfig | null = null;
 
   /**
    * Set the state machine definition for dynamic plan generation
@@ -32,6 +34,17 @@ export class PlanManager {
     logger.debug('State machine set for plan manager', {
       name: stateMachine.name,
       phases: Object.keys(stateMachine.states),
+    });
+  }
+
+  /**
+   * Set the task backend configuration
+   */
+  setTaskBackend(taskBackend: TaskBackendConfig): void {
+    this.taskBackend = taskBackend;
+    logger.debug('Task backend set for plan manager', {
+      backend: taskBackend.backend,
+      available: taskBackend.isAvailable,
     });
   }
 
@@ -138,6 +151,7 @@ export class PlanManager {
 
     const phases = Object.keys(this.stateMachine.states);
     const initialPhase = this.stateMachine.initial_state;
+    const isBeadsMode = this.taskBackend?.backend === 'beads';
 
     const documentationUrl = this.generateWorkflowDocumentationUrl(
       this.stateMachine.name
@@ -151,13 +165,19 @@ export class PlanManager {
         ? '[' + this.stateMachine.name + ']' + '(' + documentationUrl + ')'
         : this.stateMachine.name
     }*
+*Task Management: ${isBeadsMode ? 'Beads Issue Tracker' : 'Markdown Checkboxes'}*
 
 ## Goal
 *Define what you're building or fixing - this will be updated as requirements are gathered*
 
 ## ${this.capitalizePhase(initialPhase)}
+${isBeadsMode ? '<!-- beads-phase-id: TBD -->' : ''}
 ### Tasks
-- [ ] *Tasks will be added as they are identified*
+${
+  isBeadsMode
+    ? '**🔧 TASK MANAGEMENT VIA CLI TOOL bd**\n\nTasks are managed via bd CLI tool. Use bd commands to create and manage tasks with proper hierarchy:\n\n- `bd list --parent <phase-task-id>`\n- `bd create "Task title" --parent <phase-task-id> -p 2`\n- `bd ready <task-id>`\n\n**Never use [ ] or [x] checkboxes - use bd commands only!**'
+    : '- [ ] *Tasks will be added as they are identified*'
+}
 
 ### Completed
 - [x] Created development plan file
@@ -168,8 +188,13 @@ export class PlanManager {
     for (const phase of phases) {
       if (phase !== initialPhase) {
         content += `## ${this.capitalizePhase(phase)}
+${isBeadsMode ? '<!-- beads-phase-id: TBD -->' : ''}
 ### Tasks
-- [ ] *To be added when this phase becomes active*
+${
+  isBeadsMode
+    ? '**🔧 TASK MANAGEMENT VIA CLI TOOL bd**\n\nTasks are managed via bd CLI tool. Use bd commands to create and manage tasks with proper hierarchy:\n\n- `bd list --parent <phase-task-id>`\n- `bd create "Task title" --parent <phase-task-id> -p 2`\n- `bd ready <task-id>`\n\n**Never use [ ] or [x] checkboxes - use bd commands only!**'
+    : '- [ ] *To be added when this phase becomes active*'
+}
 
 ### Completed
 *None yet*

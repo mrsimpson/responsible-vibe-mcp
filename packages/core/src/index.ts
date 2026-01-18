@@ -22,6 +22,8 @@ export * from './project-docs-manager.js';
 export * from './file-detection-manager.js';
 export * from './config-manager.js';
 export * from './git-manager.js';
+export * from './task-backend.js';
+export * from './beads-integration.js';
 
 // Utilities and generators
 export * from './logger.js';

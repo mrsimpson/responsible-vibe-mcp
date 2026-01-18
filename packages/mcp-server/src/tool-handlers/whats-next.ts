@@ -7,6 +7,7 @@
 
 import { ConversationRequiredToolHandler } from './base-tool-handler.js';
 import type { ConversationContext } from '@codemcp/workflows-core';
+import { TaskBackendManager, BeadsIntegration } from '@codemcp/workflows-core';
 import { ServerContext } from '../types.js';
 
 /**
@@ -180,6 +181,15 @@ export class WhatsNextHandler extends ConversationRequiredToolHandler<
       finalInstructions += `\n\n**Git Commit Required**: Create a commit for this step using:\n\`\`\`bash\ngit add . && git commit -m "${commitMessage}"\n\`\`\``;
     }
 
+    // Add beads instructions if beads backend is active
+    const beadsInstructions = await this.generateBeadsInstructions(
+      conversationContext,
+      transitionResult.newPhase
+    );
+    if (beadsInstructions) {
+      finalInstructions += '\n\n' + beadsInstructions;
+    }
+
     // Prepare response
     const response: WhatsNextResult = {
       phase: transitionResult.newPhase,
@@ -247,5 +257,115 @@ export class WhatsNextHandler extends ConversationRequiredToolHandler<
     }
 
     return true;
+  }
+
+  /**
+   * Generate beads-specific instructions if beads backend is active
+   */
+  private async generateBeadsInstructions(
+    conversationContext: ConversationContext,
+    currentPhase: string
+  ): Promise<string | null> {
+    // Check if beads backend is configured
+    const taskBackendConfig = TaskBackendManager.detectTaskBackend();
+    if (
+      taskBackendConfig.backend !== 'beads' ||
+      !taskBackendConfig.isAvailable
+    ) {
+      return null;
+    }
+
+    try {
+      // Read plan file to extract current phase task ID
+      const phaseTaskId = await this.extractPhaseTaskId(
+        conversationContext.planFilePath,
+        currentPhase
+      );
+      if (!phaseTaskId) {
+        this.logger.warn(
+          'Could not find beads phase task ID for current phase',
+          {
+            phase: currentPhase,
+            planFilePath: conversationContext.planFilePath,
+          }
+        );
+        return null;
+      }
+
+      // Generate beads instructions using BeadsIntegration utility
+      const beadsIntegration = new BeadsIntegration(
+        conversationContext.projectPath
+      );
+      const phaseName = this.capitalizePhase(currentPhase);
+      return beadsIntegration.generateBeadsInstructions(phaseTaskId, phaseName);
+    } catch (error) {
+      this.logger.warn('Failed to generate beads instructions', {
+        phase: currentPhase,
+        projectPath: conversationContext.projectPath,
+        error: error instanceof Error ? error.message : String(error),
+      });
+      return null;
+    }
+  }
+
+  /**
+   * Extract beads phase task ID from plan file for the given phase
+   */
+  private async extractPhaseTaskId(
+    planFilePath: string,
+    phase: string
+  ): Promise<string | null> {
+    try {
+      const { readFile } = await import('node:fs/promises');
+      const content = await readFile(planFilePath, 'utf-8');
+
+      const phaseName = this.capitalizePhase(phase);
+      const phaseHeader = `## ${phaseName}`;
+
+      // Look for the phase header followed by beads-phase-id comment
+      const phaseSection = content.split('\n');
+      let foundPhaseHeader = false;
+
+      for (const line of phaseSection) {
+        if (line.trim() === phaseHeader) {
+          foundPhaseHeader = true;
+          continue;
+        }
+
+        if (foundPhaseHeader && line.includes('beads-phase-id:')) {
+          const match = line.match(/beads-phase-id:\s*([\w\d-]+)/);
+          if (match) {
+            return match[1] || null;
+          }
+        }
+
+        // Stop looking if we hit the next phase header
+        if (foundPhaseHeader && line.startsWith('##') && line !== phaseHeader) {
+          break;
+        }
+      }
+
+      return null;
+    } catch (error) {
+      this.logger.warn(
+        'Failed to read plan file for phase task ID extraction',
+        {
+          planFilePath,
+          phase,
+          error: error instanceof Error ? error.message : String(error),
+        }
+      );
+      return null;
+    }
+  }
+
+  /**
+   * Capitalize phase name for display
+   */
+  private capitalizePhase(phase: string): string {
+    return phase
+      .split('_')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
   }
 }
