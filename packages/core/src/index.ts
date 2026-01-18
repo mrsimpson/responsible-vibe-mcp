@@ -24,6 +24,7 @@ export * from './config-manager.js';
 export * from './git-manager.js';
 export * from './task-backend.js';
 export * from './beads-integration.js';
+export * from './beads-state-manager.js';
 
 // Utilities and generators
 export * from './logger.js';

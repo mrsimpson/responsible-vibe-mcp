@@ -17,7 +17,11 @@ import { GitCommitConfig } from '@codemcp/workflows-core';
 import { GitManager } from '@codemcp/workflows-core';
 import type { YamlStateMachine } from '@codemcp/workflows-core';
 import { ProjectDocsManager, ProjectDocsInfo } from '@codemcp/workflows-core';
-import { TaskBackendManager, BeadsIntegration } from '@codemcp/workflows-core';
+import {
+  TaskBackendManager,
+  BeadsIntegration,
+  BeadsStateManager,
+} from '@codemcp/workflows-core';
 import { ServerContext } from '../types.js';
 
 /**
@@ -215,7 +219,8 @@ export class StartDevelopmentHandler extends BaseToolHandler<
         projectPath,
         stateMachine,
         selectedWorkflow,
-        conversationContext.planFilePath
+        conversationContext.planFilePath,
+        conversationContext.conversationId
       );
     }
 
@@ -647,7 +652,8 @@ ${templateOptionsText}
     projectPath: string,
     stateMachine: YamlStateMachine,
     workflowName: string,
-    planFilePath: string
+    planFilePath: string,
+    conversationId: string
   ): Promise<void> {
     try {
       const beadsIntegration = new BeadsIntegration(projectPath);
@@ -673,11 +679,16 @@ ${templateOptionsText}
       // Update plan file with phase task IDs
       await this.updatePlanFileWithPhaseTaskIds(planFilePath, phaseTasks);
 
+      // Create beads state for this conversation
+      const beadsStateManager = new BeadsStateManager(projectPath);
+      await beadsStateManager.createState(conversationId, epicId, phaseTasks);
+
       this.logger.info('Beads integration setup complete', {
         projectPath,
         epicId,
         phaseCount: phaseTasks.length,
         planFilePath,
+        conversationId,
       });
     } catch (error) {
       this.logger.error(
