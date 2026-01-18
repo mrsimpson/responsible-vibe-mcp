@@ -667,6 +667,9 @@ ${templateOptionsText}
         workflowName
       );
 
+      // Create sequential dependencies between phases
+      await beadsIntegration.createPhaseDependencies(phaseTasks);
+
       // Update plan file with phase task IDs
       await this.updatePlanFileWithPhaseTaskIds(planFilePath, phaseTasks);
 

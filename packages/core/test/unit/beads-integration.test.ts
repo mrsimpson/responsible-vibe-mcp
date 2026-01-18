@@ -190,4 +190,113 @@ describe('BeadsIntegration', () => {
       expect(mockExecSync).not.toHaveBeenCalled();
     });
   });
+
+  describe('Task ID Extraction with Periods', () => {
+    it('should extract task IDs with periods correctly in createProjectEpic', async () => {
+      const mockExecSync = vi.mocked(execSync);
+
+      // Mock beads already initialized and epic creation with hierarchical ID
+      mockExecSync
+        .mockImplementationOnce(() => 'No issues found\n') // bd list succeeds
+        .mockImplementationOnce(() => '✓ Created issue: responsible-vibe-1\n'); // epic creation with period
+
+      const epicId = await beadsIntegration.createProjectEpic(
+        'Test Project',
+        'epcc'
+      );
+
+      expect(epicId).toBe('responsible-vibe-1');
+    });
+
+    it('should extract task IDs with multiple periods correctly in createPhaseTasks', async () => {
+      const mockExecSync = vi.mocked(execSync);
+
+      // Mock phase task creation with hierarchical IDs (no initialization check needed for createPhaseTasks)
+      mockExecSync
+        .mockImplementationOnce(() => '✓ Created issue: project-1.1\n') // first phase
+        .mockImplementationOnce(() => '✓ Created issue: project-1.2\n') // second phase
+        .mockImplementationOnce(() => '✓ Created issue: project-1.3\n'); // third phase
+
+      const phaseTasks = await beadsIntegration.createPhaseTasks(
+        'project-1',
+        ['explore', 'plan', 'code'],
+        'epcc'
+      );
+
+      expect(phaseTasks).toHaveLength(3);
+      expect(phaseTasks[0]).toEqual({
+        phaseId: 'explore',
+        phaseName: 'Explore',
+        taskId: 'project-1.1',
+      });
+      expect(phaseTasks[1]).toEqual({
+        phaseId: 'plan',
+        phaseName: 'Plan',
+        taskId: 'project-1.2',
+      });
+      expect(phaseTasks[2]).toEqual({
+        phaseId: 'code',
+        phaseName: 'Code',
+        taskId: 'project-1.3',
+      });
+    });
+
+    it('should extract deeply nested task IDs with multiple periods', async () => {
+      const mockExecSync = vi.mocked(execSync);
+
+      // Mock entrance criteria task creation with deeply nested hierarchical ID
+      mockExecSync
+        .mockImplementationOnce(
+          () => '✓ Created issue: responsible-vibe-1.2.3.4\n'
+        ) // criteria task
+        .mockImplementationOnce(() => 'Dependency created\n'); // dependency creation
+
+      const createdTaskIds = await beadsIntegration.createEntranceCriteriaTasks(
+        'responsible-vibe-1.2',
+        ['Requirements gathered']
+      );
+
+      expect(createdTaskIds).toContain('responsible-vibe-1.2.3.4');
+    });
+
+    it('should handle legacy format task IDs without periods', async () => {
+      const mockExecSync = vi.mocked(execSync);
+
+      // Clear any previous mocks
+      mockExecSync.mockClear();
+
+      // Mock beads already initialized and epic creation with legacy ID format
+      mockExecSync
+        .mockImplementationOnce(() => 'No issues found\n') // bd list succeeds
+        .mockImplementationOnce(() => 'Created bd-abc123\n'); // legacy format
+
+      const epicId = await beadsIntegration.createProjectEpic(
+        'Test Project',
+        'epcc'
+      );
+
+      expect(epicId).toBe('bd-abc123');
+    });
+
+    it('should handle mixed format scenarios', async () => {
+      const mockExecSync = vi.mocked(execSync);
+
+      // Mock different output formats in sequence (no initialization check for createPhaseTasks)
+      mockExecSync
+        .mockImplementationOnce(() => '✓ Created issue: my-project-123.456\n') // new format with periods
+        .mockImplementationOnce(() => 'Created issue: task-789\n') // new format without periods
+        .mockImplementationOnce(() => 'Created bd-xyz.1\n'); // legacy format with periods
+
+      const phaseTasks = await beadsIntegration.createPhaseTasks(
+        'my-project-123',
+        ['explore', 'plan', 'code'],
+        'epcc'
+      );
+
+      expect(phaseTasks).toHaveLength(3);
+      expect(phaseTasks[0].taskId).toBe('my-project-123.456');
+      expect(phaseTasks[1].taskId).toBe('task-789');
+      expect(phaseTasks[2].taskId).toBe('bd-xyz.1');
+    });
+  });
 });

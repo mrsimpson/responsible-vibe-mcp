@@ -216,7 +216,7 @@ ${taskGuidance}
 - **Start by listing ready tasks**: \`bd list --parent <phase-task-id> --status open\`
 - **Create new tasks**: \`bd create 'Task title' --parent <phase-task-id> -p 2\`
 - **Update status when working**: \`bd update <task-id> --status in_progress\`
-- **Complete tasks**: \`bd ready <task-id>\`
+- **Complete tasks**: \`bd close <task-id>\`
 - **Focus on ready tasks first** - let beads handle dependencies
 - Add new tasks as they are identified during your work with the user`;
     } else {

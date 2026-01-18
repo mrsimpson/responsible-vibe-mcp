@@ -85,7 +85,7 @@ describe('Markdown Backend Protection Tests', () => {
       expect(result.instructions).not.toContain('--parent flag');
       expect(result.instructions).not.toContain('bd create');
       expect(result.instructions).not.toContain('bd list');
-      expect(result.instructions).not.toContain('bd ready');
+      expect(result.instructions).not.toContain('bd close');
     });
 
     it('should include correct plan file path in markdown instructions', async () => {
@@ -149,7 +149,7 @@ describe('Markdown Backend Protection Tests', () => {
         'bd CLI',
         'bd create',
         'bd list',
-        'bd ready',
+        'bd close',
         'bd update',
         'bd show',
         '--parent flag',

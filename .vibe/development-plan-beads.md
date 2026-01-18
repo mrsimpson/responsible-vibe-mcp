@@ -235,7 +235,7 @@ Following user feedback about ensuring consistency between markdown and beads ta
 - Work on the tasks listed in the Explore section
 - Use beads tools for task management in this phase
 - Create tasks: `bd create 'Task title' --parent <phase-task-id> -p 2`
-- Complete tasks: `bd ready <task-id>`  
+- Complete tasks: `bd close <task-id>`  
 - Update task status: `bd update <task-id> --status in_progress`
 - List phase tasks: `bd list --parent <phase-task-id>`
 - Add new tasks as they are identified during your work with the user
@@ -258,7 +258,7 @@ Following user feedback about task dependency management, I conducted research o
 ```
 - Create sub-tasks: `bd create 'Task title' --parent <phase-task-id> -p 2`
 - List phase tasks: `bd list --parent <phase-task-id>`  
-- Mark task complete: `bd ready <task-id>`
+- Mark task complete: `bd close <task-id>`
 ```
 
 **After** (workflow-optimized):
@@ -267,7 +267,7 @@ Following user feedback about task dependency management, I conducted research o
 1. **List ready tasks**: `bd list --parent <phase-task-id> --status open`
 2. **Create new task**: `bd create 'Task title' --parent <phase-task-id> -p 2`
 3. **Start working**: `bd update <task-id> --status in_progress` 
-4. **Complete task**: `bd ready <task-id>`
+4. **Complete task**: `bd close <task-id>`
 
 **Important**: Work on ready tasks first. Let beads handle dependencies.
 ```
@@ -446,7 +446,7 @@ Current phase task: bd-a1b2.1 (Explore Phase)
 Available beads tools:
 - bd create 'Task title' --parent bd-a1b2.1 -p 1
 - bd list --parent bd-a1b2.1  
-- bd ready
+- bd close
 - bd show bd-a1b2.1
 
 Create tasks as children of the current phase task."

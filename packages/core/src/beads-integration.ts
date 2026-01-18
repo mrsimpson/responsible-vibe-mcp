@@ -130,8 +130,8 @@ export class BeadsIntegration {
       // Support both new format (v0.47.1+): "✓ Created issue: project-name-123"
       // and legacy format: "Created bd-a1b2c3"
       const match =
-        output.match(/✓ Created issue: ([\w\d-]+)/) ||
-        output.match(/Created issue: ([\w\d-]+)/) ||
+        output.match(/✓ Created issue: ([\w\d.-]+)/) ||
+        output.match(/Created issue: ([\w\d.-]+)/) ||
         output.match(/Created (bd-[\w\d.]+)/);
       if (!match) {
         logger.warn('Failed to extract task ID from beads output', {
@@ -221,8 +221,8 @@ export class BeadsIntegration {
         // Support both new format (v0.47.1+): "✓ Created issue: project-name-123"
         // and legacy format: "Created bd-a1b2c3"
         const match =
-          output.match(/✓ Created issue: ([\w\d-]+)/) ||
-          output.match(/Created issue: ([\w\d-]+)/) ||
+          output.match(/✓ Created issue: ([\w\d.-]+)/) ||
+          output.match(/Created issue: ([\w\d.-]+)/) ||
           output.match(/Created (bd-[\w\d.]+)/);
         if (!match) {
           logger.warn('Failed to extract phase task ID from beads output', {
@@ -291,6 +291,91 @@ export class BeadsIntegration {
   }
 
   /**
+   * Create sequential dependencies between workflow phase tasks
+   */
+  async createPhaseDependencies(phaseTasks: BeadsPhaseTask[]): Promise<void> {
+    if (phaseTasks.length < 2) {
+      logger.debug('Skipping phase dependencies - less than 2 phases', {
+        phaseCount: phaseTasks.length,
+        projectPath: this.projectPath,
+      });
+      return;
+    }
+
+    logger.info('Creating sequential phase dependencies', {
+      phaseCount: phaseTasks.length,
+      projectPath: this.projectPath,
+    });
+
+    // Create dependencies in sequence: each phase blocks the next one
+    for (let i = 0; i < phaseTasks.length - 1; i++) {
+      const currentPhase = phaseTasks[i];
+      const nextPhase = phaseTasks[i + 1];
+
+      if (!currentPhase || !nextPhase) {
+        logger.warn('Skipping phase dependency - missing phase data', {
+          currentPhaseIndex: i,
+          nextPhaseIndex: i + 1,
+          totalPhases: phaseTasks.length,
+          projectPath: this.projectPath,
+        });
+        continue;
+      }
+
+      const command = `bd dep ${currentPhase.taskId} --blocks ${nextPhase.taskId}`;
+
+      logger.debug('Creating phase dependency', {
+        command,
+        currentPhase: currentPhase.phaseName,
+        nextPhase: nextPhase.phaseName,
+        currentTaskId: currentPhase.taskId,
+        nextTaskId: nextPhase.taskId,
+        projectPath: this.projectPath,
+      });
+
+      try {
+        execSync(command, {
+          cwd: this.projectPath,
+          encoding: 'utf-8',
+          stdio: ['ignore', 'pipe', 'pipe'],
+        });
+
+        logger.debug('Successfully created phase dependency', {
+          currentPhase: currentPhase.phaseName,
+          nextPhase: nextPhase.phaseName,
+          projectPath: this.projectPath,
+        });
+      } catch (error) {
+        // Log as warning but don't fail the entire setup
+        const errorMessage =
+          error instanceof Error ? error.message : String(error);
+        logger.warn('Failed to create phase dependency', {
+          error: errorMessage,
+          command,
+          currentPhase: currentPhase.phaseName,
+          nextPhase: nextPhase.phaseName,
+          projectPath: this.projectPath,
+        });
+
+        // Include stderr if available for better debugging
+        const execError = error as unknown as { stderr?: string };
+        if (execError?.stderr) {
+          logger.warn('Beads dependency command stderr', {
+            stderr: execError.stderr.toString(),
+            command,
+            projectPath: this.projectPath,
+          });
+        }
+      }
+    }
+
+    logger.info('Completed phase dependency creation', {
+      dependencyCount: phaseTasks.length - 1,
+      projectPath: this.projectPath,
+    });
+  }
+
+  /**
    * Get beads task information
    */
   async getTaskInfo(taskId: string): Promise<BeadsTaskInfo | null> {
@@ -348,7 +433,13 @@ You are currently in the ${phaseName} phase. All work items should be created as
 • \`bd close <task-id>\` - Mark task complete when finished
 
 **Create New Tasks for Current Phase**:
-• \`bd create 'Task description' --parent ${currentPhaseTaskId} -p 2\` - Create work item under current phase
+• \`bd create 'Task title' --parent ${currentPhaseTaskId} --description 'Detailed context explaining what, why, and how' --priority 2\` - Create work item with rich description
+
+**📝 Task Description Best Practices**:
+• **What**: Clearly state what needs to be done
+• **Why**: Explain the purpose and context
+• **How**: Outline the approach or key steps
+• **Example**: \`bd create 'Fix user authentication bug' --parent ${currentPhaseTaskId} --description 'Resolve login failure when users have special characters in passwords. Issue occurs in validateCredentials() method. Need to update regex pattern and add proper input sanitization.' --priority 1\`
 
 **For Other Phases** (get parent task IDs from plan file):
 • Check plan file for phase task IDs: <!-- beads-phase-id: task-xyz123 -->
@@ -356,7 +447,7 @@ You are currently in the ${phaseName} phase. All work items should be created as
 
 **Essential Commands**:
 • \`bd list --parent ${currentPhaseTaskId} --status open\` - List ready work items
-• \`bd create 'Task description' --parent ${currentPhaseTaskId} -p 2\` - Create work item
+• \`bd create 'Task title' --parent ${currentPhaseTaskId} --description 'Detailed context' --priority 2\` - Create work item
 • \`bd update <task-id> --status in_progress\` - Start working
 • \`bd close <task-id>\` - Complete work item
 • \`bd show ${currentPhaseTaskId}\` - View phase and its work items
@@ -453,7 +544,7 @@ You are currently in the ${phaseName} phase. All work items should be created as
         });
 
         // Extract task ID from beads output
-        const match = output.match(/✓ Created issue: ([\w\d-]+)/);
+        const match = output.match(/✓ Created issue: ([\w\d.-]+)/);
         const taskId = match?.[1] || '';
 
         if (taskId) {
