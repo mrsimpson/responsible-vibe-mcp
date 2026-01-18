@@ -1,18 +1,9 @@
 ---
 name: commit
-description: Commits all changeswith a comprehensive conventional commit message
-arguments:
-  - name: squash
-    description: Whether the commit shall include all changes compared to main
-    required: false
-  - name: include_unstaged
-    description: Whether the commit shall include all changes compared to main
-    required: false
+description: Commits all changes with a comprehensive conventional commit message
 ---
 
-{{#if squash}}We want to squash all changes compared to main. Reset soft, then re-analyze the diff{{/if}}
-
-Commit the changes {{#if include_unstaged}}including the currently not staged files{{/if}}
+Commit the changes. If there's unstaged changes, check or ask whether they should be staged.
 
 For the commit message, use the following format:
 
