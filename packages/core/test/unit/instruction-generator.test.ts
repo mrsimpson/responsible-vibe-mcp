@@ -6,11 +6,11 @@
 
 import { describe, it, expect, beforeEach, Mocked, vi } from 'vitest';
 import { TestAccess } from '../utils/test-access.js';
-import { InstructionGenerator } from '@codemcp/workflows-core';
-import { PlanManager } from '@codemcp/workflows-core';
+import { InstructionGenerator } from '../../src/instruction-generator.js';
+import { PlanManager } from '../../src/plan-manager.js';
 import { ProjectDocsManager } from '@codemcp/workflows-core';
 import type { ConversationContext } from '../../src/types.js';
-import type { InstructionContext } from '../../src/instruction-generator.js';
+import type { InstructionContext } from '../../src/interfaces/instruction-generator.interface.js';
 import { join } from 'node:path';
 
 // Mock PlanManager
@@ -35,7 +35,7 @@ describe('InstructionGenerator', () => {
       generatePlanFileGuidance: vi
         .fn()
         .mockReturnValue('Test plan file guidance'),
-    } as unknown;
+    } as unknown as Mocked<PlanManager>;
 
     // Mock ProjectDocsManager
     mockProjectDocsManager = {
@@ -54,7 +54,7 @@ describe('InstructionGenerator', () => {
         ),
         $DESIGN_DOC: join(testProjectPath, '.vibe', 'docs', 'design.md'),
       }),
-    } as unknown;
+    } as unknown as Mocked<ProjectDocsManager>;
 
     // Create instruction generator and inject mocks
     instructionGenerator = new InstructionGenerator(mockPlanManager);

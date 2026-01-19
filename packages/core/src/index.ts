@@ -2,6 +2,9 @@
 export * from './types.js';
 export * from './state-machine-types.js';
 
+// Strategy pattern interfaces
+export * from './interfaces/index.js';
+
 // State machine and workflow management
 export * from './state-machine.js';
 export * from './state-machine-loader.js';

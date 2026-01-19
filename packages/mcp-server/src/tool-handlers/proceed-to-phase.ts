@@ -8,8 +8,8 @@
 import { ConversationRequiredToolHandler } from './base-tool-handler.js';
 import { validateRequiredArgs } from '../server-helpers.js';
 import type { ConversationContext } from '@codemcp/workflows-core';
-import { TaskBackendManager, BeadsStateManager } from '@codemcp/workflows-core';
-import { execSync } from 'node:child_process';
+import { BeadsStateManager } from '@codemcp/workflows-core';
+import { ServerComponentsFactory } from '../components/server-components-factory.js';
 import { ServerContext } from '../types.js';
 
 /**
@@ -301,19 +301,15 @@ export class ProceedToPhaseHandler extends ConversationRequiredToolHandler<
     projectPath: string
   ): Promise<void> {
     try {
-      // Check if beads mode is active
-      const taskBackendConfig = TaskBackendManager.detectTaskBackend();
+      // Use factory to create task backend client (strategy pattern)
+      const factory = new ServerComponentsFactory({ projectPath });
+      const taskBackendClient = factory.createTaskBackendClient();
 
-      if (
-        taskBackendConfig.backend !== 'beads' ||
-        !taskBackendConfig.isAvailable
-      ) {
-        // Not in beads mode, skip validation
+      if (!taskBackendClient) {
+        // Not in beads mode or beads not available, skip validation
         this.logger.debug(
-          'Skipping beads task validation - beads mode not active',
+          'Skipping beads task validation - no task backend client available',
           {
-            backend: taskBackendConfig.backend,
-            available: taskBackendConfig.isAvailable,
             conversationId,
             currentPhase,
             targetPhase,
@@ -340,47 +336,24 @@ export class ProceedToPhaseHandler extends ConversationRequiredToolHandler<
         return;
       }
 
-      // Check for incomplete tasks in the current phase
-      const command = `bd list --parent ${currentPhaseTaskId} --status open --json`;
-
-      this.logger.debug('Checking for incomplete beads tasks', {
-        conversationId,
-        currentPhase,
-        currentPhaseTaskId,
-        command,
-      });
-
-      let incompleteTasks: Array<{ id: string; title?: string }> = [];
-      try {
-        const output = execSync(command, {
-          cwd: projectPath,
-          encoding: 'utf-8',
-          stdio: ['ignore', 'pipe', 'pipe'],
-        });
-
-        // Parse JSON output from beads
-        if (output.trim()) {
-          incompleteTasks = JSON.parse(output);
+      this.logger.debug(
+        'Checking for incomplete beads tasks using task backend client',
+        {
+          conversationId,
+          currentPhase,
+          currentPhaseTaskId,
         }
-      } catch (execError) {
-        // If beads command fails, log warning but don't block transition
-        const errorMessage =
-          execError instanceof Error ? execError.message : String(execError);
-        this.logger.warn(
-          'Failed to check beads task completion, allowing transition',
-          {
-            error: errorMessage,
-            conversationId,
-            currentPhase,
-            command,
-            projectPath,
-          }
-        );
-        return; // Graceful degradation - allow transition to proceed
-      }
+      );
 
-      // If there are incomplete tasks, throw an error with helpful details
-      if (incompleteTasks.length > 0) {
+      // Use task backend client to validate task completion (strategy pattern)
+      const validationResult =
+        await taskBackendClient.validateTasksCompleted(currentPhaseTaskId);
+
+      if (!validationResult.valid) {
+        // Get the incomplete tasks from the validation result
+        const incompleteTasks = validationResult.openTasks;
+
+        // Create detailed error message with incomplete tasks
         const taskDetails = incompleteTasks
           .map(task => `  • ${task.id} - ${task.title || 'Untitled task'}`)
           .join('\n');
