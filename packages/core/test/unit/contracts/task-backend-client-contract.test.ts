@@ -141,7 +141,7 @@ class TaskBackendClientContract extends BaseInterfaceContract<ITaskBackendClient
       },
       {
         methodName: 'updateTaskStatus',
-        invalidParameters: ['task-1', 'invalid_status' as any],
+        invalidParameters: ['task-1', 'invalid_status' as unknown],
         expectedError: /status|invalid/i,
         description: 'should reject invalid task status',
       },
@@ -348,7 +348,7 @@ class TaskBackendClientContract extends BaseInterfaceContract<ITaskBackendClient
                 priority
               );
               expect(typeof taskId).toBe('string');
-            } catch (error) {
+            } catch (_error) {
               // Some priorities might not be supported
               console.warn(
                 `Priority ${priority} not supported by ${registration.name}`

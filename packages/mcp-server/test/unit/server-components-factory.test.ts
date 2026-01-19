@@ -224,9 +224,12 @@ describe('ServerComponentsFactory', () => {
   describe('Backend Integration', () => {
     it('should handle unknown backend types gracefully', () => {
       const unknownBackend: TaskBackendConfig = {
-        backend: 'unknown-backend' as any,
+        backend: 'beads' as TaskBackendConfig['backend'],
         isAvailable: true,
       };
+      // Simulate an unknown backend type for testing
+      (unknownBackend as unknown as { backend: string }).backend =
+        'unknown-backend';
 
       factory = new ServerComponentsFactory({ taskBackend: unknownBackend });
 

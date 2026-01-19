@@ -140,7 +140,9 @@ export abstract class BaseInterfaceContract<T> {
 
         for (const methodName of requiredMethods) {
           expect(instance).toHaveProperty(methodName);
-          expect(typeof (instance as any)[methodName]).toBe('function');
+          expect(
+            typeof (instance as unknown as Record<string, unknown>)[methodName]
+          ).toBe('function');
         }
       } finally {
         if (registration.cleanup) {
@@ -175,13 +177,18 @@ export abstract class BaseInterfaceContract<T> {
         }
 
         try {
-          const method = (instance as any)[methodTest.methodName];
+          const method = (instance as unknown as Record<string, unknown>)[
+            methodTest.methodName
+          ];
           expect(method).toBeDefined();
           expect(typeof method).toBe('function');
 
           // Test method can be called with expected parameters
-          if (methodTest.parameters) {
-            const result = method.call(instance, ...methodTest.parameters);
+          if (methodTest.parameters && typeof method === 'function') {
+            const result = (method as (...args: unknown[]) => unknown).call(
+              instance,
+              ...methodTest.parameters
+            );
 
             if (methodTest.isAsync) {
               expect(result).toBeInstanceOf(Promise);
@@ -221,12 +228,24 @@ export abstract class BaseInterfaceContract<T> {
         }
 
         try {
-          const method = (instance as any)[methodTest.methodName];
-          const result = methodTest.isAsync
-            ? await method.call(instance, ...(methodTest.parameters || []))
-            : method.call(instance, ...(methodTest.parameters || []));
+          const method = (instance as unknown as Record<string, unknown>)[
+            methodTest.methodName
+          ];
+          if (typeof method === 'function') {
+            const result = methodTest.isAsync
+              ? await (method as (...args: unknown[]) => Promise<unknown>).call(
+                  instance,
+                  ...(methodTest.parameters || [])
+                )
+              : (method as (...args: unknown[]) => unknown).call(
+                  instance,
+                  ...(methodTest.parameters || [])
+                );
 
-          expect(methodTest.returnTypeValidator!(result)).toBe(true);
+            if (methodTest.returnTypeValidator) {
+              expect(methodTest.returnTypeValidator(result)).toBe(true);
+            }
+          }
         } finally {
           if (registration.cleanup) {
             await registration.cleanup(instance);
@@ -261,13 +280,15 @@ export abstract class BaseInterfaceContract<T> {
         }
 
         try {
-          const method = (instance as any)[errorTest.methodName];
+          const method = (instance as unknown as Record<string, unknown>)[
+            errorTest.methodName
+          ];
 
-          if (errorTest.invalidParameters) {
+          if (errorTest.invalidParameters && typeof method === 'function') {
             await expect(async () => {
-              const result = method.call(
+              const result = (method as (...args: unknown[]) => unknown).call(
                 instance,
-                ...errorTest.invalidParameters!
+                ...(errorTest.invalidParameters || [])
               );
               if (result instanceof Promise) {
                 await result;
