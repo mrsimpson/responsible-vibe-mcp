@@ -1,26 +1,27 @@
 /**
- * Plan Manager
+ * Beads Plan Manager
  *
- * Handles the creation, updating, and maintenance of project development plan files.
- * Manages markdown plan files that serve as long-term project memory.
- * Supports custom state machine definitions for dynamic plan file generation.
+ * Beads-specific implementation of IPlanManager.
+ * Manages plan files optimized for beads task management workflow.
  */
 
+import {
+  type IPlanManager,
+  type PlanFileInfo,
+  type YamlStateMachine,
+  type TaskBackendConfig,
+  createLogger,
+} from '@codemcp/workflows-core';
 import { writeFile, readFile, access } from 'node:fs/promises';
 import { dirname } from 'node:path';
 import { mkdir } from 'node:fs/promises';
-import { createLogger } from './logger.js';
 
-import type { YamlStateMachine } from './state-machine-types.js';
-import type { TaskBackendConfig } from './task-backend.js';
-import type {
-  IPlanManager,
-  PlanFileInfo,
-} from './interfaces/plan-manager.interface.js';
+const logger = createLogger('BeadsPlanManager');
 
-const logger = createLogger('PlanManager');
-
-export class PlanManager implements IPlanManager {
+/**
+ * Beads-specific plan manager implementation
+ */
+export class BeadsPlanManager implements IPlanManager {
   private stateMachine: YamlStateMachine | null = null;
 
   /**
@@ -28,7 +29,7 @@ export class PlanManager implements IPlanManager {
    */
   setStateMachine(stateMachine: YamlStateMachine): void {
     this.stateMachine = stateMachine;
-    logger.debug('State machine set for plan manager', {
+    logger.debug('State machine set for beads plan manager', {
       name: stateMachine.name,
       phases: Object.keys(stateMachine.states),
     });
@@ -38,9 +39,8 @@ export class PlanManager implements IPlanManager {
    * Set the task backend configuration
    */
   setTaskBackend(taskBackend: TaskBackendConfig): void {
-    // Default plan manager only supports markdown backend
-    // Task backend information is not stored as it's not used for markdown plan generation
-    logger.debug('Task backend set for plan manager (markdown mode)', {
+    // Task backend is implicit for beads plan manager (always beads)
+    logger.debug('Task backend set for beads plan manager', {
       backend: taskBackend.backend,
       available: taskBackend.isAvailable,
     });
@@ -74,7 +74,7 @@ export class PlanManager implements IPlanManager {
     projectPath: string,
     gitBranch: string
   ): Promise<void> {
-    logger.debug('Ensuring plan file exists', {
+    logger.debug('Ensuring beads plan file exists', {
       planFilePath,
       projectPath,
       gitBranch,
@@ -83,25 +83,29 @@ export class PlanManager implements IPlanManager {
     const planInfo = await this.getPlanFileInfo(planFilePath);
 
     if (!planInfo.exists) {
-      logger.info('Plan file not found, creating initial plan', {
+      logger.info('Plan file not found, creating beads-optimized plan', {
         planFilePath,
       });
-      await this.createInitialPlanFile(planFilePath, projectPath, gitBranch);
-      logger.info('Initial plan file created successfully', { planFilePath });
+      await this.createInitialBeadsPlanFile(
+        planFilePath,
+        projectPath,
+        gitBranch
+      );
+      logger.info('Beads plan file created successfully', { planFilePath });
     } else {
       logger.debug('Plan file already exists', { planFilePath });
     }
   }
 
   /**
-   * Create initial plan file with template content
+   * Create initial plan file optimized for beads workflow
    */
-  private async createInitialPlanFile(
+  private async createInitialBeadsPlanFile(
     planFilePath: string,
     projectPath: string,
     gitBranch: string
   ): Promise<void> {
-    logger.debug('Creating initial plan file', { planFilePath });
+    logger.debug('Creating beads-optimized plan file', { planFilePath });
 
     try {
       // Ensure directory exists
@@ -113,19 +117,19 @@ export class PlanManager implements IPlanManager {
       const projectName = projectPath.split('/').pop() || 'Unknown Project';
       const branchInfo = gitBranch !== 'no-git' ? ` (${gitBranch} branch)` : '';
 
-      const initialContent = this.generateInitialPlanContent(
+      const initialContent = this.generateBeadsInitialPlanContent(
         projectName,
         branchInfo
       );
 
       await writeFile(planFilePath, initialContent, 'utf-8');
-      logger.info('Initial plan file written successfully', {
+      logger.info('Beads plan file written successfully', {
         planFilePath,
         contentLength: initialContent.length,
         projectName,
       });
     } catch (error) {
-      logger.error('Failed to create initial plan file', error as Error, {
+      logger.error('Failed to create beads plan file', error as Error, {
         planFilePath,
       });
       throw error;
@@ -133,9 +137,9 @@ export class PlanManager implements IPlanManager {
   }
 
   /**
-   * Generate initial plan file content based on state machine definition
+   * Generate initial plan file content optimized for beads workflow
    */
-  private generateInitialPlanContent(
+  private generateBeadsInitialPlanContent(
     projectName: string,
     branchInfo: string
   ): string {
@@ -162,26 +166,46 @@ export class PlanManager implements IPlanManager {
         ? '[' + this.stateMachine.name + ']' + '(' + documentationUrl + ')'
         : this.stateMachine.name
     }*
-*Task Management: Markdown Checkboxes*
+*Task Management: Beads Issue Tracker*
 
 ## Goal
 *Define what you're building or fixing - this will be updated as requirements are gathered*
 
 ## ${this.capitalizePhase(initialPhase)}
+<!-- beads-phase-id: TBD -->
 ### Tasks
-- [ ] *Tasks will be added as they are identified*
+
+**🔧 TASK MANAGEMENT VIA CLI TOOL bd**
+
+Tasks are managed via bd CLI tool. Use bd commands to create and manage tasks with proper hierarchy:
+
+- \`bd list --parent <phase-task-id> --status open\`
+- \`bd create "Task title" --parent <phase-task-id> -p 2\`
+- \`bd close <task-id>\`
+
+**Never use [ ] or [x] checkboxes - use bd commands only!**
 
 ### Completed
 - [x] Created development plan file
 
 `;
 
-    // Generate simple sections for each phase
+    // Generate sections for each phase with beads-specific guidance
     for (const phase of phases) {
       if (phase !== initialPhase) {
         content += `## ${this.capitalizePhase(phase)}
+<!-- beads-phase-id: TBD -->
 ### Tasks
-- [ ] *To be added when this phase becomes active*
+
+**🔧 TASK MANAGEMENT VIA CLI TOOL bd**
+
+Tasks are managed via bd CLI tool. Use bd commands to create and manage tasks with proper hierarchy:
+
+- \`bd list --parent <phase-task-id> --status open\`
+- \`bd create "Task title" --parent <phase-task-id> -p 2\`
+- \`bd close <task-id>\`
+
+**Never use [ ] or [x] checkboxes - use bd commands only!**
 
 ### Completed
 *None yet*
@@ -197,14 +221,14 @@ export class PlanManager implements IPlanManager {
 *Additional context and observations*
 
 ---
-*This plan is maintained by the LLM. Tool responses provide guidance on which section to focus on and what tasks to work on.*
+*This plan is maintained by the LLM and uses beads CLI for task management. Tool responses provide guidance on which bd commands to use for task management.*
 `;
 
     return content;
   }
 
   /**
-   * Update plan file with new content (this is typically done by the LLM)
+   * Update plan file with new content
    */
   async updatePlanFile(planFilePath: string, content: string): Promise<void> {
     // Ensure directory exists
@@ -227,7 +251,7 @@ export class PlanManager implements IPlanManager {
   }
 
   /**
-   * Generate phase-specific plan file guidance based on state machine
+   * Generate phase-specific plan file guidance optimized for beads
    */
   generatePlanFileGuidance(phase: string): string {
     if (!this.stateMachine) {
@@ -238,20 +262,20 @@ export class PlanManager implements IPlanManager {
 
     const phaseDefinition = this.stateMachine.states[phase];
     if (!phaseDefinition) {
-      logger.warn('Unknown phase for plan file guidance', { phase });
-      return `Update the ${this.capitalizePhase(phase)} section with current progress and mark completed tasks.`;
+      logger.warn('Unknown phase for beads plan file guidance', { phase });
+      return `Update the ${this.capitalizePhase(phase)} section with current progress. Use bd CLI for all task management.`;
     }
 
     const capitalizedPhase = this.capitalizePhase(phase);
 
-    return `Update the ${capitalizedPhase} section with progress. Mark completed tasks with [x] and add new tasks as they are identified.`;
+    return `Update the ${capitalizedPhase} section with progress. Use bd CLI exclusively for task management - never use checkboxes. Document important decisions in the Key Decisions section.`;
   }
 
   /**
    * Delete plan file
    */
   async deletePlanFile(planFilePath: string): Promise<boolean> {
-    logger.debug('Deleting plan file', { planFilePath });
+    logger.debug('Deleting beads plan file', { planFilePath });
 
     try {
       // Check if file exists first
@@ -261,17 +285,17 @@ export class PlanManager implements IPlanManager {
       const { unlink } = await import('node:fs/promises');
       await unlink(planFilePath);
 
-      logger.info('Plan file deleted successfully', { planFilePath });
+      logger.info('Beads plan file deleted successfully', { planFilePath });
       return true;
     } catch (error: unknown) {
       if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
-        logger.debug('Plan file does not exist, nothing to delete', {
+        logger.debug('Beads plan file does not exist, nothing to delete', {
           planFilePath,
         });
         return true; // Consider it successful if file doesn't exist
       }
 
-      logger.error('Failed to delete plan file', error as Error, {
+      logger.error('Failed to delete beads plan file', error as Error, {
         planFilePath,
       });
       throw error;
@@ -282,25 +306,25 @@ export class PlanManager implements IPlanManager {
    * Ensure plan file is deleted (verify deletion)
    */
   async ensurePlanFileDeleted(planFilePath: string): Promise<boolean> {
-    logger.debug('Ensuring plan file is deleted', { planFilePath });
+    logger.debug('Ensuring beads plan file is deleted', { planFilePath });
 
     try {
       await access(planFilePath);
       // If we reach here, file still exists
-      logger.warn('Plan file still exists after deletion attempt', {
+      logger.warn('Beads plan file still exists after deletion attempt', {
         planFilePath,
       });
       return false;
     } catch (error: unknown) {
       if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
-        logger.debug('Plan file successfully deleted (does not exist)', {
+        logger.debug('Beads plan file successfully deleted (does not exist)', {
           planFilePath,
         });
         return true;
       }
 
       // Some other error occurred
-      logger.error('Error checking plan file deletion', error as Error, {
+      logger.error('Error checking beads plan file deletion', error as Error, {
         planFilePath,
       });
       throw error;
@@ -319,7 +343,6 @@ export class PlanManager implements IPlanManager {
 
   /**
    * Generate workflow documentation URL for predefined workflows
-   * Returns undefined for custom workflows
    */
   private generateWorkflowDocumentationUrl(
     workflowName: string

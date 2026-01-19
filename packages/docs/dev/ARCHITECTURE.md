@@ -523,3 +523,19 @@ cat .vibe/conversations/my-project-main-abc123/interactions.jsonl | jq .
 ```
 
 **Note**: All interaction data is stored locally on your system and is never transmitted to external services.
+
+## Task Backend Architecture
+
+The system supports multiple task management backends through a factory pattern for component substitution.
+
+### Component Factory
+
+The ServerComponentsFactory creates appropriate implementations based on detected task backend configuration.
+
+### Component Responsibilities
+
+Task management functionality varies between backends:
+
+- **Plan Management**: Markdown backends use traditional plan files with checkboxes; beads backends reference task hierarchies
+- **Instruction Generation**: Markdown backends provide generic task guidance; beads backends provide CLI command guidance
+- **Task Operations**: Markdown backends store tasks in plan files; beads backends integrate with CLI tools for task lifecycle management

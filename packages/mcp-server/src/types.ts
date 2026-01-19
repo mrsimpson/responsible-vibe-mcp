@@ -4,8 +4,8 @@
 
 import { ConversationManager } from '@codemcp/workflows-core';
 import { TransitionEngine } from '@codemcp/workflows-core';
-import { PlanManager } from '@codemcp/workflows-core';
-import { InstructionGenerator } from '@codemcp/workflows-core';
+import { IPlanManager } from '@codemcp/workflows-core';
+import { IInstructionGenerator } from '@codemcp/workflows-core';
 import { WorkflowManager } from '@codemcp/workflows-core';
 import { InteractionLogger } from '@codemcp/workflows-core';
 
@@ -16,8 +16,8 @@ import { InteractionLogger } from '@codemcp/workflows-core';
 export interface ServerContext {
   conversationManager: ConversationManager;
   transitionEngine: TransitionEngine;
-  planManager: PlanManager;
-  instructionGenerator: InstructionGenerator;
+  planManager: IPlanManager;
+  instructionGenerator: IInstructionGenerator;
   workflowManager: WorkflowManager;
   interactionLogger?: InteractionLogger;
   projectPath: string;

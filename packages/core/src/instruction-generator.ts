@@ -7,42 +7,23 @@
  * Handles variable substitution for project artifact references.
  */
 
-import type { ConversationContext } from './types.js';
+// ConversationContext import removed as it's not used
 import { PlanManager } from './plan-manager.js';
 import { ProjectDocsManager } from './project-docs-manager.js';
 import type { YamlStateMachine } from './state-machine-types.js';
-import { TaskBackendManager, type TaskBackendConfig } from './task-backend.js';
+// Task backend detection now handled by factory pattern
+import type {
+  IInstructionGenerator,
+  InstructionContext,
+  GeneratedInstructions,
+} from './interfaces/instruction-generator.interface.js';
 
-export interface InstructionContext {
-  phase: string;
-  conversationContext: ConversationContext;
-  transitionReason: string;
-  isModeled: boolean;
-  planFileExists: boolean;
-}
-
-export interface GeneratedInstructions {
-  instructions: string;
-  planFileGuidance: string;
-  metadata: {
-    phase: string;
-    planFilePath: string;
-    transitionReason: string;
-    isModeled: boolean;
-  };
-}
-
-export class InstructionGenerator {
+export class InstructionGenerator implements IInstructionGenerator {
   private projectDocsManager: ProjectDocsManager;
-  private taskBackendDetector: () => TaskBackendConfig;
 
-  constructor(
-    _planManager: PlanManager,
-    taskBackendDetector: () => TaskBackendConfig = TaskBackendManager.detectTaskBackend
-  ) {
+  constructor(_planManager: PlanManager) {
     // planManager parameter kept for API compatibility but not stored since unused
     this.projectDocsManager = new ProjectDocsManager();
-    this.taskBackendDetector = taskBackendDetector;
   }
 
   /**
@@ -134,33 +115,13 @@ export class InstructionGenerator {
       planFileExists,
     } = context;
 
-    // Generate task-backend-specific guidance
-    const taskBackendConfig = this.taskBackendDetector();
-    const taskGuidance = this.generateTaskManagementGuidance(taskBackendConfig);
+    // Generate task management guidance for markdown backend
+    const taskGuidance = this.generateTaskManagementGuidance();
 
     let enhanced: string;
 
-    // Different instruction structure for beads vs markdown
-    if (
-      taskBackendConfig.backend === 'beads' &&
-      taskBackendConfig.isAvailable
-    ) {
-      // Beads mode: Focus on bd CLI task management, not plan file
-      enhanced = `You are in the ${phase} phase.
-${baseInstructions}
-
-**Plan File Guidance:**
-Use the plan file as memory for the current objective
-- Update the "Key Decisions" section with important choices made
-- Add relevant notes to help maintain context
-- Do NOT enter tasks in the plan file, follow the below instructions for plan file management
-
-**Task Management Guidance:**
-${taskGuidance}
-        `;
-    } else {
-      // Markdown mode: Traditional plan file approach
-      enhanced = `Check your plan file at \`${conversationContext.planFilePath}\` and focus on the "${this.capitalizePhase(phase)}" section.
+    // Markdown mode: Traditional plan file approach
+    enhanced = `Check your plan file at \`${conversationContext.planFilePath}\` and focus on the "${this.capitalizePhase(phase)}" section.
 
 ${baseInstructions}
 
@@ -169,7 +130,6 @@ ${baseInstructions}
 ${taskGuidance}
 - Update the "Key Decisions" section with important choices made
 - Add relevant notes to help maintain context`;
-    }
 
     // Add project context
     enhanced += `\n\n**Project Context:**
@@ -190,40 +150,20 @@ ${taskGuidance}
     }
 
     // Add continuity and task management instructions
-    const taskReminder =
-      taskBackendConfig.backend === 'beads' && taskBackendConfig.isAvailable
-        ? 'Use ONLY bd CLI tool for task management - do not use your own task management tools'
-        : 'Use ONLY the development plan for task management - do not use your own task management tools';
-
     enhanced += `\n\n**Important Reminders:**
-- ${taskReminder}
+- Use ONLY the development plan for task management - do not use your own task management tools
 - Call whats_next() after the next user message to maintain the development workflow`;
 
     return enhanced;
   }
 
   /**
-   * Generate task management guidance based on active backend
+   * Generate task management guidance for markdown backend
    */
-  private generateTaskManagementGuidance(
-    taskBackendConfig: TaskBackendConfig
-  ): string {
-    if (
-      taskBackendConfig.backend === 'beads' &&
-      taskBackendConfig.isAvailable
-    ) {
-      return `- Use bd CLI tool exclusively
-- **Start by listing ready tasks**: \`bd list --parent <phase-task-id> --status open\`
-- **Create new tasks**: \`bd create 'Task title' --parent <phase-task-id> -p 2\`
-- **Update status when working**: \`bd update <task-id> --status in_progress\`
-- **Complete tasks**: \`bd close <task-id>\`
-- **Focus on ready tasks first** - let beads handle dependencies
+  private generateTaskManagementGuidance(): string {
+    // Default markdown backend
+    return `- Mark completed tasks with [x] as you finish them
 - Add new tasks as they are identified during your work with the user`;
-    } else {
-      // Default markdown backend
-      return `- Mark completed tasks with [x] as you finish them
-- Add new tasks as they are identified during your work with the user`;
-    }
   }
 
   /**

@@ -15,8 +15,6 @@ import { FileStorage } from '@codemcp/workflows-core';
 import type { IPersistence } from '@codemcp/workflows-core';
 import { ConversationManager } from '@codemcp/workflows-core';
 import { TransitionEngine } from '@codemcp/workflows-core';
-import { InstructionGenerator } from '@codemcp/workflows-core';
-import { PlanManager } from '@codemcp/workflows-core';
 import { InteractionLogger } from '@codemcp/workflows-core';
 import { WorkflowManager } from '@codemcp/workflows-core';
 import { GitManager } from '@codemcp/workflows-core';
@@ -36,6 +34,7 @@ import {
   generateWorkflowDescription,
 } from './server-helpers.js';
 import { notificationService } from './notification-service.js';
+import { ServerComponentsFactory } from './components/server-components-factory.js';
 
 const logger = createLogger('ServerConfig');
 
@@ -113,8 +112,11 @@ export async function initializeServerComponents(
   );
   const transitionEngine = new TransitionEngine(projectPath);
   transitionEngine.setConversationManager(conversationManager);
-  const planManager = new PlanManager();
-  const instructionGenerator = new InstructionGenerator(planManager);
+
+  // Use factory pattern for strategy-based component creation
+  const componentsFactory = new ServerComponentsFactory({ projectPath });
+  const planManager = componentsFactory.createPlanManager();
+  const instructionGenerator = componentsFactory.createInstructionGenerator();
 
   // Always create interaction logger as it's critical for transition engine logic
   // (determining first call from initial state)

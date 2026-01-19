@@ -7,12 +7,12 @@
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { TestAccess } from '../utils/test-access.js';
-import { InstructionGenerator } from '@codemcp/workflows-core';
+import { InstructionGenerator } from '../../src/instruction-generator.js';
 import type { ConversationContext } from '../../src/types.js';
-import type { InstructionContext } from '../../src/instruction-generator.js';
+import type { InstructionContext } from '../../src/interfaces/instruction-generator.interface.js';
 import type { TaskBackendConfig } from '../../src/task-backend.js';
 import type { ProjectDocsManager } from '../../src/project-docs-manager.js';
-import type { PlanManager } from '../../src/plan-manager.js';
+import { PlanManager } from '../../src/plan-manager.js';
 import { join } from 'node:path';
 
 // Mock ProjectDocsManager
@@ -42,9 +42,10 @@ describe('InstructionGenerator - Backend Adaptation', () => {
       }),
     };
 
-    // Create instruction generator with injected task backend detector
+    // Create instruction generator with mocked PlanManager
+    const mockPlanManager = {} as unknown as PlanManager;
     instructionGenerator = new InstructionGenerator(
-      {} as unknown as PlanManager,
+      mockPlanManager,
       mockTaskBackendDetector
     );
     TestAccess.injectMock(
