@@ -230,6 +230,18 @@ export class PlanManager implements IPlanManager {
    * Generate phase-specific plan file guidance based on state machine
    */
   generatePlanFileGuidance(phase: string): string {
+    if (phase === null || phase === undefined) {
+      throw new Error('Phase parameter cannot be null or undefined');
+    }
+
+    if (typeof phase !== 'string') {
+      throw new Error('Phase parameter must be a string');
+    }
+
+    if (phase.trim() === '') {
+      throw new Error('Phase parameter cannot be empty');
+    }
+
     if (!this.stateMachine) {
       throw new Error(
         'State machine not set. This should not happen as state machine is always loaded.'

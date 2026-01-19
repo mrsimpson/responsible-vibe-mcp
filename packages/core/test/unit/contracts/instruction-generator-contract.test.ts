@@ -5,7 +5,7 @@
  * These tests ensure compliance with the IInstructionGenerator interface requirements.
  */
 
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import {
   BaseInterfaceContract,
   ValidationHelpers,
@@ -21,6 +21,25 @@ import type {
 } from '../../../src/interfaces/instruction-generator.interface.js';
 import type { YamlStateMachine } from '../../../src/state-machine-types.js';
 import type { ConversationContext } from '../../../src/types.js';
+import { InstructionGenerator } from '../../../src/instruction-generator.js';
+import { PlanManager } from '../../../src/plan-manager.js';
+
+// Register implementations before creating contract tests
+const existingImplementations =
+  ImplementationRegistry.getInstructionGeneratorImplementations();
+
+if (existingImplementations.length === 0) {
+  // Register the core InstructionGenerator implementation
+  ImplementationRegistry.registerInstructionGenerator({
+    name: 'InstructionGenerator',
+    description:
+      'Core InstructionGenerator implementation for markdown-based task management',
+    createInstance: () => {
+      const mockPlanManager = new PlanManager();
+      return new InstructionGenerator(mockPlanManager);
+    },
+  });
+}
 
 /**
  * Mock state machine for testing
@@ -121,16 +140,30 @@ class InstructionGeneratorContract extends BaseInterfaceContract<IInstructionGen
         },
         description: 'should return valid GeneratedInstructions structure',
       },
+      {
+        methodName: 'generateInstructions',
+        parameters: ['', mockInstructionContext],
+        isAsync: true,
+        returnTypeValidator: (result): result is GeneratedInstructions => {
+          return (
+            ValidationHelpers.hasProperties([
+              'instructions',
+              'planFileGuidance',
+              'metadata',
+            ])(result) &&
+            typeof (result as GeneratedInstructions).instructions ===
+              'string' &&
+            typeof (result as GeneratedInstructions).planFileGuidance ===
+              'string'
+          );
+        },
+        description: 'should handle empty base instructions gracefully',
+      },
     ];
   }
 
   protected getErrorTests(): ErrorTestConfig[] {
     return [
-      {
-        methodName: 'generateInstructions',
-        invalidParameters: ['', mockInstructionContext],
-        description: 'should handle empty base instructions gracefully',
-      },
       {
         methodName: 'generateInstructions',
         invalidParameters: ['Base instructions', null],
@@ -402,15 +435,19 @@ class InstructionGeneratorContract extends BaseInterfaceContract<IInstructionGen
 describe('IInstructionGenerator Interface Contract', () => {
   const contract = new InstructionGeneratorContract();
 
-  beforeEach(() => {
-    // Register implementations for testing
-    const implementations =
-      ImplementationRegistry.getInstructionGeneratorImplementations();
+  // Register implementations directly with the contract before creating tests
+  const instructionGeneratorRegistration: ImplementationRegistration<IInstructionGenerator> =
+    {
+      name: 'InstructionGenerator',
+      description:
+        'Core InstructionGenerator implementation for markdown-based task management',
+      createInstance: () => {
+        const mockPlanManager = new PlanManager();
+        return new InstructionGenerator(mockPlanManager);
+      },
+    };
 
-    for (const impl of implementations) {
-      contract.registerImplementation(impl);
-    }
-  });
+  contract.registerImplementation(instructionGeneratorRegistration);
 
   // Create the actual contract test suite
   contract.createContractTests();

@@ -8,6 +8,7 @@ import { IPlanManager } from '@codemcp/workflows-core';
 import { IInstructionGenerator } from '@codemcp/workflows-core';
 import { WorkflowManager } from '@codemcp/workflows-core';
 import { InteractionLogger } from '@codemcp/workflows-core';
+import type { TaskBackendConfig } from '@codemcp/workflows-core';
 
 /**
  * Server context shared across all handlers
@@ -127,4 +128,6 @@ export interface ServerConfig {
   databasePath?: string;
   /** Enable interaction logging */
   enableLogging?: boolean;
+  /** Task backend configuration override (for testing) */
+  taskBackend?: TaskBackendConfig;
 }
