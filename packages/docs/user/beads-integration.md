@@ -2,7 +2,7 @@
 
 > ⚠️ **Experimental Feature**: Beads integration is experimental. Requires `bd` CLI to be installed.
 
-Integration between responsible-vibe-mcp and [beads distributed issue tracker](https://github.com/beads-data/beads) for enhanced AI agent task management.
+Integration between responsible-vibe-mcp and [beads distributed issue tracker](https://github.com/steveyegge/beads) for enhanced AI agent task management.
 
 ## Overview
 
@@ -23,6 +23,8 @@ export TASK_BACKEND=beads
 export TASK_BACKEND=markdown
 # or unset TASK_BACKEND
 ```
+
+or add this to the MCP env config in your agent.
 
 **Auto-detection**: System validates `bd` command availability and falls back to markdown if unavailable.
 
@@ -88,5 +90,5 @@ bd list --parent bd-a1b2 --recursive       # All project tasks
 
 ## Resources
 
-- [Beads Repository](https://github.com/beads-data/beads)
+- [Beads Repository](https://github.com/steveyegge/beads)
 - [Beads MCP Integration](https://github.com/beads-data/beads/tree/main/integrations/beads-mcp)
