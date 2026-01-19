@@ -21,6 +21,7 @@ import type {
 } from '../../../src/interfaces/plan-manager-interface.js';
 import { PlanManager } from '../../../src/plan-manager.js';
 import type { TaskBackendConfig } from '../../../src/task-backend.js';
+import { cleanupDirectory } from '../../utils/temp-files.js';
 
 /**
  * Mock data for testing
@@ -324,12 +325,7 @@ describe('IPlanManager Interface Contract', () => {
       ).setStateMachine(mockStateMachine);
     },
     cleanup: async () => {
-      // Clean up test directory
-      const { rmdir } = await import('node:fs/promises');
-      const { existsSync } = await import('node:fs');
-      if (existsSync(testDir)) {
-        await rmdir(testDir, { recursive: true });
-      }
+      await cleanupDirectory(testDir);
     },
   };
 

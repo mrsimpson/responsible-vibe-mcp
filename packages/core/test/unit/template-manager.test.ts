@@ -7,9 +7,10 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { TestAccess } from '../utils/test-access.js';
 import { TemplateManager } from '@codemcp/workflows-core';
-import { mkdir, writeFile, rmdir } from 'node:fs/promises';
+import { mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
+import { cleanupDirectory } from '../utils/temp-files.js';
 
 describe('TemplateManager', () => {
   let templateManager: TemplateManager;
@@ -74,7 +75,7 @@ describe('TemplateManager', () => {
   afterEach(async () => {
     // Clean up test directory
     try {
-      await rmdir(testTemplatesPath, { recursive: true });
+      await cleanupDirectory(testTemplatesPath);
     } catch {
       // Ignore cleanup errors
     }

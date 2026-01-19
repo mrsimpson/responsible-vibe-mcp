@@ -6,6 +6,7 @@
  */
 
 import { mkdirSync, writeFileSync, rmSync, existsSync } from 'node:fs';
+import { rm } from 'node:fs/promises';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 
@@ -304,5 +305,16 @@ export function safeParseServerResponse(
     throw new Error(
       `Failed to parse server response as JSON: ${text.substring(0, 100)}...`
     );
+  }
+}
+
+/**
+ * Async helper to clean up a directory
+ * Uses fs.rm which is the Node.js 14.14+ recommended approach
+ * @param dirPath - Path to directory to remove
+ */
+export async function cleanupDirectory(dirPath: string): Promise<void> {
+  if (existsSync(dirPath)) {
+    await rm(dirPath, { recursive: true, force: true });
   }
 }

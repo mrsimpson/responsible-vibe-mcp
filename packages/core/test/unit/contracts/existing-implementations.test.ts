@@ -12,10 +12,11 @@ import type { IPlanManager } from '../../../src/interfaces/plan-manager.interfac
 import type { IInstructionGenerator } from '../../../src/interfaces/instruction-generator.interface.js';
 import { PlanManager } from '../../../src/plan-manager.js';
 import { InstructionGenerator } from '../../../src/instruction-generator.js';
-import { rmdir, mkdir } from 'node:fs/promises';
+import { mkdir } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
+import { cleanupDirectory } from '../../utils/temp-files.js';
 
 /**
  * Test directory for file operations
@@ -27,15 +28,13 @@ const testDir = join(tmpdir(), 'responsible-vibe-contract-tests');
  */
 async function setupTestDirectory(): Promise<void> {
   if (existsSync(testDir)) {
-    await rmdir(testDir, { recursive: true });
+    await cleanupDirectory(testDir);
   }
   await mkdir(testDir, { recursive: true });
 }
 
 async function cleanupTestDirectory(): Promise<void> {
-  if (existsSync(testDir)) {
-    await rmdir(testDir, { recursive: true });
-  }
+  await cleanupDirectory(testDir);
 }
 
 /**
