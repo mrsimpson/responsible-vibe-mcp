@@ -176,7 +176,7 @@ export function RegisterImplementation<T>(
     | 'task-backend-client',
   registration: Omit<ImplementationRegistration<T>, 'createInstance'>
 ) {
-  return function (constructor: new (...args: any[]) => T) {
+  return function (constructor: new (...args: unknown[]) => T) {
     const fullRegistration: ImplementationRegistration<T> = {
       ...registration,
       createInstance: () => new constructor(),
