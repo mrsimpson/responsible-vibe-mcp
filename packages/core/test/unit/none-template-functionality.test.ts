@@ -8,7 +8,8 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { ProjectDocsManager } from '@codemcp/workflows-core';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
-import { mkdir, rmdir, readFile } from 'node:fs/promises';
+import { mkdir, readFile } from 'node:fs/promises';
+import { cleanupDirectory } from '../utils/temp-files.js';
 
 describe('None Template Functionality', () => {
   let testProjectPath: string;
@@ -25,7 +26,7 @@ describe('None Template Functionality', () => {
   afterEach(async () => {
     // Clean up test directory
     try {
-      await rmdir(testProjectPath, { recursive: true });
+      await cleanupDirectory(testProjectPath);
     } catch {
       // Ignore cleanup errors
     }

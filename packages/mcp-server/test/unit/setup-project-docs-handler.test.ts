@@ -20,7 +20,8 @@ import { TemplateManager } from '@codemcp/workflows-core';
 import { ServerContext } from '../../src/types';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
-import { mkdir, rmdir } from 'node:fs/promises';
+import { mkdir } from 'node:fs/promises';
+import { cleanupDirectory } from '../utils/temp-files.js';
 
 // Mock ProjectDocsManager and TemplateManager
 vi.mock('../../src/project-docs-manager.js');
@@ -72,7 +73,7 @@ describe('SetupProjectDocsHandler', () => {
   afterEach(async () => {
     // Clean up test directory
     try {
-      await rmdir(testProjectPath, { recursive: true });
+      await cleanupDirectory(testProjectPath);
     } catch {
       // Ignore cleanup errors
     }

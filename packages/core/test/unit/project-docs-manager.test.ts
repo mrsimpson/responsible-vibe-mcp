@@ -8,9 +8,10 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { TestAccess } from '../utils/test-access.js';
 import { ProjectDocsManager } from '@codemcp/workflows-core';
 import { TemplateManager } from '@codemcp/workflows-core';
-import { mkdir, writeFile, rmdir, readFile } from 'node:fs/promises';
+import { mkdir, writeFile, readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
+import { cleanupDirectory } from '../utils/temp-files.js';
 
 // Mock TemplateManager
 vi.mock('../../src/template-manager.js');
@@ -48,7 +49,7 @@ describe('ProjectDocsManager', () => {
   afterEach(async () => {
     // Clean up test directory
     try {
-      await rmdir(testProjectPath, { recursive: true });
+      await cleanupDirectory(testProjectPath);
     } catch {
       // Ignore cleanup errors
     }

@@ -11,7 +11,8 @@ import { FileDetectionManager } from '@codemcp/workflows-core';
 import { ProjectDocsManager } from '@codemcp/workflows-core';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
-import { mkdir, writeFile, rmdir, lstat } from 'node:fs/promises';
+import { mkdir, writeFile, lstat } from 'node:fs/promises';
+import { cleanupDirectory } from '../utils/temp-files.js';
 
 describe('File Linking Integration', () => {
   let testProjectPath: string;
@@ -47,7 +48,7 @@ describe('File Linking Integration', () => {
   afterEach(async () => {
     // Clean up test directory
     try {
-      await rmdir(testProjectPath, { recursive: true });
+      await cleanupDirectory(testProjectPath);
     } catch {
       // Ignore cleanup errors
     }
