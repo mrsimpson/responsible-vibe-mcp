@@ -9,6 +9,7 @@ import { z } from 'zod';
 import { BaseToolHandler } from './base-tool-handler.js';
 import { createLogger } from '@codemcp/workflows-core';
 import { ServerContext } from '../types.js';
+import { getFormattedVersion } from '../version-info.js';
 
 const logger = createLogger('GetToolInfoHandler');
 
@@ -207,7 +208,7 @@ export class GetToolInfoHandler extends BaseToolHandler<
     // Build the complete response
     const response: GetToolInfoResponse = {
       tool_name: 'Responsible Vibe MCP - Development Workflow Management',
-      version: '3.1.6-monorepo', // This should ideally come from package.json
+      version: getFormattedVersion(),
       purpose:
         'Structured development workflows with guided phase transitions and conversation state management',
       description:
