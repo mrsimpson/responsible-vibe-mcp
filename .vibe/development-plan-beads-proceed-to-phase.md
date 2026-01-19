@@ -104,6 +104,56 @@ Tasks are managed via bd CLI tool. Use bd commands to create and manage tasks wi
 ## Key Decisions
 *Important decisions will be documented here as they are made*
 
+**COMPREHENSIVE BEADS INSTRUCTION VALIDATION TESTS IMPLEMENTED** - Added complete test coverage for beads vs markdown instruction text validation to close critical gap in test coverage:
+
+**Critical Gap Identified:**
+- While markdown backend had excellent test coverage with anti-contamination protection, BeadsInstructionGenerator had virtually no tests validating actual instruction text content
+- No comparative tests between backends to ensure proper differentiation
+- Missing validation of beads-specific CLI commands and task management instructions
+
+**Test Suites Implemented:**
+1. **BeadsInstructionGenerator Content Tests** (`packages/mcp-server/test/unit/beads-instruction-generator.test.ts`):
+   - ✅ **22 comprehensive tests** validating beads-specific content presence
+   - ✅ **Beads CLI Commands**: Tests verify presence of all bd CLI commands (`bd list`, `bd create`, `bd close`, etc.)
+   - ✅ **Task Management Structure**: Validates "🔧 BD CLI Task Management:" header and guidance
+   - ✅ **Anti-Contamination**: Ensures no markdown-specific content appears in beads instructions
+   - ✅ **Phase-Specific Content**: Tests different phases maintain beads structure consistently
+   - ✅ **Variable Substitution**: Validates variable handling while maintaining beads format
+
+2. **Backend Comparison Tests** (`packages/core/test/unit/instruction-generator-comparison.test.ts`):
+   - ✅ **12 tests** directly comparing markdown vs beads instruction output
+   - ✅ **Task Management Differences**: Validates markdown uses plan file checkboxes vs beads uses CLI
+   - ✅ **Shared Content**: Ensures both backends preserve base instruction content
+   - ✅ **Consistency Validation**: Tests variable substitution works identically across backends
+   - ✅ **Format Differences**: Validates backend-specific instruction structure and guidance
+
+3. **Phase Task ID Integration Tests** (`packages/mcp-server/test/unit/beads-phase-task-id-integration.test.ts`):
+   - ✅ **15 tests** validating phase task ID extraction and usage
+   - ✅ **ID Extraction**: Tests proper extraction from `<!-- beads-phase-id: project-epic-1.2 -->` format
+   - ✅ **BD CLI Integration**: Validates extracted IDs are properly used in all bd commands
+   - ✅ **Multi-Phase Support**: Tests correct handling of multiple phases in plan files
+   - ✅ **Graceful Fallback**: Tests robust error handling for missing or malformed task IDs
+   - ✅ **Edge Cases**: Comprehensive validation of error scenarios and malformed input
+
+**Test Quality and Coverage:**
+- ✅ **All 49 new tests pass** across all three test suites
+- ✅ **Real Bug Discovery**: Tests identified edge cases in phase task ID regex parsing
+- ✅ **Integration with Existing Framework**: Tests follow established patterns and use same mocking strategies
+- ✅ **Comprehensive Validation**: Tests cover all requirements including anti-contamination, content structure, and phase integration
+
+**Critical Protection Achieved:**
+- **BeadsInstructionGenerator Quality**: Now has same level of test protection as markdown backend
+- **Backend Differentiation**: Validates that each backend produces appropriate task management instructions
+- **Instruction Text Reliability**: Ensures beads instructions contain correct CLI commands and guidance
+- **Future Safety**: Test framework prevents regression and ensures instruction quality
+
+**Benefits:**
+- 🛡️ **Quality Assurance**: Critical gap in test coverage eliminated
+- 📝 **Instruction Validation**: Ensures users receive correct, usable beads instructions
+- 🔄 **Backend Consistency**: Validates proper separation and differentiation between backends
+- 🧪 **Test Coverage**: Comprehensive validation of instruction text content and structure
+- 🚀 **Regression Prevention**: Future changes to instruction generation will be validated automatically
+
 **COMPREHENSIVE INTERFACE CONTRACT TEST FRAMEWORK IMPLEMENTATION** - Created a complete testing framework for strategy pattern interfaces:
 
 **Implementation Completed:**
@@ -148,6 +198,21 @@ Tasks are managed via bd CLI tool. Use bd commands to create and manage tasks wi
 - **Interface Compliance**: Automatic validation that all implementations satisfy interface contracts
 - **Future-Proof**: Easy to add new implementations and interfaces to the testing framework
 - **Quality Assurance**: Comprehensive error handling, return type validation, and behavior testing
+
+**TEST FRAMEWORK FIXES AND IMPROVEMENTS** - Resolved critical test infrastructure issues:
+
+**Issues Fixed:**
+1. **Backend Detection Test Architecture Mismatch**: The instruction-generator-backends.test.ts was testing backend detection in the core InstructionGenerator class, but backend selection was moved to the ServerComponentsFactory. Fixed by rewriting tests to focus on core InstructionGenerator functionality (markdown-only behavior).
+
+2. **Contract Test Registration Timing Issue**: Contract tests were failing because implementations weren't registered before createContractTests() was called. Fixed by registering implementations directly with contract instances at module level before test creation.
+
+3. **Mock Implementation Creation**: Created MockTaskBackendClient for testing ITaskBackendClient interface contracts since no concrete implementation exists in the core package.
+
+**Results:**
+✅ **instruction-generator-backends.test.ts**: All 6 tests now pass, focusing on core markdown functionality
+✅ **Contract Test Registration**: All three interfaces (IPlanManager, IInstructionGenerator, ITaskBackendClient) now have proper implementation registration
+✅ **Test Robustness**: String validations use flexible toContain() assertions rather than brittle exact matches
+✅ **Architecture Alignment**: Tests now correctly reflect the factory pattern architecture where backend selection happens at the factory level, not in individual components
 - **Developer Experience**: Clear documentation and examples for extending the framework
 - **CI/CD Ready**: Deterministic tests suitable for automated testing pipelines
 

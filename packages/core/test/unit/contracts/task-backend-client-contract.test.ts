@@ -5,7 +5,7 @@
  * These tests ensure compliance with the ITaskBackendClient interface requirements.
  */
 
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import {
   BaseInterfaceContract,
   ValidationHelpers,
@@ -13,7 +13,6 @@ import {
   type ErrorTestConfig,
   type ImplementationRegistration,
 } from './base-interface-contract.js';
-import { ImplementationRegistry } from './implementation-registry.js';
 import type {
   ITaskBackendClient,
   BackendTask,
@@ -45,6 +44,113 @@ const mockChildTask2: BackendTask = {
   priority: 2,
   parent: 'parent-task-1',
 };
+
+/**
+ * Mock TaskBackendClient implementation for testing
+ */
+class MockTaskBackendClient implements ITaskBackendClient {
+  private tasks: Map<string, BackendTask> = new Map();
+
+  constructor() {
+    // Initialize with some mock tasks
+    this.tasks.set('parent-task-1', {
+      id: 'parent-task-1',
+      title: 'Parent Task',
+      status: 'open',
+      priority: 1,
+    });
+
+    this.tasks.set('child-task-1', {
+      id: 'child-task-1',
+      title: 'Child Task 1',
+      status: 'completed',
+      priority: 2,
+      parent: 'parent-task-1',
+    });
+
+    this.tasks.set('task-1', {
+      id: 'task-1',
+      title: 'Test Task 1',
+      status: 'open',
+      priority: 1,
+    });
+  }
+
+  async isAvailable(): Promise<boolean> {
+    return true;
+  }
+
+  async getOpenTasks(parentTaskId: string): Promise<BackendTask[]> {
+    if (!parentTaskId.trim()) {
+      throw new Error('Parent task ID cannot be empty');
+    }
+
+    return Array.from(this.tasks.values()).filter(
+      task => task.parent === parentTaskId && task.status === 'open'
+    );
+  }
+
+  async validateTasksCompleted(
+    parentTaskId: string
+  ): Promise<TaskValidationResult> {
+    if (!parentTaskId.trim()) {
+      throw new Error('Parent task ID cannot be empty');
+    }
+
+    const openTasks = await this.getOpenTasks(parentTaskId);
+    return {
+      valid: openTasks.length === 0,
+      openTasks,
+      message: openTasks.length > 0 ? 'There are incomplete tasks' : undefined,
+    };
+  }
+
+  async createTask(
+    title: string,
+    parentTaskId: string,
+    priority = 2
+  ): Promise<string> {
+    if (!title.trim()) {
+      throw new Error('Task title cannot be empty');
+    }
+    if (!parentTaskId.trim()) {
+      throw new Error('Parent task ID cannot be empty');
+    }
+
+    const taskId = `task-${Date.now()}`;
+    this.tasks.set(taskId, {
+      id: taskId,
+      title,
+      status: 'open',
+      priority,
+      parent: parentTaskId,
+    });
+
+    return taskId;
+  }
+
+  async updateTaskStatus(
+    taskId: string,
+    status: 'open' | 'in_progress' | 'completed' | 'cancelled'
+  ): Promise<void> {
+    if (!taskId.trim()) {
+      throw new Error('Task ID cannot be empty');
+    }
+
+    // Validate status first
+    const validStatuses = ['open', 'in_progress', 'completed', 'cancelled'];
+    if (!validStatuses.includes(status)) {
+      throw new Error(`Invalid task status: ${status}`);
+    }
+
+    const task = this.tasks.get(taskId);
+    if (!task) {
+      throw new Error(`Task not found: ${taskId}`);
+    }
+
+    task.status = status;
+  }
+}
 
 /**
  * Task Backend Client Contract Test Suite
@@ -467,15 +573,18 @@ class TaskBackendClientContract extends BaseInterfaceContract<ITaskBackendClient
 describe('ITaskBackendClient Interface Contract', () => {
   const contract = new TaskBackendClientContract();
 
-  beforeEach(() => {
-    // Register implementations for testing
-    const implementations =
-      ImplementationRegistry.getTaskBackendClientImplementations();
+  // Register implementations directly with the contract before creating tests
+  const mockTaskBackendClientRegistration: ImplementationRegistration<ITaskBackendClient> =
+    {
+      name: 'MockTaskBackendClient',
+      description:
+        'Mock TaskBackendClient implementation for testing contract compliance',
+      createInstance: () => {
+        return new MockTaskBackendClient();
+      },
+    };
 
-    for (const impl of implementations) {
-      contract.registerImplementation(impl);
-    }
-  });
+  contract.registerImplementation(mockTaskBackendClientRegistration);
 
   // Create the actual contract test suite
   contract.createContractTests();

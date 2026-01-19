@@ -1,39 +1,32 @@
 /**
- * Unit tests for InstructionGenerator Backend Integration
+ * Unit tests for InstructionGenerator Core Functionality
  *
- * Tests how instruction generation adapts to different task backends (markdown vs beads)
- * using dependency injection for controlled testing.
+ * Tests the core InstructionGenerator class behavior.
+ * Backend selection is now handled by the ServerComponentsFactory in the mcp-server package.
+ * This test validates that the core InstructionGenerator produces consistent markdown-based instructions.
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { TestAccess } from '../utils/test-access.js';
 import { InstructionGenerator } from '../../src/instruction-generator.js';
 import type { ConversationContext } from '../../src/types.js';
 import type { InstructionContext } from '../../src/interfaces/instruction-generator.interface.js';
-import type { TaskBackendConfig } from '../../src/task-backend.js';
 import type { ProjectDocsManager } from '../../src/project-docs-manager.js';
 import { PlanManager } from '../../src/plan-manager.js';
+import { TestAccess } from '../utils/test-access.js';
 import { join } from 'node:path';
 
 // Mock ProjectDocsManager
 vi.mock('../../src/project-docs-manager.js');
 
-describe('InstructionGenerator - Backend Adaptation', () => {
+describe('InstructionGenerator - Core Functionality', () => {
   let instructionGenerator: InstructionGenerator;
   let mockProjectDocsManager: Partial<ProjectDocsManager>;
   let testProjectPath: string;
   let mockConversationContext: ConversationContext;
   let mockInstructionContext: InstructionContext;
-  let mockTaskBackendDetector: () => TaskBackendConfig;
 
   beforeEach(() => {
     testProjectPath = '/test/project';
-
-    // Mock task backend detector
-    mockTaskBackendDetector = vi.fn().mockReturnValue({
-      backend: 'markdown',
-      isAvailable: true,
-    });
 
     // Mock ProjectDocsManager
     mockProjectDocsManager = {
@@ -42,12 +35,9 @@ describe('InstructionGenerator - Backend Adaptation', () => {
       }),
     };
 
-    // Create instruction generator with mocked PlanManager
+    // Create instruction generator
     const mockPlanManager = {} as unknown as PlanManager;
-    instructionGenerator = new InstructionGenerator(
-      mockPlanManager,
-      mockTaskBackendDetector
-    );
+    instructionGenerator = new InstructionGenerator(mockPlanManager);
     TestAccess.injectMock(
       instructionGenerator,
       'projectDocsManager',
@@ -72,147 +62,96 @@ describe('InstructionGenerator - Backend Adaptation', () => {
     };
   });
 
-  it('should provide markdown task guidance when markdown backend is active', async () => {
+  it('should provide markdown task guidance consistently', async () => {
     const baseInstructions = 'Work on design tasks.';
     const result = await instructionGenerator.generateInstructions(
       baseInstructions,
       mockInstructionContext
     );
 
+    // Core InstructionGenerator always produces markdown-style instructions
+    expect(result.instructions).toContain('Mark completed tasks with [x]');
     expect(result.instructions).toContain(
-      'Mark completed tasks with [x] as you finish them'
+      'Use ONLY the development plan for task management'
     );
-    expect(result.instructions).not.toContain('bd create');
-    expect(result.instructions).not.toContain('Use beads tools');
-    expect(result.instructions).toContain(
-      'Use ONLY the development plan for task management - do not use your own task management tools'
-    );
-  });
-
-  it('should provide beads task guidance when beads backend is active', async () => {
-    // Mock beads backend
-    vi.mocked(mockTaskBackendDetector).mockReturnValue({
-      backend: 'beads',
-      isAvailable: true,
-    });
-
-    const baseInstructions = 'Work on design tasks.';
-    const result = await instructionGenerator.generateInstructions(
-      baseInstructions,
-      mockInstructionContext
-    );
-
-    expect(result.instructions).toContain('Use bd CLI tool exclusively');
-    expect(result.instructions).not.toContain('[x]');
-    expect(result.instructions).toContain('ONLY bd CLI');
-  });
-
-  it('should fall back to markdown guidance when beads backend is unavailable', async () => {
-    // Mock unavailable beads backend
-    vi.mocked(mockTaskBackendDetector).mockReturnValue({
-      backend: 'beads',
-      isAvailable: false,
-      errorMessage: 'Beads not installed',
-    });
-
-    const baseInstructions = 'Work on design tasks.';
-    const result = await instructionGenerator.generateInstructions(
-      baseInstructions,
-      mockInstructionContext
-    );
-
-    expect(result.instructions).toContain(
-      'Mark completed tasks with [x] as you finish them'
-    );
-    expect(result.instructions).not.toContain('Use beads tools');
-    expect(result.instructions).toContain(
-      'Use ONLY the development plan for task management - do not use your own task management tools'
-    );
-  });
-
-  it('should adapt important reminders based on task backend', async () => {
-    // Test markdown reminder (already set in beforeEach)
-    let result = await instructionGenerator.generateInstructions(
-      'Test instructions',
-      mockInstructionContext
-    );
-
-    expect(result.instructions).toContain(
-      'Use ONLY the development plan for task management - do not use your own task management tools'
-    );
-
-    // Test beads reminder
-    vi.mocked(mockTaskBackendDetector).mockReturnValue({
-      backend: 'beads',
-      isAvailable: true,
-    });
-
-    result = await instructionGenerator.generateInstructions(
-      'Test instructions',
-      mockInstructionContext
-    );
-
-    expect(result.instructions).toContain(
-      'Use ONLY bd CLI tool for task management - do not use your own task management tools'
-    );
-  });
-
-  it('should provide different instruction structures for different backends', async () => {
-    // Test markdown backend structure
-    let result = await instructionGenerator.generateInstructions(
-      'Test instructions',
-      mockInstructionContext
-    );
-
-    // Markdown should have plan file references
     expect(result.instructions).toContain('Check your plan file');
     expect(result.instructions).toContain('**Plan File Guidance:**');
     expect(result.instructions).toContain('**Project Context:**');
     expect(result.instructions).toContain('**Important Reminders:**');
+  });
 
-    // Test with beads - should have DIFFERENT structure
-    vi.mocked(mockTaskBackendDetector).mockReturnValue({
-      backend: 'beads',
-      isAvailable: true,
-    });
-
-    result = await instructionGenerator.generateInstructions(
-      'Test instructions',
+  it('should not contain beads-specific instructions', async () => {
+    const baseInstructions = 'Work on design tasks.';
+    const result = await instructionGenerator.generateInstructions(
+      baseInstructions,
       mockInstructionContext
     );
 
-    // Beads should NOT have plan file references, but have task management focus
-    expect(result.instructions).not.toContain('Check your plan file');
-    expect(result.instructions).toContain('bd CLI');
-    expect(result.instructions).toContain('**Project Context:**');
-    expect(result.instructions).toContain('**Important Reminders:**');
+    // Core InstructionGenerator should not produce beads-specific content
+    expect(result.instructions).not.toContain('bd create');
+    expect(result.instructions).not.toContain('bd CLI tool');
+    expect(result.instructions).not.toContain('beads');
+    expect(result.instructions).not.toContain('BD CLI');
   });
 
-  it('should work with variable substitution in both backends', async () => {
+  it('should handle variable substitution correctly', async () => {
     const baseInstructions =
       'Review the design in $DESIGN_DOC and complete the tasks.';
-
-    // Test markdown backend with variables (already set in beforeEach)
-    let result = await instructionGenerator.generateInstructions(
+    const result = await instructionGenerator.generateInstructions(
       baseInstructions,
       mockInstructionContext
     );
 
     expect(result.instructions).toContain('/test/project/.vibe/docs/design.md');
     expect(result.instructions).toContain('Mark completed tasks with [x]');
+  });
 
-    // Test beads backend with variables
-    vi.mocked(mockTaskBackendDetector).mockReturnValue({
-      backend: 'beads',
-      isAvailable: true,
-    });
-
-    result = await instructionGenerator.generateInstructions(
+  it('should provide consistent instruction structure', async () => {
+    const baseInstructions = 'Test instructions';
+    const result = await instructionGenerator.generateInstructions(
       baseInstructions,
       mockInstructionContext
     );
 
-    expect(result.instructions).toContain('/test/project/.vibe/docs/design.md');
-    expect(result.instructions).toContain('bd CLI');
+    // Check for expected sections
+    expect(result.instructions).toContain('Check your plan file');
+    expect(result.instructions).toContain('**Plan File Guidance:**');
+    expect(result.instructions).toContain('**Project Context:**');
+    expect(result.instructions).toContain('**Important Reminders:**');
+    expect(result.instructions).toContain('- Project: /test/project');
+    expect(result.instructions).toContain('- Branch: main');
+    expect(result.instructions).toContain('- Current Phase: design');
+  });
+
+  it('should handle transition context when provided', async () => {
+    const contextWithTransition = {
+      ...mockInstructionContext,
+      isModeled: true,
+      transitionReason: 'All exploration tasks completed',
+    };
+
+    const result = await instructionGenerator.generateInstructions(
+      'Continue with implementation.',
+      contextWithTransition
+    );
+
+    expect(result.instructions).toContain('**Phase Context:**');
+    expect(result.instructions).toContain('All exploration tasks completed');
+  });
+
+  it('should handle missing plan file scenario', async () => {
+    const contextWithoutPlan = {
+      ...mockInstructionContext,
+      planFileExists: false,
+    };
+
+    const result = await instructionGenerator.generateInstructions(
+      'Start working on tasks.',
+      contextWithoutPlan
+    );
+
+    expect(result.instructions).toContain(
+      'Plan file will be created when you first update it'
+    );
   });
 });

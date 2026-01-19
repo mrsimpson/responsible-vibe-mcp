@@ -114,7 +114,10 @@ export async function initializeServerComponents(
   transitionEngine.setConversationManager(conversationManager);
 
   // Use factory pattern for strategy-based component creation
-  const componentsFactory = new ServerComponentsFactory({ projectPath });
+  const componentsFactory = new ServerComponentsFactory({
+    projectPath,
+    taskBackend: config.taskBackend, // Pass through task backend config if provided
+  });
   const planManager = componentsFactory.createPlanManager();
   const instructionGenerator = componentsFactory.createInstructionGenerator();
 

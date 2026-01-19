@@ -46,8 +46,33 @@ const planManagerRegistration: ImplementationRegistration<IPlanManager> = {
   description:
     'Default filesystem-based plan manager that handles markdown plan files and supports both markdown and beads task backends',
   createInstance: () => new PlanManager(),
-  setup: async () => {
+  setup: async (instance: IPlanManager) => {
     await setupTestDirectory();
+    // Set up a minimal state machine for testing
+    const mockStateMachine = {
+      name: 'test-workflow',
+      description: 'Test workflow for contract compliance',
+      initial_state: 'start',
+      states: {
+        start: {
+          name: 'Start',
+          instructions: 'Starting phase instructions',
+          entrance_criteria: ['Project initialized'],
+          tasks: ['Initialize project'],
+          transitions: { complete: 'end' },
+        },
+        end: {
+          name: 'End',
+          instructions: 'Ending phase instructions',
+          entrance_criteria: ['All tasks completed'],
+          tasks: ['Finalize project'],
+          transitions: {},
+        },
+      },
+    };
+    (
+      instance as unknown as { setStateMachine: typeof mockStateMachine }
+    ).setStateMachine(mockStateMachine);
   },
   cleanup: async () => {
     await cleanupTestDirectory();

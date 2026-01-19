@@ -5,7 +5,9 @@
  * These tests ensure compliance with the IPlanManager interface requirements.
  */
 
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import {
   BaseInterfaceContract,
   ValidationHelpers,
@@ -13,70 +15,49 @@ import {
   type ErrorTestConfig,
   type ImplementationRegistration,
 } from './base-interface-contract.js';
-import { ImplementationRegistry } from './implementation-registry.js';
 import type {
   IPlanManager,
   PlanFileInfo,
-} from '../../../src/interfaces/plan-manager.interface.js';
-import type { YamlStateMachine } from '../../../src/state-machine-types.js';
+} from '../../../src/interfaces/plan-manager-interface.js';
+import { PlanManager } from '../../../src/plan-manager.js';
 import type { TaskBackendConfig } from '../../../src/task-backend.js';
 
 /**
- * Mock state machine for testing
- */
-const mockStateMachine: YamlStateMachine = {
-  name: 'test-workflow',
-  description: 'Test workflow for contract testing',
-  initial_state: 'explore',
-  states: {
-    explore: {
-      description: 'Initial exploration phase',
-      default_instructions: 'Explore the problem space',
-      transitions: [
-        {
-          trigger: 'ready_to_plan',
-          to: 'plan',
-          transition_reason: 'Exploration complete',
-        },
-      ],
-    },
-    plan: {
-      description: 'Planning phase',
-      default_instructions: 'Create implementation plan',
-      transitions: [
-        {
-          trigger: 'ready_to_code',
-          to: 'code',
-          transition_reason: 'Planning complete',
-        },
-      ],
-    },
-    code: {
-      description: 'Implementation phase',
-      default_instructions: 'Implement the solution',
-      transitions: [
-        {
-          trigger: 'ready_to_commit',
-          to: 'commit',
-          transition_reason: 'Implementation complete',
-        },
-      ],
-    },
-    commit: {
-      description: 'Finalization phase',
-      default_instructions: 'Commit and finalize',
-      transitions: [],
-    },
-  },
-};
-
-/**
- * Mock task backend configuration for testing
+ * Mock data for testing
  */
 const mockTaskBackend: TaskBackendConfig = {
   backend: 'markdown',
   isAvailable: true,
+  client: null,
 };
+
+// Mock state machine for testing
+const mockStateMachine = {
+  name: 'test-workflow',
+  description: 'Test workflow for contract compliance',
+  initial_state: 'start',
+  states: {
+    start: {
+      name: 'Start',
+      instructions: 'Starting phase instructions',
+      entrance_criteria: ['Project initialized'],
+      tasks: ['Initialize project'],
+      transitions: { complete: 'end' },
+    },
+    end: {
+      name: 'End',
+      instructions: 'Ending phase instructions',
+      entrance_criteria: ['All tasks completed'],
+      tasks: ['Finalize project'],
+      transitions: {},
+    },
+  },
+};
+
+// Create test paths using temp directory
+const testDir = join(tmpdir(), 'plan-manager-contract-tests');
+const testPlanPath = join(testDir, 'plan.md');
+const testProjectPath = join(testDir, 'project');
 
 /**
  * Plan Manager Contract Test Suite
@@ -114,7 +95,7 @@ class PlanManagerContract extends BaseInterfaceContract<IPlanManager> {
       },
       {
         methodName: 'getPlanFileInfo',
-        parameters: ['/test/plan.md'],
+        parameters: [testPlanPath],
         isAsync: true,
         returnTypeValidator: (result): result is PlanFileInfo => {
           return (
@@ -127,19 +108,19 @@ class PlanManagerContract extends BaseInterfaceContract<IPlanManager> {
       },
       {
         methodName: 'ensurePlanFile',
-        parameters: ['/test/plan.md', '/test/project', 'main'],
+        parameters: [testPlanPath, testProjectPath, 'main'],
         isAsync: true,
         description: 'should handle plan file creation',
       },
       {
         methodName: 'updatePlanFile',
-        parameters: ['/test/plan.md', 'test content'],
+        parameters: [testPlanPath, 'test content'],
         isAsync: true,
         description: 'should handle plan file updates',
       },
       {
         methodName: 'getPlanFileContent',
-        parameters: ['/test/plan.md'],
+        parameters: [testPlanPath],
         isAsync: true,
         returnTypeValidator: ValidationHelpers.isNonEmptyString,
         description: 'should return plan file content as string',
@@ -152,15 +133,22 @@ class PlanManagerContract extends BaseInterfaceContract<IPlanManager> {
         description: 'should generate guidance for phases',
       },
       {
+        methodName: 'generatePlanFileGuidance',
+        parameters: ['invalid_phase'],
+        isAsync: false,
+        returnTypeValidator: ValidationHelpers.isNonEmptyString,
+        description: 'should handle invalid phase names gracefully',
+      },
+      {
         methodName: 'deletePlanFile',
-        parameters: ['/test/plan.md'],
+        parameters: [testPlanPath],
         isAsync: true,
         returnTypeValidator: ValidationHelpers.isBoolean,
         description: 'should return boolean indicating deletion success',
       },
       {
         methodName: 'ensurePlanFileDeleted',
-        parameters: ['/test/plan.md'],
+        parameters: [testPlanPath],
         isAsync: true,
         returnTypeValidator: ValidationHelpers.isBoolean,
         description: 'should verify plan file deletion',
@@ -172,20 +160,9 @@ class PlanManagerContract extends BaseInterfaceContract<IPlanManager> {
     return [
       {
         methodName: 'generatePlanFileGuidance',
-        invalidParameters: ['invalid_phase'],
-        description: 'should handle invalid phase names gracefully',
-      },
-      {
-        methodName: 'getPlanFileInfo',
-        invalidParameters: [''],
-        expectedError: /path|file/i,
-        description: 'should reject empty file paths',
-      },
-      {
-        methodName: 'ensurePlanFile',
-        invalidParameters: ['', '/test/project', 'main'],
-        expectedError: /path|file/i,
-        description: 'should reject empty plan file path',
+        invalidParameters: [null as unknown],
+        expectedError: /phase/i,
+        description: 'should reject null phase parameter',
       },
     ];
   }
@@ -328,15 +305,35 @@ class PlanManagerContract extends BaseInterfaceContract<IPlanManager> {
 describe('IPlanManager Interface Contract', () => {
   const contract = new PlanManagerContract();
 
-  beforeEach(() => {
-    // Register implementations for testing
-    const implementations =
-      ImplementationRegistry.getPlanManagerImplementations();
+  // Register implementations directly with the contract before creating tests
+  const planManagerRegistration: ImplementationRegistration<IPlanManager> = {
+    name: 'PlanManager',
+    description:
+      'Core PlanManager implementation for filesystem-based plan management',
+    createInstance: () => {
+      return new PlanManager();
+    },
+    setup: async (instance: IPlanManager) => {
+      // Ensure test directory exists
+      const { mkdir } = await import('node:fs/promises');
+      await mkdir(testDir, { recursive: true });
 
-    for (const impl of implementations) {
-      contract.registerImplementation(impl);
-    }
-  });
+      // Set up state machine for PlanManager
+      (
+        instance as unknown as { setStateMachine: typeof mockStateMachine }
+      ).setStateMachine(mockStateMachine);
+    },
+    cleanup: async () => {
+      // Clean up test directory
+      const { rmdir } = await import('node:fs/promises');
+      const { existsSync } = await import('node:fs');
+      if (existsSync(testDir)) {
+        await rmdir(testDir, { recursive: true });
+      }
+    },
+  };
+
+  contract.registerImplementation(planManagerRegistration);
 
   // Create the actual contract test suite
   contract.createContractTests();

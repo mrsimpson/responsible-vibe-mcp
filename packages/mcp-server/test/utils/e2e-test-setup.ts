@@ -17,7 +17,6 @@ import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { mkdirSync, rmSync, existsSync } from 'node:fs';
 import type { ServerContext } from '../../src/types';
-import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 
 // Disable fs mocking for E2E tests
 vi.unmock('fs');
