@@ -162,12 +162,20 @@ export class PlanManager implements IPlanManager {
         ? '[' + this.stateMachine.name + ']' + '(' + documentationUrl + ')'
         : this.stateMachine.name
     }*
-*Task Management: Markdown Checkboxes*
 
 ## Goal
 *Define what you're building or fixing - this will be updated as requirements are gathered*
+`;
 
-## ${this.capitalizePhase(initialPhase)}
+    content += `## Key Decisions
+*Important decisions will be documented here as they are made*
+
+## Notes
+*Additional context and observations*
+
+`;
+
+    content += `## ${this.capitalizePhase(initialPhase)}
 ### Tasks
 - [ ] *Tasks will be added as they are identified*
 
@@ -190,11 +198,7 @@ export class PlanManager implements IPlanManager {
       }
     }
 
-    content += `## Key Decisions
-*Important decisions will be documented here as they are made*
-
-## Notes
-*Additional context and observations*
+    content += `
 
 ---
 *This plan is maintained by the LLM. Tool responses provide guidance on which section to focus on and what tasks to work on.*
