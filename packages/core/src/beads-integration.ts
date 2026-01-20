@@ -443,26 +443,15 @@ You are currently in the ${phaseName} phase. All work items should be created as
 • \`bd list --parent ${currentPhaseTaskId} --status open\` - List ready work items
 • \`bd update <task-id> --status in_progress\` - Start working on a specific task
 • \`bd close <task-id>\` - Mark task complete when finished
+• \`bd show ${currentPhaseTaskId}\` - View phase and its work items
 
 **Create New Tasks for Current Phase**:
-• \`bd create 'Task title' --parent ${currentPhaseTaskId} --description 'Detailed context explaining what, why, and how' --priority 2\` - Create work item with rich description
+• \`bd create 'Task title' --parent ${currentPhaseTaskId} --description '<A brief description of the intention and a list of acceptance criteria>' --priority <priority denotes an urgency>\` - Create work item with rich description
+• **Example**: \`bd create 'Fix user authentication bug' --parent ${currentPhaseTaskId} --description 'Resolve login failure when users have special characters in passwords. \nAcceptance criteria:\n- Users with special characters can log in successfully\n- Input validation is updated\n- Tests cover edge cases' --priority 1\`
 
-**📝 Task Description Best Practices**:
-• **What**: Clearly state what needs to be done
-• **Why**: Explain the purpose and context
-• **How**: Outline the approach or key steps
-• **Example**: \`bd create 'Fix user authentication bug' --parent ${currentPhaseTaskId} --description 'Resolve login failure when users have special characters in passwords. Issue occurs in validateCredentials() method. Need to update regex pattern and add proper input sanitization.' --priority 1\`
-
-**For Other Phases** (get parent task IDs from plan file):
+**If you need to create tasks for other phases** (get parent task IDs from plan file):
 • Check plan file for phase task IDs: <!-- beads-phase-id: task-xyz123 -->
 • Create tasks for other phases using their parent IDs
-
-**Essential Commands**:
-• \`bd list --parent ${currentPhaseTaskId} --status open\` - List ready work items
-• \`bd create 'Task title' --parent ${currentPhaseTaskId} --description 'Detailed context' --priority 2\` - Create work item
-• \`bd update <task-id> --status in_progress\` - Start working
-• \`bd close <task-id>\` - Complete work item
-• \`bd show ${currentPhaseTaskId}\` - View phase and its work items
 
 **Immediate Action**: Run \`bd list --parent ${currentPhaseTaskId} --status open\` to see ready tasks.`;
   }
