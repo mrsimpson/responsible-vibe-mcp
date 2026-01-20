@@ -666,10 +666,9 @@ ${templateOptionsText}
       );
 
       // Create phase tasks for all workflow phases
-      const phases = Object.keys(stateMachine.states);
       const phaseTasks = await beadsIntegration.createPhaseTasks(
         epicId,
-        phases,
+        stateMachine.states,
         workflowName
       );
 

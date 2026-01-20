@@ -217,9 +217,28 @@ describe('BeadsIntegration', () => {
         .mockImplementationOnce(() => '✓ Created issue: project-1.2\n') // second phase
         .mockImplementationOnce(() => '✓ Created issue: project-1.3\n'); // third phase
 
+      const mockPhases = {
+        explore: {
+          description: 'Exploration phase',
+          default_instructions:
+            'Explore the codebase and understand requirements',
+          transitions: [],
+        },
+        plan: {
+          description: 'Planning phase',
+          default_instructions: 'Create detailed plan and design',
+          transitions: [],
+        },
+        code: {
+          description: 'Coding phase',
+          default_instructions: 'Implement the planned solution',
+          transitions: [],
+        },
+      };
+
       const phaseTasks = await beadsIntegration.createPhaseTasks(
         'project-1',
-        ['explore', 'plan', 'code'],
+        mockPhases,
         'epcc'
       );
 
@@ -287,9 +306,28 @@ describe('BeadsIntegration', () => {
         .mockImplementationOnce(() => 'Created issue: task-789\n') // new format without periods
         .mockImplementationOnce(() => 'Created bd-xyz.1\n'); // legacy format with periods
 
+      const mockPhases = {
+        explore: {
+          description: 'Exploration phase',
+          default_instructions:
+            'Explore the codebase and understand requirements',
+          transitions: [],
+        },
+        plan: {
+          description: 'Planning phase',
+          default_instructions: 'Create detailed plan and design',
+          transitions: [],
+        },
+        code: {
+          description: 'Coding phase',
+          default_instructions: 'Implement the planned solution',
+          transitions: [],
+        },
+      };
+
       const phaseTasks = await beadsIntegration.createPhaseTasks(
         'my-project-123',
-        ['explore', 'plan', 'code'],
+        mockPhases,
         'epcc'
       );
 

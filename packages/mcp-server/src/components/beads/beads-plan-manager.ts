@@ -166,7 +166,6 @@ export class BeadsPlanManager implements IPlanManager {
         ? '[' + this.stateMachine.name + ']' + '(' + documentationUrl + ')'
         : this.stateMachine.name
     }*
-*Task Management: Beads Issue Tracker*
 
 ## Goal
 *Define what you're building or fixing - this will be updated as requirements are gathered*
@@ -241,12 +240,10 @@ export class BeadsPlanManager implements IPlanManager {
     const phaseDefinition = this.stateMachine.states[phase];
     if (!phaseDefinition) {
       logger.warn('Unknown phase for beads plan file guidance', { phase });
-      return `Update the ${this.capitalizePhase(phase)} section with current progress. Use bd CLI for all task management.`;
+      return `Track key decisions and take notes in the plan file. Use bd CLI for all task management.`;
     }
 
-    const capitalizedPhase = this.capitalizePhase(phase);
-
-    return `Update the ${capitalizedPhase} section with progress. Use bd CLI exclusively for task management - never use checkboxes. Document important decisions in the Key Decisions section.`;
+    return `Track key decisions and take notes in the plan file. Use bd CLI exclusively for task management - never use checkboxes. Document important decisions in the Key Decisions section.`;
   }
 
   /**
