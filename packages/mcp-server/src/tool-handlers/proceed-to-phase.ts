@@ -111,7 +111,7 @@ export class ProceedToPhaseHandler extends ConversationRequiredToolHandler<
       reason: transitionResult.transitionReason,
     });
 
-    // Ensure plan file exists
+    // Ensure plan file exists - or create it
     await context.planManager.ensurePlanFile(
       conversationContext.planFilePath,
       conversationContext.projectPath,
@@ -138,6 +138,12 @@ export class ProceedToPhaseHandler extends ConversationRequiredToolHandler<
           planFileExists: planInfo.exists,
         }
       );
+
+    instructions.instructions += `
+
+    After transitioning to the ${transitionResult.newPhase} phase, check the already created tasks and add those that are missing based on the key decisions noted in the plan file.
+    While doing this, also denote dependencies for each task.
+    `;
 
     // Add commit instructions if configured
     let finalInstructions = instructions.instructions;
@@ -362,10 +368,8 @@ export class ProceedToPhaseHandler extends ConversationRequiredToolHandler<
 
 ${taskDetails}
 
-To proceed, please complete these tasks using:
-  bd close <task-id>
+To proceed, check the in-progress-tasks using:
 
-Or check remaining work with:
   bd list --parent ${currentPhaseTaskId} --status open
 
 You can also defer tasks if they're no longer needed:
