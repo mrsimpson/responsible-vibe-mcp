@@ -9,6 +9,7 @@
 
 import { execSync } from 'node:child_process';
 import { createLogger } from './logger.js';
+import { YamlState } from './state-machine-types.js';
 
 const logger = createLogger('BeadsIntegration');
 
@@ -188,20 +189,31 @@ export class BeadsIntegration {
    */
   async createPhaseTasks(
     epicId: string,
-    phases: string[],
+    phases: Record<string, YamlState>,
     workflowName: string
   ): Promise<BeadsPhaseTask[]> {
     // Validate parameters
     this.validateCreatePhaseParameters(epicId, phases, workflowName);
 
     const phaseTasks: BeadsPhaseTask[] = [];
+    const phaseNames = Object.keys(phases);
 
-    for (const phase of phases) {
+    for (const phase of phaseNames) {
       const phaseTitle = `${this.capitalizePhase(phase)}`;
-      const phaseDescription = `${workflowName} workflow ${phase} phase tasks`;
-      const priority = 2;
+      const priority = 3;
+      const stateDefinition = phases[phase];
 
-      const command = `bd create "${phaseTitle}" --description "${phaseDescription}" --parent ${epicId} --priority ${priority}`;
+      // Escape the description to prevent shell injection and handle special characters
+      const description = (
+        stateDefinition?.default_instructions ||
+        `${workflowName} workflow ${phase} phase tasks`
+      )
+        .replace(/"/g, '\\"') // Escape double quotes
+        .replace(/\n/g, ' ') // Replace newlines with spaces
+        .replace(/\r/g, '') // Remove carriage returns
+        .trim();
+
+      const command = `bd create "${phaseTitle}" --description "${description}" --parent ${epicId} --priority ${priority}`;
 
       logger.debug('Creating beads phase task', {
         command,
@@ -226,7 +238,7 @@ export class BeadsIntegration {
           output.match(/Created (bd-[\w\d.]+)/);
         if (!match) {
           logger.warn('Failed to extract phase task ID from beads output', {
-            command: `bd create "${phaseTitle}" --description "${phaseDescription}" --parent ${epicId} --priority 2`,
+            command,
             output: output.slice(0, 200), // Truncated for logging
           });
           throw new Error(
@@ -494,15 +506,19 @@ You are currently in the ${phaseName} phase. All work items should be created as
    */
   private validateCreatePhaseParameters(
     epicId: string,
-    phases: string[],
+    phases: Record<string, YamlState>,
     workflowName: string
   ): void {
     if (!epicId || typeof epicId !== 'string' || epicId.trim() === '') {
       throw new Error('Epic ID is required and cannot be empty');
     }
 
-    if (!phases || !Array.isArray(phases) || phases.length === 0) {
-      throw new Error('Phases array is required and cannot be empty');
+    if (
+      !phases ||
+      typeof phases !== 'object' ||
+      Object.keys(phases).length === 0
+    ) {
+      throw new Error('Phases object is required and cannot be empty');
     }
 
     if (
@@ -514,10 +530,29 @@ You are currently in the ${phaseName} phase. All work items should be created as
     }
 
     // Validate each phase
-    for (const phase of phases) {
-      if (!phase || typeof phase !== 'string' || phase.trim() === '') {
+    for (const [phaseName, phaseState] of Object.entries(phases)) {
+      if (
+        !phaseName ||
+        typeof phaseName !== 'string' ||
+        phaseName.trim() === ''
+      ) {
         throw new Error(
-          `Invalid phase: "${phase}" - phases must be non-empty strings`
+          `Invalid phase name: "${phaseName}" - phase names must be non-empty strings`
+        );
+      }
+
+      if (!phaseState || typeof phaseState !== 'object') {
+        throw new Error(
+          `Invalid phase state for "${phaseName}" - phase states must be objects`
+        );
+      }
+
+      if (
+        !phaseState.default_instructions ||
+        typeof phaseState.default_instructions !== 'string'
+      ) {
+        throw new Error(
+          `Invalid phase state for "${phaseName}" - default_instructions must be a non-empty string`
         );
       }
     }
