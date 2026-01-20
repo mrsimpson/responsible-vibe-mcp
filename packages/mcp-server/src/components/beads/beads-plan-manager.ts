@@ -175,18 +175,7 @@ export class BeadsPlanManager implements IPlanManager {
 <!-- beads-phase-id: TBD -->
 ### Tasks
 
-**🔧 TASK MANAGEMENT VIA CLI TOOL bd**
-
-Tasks are managed via bd CLI tool. Use bd commands to create and manage tasks with proper hierarchy:
-
-- \`bd list --parent <phase-task-id> --status open\`
-- \`bd create "Task title" --parent <phase-task-id> -p 2\`
-- \`bd close <task-id>\`
-
-**Never use [ ] or [x] checkboxes - use bd commands only!**
-
-### Completed
-- [x] Created development plan file
+*Tasks managed via \`bd\` CLI*
 
 `;
 
@@ -197,18 +186,7 @@ Tasks are managed via bd CLI tool. Use bd commands to create and manage tasks wi
 <!-- beads-phase-id: TBD -->
 ### Tasks
 
-**🔧 TASK MANAGEMENT VIA CLI TOOL bd**
-
-Tasks are managed via bd CLI tool. Use bd commands to create and manage tasks with proper hierarchy:
-
-- \`bd list --parent <phase-task-id> --status open\`
-- \`bd create "Task title" --parent <phase-task-id> -p 2\`
-- \`bd close <task-id>\`
-
-**Never use [ ] or [x] checkboxes - use bd commands only!**
-
-### Completed
-*None yet*
+*Tasks managed via \`bd\` CLI*
 
 `;
       }
