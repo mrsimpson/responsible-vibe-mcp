@@ -176,7 +176,7 @@ ${beadsTaskGuidance}`;
     if (!phaseTaskId) {
       return `- Use bd CLI tool exclusively
 - **Start by listing ready tasks**: \`bd list --parent <phase-task-id> --status open\`
-- **Create new tasks**: \`bd create 'Task title' --parent <phase-task-id> -p 2\`
+- **Create new tasks**: \`bd create 'Task title' --parent <phase-task-id> -p <priority>\`
 - **Update status when working**: \`bd update <task-id> --status in_progress\`
 - **Complete tasks**: \`bd close <task-id>\`
 - **Focus on ready tasks first** - let beads handle dependencies
@@ -191,8 +191,10 @@ You are currently in the ${this.capitalizePhase(phase)} phase. All work items sh
 • \`bd update <task-id> --status in_progress\` - Start working on a specific task
 • \`bd close <task-id>\` - Mark task complete when finished
 
-**Create New Tasks for Current Phase**:
+**New Tasks for Current Phase**:
 • \`bd create 'Task description' --parent ${phaseTaskId} -p 2\` - Create work item under current phase
+• \`bd dep add <task-id> <depends-on-id>\` - Define dependencies for a task:
+
 
 **Essential Commands**:
 • \`bd list --parent ${phaseTaskId} --status open\` - List ready work items
