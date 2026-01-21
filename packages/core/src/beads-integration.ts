@@ -99,16 +99,27 @@ export class BeadsIntegration {
    */
   async createProjectEpic(
     projectName: string,
-    workflowName: string
+    workflowName: string,
+    description?: string,
+    planFilename?: string
   ): Promise<string> {
     // Validate parameters first
-    this.validateCreateEpicParameters(projectName, workflowName);
+    this.validateCreateEpicParameters(
+      projectName,
+      workflowName,
+      description,
+      planFilename
+    );
 
     // Ensure beads is initialized
     await this.ensureBeadsInitialized();
 
-    const epicTitle = `Responsible-Vibe Development: ${projectName}`;
-    const epicDescription = `Development session using ${workflowName} workflow for ${projectName}`;
+    const epicTitle = planFilename
+      ? `${projectName}: ${workflowName} (${planFilename})`
+      : `${projectName}: ${workflowName}`;
+    const epicDescription =
+      description ||
+      `Responsible vibe engineering session using ${workflowName} workflow for ${projectName}`;
     const priority = 2;
 
     const command = `bd create "${epicTitle}" --description "${epicDescription}" --priority ${priority}`;
@@ -471,7 +482,9 @@ You are currently in the ${phaseName} phase. All work items should be created as
    */
   private validateCreateEpicParameters(
     projectName: string,
-    workflowName: string
+    workflowName: string,
+    description?: string,
+    planFilename?: string
   ): void {
     if (
       !projectName ||
@@ -487,6 +500,22 @@ You are currently in the ${phaseName} phase. All work items should be created as
       workflowName.trim() === ''
     ) {
       throw new Error('Workflow name is required and cannot be empty');
+    }
+
+    // Optional description validation - if provided, must be a valid string
+    if (
+      description !== undefined &&
+      (typeof description !== 'string' || description.trim() === '')
+    ) {
+      throw new Error('Description, if provided, must be a non-empty string');
+    }
+
+    // Optional plan filename validation - if provided, must be a valid string
+    if (
+      planFilename !== undefined &&
+      (typeof planFilename !== 'string' || planFilename.trim() === '')
+    ) {
+      throw new Error('Plan filename, if provided, must be a non-empty string');
     }
   }
 

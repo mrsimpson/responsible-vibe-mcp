@@ -220,7 +220,8 @@ export class StartDevelopmentHandler extends BaseToolHandler<
         stateMachine,
         selectedWorkflow,
         conversationContext.planFilePath,
-        conversationContext.conversationId
+        conversationContext.conversationId,
+        context
       );
     }
 
@@ -653,16 +654,35 @@ ${templateOptionsText}
     stateMachine: YamlStateMachine,
     workflowName: string,
     planFilePath: string,
-    conversationId: string
+    conversationId: string,
+    context: ServerContext
   ): Promise<void> {
     try {
       const beadsIntegration = new BeadsIntegration(projectPath);
       const projectName = projectPath.split('/').pop() || 'Unknown Project';
 
+      // Extract goal from plan file if it exists and has meaningful content
+      let goalDescription: string | undefined;
+      try {
+        const planFileContent =
+          await context.planManager.getPlanFileContent(planFilePath);
+        goalDescription = this.extractGoalFromPlan(planFileContent);
+      } catch (error) {
+        this.logger.warn('Could not extract goal from plan file', {
+          error: error instanceof Error ? error.message : String(error),
+          planFilePath,
+        });
+      }
+
+      // Extract plan filename for use in epic title
+      const planFilename = planFilePath.split('/').pop();
+
       // Create project epic
       const epicId = await beadsIntegration.createProjectEpic(
         projectName,
-        workflowName
+        workflowName,
+        goalDescription,
+        planFilename
       );
 
       // Create phase tasks for all workflow phases
@@ -839,5 +859,56 @@ conversations/
         }
       );
     }
+  }
+
+  /**
+   * Extract Goal section content from plan file
+   * Returns the goal content if it exists and is meaningful, otherwise undefined
+   */
+  private extractGoalFromPlan(planContent: string): string | undefined {
+    if (!planContent || typeof planContent !== 'string') {
+      return undefined;
+    }
+
+    // Split content into lines for more reliable parsing
+    const lines = planContent.split('\n');
+    const goalIndex = lines.findIndex(line => line.trim() === '## Goal');
+
+    if (goalIndex === -1) {
+      return undefined;
+    }
+
+    // Find the next section (## anything) after the Goal section
+    const nextSectionIndex = lines.findIndex(
+      (line, index) => index > goalIndex && line.trim().startsWith('## ')
+    );
+
+    // Extract content between Goal and next section (or end of content)
+    const contentLines =
+      nextSectionIndex === -1
+        ? lines.slice(goalIndex + 1)
+        : lines.slice(goalIndex + 1, nextSectionIndex);
+
+    const goalContent = contentLines.join('\n').trim();
+
+    // Check if the goal content is meaningful (not just a placeholder or comment)
+    const meaninglessPatterns = [
+      /^\*.*\*$/, // Enclosed in asterisks like "*Define what you're building...*"
+      /^To be defined/i,
+      /^TBD$/i,
+      /^TODO/i,
+      /^Define what you're building/i,
+      /^This will be updated/i,
+    ];
+
+    const isMeaningless = meaninglessPatterns.some(pattern =>
+      pattern.test(goalContent)
+    );
+
+    if (isMeaningless || goalContent.length < 10) {
+      return undefined;
+    }
+
+    return goalContent;
   }
 }
