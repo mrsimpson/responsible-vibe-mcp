@@ -87,7 +87,7 @@ Some implementation tasks here.
         'bd list --parent project-epic-1.2 --status open'
       );
       expect(result.instructions).toContain(
-        "bd create 'Task description' --parent project-epic-1.2 -p 2"
+        "bd create 'Task description' --parent project-epic-1.2"
       );
       expect(result.instructions).toContain('bd show project-epic-1.2');
       expect(result.instructions).toContain(
@@ -127,7 +127,7 @@ Some implementation tasks here.
           result.instructions,
           `Should use ID in create command: ${testCase.id}`
         ).toContain(
-          `bd create 'Task description' --parent ${testCase.id} -p 2`
+          `bd create 'Task description' --parent ${testCase.id} -p <priority>`
         );
       }
     });
@@ -176,7 +176,7 @@ Some implementation tasks here.
 - Research requirements
 - Analyze existing solutions
 
-## Design  
+## Design
 <!-- beads-phase-id: design-task-2 -->
 - Create system design
 - Design database schema
@@ -236,7 +236,7 @@ Some implementation tasks here.
         'bd list --parent <phase-task-id> --status open'
       );
       expect(result.instructions).toContain(
-        "bd create 'Task title' --parent <phase-task-id> -p 2"
+        "bd create 'Task title' --parent <phase-task-id> -p <priority>"
       );
       expect(result.instructions).toContain('Use bd CLI tool exclusively');
       expect(result.instructions).not.toContain('bd list --parent design-');
@@ -373,7 +373,7 @@ ${edgeCase.comment}
       // Check all BD CLI commands contain the extracted ID
       const expectedCommands = [
         'bd list --parent design-epic-789 --status open',
-        "bd create 'Task description' --parent design-epic-789 -p 2",
+        "bd create 'Task description' --parent design-epic-789",
         'bd show design-epic-789',
       ];
 

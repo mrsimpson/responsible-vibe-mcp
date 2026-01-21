@@ -192,13 +192,12 @@ You are currently in the ${this.capitalizePhase(phase)} phase. All work items sh
 • \`bd close <task-id>\` - Mark task complete when finished
 
 **New Tasks for Current Phase**:
-• \`bd create 'Task description' --parent ${phaseTaskId} -p 2\` - Create work item under current phase
+• \`bd create 'Task description' --parent ${phaseTaskId} -p <priority>\` - Create work item under current phase
 • \`bd dep add <task-id> <depends-on-id>\` - Define dependencies for a task:
 
 
-**Essential Commands**:
+**Essential bd Commands**:
 • \`bd list --parent ${phaseTaskId} --status open\` - List ready work items
-• \`bd create 'Task description' --parent ${phaseTaskId} -p 2\` - Create work item
 • \`bd update <task-id> --status in_progress\` - Start working
 • \`bd close <task-id>\` - Complete work item
 • \`bd show ${phaseTaskId}\` - View phase and its work items

@@ -166,9 +166,7 @@ describe('BeadsIntegration', () => {
 
       // Verify epic creation command
       expect(mockExecSync).toHaveBeenCalledWith(
-        expect.stringContaining(
-          'bd create "Responsible-Vibe Development: My Test Project"'
-        ),
+        expect.stringContaining('bd create "My Test Project: greenfield"'),
         expect.objectContaining({
           cwd: '/test/project',
           encoding: 'utf-8',

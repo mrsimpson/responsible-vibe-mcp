@@ -62,7 +62,7 @@ describe('BeadsInstructionGenerator Content Validation', () => {
         'bd list --parent <phase-task-id> --status open'
       );
       expect(result.instructions).toContain(
-        "bd create 'Task title' --parent <phase-task-id> -p 2"
+        "bd create 'Task title' --parent <phase-task-id> -p <priority>"
       );
       expect(result.instructions).toContain(
         'bd update <task-id> --status in_progress'
@@ -643,12 +643,12 @@ describe('BeadsInstructionGenerator Content Validation', () => {
         - Analyze existing markdown-based systems
         - Review plan file management approaches
         - Document [x] checkbox patterns
-        
+
         ### Layer 2: Implementation
         - Implement beads CLI integration
         - Create hierarchical task structures
         - Build robust error handling
-        
+
         ### Layer 3: Validation
         - Test cross-backend compatibility
         - Verify anti-contamination measures
@@ -689,7 +689,7 @@ describe('BeadsInstructionGenerator Content Validation', () => {
         - Has bd CLI-like commands but for different purposes
         - Manages plan files with markdown syntax
         - Creates beads-style hierarchical structures
-        
+
         This should test anti-contamination thoroughly.
       `.trim();
 
