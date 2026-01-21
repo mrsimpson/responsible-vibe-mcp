@@ -173,11 +173,13 @@ export class PlantUMLRenderer {
     }
 
     // Add final states if any
-    const finalStates = Object.keys(workflow.states).filter(
-      state =>
-        !workflow.states[state].transitions ||
-        workflow.states[state].transitions.length === 0
-    );
+    const finalStates = Object.keys(workflow.states).filter(state => {
+      const stateConfig = workflow.states[state];
+      return (
+        stateConfig &&
+        (!stateConfig.transitions || stateConfig.transitions.length === 0)
+      );
+    });
     if (finalStates.length > 0) {
       lines.push('');
       for (const state of finalStates) {
@@ -265,128 +267,190 @@ export class PlantUMLRenderer {
     svgElement: SVGSVGElement,
     workflow: YamlStateMachine
   ): void {
-    // Find all group elements with state IDs
-    const stateGroups = svgElement.querySelectorAll('g[id]');
+    /**
+     * STATE DETECTION STRATEGY:
+     *
+     * PlantUML generates SVG where state elements don't have meaningful IDs that match
+     * state names. Instead, states appear as <g> elements with empty/random IDs, but
+     * they contain <text> elements with the actual state names.
+     *
+     * Strategy:
+     * 1. Find all <text> elements in the SVG
+     * 2. Check if text content matches any workflow state name
+     * 3. Navigate up to find the parent <g> element
+     * 4. Attach click handlers to the parent <g>
+     *
+     * This approach works because PlantUML consistently puts state names
+     * in <text> elements, even though the container IDs are not predictable.
+     */
     const states = Object.keys(workflow.states);
 
-    for (const group of stateGroups) {
-      const groupId = group.getAttribute('id');
-      if (groupId && states.includes(groupId)) {
-        // This group represents a state
-        const stateName = groupId;
+    // Find all text elements and check if their content matches a state name
+    const textElements = svgElement.querySelectorAll('text');
+    for (const textElement of textElements) {
+      const textContent = textElement.textContent?.trim();
+      if (textContent && states.includes(textContent)) {
+        // Found a text element with a state name, get its parent group
+        const group = textElement.closest('g');
+        if (group) {
+          const stateName = textContent;
 
-        // Make the entire group clickable
-        (group as HTMLElement).style.cursor = 'pointer';
-        (group as HTMLElement).style.transition = 'all 0.2s ease';
+          // Make the entire group clickable
+          (group as unknown as HTMLElement).style.cursor = 'pointer';
+          (group as unknown as HTMLElement).style.transition = 'all 0.2s ease';
 
-        // Find the rect/shape element for hover effects
-        const shape = group.querySelector('rect, ellipse, polygon');
-        const originalFill = shape?.getAttribute('fill') || '#ffffff';
-        const originalStroke = shape?.getAttribute('stroke') || '#000000';
+          // Find the rect/shape element for hover effects
+          const shape = group.querySelector('rect, ellipse, polygon');
+          const originalFill = shape?.getAttribute('fill') || '#ffffff';
+          const originalStroke = shape?.getAttribute('stroke') || '#000000';
 
-        // Add hover effects
-        group.addEventListener('mouseenter', () => {
-          if (shape) {
-            shape.setAttribute('fill', '#e0f2fe');
-            shape.setAttribute('stroke', '#2563eb');
-            shape.setAttribute('stroke-width', '2');
-          }
-        });
+          // Add hover effects
+          group.addEventListener('mouseenter', () => {
+            if (shape) {
+              shape.setAttribute('fill', '#e0f2fe');
+              shape.setAttribute('stroke', '#2563eb');
+              shape.setAttribute('stroke-width', '2');
+            }
+          });
 
-        group.addEventListener('mouseleave', () => {
-          if (shape) {
-            shape.setAttribute('fill', originalFill);
-            shape.setAttribute('stroke', originalStroke);
-            shape.setAttribute('stroke-width', '1');
-          }
-        });
+          group.addEventListener('mouseleave', () => {
+            if (shape) {
+              shape.setAttribute('fill', originalFill);
+              shape.setAttribute('stroke', originalStroke);
+              shape.setAttribute('stroke-width', '1');
+            }
+          });
 
-        // Add click handler
-        group.addEventListener('click', e => {
-          e.stopPropagation();
-          if (this.onElementClick) {
-            this.onElementClick('state', stateName, workflow.states[stateName]);
-          }
-        });
+          // Add click handler
+          group.addEventListener('click', e => {
+            e.stopPropagation();
+            if (this.onElementClick) {
+              this.onElementClick(
+                'state',
+                stateName,
+                workflow.states[stateName]
+              );
+            }
+          });
+        }
       }
     }
 
-    // Also make transition links clickable using link_<source>_<target> pattern
-    const linkGroups = svgElement.querySelectorAll('g.link[id^="link_"]');
+    /**
+     * TRANSITION DETECTION STRATEGY:
+     *
+     * PlantUML generates transition elements as <g class="link"> with IDs like "lnk3",
+     * "lnk4", etc. These IDs don't contain source/target state information.
+     *
+     * The original code expected IDs like "link_reproduce_analyze" but PlantUML
+     * generates generic IDs like "lnk3". We can't rely on ID parsing.
+     *
+     * Strategy:
+     * 1. Find all <g class="link"> elements with IDs starting with "lnk"
+     * 2. Extract the transition label text from the <text> element inside
+     * 3. Use fuzzy text matching to find corresponding transition in workflow data
+     * 4. Match transition trigger text against the SVG label text
+     * 5. Attach click handlers with full transition data
+     *
+     * This approach works because:
+     * - PlantUML consistently puts transition labels in <text> elements
+     * - We can normalize text (underscores to spaces) for matching
+     * - We have access to complete workflow transition data for context
+     */
+    const linkGroups = svgElement.querySelectorAll('g.link[id^="lnk"]');
     for (const linkGroup of linkGroups) {
       const linkId = linkGroup.getAttribute('id');
-      if (linkId && linkId.startsWith('link_')) {
-        // Parse link ID to get source and target
-        const parts = linkId.replace('link_', '').split('_');
-        if (parts.length >= 2) {
-          const fromState = parts[0];
-          const toState = parts[1];
+      if (linkId && linkId.startsWith('lnk')) {
+        // Make the entire link group clickable
+        (linkGroup as unknown as HTMLElement).style.cursor = 'pointer';
+        (linkGroup as unknown as HTMLElement).style.transition =
+          'all 0.2s ease';
 
-          // Verify these are valid states
-          if (states.includes(fromState) && states.includes(toState)) {
-            // Make the entire link group clickable
-            (linkGroup as HTMLElement).style.cursor = 'pointer';
-            (linkGroup as HTMLElement).style.transition = 'all 0.2s ease';
+        // Find path and text elements for hover effects
+        const pathEl = linkGroup.querySelector('path');
+        const textEl = linkGroup.querySelector('text');
+        const originalStroke = pathEl?.getAttribute('stroke') || '#94A3B8';
+        const originalTextFill = textEl?.getAttribute('fill') || '#64748B';
 
-            // Find path and text elements for hover effects
-            const pathEl = linkGroup.querySelector('path');
-            const textEl = linkGroup.querySelector('text');
-            const originalStroke = pathEl?.getAttribute('stroke') || '#94A3B8';
-            const originalTextFill = textEl?.getAttribute('fill') || '#64748B';
+        // Add hover effects
+        linkGroup.addEventListener('mouseenter', () => {
+          if (pathEl) {
+            pathEl.setAttribute('stroke', '#2563eb');
+            pathEl.setAttribute('stroke-width', '3');
+          }
+          if (textEl) {
+            textEl.setAttribute('fill', '#2563eb');
+            (textEl as unknown as HTMLElement).style.fontWeight = 'bold';
+          }
+        });
 
-            // Add hover effects
-            linkGroup.addEventListener('mouseenter', () => {
-              if (pathEl) {
-                pathEl.setAttribute('stroke', '#2563eb');
-                pathEl.setAttribute('stroke-width', '3');
-              }
-              if (textEl) {
-                textEl.setAttribute('fill', '#2563eb');
-                textEl.style.fontWeight = 'bold';
-              }
-            });
+        linkGroup.addEventListener('mouseleave', () => {
+          if (pathEl) {
+            pathEl.setAttribute('stroke', originalStroke);
+            pathEl.setAttribute('stroke-width', '1');
+          }
+          if (textEl) {
+            textEl.setAttribute('fill', originalTextFill);
+            (textEl as unknown as HTMLElement).style.fontWeight = 'normal';
+          }
+        });
 
-            linkGroup.addEventListener('mouseleave', () => {
-              if (pathEl) {
-                pathEl.setAttribute('stroke', originalStroke);
-                pathEl.setAttribute('stroke-width', '1');
-              }
-              if (textEl) {
-                textEl.setAttribute('fill', originalTextFill);
-                textEl.style.fontWeight = 'normal';
-              }
-            });
+        // Add click handler - find transition by label text matching
+        linkGroup.addEventListener('click', e => {
+          e.stopPropagation();
 
-            // Add click handler
-            linkGroup.addEventListener('click', e => {
-              e.stopPropagation();
+          // Try to find matching transition by analyzing the label text
+          const labelText = textEl?.textContent?.trim();
+          if (labelText) {
+            // Clean the label text (remove emoji/icons, normalize spaces)
+            const cleanLabel = labelText.replace(/[^\w\s]/g, '').trim();
 
-              // Find the transition data
-              const sourceState = workflow.states[fromState];
-              if (sourceState && sourceState.transitions) {
-                const transition = sourceState.transitions.find(
-                  t => t.to === toState
-                );
-                if (transition && this.onElementClick) {
-                  this.onElementClick(
-                    'transition',
-                    `${fromState}->${toState}`,
-                    {
-                      from: fromState,
-                      to: toState,
-                      trigger: transition.trigger,
-                      instructions: transition.instructions,
-                      additional_instructions:
-                        transition.additional_instructions,
-                      transition_reason: transition.transition_reason,
-                      review_perspectives: transition.review_perspectives || [],
+            // Search through all states to find matching transition
+            for (const [stateName, stateData] of Object.entries(
+              workflow.states
+            )) {
+              if (stateData.transitions) {
+                for (const transition of stateData.transitions) {
+                  // Normalize trigger text: "bug_reproduced" -> "bug reproduced"
+                  const cleanTrigger = transition.trigger.replace(/_/g, ' ');
+
+                  // Fuzzy match: check if labels contain each other (case-insensitive)
+                  if (
+                    cleanTrigger
+                      .toLowerCase()
+                      .includes(cleanLabel.toLowerCase()) ||
+                    cleanLabel
+                      .toLowerCase()
+                      .includes(cleanTrigger.toLowerCase())
+                  ) {
+                    // Found matching transition - attach complete data
+                    if (this.onElementClick) {
+                      this.onElementClick(
+                        'transition',
+                        `${stateName}->${transition.to}`,
+                        {
+                          from: stateName,
+                          to: transition.to,
+                          trigger: transition.trigger,
+                          instructions: transition.instructions,
+                          additional_instructions:
+                            transition.additional_instructions,
+                          transition_reason: transition.transition_reason,
+                          review_perspectives:
+                            transition.review_perspectives || [],
+                        }
+                      );
                     }
-                  );
+                    return; // Exit once we find a match
+                  }
                 }
               }
-            });
+            }
           }
-        }
+
+          // Note: If no transition mapping is found, the click is silently ignored
+          // This can happen if the PlantUML label doesn't match any workflow trigger text
+        });
       }
     }
   }
