@@ -315,6 +315,7 @@ export class BeadsIntegration {
 
   /**
    * Create sequential dependencies between workflow phase tasks
+   * Implements graceful error handling: logs warnings for failed dependencies but continues
    */
   async createPhaseDependencies(phaseTasks: BeadsPhaseTask[]): Promise<void> {
     if (phaseTasks.length < 2) {
@@ -330,6 +331,13 @@ export class BeadsIntegration {
       projectPath: this.projectPath,
     });
 
+    // Track failed dependencies for logging
+    const failedDependencies: Array<{
+      from: string;
+      to: string;
+      error: string;
+    }> = [];
+
     // Create dependencies in sequence: each phase blocks the next one
     for (let i = 0; i < phaseTasks.length - 1; i++) {
       const currentPhase = phaseTasks[i];
@@ -341,6 +349,11 @@ export class BeadsIntegration {
           nextPhaseIndex: i + 1,
           totalPhases: phaseTasks.length,
           projectPath: this.projectPath,
+        });
+        failedDependencies.push({
+          from: `Phase ${i}`,
+          to: `Phase ${i + 1}`,
+          error: 'Missing phase data',
         });
         continue;
       }
@@ -372,7 +385,7 @@ export class BeadsIntegration {
         // Log as warning but don't fail the entire setup
         const errorMessage =
           error instanceof Error ? error.message : String(error);
-        logger.warn('Failed to create phase dependency', {
+        logger.warn('Failed to create phase dependency - continuing anyway', {
           error: errorMessage,
           command,
           currentPhase: currentPhase.phaseName,
@@ -383,17 +396,37 @@ export class BeadsIntegration {
         // Include stderr if available for better debugging
         const execError = error as unknown as { stderr?: string };
         if (execError?.stderr) {
-          logger.warn('Beads dependency command stderr', {
+          logger.debug('Beads dependency command stderr', {
             stderr: execError.stderr.toString(),
             command,
             projectPath: this.projectPath,
           });
         }
+
+        // Track failed dependency but continue
+        failedDependencies.push({
+          from: currentPhase.phaseName,
+          to: nextPhase.phaseName,
+          error: errorMessage,
+        });
       }
+    }
+
+    if (failedDependencies.length > 0) {
+      logger.warn(
+        'Some phase dependencies could not be created - app continues without these dependencies',
+        {
+          failedCount: failedDependencies.length,
+          failedDependencies,
+          projectPath: this.projectPath,
+        }
+      );
     }
 
     logger.info('Completed phase dependency creation', {
       dependencyCount: phaseTasks.length - 1,
+      successCount: phaseTasks.length - 1 - failedDependencies.length,
+      failedCount: failedDependencies.length,
       projectPath: this.projectPath,
     });
   }

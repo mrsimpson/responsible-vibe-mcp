@@ -9,6 +9,7 @@ import { IInstructionGenerator } from '@codemcp/workflows-core';
 import { WorkflowManager } from '@codemcp/workflows-core';
 import { InteractionLogger } from '@codemcp/workflows-core';
 import type { TaskBackendConfig } from '@codemcp/workflows-core';
+import type { IPluginRegistry } from './plugin-system/plugin-interfaces.js';
 
 /**
  * Server context shared across all handlers
@@ -22,6 +23,7 @@ export interface ServerContext {
   workflowManager: WorkflowManager;
   interactionLogger?: InteractionLogger;
   projectPath: string;
+  pluginRegistry?: IPluginRegistry;
 }
 
 /**

@@ -17,12 +17,9 @@ import { GitCommitConfig } from '@codemcp/workflows-core';
 import { GitManager } from '@codemcp/workflows-core';
 import type { YamlStateMachine } from '@codemcp/workflows-core';
 import { ProjectDocsManager, ProjectDocsInfo } from '@codemcp/workflows-core';
-import {
-  TaskBackendManager,
-  BeadsIntegration,
-  BeadsStateManager,
-} from '@codemcp/workflows-core';
+import { TaskBackendManager } from '@codemcp/workflows-core';
 import { ServerContext } from '../types.js';
+import type { PluginHookContext } from '../plugin-system/plugin-interfaces.js';
 
 /**
  * Arguments for the start_development tool
@@ -213,15 +210,39 @@ export class StartDevelopmentHandler extends BaseToolHandler<
       conversationContext.gitBranch
     );
 
-    // Handle beads integration if beads backend is configured
-    if (taskBackendConfig.backend === 'beads') {
-      await this.setupBeadsIntegration(
-        projectPath,
-        stateMachine,
-        selectedWorkflow,
-        conversationContext.planFilePath,
-        conversationContext.conversationId,
-        context
+    // Execute plugin hooks after successful development start
+    const pluginContext: PluginHookContext = {
+      conversationId: conversationContext.conversationId,
+      planFilePath: conversationContext.planFilePath,
+      currentPhase: conversationContext.currentPhase,
+      workflow: selectedWorkflow,
+      projectPath,
+      gitBranch: conversationContext.gitBranch,
+      stateMachine: {
+        name: stateMachine.name,
+        description: stateMachine.description,
+        initial_state: stateMachine.initial_state,
+        states: stateMachine.states,
+      },
+    };
+
+    // Execute plugin hooks safely - guard against missing plugin registry
+    if (context.pluginRegistry) {
+      await context.pluginRegistry.executeHook(
+        'afterStartDevelopment',
+        pluginContext,
+        {
+          workflow: selectedWorkflow,
+          commit_behaviour: args.commit_behaviour ?? 'end',
+          require_reviews: args.require_reviews,
+          project_path: projectPath,
+        },
+        {
+          conversationId: conversationContext.conversationId,
+          planFilePath: conversationContext.planFilePath,
+          phase: conversationContext.currentPhase,
+          workflow: selectedWorkflow,
+        }
       );
     }
 
@@ -647,146 +668,6 @@ ${templateOptionsText}
   }
 
   /**
-   * Setup beads integration - create project epic and phase tasks
-   */
-  private async setupBeadsIntegration(
-    projectPath: string,
-    stateMachine: YamlStateMachine,
-    workflowName: string,
-    planFilePath: string,
-    conversationId: string,
-    context: ServerContext
-  ): Promise<void> {
-    try {
-      const beadsIntegration = new BeadsIntegration(projectPath);
-      const projectName = projectPath.split('/').pop() || 'Unknown Project';
-
-      // Extract goal from plan file if it exists and has meaningful content
-      let goalDescription: string | undefined;
-      try {
-        const planFileContent =
-          await context.planManager.getPlanFileContent(planFilePath);
-        goalDescription = this.extractGoalFromPlan(planFileContent);
-      } catch (error) {
-        this.logger.warn('Could not extract goal from plan file', {
-          error: error instanceof Error ? error.message : String(error),
-          planFilePath,
-        });
-      }
-
-      // Extract plan filename for use in epic title
-      const planFilename = planFilePath.split('/').pop();
-
-      // Create project epic
-      const epicId = await beadsIntegration.createProjectEpic(
-        projectName,
-        workflowName,
-        goalDescription,
-        planFilename
-      );
-
-      // Create phase tasks for all workflow phases
-      const phaseTasks = await beadsIntegration.createPhaseTasks(
-        epicId,
-        stateMachine.states,
-        workflowName
-      );
-
-      // Create sequential dependencies between phases
-      await beadsIntegration.createPhaseDependencies(phaseTasks);
-
-      // Update plan file with phase task IDs
-      await this.updatePlanFileWithPhaseTaskIds(planFilePath, phaseTasks);
-
-      // Create beads state for this conversation
-      const beadsStateManager = new BeadsStateManager(projectPath);
-      await beadsStateManager.createState(conversationId, epicId, phaseTasks);
-
-      this.logger.info('Beads integration setup complete', {
-        projectPath,
-        epicId,
-        phaseCount: phaseTasks.length,
-        planFilePath,
-        conversationId,
-      });
-    } catch (error) {
-      this.logger.error(
-        'Failed to setup beads integration',
-        error instanceof Error ? error : new Error(String(error)),
-        {
-          projectPath,
-          workflowName,
-        }
-      );
-      throw new Error(
-        `Failed to setup beads integration: ${error instanceof Error ? error.message : String(error)}`
-      );
-    }
-  }
-
-  /**
-   * Update plan file to include beads phase task IDs in comments
-   */
-  private async updatePlanFileWithPhaseTaskIds(
-    planFilePath: string,
-    phaseTasks: Array<{ phaseId: string; phaseName: string; taskId: string }>
-  ): Promise<void> {
-    try {
-      const { readFile, writeFile } = await import('node:fs/promises');
-      let content = await readFile(planFilePath, 'utf-8');
-
-      // Replace TBD placeholders with actual task IDs
-      for (const phaseTask of phaseTasks) {
-        const phaseHeader = `## ${phaseTask.phaseName}`;
-        const placeholderPattern = new RegExp(
-          `(${phaseHeader.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*\n)<!-- beads-phase-id: TBD -->`,
-          'g'
-        );
-        content = content.replace(
-          placeholderPattern,
-          `$1<!-- beads-phase-id: ${phaseTask.taskId} -->`
-        );
-      }
-
-      // Validate that all TBD placeholders were replaced
-      const remainingTBDs = content.match(/<!-- beads-phase-id: TBD -->/g);
-      if (remainingTBDs && remainingTBDs.length > 0) {
-        throw new Error(
-          `Failed to replace ${remainingTBDs.length} TBD placeholder(s) in plan file. ` +
-            `This indicates that phase names in the plan file don't match the workflow phases, ` +
-            `or the beads task creation process failed for some phases.`
-        );
-      }
-
-      await writeFile(planFilePath, content, 'utf-8');
-
-      this.logger.info(
-        'Successfully updated plan file with beads phase task IDs',
-        {
-          planFilePath,
-          phaseTaskCount: phaseTasks.length,
-          replacedTasks: phaseTasks.map(
-            task => `${task.phaseName}: ${task.taskId}`
-          ),
-        }
-      );
-    } catch (error) {
-      this.logger.error(
-        'Failed to update plan file with phase task IDs',
-        error instanceof Error ? error : new Error(String(error)),
-        {
-          planFilePath,
-        }
-      );
-      // For beads integration, TBD replacement failure is critical
-      throw new Error(
-        `Failed to update plan file with beads task IDs: ${error instanceof Error ? error.message : String(error)}. ` +
-          `This indicates beads integration setup is incomplete. Check that beads CLI is working and task IDs were created successfully.`
-      );
-    }
-  }
-
-  /**
    * Ensure .gitignore exists in .vibe folder to exclude SQLite files
    * This function is idempotent and self-contained within the .vibe directory
    */
@@ -859,56 +740,5 @@ conversations/
         }
       );
     }
-  }
-
-  /**
-   * Extract Goal section content from plan file
-   * Returns the goal content if it exists and is meaningful, otherwise undefined
-   */
-  private extractGoalFromPlan(planContent: string): string | undefined {
-    if (!planContent || typeof planContent !== 'string') {
-      return undefined;
-    }
-
-    // Split content into lines for more reliable parsing
-    const lines = planContent.split('\n');
-    const goalIndex = lines.findIndex(line => line.trim() === '## Goal');
-
-    if (goalIndex === -1) {
-      return undefined;
-    }
-
-    // Find the next section (## anything) after the Goal section
-    const nextSectionIndex = lines.findIndex(
-      (line, index) => index > goalIndex && line.trim().startsWith('## ')
-    );
-
-    // Extract content between Goal and next section (or end of content)
-    const contentLines =
-      nextSectionIndex === -1
-        ? lines.slice(goalIndex + 1)
-        : lines.slice(goalIndex + 1, nextSectionIndex);
-
-    const goalContent = contentLines.join('\n').trim();
-
-    // Check if the goal content is meaningful (not just a placeholder or comment)
-    const meaninglessPatterns = [
-      /^\*.*\*$/, // Enclosed in asterisks like "*Define what you're building...*"
-      /^To be defined/i,
-      /^TBD$/i,
-      /^TODO/i,
-      /^Define what you're building/i,
-      /^This will be updated/i,
-    ];
-
-    const isMeaningless = meaninglessPatterns.some(pattern =>
-      pattern.test(goalContent)
-    );
-
-    if (isMeaningless || goalContent.length < 10) {
-      return undefined;
-    }
-
-    return goalContent;
   }
 }
