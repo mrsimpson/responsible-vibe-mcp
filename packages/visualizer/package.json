@@ -12,8 +12,9 @@
     "dist"
   ],
   "scripts": {
-    "build": "node ../../scripts/generate-workflow-list.js && mkdir -p dist && cp -r src/* dist/",
-    "dev": "npm run build && nodemon --watch src --ext ts,vue,js --exec 'npm run build'",
+    "prebuild": "node ../../scripts/generate-workflow-list.js",
+    "build": "mkdir -p dist && cp -r src/* dist/",
+    "dev": "npm run prebuild && nodemon --watch src --ext ts,vue,js --ignore 'src/services/workflow-list.ts' --ignore 'dist/**/*' --exec 'npm run build'",
     "clean:build": "rimraf ./dist",
     "lint": "oxlint .",
     "lint:fix": "oxlint --fix .",
