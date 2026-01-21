@@ -113,8 +113,9 @@ export class PluginRegistry implements IPluginRegistry {
       const [context, planFilePath, content] = args as Parameters<
         typeof typedHook
       >;
-      const contentToUse = (previousResult as string | undefined) ?? content;
-      return typedHook(context, planFilePath, contentToUse as string);
+      const contentToUse = ((previousResult as string | undefined) ??
+        content) as string;
+      return typedHook(context, planFilePath, contentToUse);
     }
 
     if (hookName === 'afterInstructionsGenerated') {

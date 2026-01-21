@@ -16,6 +16,7 @@ import type {
   StartDevelopmentArgs,
   StartDevelopmentResult,
 } from './plugin-interfaces.js';
+import type { YamlState } from '@codemcp/workflows-core';
 import {
   BeadsStateManager,
   BeadsIntegration,
@@ -204,7 +205,7 @@ export class BeadsPlugin implements IPlugin {
       try {
         phaseTasks = await beadsIntegration.createPhaseTasks(
           epicId,
-          context.stateMachine.states,
+          context.stateMachine.states as Record<string, YamlState>,
           args.workflow
         );
       } catch (error) {
