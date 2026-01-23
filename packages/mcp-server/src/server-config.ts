@@ -37,6 +37,8 @@ import { notificationService } from './notification-service.js';
 import { PlanManager, InstructionGenerator } from '@codemcp/workflows-core';
 import { PluginRegistry } from './plugin-system/plugin-registry.js';
 import { BeadsPlugin } from './plugin-system/beads-plugin.js';
+import { BeadsPlanManager } from './components/beads/beads-plan-manager.js';
+import { BeadsInstructionGenerator } from './components/beads/beads-instruction-generator.js';
 
 const logger = createLogger('ServerConfig');
 
@@ -115,9 +117,15 @@ export async function initializeServerComponents(
   const transitionEngine = new TransitionEngine(projectPath);
   transitionEngine.setConversationManager(conversationManager);
 
-  // Use default components - plugins enhance via hooks, not component substitution
-  const planManager = new PlanManager();
-  const instructionGenerator = new InstructionGenerator(planManager);
+  // Use beads components if TASK_BACKEND=beads, otherwise use defaults
+  // This enables beads features like plan file markers and beads CLI instructions
+  const isBeadsBackend = process.env.TASK_BACKEND === 'beads';
+  const planManager = isBeadsBackend
+    ? new BeadsPlanManager()
+    : new PlanManager();
+  const instructionGenerator = isBeadsBackend
+    ? new BeadsInstructionGenerator()
+    : new InstructionGenerator(planManager as InstanceType<typeof PlanManager>);
 
   // Always create interaction logger as it's critical for transition engine logic
   // (determining first call from initial state)
