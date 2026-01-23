@@ -329,7 +329,6 @@ export class BeadsPlugin implements IPlugin {
 
   /**
    * Validate beads task completion before phase transition
-   * Extracted from proceed-to-phase.ts validateBeadsTaskCompletion() method
    * Implements graceful error handling: logs errors but continues on non-validation failures
    */
   private async validateBeadsTaskCompletion(

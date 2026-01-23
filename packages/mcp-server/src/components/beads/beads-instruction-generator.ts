@@ -168,8 +168,16 @@ ${beadsTaskGuidance}`;
   private async generateBeadsTaskGuidance(
     context: InstructionContext
   ): Promise<string> {
-    const { phase } = context;
+    const { phase, instructionSource } = context;
 
+    // For explicit phase transitions (proceed_to_phase), provide minimal guidance
+    // The detailed guidance is better suited for whats_next which analyzes context
+    if (instructionSource === 'proceed_to_phase') {
+      return `- Use bd CLI tool exclusively for task management
+- Do not use your own task management tools`;
+    }
+
+    // For implicit transitions (whats_next), provide detailed guidance
     // Extract phase task ID from plan file (this would need to be implemented)
     const phaseTaskId = await this.extractPhaseTaskId(context);
 

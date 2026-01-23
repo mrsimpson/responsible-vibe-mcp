@@ -168,6 +168,7 @@ export class WhatsNextHandler extends ConversationRequiredToolHandler<
           transitionReason: transitionResult.transitionReason,
           isModeled: transitionResult.isModeled,
           planFileExists: planInfo.exists,
+          instructionSource: 'whats_next',
         }
       );
 

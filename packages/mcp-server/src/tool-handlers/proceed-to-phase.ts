@@ -147,6 +147,7 @@ export class ProceedToPhaseHandler extends ConversationRequiredToolHandler<
           transitionReason: transitionResult.transitionReason,
           isModeled: transitionResult.isModeled,
           planFileExists: planInfo.exists,
+          instructionSource: 'proceed_to_phase',
         }
       );
 
