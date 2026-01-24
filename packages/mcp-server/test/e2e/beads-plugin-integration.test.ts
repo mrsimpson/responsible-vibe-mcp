@@ -57,9 +57,7 @@ function validateBeadsPlanFileStructure(content: string): void {
 
   // Should have HTML comment format with either TBD or actual task IDs
   // Task IDs can include alphanumerics, hyphens, and dots
-  expect(content).toMatch(
-    /<!-- beads-phase-id:\s*(TBD|[a-zA-Z0-9\-.]+)\s*-->/
-  );
+  expect(content).toMatch(/<!-- beads-phase-id:\s*(TBD|[a-zA-Z0-9\-.]+)\s*-->/);
 
   // Should have phase headers
   expect(content).toMatch(/^## \w+/m);
