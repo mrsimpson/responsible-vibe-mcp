@@ -13,13 +13,6 @@ import { YamlState } from './state-machine-types.js';
 
 const logger = createLogger('BeadsIntegration');
 
-export interface BeadsTaskInfo {
-  id: string;
-  title: string;
-  status: string;
-  parent?: string;
-}
-
 export interface BeadsPhaseTask {
   phaseId: string;
   phaseName: string;
@@ -432,75 +425,6 @@ export class BeadsIntegration {
   }
 
   /**
-   * Get beads task information
-   */
-  async getTaskInfo(taskId: string): Promise<BeadsTaskInfo | null> {
-    try {
-      const output = execSync(`bd show ${taskId}`, {
-        cwd: this.projectPath,
-        encoding: 'utf-8',
-        stdio: ['ignore', 'pipe', 'pipe'],
-      });
-
-      // Parse basic info from output (this is a simplified parser)
-      const lines = output.split('\n');
-      const titleLine = lines.find(line => line.includes('Title:'));
-      const statusLine = lines.find(line => line.includes('Status:'));
-
-      if (!titleLine) {
-        return null;
-      }
-
-      const title = titleLine.split('Title:')[1]?.trim() || taskId;
-      const status = statusLine?.split('Status:')[1]?.trim() || 'unknown';
-
-      return {
-        id: taskId,
-        title,
-        status,
-      };
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
-      logger.warn('Failed to get beads task info', {
-        error: errorMessage,
-        taskId,
-        projectPath: this.projectPath,
-      });
-      return null;
-    }
-  }
-
-  /**
-   * Generate beads tool instructions for whats_next() responses
-   */
-  generateBeadsInstructions(
-    currentPhaseTaskId: string,
-    phaseName: string
-  ): string {
-    return `
-**🔧 BD CLI Task Management:**
-
-You are currently in the ${phaseName} phase. All work items should be created as children of ${currentPhaseTaskId}.
-
-**Focus on ${phaseName} Phase Tasks** (subtasks of \`${currentPhaseTaskId}\`):
-• \`bd list --parent ${currentPhaseTaskId} --status open\` - List ready work items
-• \`bd update <task-id> --status in_progress\` - Start working on a specific task
-• \`bd close <task-id>\` - Mark task complete when finished
-• \`bd show ${currentPhaseTaskId}\` - View phase and its work items
-
-**Create New Tasks for Current Phase**:
-• \`bd create 'Task title' --parent ${currentPhaseTaskId} --description '<A brief description of the intention and a list of acceptance criteria>' --priority <priority denotes an urgency>\` - Create work item with rich description
-• **Example**: \`bd create 'Fix user authentication bug' --parent ${currentPhaseTaskId} --description 'Resolve login failure when users have special characters in passwords. \nAcceptance criteria:\n- Users with special characters can log in successfully\n- Input validation is updated\n- Tests cover edge cases' --priority 1\`
-
-**If you need to create tasks for other phases** (get parent task IDs from plan file):
-• Check plan file for phase task IDs: <!-- beads-phase-id: task-xyz123 -->
-• Create tasks for other phases using their parent IDs
-
-**Immediate Action**: Run \`bd list --parent ${currentPhaseTaskId} --status open\` to see ready tasks.`;
-  }
-
-  /**
    * Capitalize phase name for display
    */
   private capitalizePhase(phase: string): string {
@@ -607,87 +531,5 @@ You are currently in the ${phaseName} phase. All work items should be created as
         );
       }
     }
-  }
-
-  /**
-   * Create entrance criteria tasks as dependencies for a phase
-   */
-  async createEntranceCriteriaTasks(
-    phaseTaskId: string,
-    entranceCriteria: string[]
-  ): Promise<string[]> {
-    const createdTaskIds: string[] = [];
-
-    for (const criterion of entranceCriteria) {
-      try {
-        const taskTitle = `Entrance Criterion: ${criterion}`;
-        const command = `bd create "${taskTitle}" --parent ${phaseTaskId} -p 1`;
-
-        const output = execSync(command, {
-          cwd: this.projectPath,
-          encoding: 'utf-8',
-          stdio: ['ignore', 'pipe', 'pipe'],
-        });
-
-        // Extract task ID from beads output
-        const match = output.match(/✓ Created issue: ([\w\d.-]+)/);
-        const taskId = match?.[1] || '';
-
-        if (taskId) {
-          createdTaskIds.push(taskId);
-          logger.info('Created entrance criterion task', {
-            phaseTaskId,
-            criterion,
-            taskId,
-            projectPath: this.projectPath,
-          });
-        }
-      } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : String(error);
-        logger.error(
-          'Failed to create entrance criterion task',
-          error instanceof Error ? error : new Error(errorMessage),
-          {
-            phaseTaskId,
-            criterion,
-            projectPath: this.projectPath,
-          }
-        );
-        // Continue with other criteria even if one fails
-      }
-    }
-
-    // Set phase task to depend on all entrance criteria tasks
-    if (createdTaskIds.length > 0) {
-      try {
-        for (const taskId of createdTaskIds) {
-          const dependencyCommand = `bd update ${phaseTaskId} --blocks ${taskId}`;
-          execSync(dependencyCommand, {
-            cwd: this.projectPath,
-            encoding: 'utf-8',
-            stdio: ['ignore', 'pipe', 'pipe'],
-          });
-        }
-
-        logger.info('Set phase dependencies on entrance criteria', {
-          phaseTaskId,
-          dependencyTasks: createdTaskIds,
-          projectPath: this.projectPath,
-        });
-      } catch (error) {
-        logger.error(
-          'Failed to set phase dependencies',
-          error instanceof Error ? error : new Error(String(error)),
-          {
-            phaseTaskId,
-            dependencyTasks: createdTaskIds,
-            projectPath: this.projectPath,
-          }
-        );
-      }
-    }
-
-    return createdTaskIds;
   }
 }

@@ -11,10 +11,7 @@ import {
   type GeneratedInstructions,
   type YamlStateMachine,
   ProjectDocsManager,
-  TaskBackendManager,
-  type TaskBackendConfig,
 } from '@codemcp/workflows-core';
-import { BeadsTaskBackendClient } from './beads-task-backend-client.js';
 
 /**
  * Beads-specific instruction generator
@@ -22,20 +19,15 @@ import { BeadsTaskBackendClient } from './beads-task-backend-client.js';
 export class BeadsInstructionGenerator implements IInstructionGenerator {
   private projectDocsManager: ProjectDocsManager;
 
-  constructor(
-    _taskBackendClient?: BeadsTaskBackendClient,
-    _taskBackendDetector: () => TaskBackendConfig = TaskBackendManager.detectTaskBackend
-  ) {
+  constructor() {
     this.projectDocsManager = new ProjectDocsManager();
-    // Task backend client and detector may be used in future enhancements
   }
 
   /**
-   * Set the state machine definition (kept for interface compatibility)
+   * Set the state machine definition (interface requirement)
    */
   setStateMachine(_stateMachine: YamlStateMachine): void {
-    // Not needed for beads implementation but kept for interface compliance
-    return;
+    // No-op: beads uses CLI for state management
   }
 
   /**

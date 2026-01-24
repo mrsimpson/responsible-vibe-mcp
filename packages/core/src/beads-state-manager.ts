@@ -203,8 +203,6 @@ export class BeadsStateManager {
     try {
       await access(statePath);
       await writeFile(statePath + '.backup', await readFile(statePath));
-      // Note: We could delete the file here, but keeping it for now in case of recovery needs
-      // await unlink(statePath);
 
       logger.info('Cleaned up beads conversation state', {
         conversationId,

@@ -143,8 +143,7 @@ export class ConductReviewHandler extends ConversationRequiredToolHandler<
     perspectives: Array<{ perspective: string; prompt: string }>,
     conversationContext: ConversationContext
   ): Promise<ConductReviewResult> {
-    // TODO: Implement automated review when sampling tools are available
-    // For now, fall back to guided instructions
+    // Falls back to guided instructions until automated review is implemented
     return this.generateReviewInstructions(
       perspectives,
       conversationContext.currentPhase,
