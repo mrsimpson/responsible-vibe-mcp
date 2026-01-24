@@ -27,11 +27,80 @@ import {
   assertToolSuccess,
 } from '../utils/e2e-test-setup';
 import { promises as fs } from 'node:fs';
+import { execSync } from 'node:child_process';
 import type { StartDevelopmentResult } from '../../src/tool-handlers/start-development';
 import type { WhatsNextResult } from '../../src/tool-handlers/whats-next';
 
 vi.unmock('fs');
 vi.unmock('fs/promises');
+
+// Mock child_process to simulate beads CLI responses
+vi.mock('node:child_process', () => ({
+  execSync: vi.fn(),
+}));
+
+// Track created task IDs for consistent mock responses
+let mockTaskIdCounter = 0;
+
+/**
+ * Setup beads CLI mock for tests
+ * This simulates the bd CLI responses needed for beads integration
+ */
+function setupBeadsCliMock(): void {
+  mockTaskIdCounter = 0;
+
+  vi.mocked(execSync).mockImplementation((command: string) => {
+    // Handle bd --version check (used by TaskBackendManager)
+    if (command === 'bd --version') {
+      return 'beads v1.0.0\n';
+    }
+
+    // Handle bd list command (used to check if beads is initialized)
+    if (command.includes('bd list')) {
+      return ''; // Return empty list
+    }
+
+    // Handle bd init command
+    if (command.includes('bd init')) {
+      return 'Initialized beads repository\n';
+    }
+
+    // Handle bd create command for epic/phase tasks
+    if (command.includes('bd create')) {
+      mockTaskIdCounter++;
+      const taskId = `mock-task-${mockTaskIdCounter}`;
+      return `✓ Created issue: ${taskId}\n`;
+    }
+
+    // Handle bd dep command for dependencies
+    if (command.includes('bd dep')) {
+      return '✓ Dependency created\n';
+    }
+
+    // Handle bd show command
+    if (command.includes('bd show')) {
+      return 'Title: Mock Task\nStatus: open\n';
+    }
+
+    // Handle bd update command
+    if (command.includes('bd update')) {
+      return '✓ Updated\n';
+    }
+
+    // Handle bd close command
+    if (command.includes('bd close')) {
+      return '✓ Closed\n';
+    }
+
+    // Handle git commands (used in some tests)
+    if (command === 'git symbolic-ref --short HEAD') {
+      return 'feature/test-branch\n';
+    }
+
+    // For any other command, throw an error (unexpected command)
+    throw new Error(`Unexpected command in beads test: ${command}`);
+  });
+}
 
 // ============================================================================
 // TEST CONSTANTS (Remove magic numbers)
@@ -119,8 +188,9 @@ describe('Beads Plugin Comprehensive Integration', () => {
     let cleanup: () => Promise<void>;
 
     beforeEach(async () => {
-      // CRITICAL: Enable beads backend
+      // CRITICAL: Enable beads backend and mock CLI
       process.env.TASK_BACKEND = 'beads';
+      setupBeadsCliMock();
 
       const scenario = await createSuiteIsolatedE2EScenario({
         suiteName: 'beads-plan-structure',
@@ -223,6 +293,7 @@ describe('Beads Plugin Comprehensive Integration', () => {
 
     beforeEach(async () => {
       process.env.TASK_BACKEND = 'beads';
+      setupBeadsCliMock();
 
       const scenario = await createSuiteIsolatedE2EScenario({
         suiteName: 'beads-instructions',
@@ -326,6 +397,7 @@ describe('Beads Plugin Comprehensive Integration', () => {
 
       // WITH BEADS
       process.env.TASK_BACKEND = 'beads';
+      setupBeadsCliMock();
       const scenarioWith = await createSuiteIsolatedE2EScenario({
         suiteName: 'beads-comparison-with',
         tempProjectFactory: createTempProjectWithDefaultStateMachine,
@@ -383,6 +455,7 @@ describe('Beads Plugin Comprehensive Integration', () => {
     it('should generate DIFFERENT instructions with and without beads', async () => {
       // WITH BEADS
       process.env.TASK_BACKEND = 'beads';
+      setupBeadsCliMock();
       const scenarioWith = await createSuiteIsolatedE2EScenario({
         suiteName: 'beads-instructions-comparison-with',
         tempProjectFactory: createTempProjectWithDefaultStateMachine,
@@ -443,6 +516,7 @@ describe('Beads Plugin Comprehensive Integration', () => {
     it('should maintain identical response contracts regardless of beads', async () => {
       // WITH BEADS
       process.env.TASK_BACKEND = 'beads';
+      setupBeadsCliMock();
       const scenarioWith = await createSuiteIsolatedE2EScenario({
         suiteName: 'beads-contract-with',
         tempProjectFactory: createTempProjectWithDefaultStateMachine,
@@ -501,6 +575,7 @@ describe('Beads Plugin Comprehensive Integration', () => {
 
     beforeEach(async () => {
       process.env.TASK_BACKEND = 'beads';
+      setupBeadsCliMock();
 
       const scenario = await createSuiteIsolatedE2EScenario({
         suiteName: 'beads-task-ids',
@@ -594,6 +669,7 @@ describe('Beads Plugin Comprehensive Integration', () => {
 
     beforeEach(async () => {
       process.env.TASK_BACKEND = 'beads';
+      setupBeadsCliMock();
 
       const scenario = await createSuiteIsolatedE2EScenario({
         suiteName: 'beads-error-handling',
@@ -663,6 +739,7 @@ describe('Beads Plugin Comprehensive Integration', () => {
 
     beforeEach(async () => {
       process.env.TASK_BACKEND = 'beads';
+      setupBeadsCliMock();
 
       const scenario = await createSuiteIsolatedE2EScenario({
         suiteName: 'beads-plugin-hooks',
@@ -770,6 +847,7 @@ describe('Beads Plugin Comprehensive Integration', () => {
   describe('7. Beads Environment Activation', () => {
     it('should apply beads when TASK_BACKEND=beads is set', async () => {
       process.env.TASK_BACKEND = 'beads';
+      setupBeadsCliMock();
 
       const scenario = await createSuiteIsolatedE2EScenario({
         suiteName: 'beads-activation-with',
@@ -848,6 +926,7 @@ describe('Beads Plugin Comprehensive Integration', () => {
 
     beforeEach(async () => {
       process.env.TASK_BACKEND = 'beads';
+      setupBeadsCliMock();
 
       const scenario = await createSuiteIsolatedE2EScenario({
         suiteName: 'beads-content-validation',
@@ -944,6 +1023,7 @@ describe('Beads Plugin Comprehensive Integration', () => {
 
     beforeEach(async () => {
       process.env.TASK_BACKEND = 'beads';
+      setupBeadsCliMock();
 
       const scenario = await createSuiteIsolatedE2EScenario({
         suiteName: 'beads-task-id-extraction',
@@ -1056,6 +1136,7 @@ describe('Beads Plugin Comprehensive Integration', () => {
 
     beforeEach(async () => {
       process.env.TASK_BACKEND = 'beads';
+      setupBeadsCliMock();
 
       const scenario = await createSuiteIsolatedE2EScenario({
         suiteName: 'beads-phase-transitions',
@@ -1188,6 +1269,7 @@ describe('Beads Plugin Comprehensive Integration', () => {
 
     beforeEach(async () => {
       process.env.TASK_BACKEND = 'beads';
+      setupBeadsCliMock();
 
       const scenario = await createSuiteIsolatedE2EScenario({
         suiteName: 'beads-hook-execution',
@@ -1302,6 +1384,7 @@ describe('Beads Plugin Comprehensive Integration', () => {
 
     it('should apply beads markers to waterfall workflow', async () => {
       process.env.TASK_BACKEND = 'beads';
+      setupBeadsCliMock();
 
       const scenario = await createSuiteIsolatedE2EScenario({
         suiteName: 'beads-waterfall',
@@ -1331,6 +1414,7 @@ describe('Beads Plugin Comprehensive Integration', () => {
 
     it('should apply beads markers to tdd workflow', async () => {
       process.env.TASK_BACKEND = 'beads';
+      setupBeadsCliMock();
 
       const scenario = await createSuiteIsolatedE2EScenario({
         suiteName: 'beads-tdd',
@@ -1359,6 +1443,7 @@ describe('Beads Plugin Comprehensive Integration', () => {
 
     it('should apply beads markers to bugfix workflow', async () => {
       process.env.TASK_BACKEND = 'beads';
+      setupBeadsCliMock();
 
       const scenario = await createSuiteIsolatedE2EScenario({
         suiteName: 'beads-bugfix',
@@ -1396,6 +1481,7 @@ describe('Beads Plugin Comprehensive Integration', () => {
 
     beforeEach(async () => {
       process.env.TASK_BACKEND = 'beads';
+      setupBeadsCliMock();
 
       const scenario = await createSuiteIsolatedE2EScenario({
         suiteName: 'beads-robustness',
