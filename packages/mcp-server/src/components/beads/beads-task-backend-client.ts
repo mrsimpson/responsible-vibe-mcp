@@ -97,8 +97,7 @@ export class BeadsTaskBackendClient implements ITaskBackendClient {
         return [];
       }
 
-      // Parse text output from beads CLI (since JSON format may not be available)
-      // This is a simplified parser - would need to be adjusted based on actual beads output format
+      // Parse beads CLI text output
       const lines = result.stdout.trim().split('\n');
       const tasks: BackendTask[] = [];
 
@@ -109,8 +108,6 @@ export class BeadsTaskBackendClient implements ITaskBackendClient {
           !line.startsWith('●') &&
           !line.includes('Tip:')
         ) {
-          // Extract task ID and title from beads output format
-          // This is based on observed beads CLI output format
           const match = line.match(/^○?\s*([^\s]+)\s+.*?\s+-\s+(.+)$/);
           if (match) {
             tasks.push({

@@ -11,10 +11,7 @@ import {
   type GeneratedInstructions,
   type YamlStateMachine,
   ProjectDocsManager,
-  TaskBackendManager,
-  type TaskBackendConfig,
 } from '@codemcp/workflows-core';
-import { BeadsTaskBackendClient } from './beads-task-backend-client.js';
 
 /**
  * Beads-specific instruction generator
@@ -22,20 +19,15 @@ import { BeadsTaskBackendClient } from './beads-task-backend-client.js';
 export class BeadsInstructionGenerator implements IInstructionGenerator {
   private projectDocsManager: ProjectDocsManager;
 
-  constructor(
-    _taskBackendClient?: BeadsTaskBackendClient,
-    _taskBackendDetector: () => TaskBackendConfig = TaskBackendManager.detectTaskBackend
-  ) {
+  constructor() {
     this.projectDocsManager = new ProjectDocsManager();
-    // Task backend client and detector may be used in future enhancements
   }
 
   /**
-   * Set the state machine definition (kept for interface compatibility)
+   * Set the state machine definition (interface requirement)
    */
   setStateMachine(_stateMachine: YamlStateMachine): void {
-    // Not needed for beads implementation but kept for interface compliance
-    return;
+    // No-op: beads uses CLI for state management
   }
 
   /**
@@ -168,8 +160,16 @@ ${beadsTaskGuidance}`;
   private async generateBeadsTaskGuidance(
     context: InstructionContext
   ): Promise<string> {
-    const { phase } = context;
+    const { phase, instructionSource } = context;
 
+    // For explicit phase transitions (proceed_to_phase), provide minimal guidance
+    // The detailed guidance is better suited for whats_next which analyzes context
+    if (instructionSource === 'proceed_to_phase') {
+      return `- Use bd CLI tool exclusively for task management
+- Do not use your own task management tools`;
+    }
+
+    // For implicit transitions (whats_next), provide detailed guidance
     // Extract phase task ID from plan file (this would need to be implemented)
     const phaseTaskId = await this.extractPhaseTaskId(context);
 

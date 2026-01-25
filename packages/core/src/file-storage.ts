@@ -29,13 +29,9 @@ export class FileStorage implements IPersistence {
 
   /**
    * @param basePath - Path to the storage location (e.g., .vibe/conversation.sqlite for backward compat)
-   *                   In the future, this should just be the .vibe directory path.
-   *                   TODO: Change to accept .vibe directory path directly in v5.0 (see issue #155)
    */
   constructor(basePath: string) {
-    // For backward compatibility, basePath currently points to where conversation.sqlite was
-    // We derive the conversations directory from this
-    // TODO: In v5.0, accept .vibe directory path directly and use join(basePath, 'conversations')
+    // basePath points to where conversation.sqlite was for backward compatibility
     this.basePath = basePath;
     this.conversationsDir = join(dirname(basePath), 'conversations');
   }

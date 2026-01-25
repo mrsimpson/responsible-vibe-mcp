@@ -14,6 +14,8 @@ export interface InstructionContext {
   transitionReason: string;
   isModeled: boolean;
   planFileExists: boolean;
+  /** Source of the instruction generation request - helps generators adapt output */
+  instructionSource: 'proceed_to_phase' | 'whats_next';
 }
 
 export interface GeneratedInstructions {

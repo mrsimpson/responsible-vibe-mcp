@@ -25,6 +25,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - name: Install beads
+        run: npm install -g @beads/bd
+
       - name: Install platform-specific dependencies
         run: |
           # Install oxlint platform dependency for Linux (temporary, not saved to package.json)
@@ -59,6 +62,9 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install
+
+      - name: Install beads
+        run: npm install -g @beads/bd
 
       - name: Install platform-specific dependencies
         run: |

@@ -13,13 +13,6 @@ import { YamlState } from './state-machine-types.js';
 
 const logger = createLogger('BeadsIntegration');
 
-export interface BeadsTaskInfo {
-  id: string;
-  title: string;
-  status: string;
-  parent?: string;
-}
-
 export interface BeadsPhaseTask {
   phaseId: string;
   phaseName: string;
@@ -315,6 +308,7 @@ export class BeadsIntegration {
 
   /**
    * Create sequential dependencies between workflow phase tasks
+   * Implements graceful error handling: logs warnings for failed dependencies but continues
    */
   async createPhaseDependencies(phaseTasks: BeadsPhaseTask[]): Promise<void> {
     if (phaseTasks.length < 2) {
@@ -330,6 +324,13 @@ export class BeadsIntegration {
       projectPath: this.projectPath,
     });
 
+    // Track failed dependencies for logging
+    const failedDependencies: Array<{
+      from: string;
+      to: string;
+      error: string;
+    }> = [];
+
     // Create dependencies in sequence: each phase blocks the next one
     for (let i = 0; i < phaseTasks.length - 1; i++) {
       const currentPhase = phaseTasks[i];
@@ -341,6 +342,11 @@ export class BeadsIntegration {
           nextPhaseIndex: i + 1,
           totalPhases: phaseTasks.length,
           projectPath: this.projectPath,
+        });
+        failedDependencies.push({
+          from: `Phase ${i}`,
+          to: `Phase ${i + 1}`,
+          error: 'Missing phase data',
         });
         continue;
       }
@@ -372,7 +378,7 @@ export class BeadsIntegration {
         // Log as warning but don't fail the entire setup
         const errorMessage =
           error instanceof Error ? error.message : String(error);
-        logger.warn('Failed to create phase dependency', {
+        logger.warn('Failed to create phase dependency - continuing anyway', {
           error: errorMessage,
           command,
           currentPhase: currentPhase.phaseName,
@@ -383,88 +389,39 @@ export class BeadsIntegration {
         // Include stderr if available for better debugging
         const execError = error as unknown as { stderr?: string };
         if (execError?.stderr) {
-          logger.warn('Beads dependency command stderr', {
+          logger.debug('Beads dependency command stderr', {
             stderr: execError.stderr.toString(),
             command,
             projectPath: this.projectPath,
           });
         }
+
+        // Track failed dependency but continue
+        failedDependencies.push({
+          from: currentPhase.phaseName,
+          to: nextPhase.phaseName,
+          error: errorMessage,
+        });
       }
+    }
+
+    if (failedDependencies.length > 0) {
+      logger.warn(
+        'Some phase dependencies could not be created - app continues without these dependencies',
+        {
+          failedCount: failedDependencies.length,
+          failedDependencies,
+          projectPath: this.projectPath,
+        }
+      );
     }
 
     logger.info('Completed phase dependency creation', {
       dependencyCount: phaseTasks.length - 1,
+      successCount: phaseTasks.length - 1 - failedDependencies.length,
+      failedCount: failedDependencies.length,
       projectPath: this.projectPath,
     });
-  }
-
-  /**
-   * Get beads task information
-   */
-  async getTaskInfo(taskId: string): Promise<BeadsTaskInfo | null> {
-    try {
-      const output = execSync(`bd show ${taskId}`, {
-        cwd: this.projectPath,
-        encoding: 'utf-8',
-        stdio: ['ignore', 'pipe', 'pipe'],
-      });
-
-      // Parse basic info from output (this is a simplified parser)
-      const lines = output.split('\n');
-      const titleLine = lines.find(line => line.includes('Title:'));
-      const statusLine = lines.find(line => line.includes('Status:'));
-
-      if (!titleLine) {
-        return null;
-      }
-
-      const title = titleLine.split('Title:')[1]?.trim() || taskId;
-      const status = statusLine?.split('Status:')[1]?.trim() || 'unknown';
-
-      return {
-        id: taskId,
-        title,
-        status,
-      };
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
-      logger.warn('Failed to get beads task info', {
-        error: errorMessage,
-        taskId,
-        projectPath: this.projectPath,
-      });
-      return null;
-    }
-  }
-
-  /**
-   * Generate beads tool instructions for whats_next() responses
-   */
-  generateBeadsInstructions(
-    currentPhaseTaskId: string,
-    phaseName: string
-  ): string {
-    return `
-**🔧 BD CLI Task Management:**
-
-You are currently in the ${phaseName} phase. All work items should be created as children of ${currentPhaseTaskId}.
-
-**Focus on ${phaseName} Phase Tasks** (subtasks of \`${currentPhaseTaskId}\`):
-• \`bd list --parent ${currentPhaseTaskId} --status open\` - List ready work items
-• \`bd update <task-id> --status in_progress\` - Start working on a specific task
-• \`bd close <task-id>\` - Mark task complete when finished
-• \`bd show ${currentPhaseTaskId}\` - View phase and its work items
-
-**Create New Tasks for Current Phase**:
-• \`bd create 'Task title' --parent ${currentPhaseTaskId} --description '<A brief description of the intention and a list of acceptance criteria>' --priority <priority denotes an urgency>\` - Create work item with rich description
-• **Example**: \`bd create 'Fix user authentication bug' --parent ${currentPhaseTaskId} --description 'Resolve login failure when users have special characters in passwords. \nAcceptance criteria:\n- Users with special characters can log in successfully\n- Input validation is updated\n- Tests cover edge cases' --priority 1\`
-
-**If you need to create tasks for other phases** (get parent task IDs from plan file):
-• Check plan file for phase task IDs: <!-- beads-phase-id: task-xyz123 -->
-• Create tasks for other phases using their parent IDs
-
-**Immediate Action**: Run \`bd list --parent ${currentPhaseTaskId} --status open\` to see ready tasks.`;
   }
 
   /**
@@ -574,87 +531,5 @@ You are currently in the ${phaseName} phase. All work items should be created as
         );
       }
     }
-  }
-
-  /**
-   * Create entrance criteria tasks as dependencies for a phase
-   */
-  async createEntranceCriteriaTasks(
-    phaseTaskId: string,
-    entranceCriteria: string[]
-  ): Promise<string[]> {
-    const createdTaskIds: string[] = [];
-
-    for (const criterion of entranceCriteria) {
-      try {
-        const taskTitle = `Entrance Criterion: ${criterion}`;
-        const command = `bd create "${taskTitle}" --parent ${phaseTaskId} -p 1`;
-
-        const output = execSync(command, {
-          cwd: this.projectPath,
-          encoding: 'utf-8',
-          stdio: ['ignore', 'pipe', 'pipe'],
-        });
-
-        // Extract task ID from beads output
-        const match = output.match(/✓ Created issue: ([\w\d.-]+)/);
-        const taskId = match?.[1] || '';
-
-        if (taskId) {
-          createdTaskIds.push(taskId);
-          logger.info('Created entrance criterion task', {
-            phaseTaskId,
-            criterion,
-            taskId,
-            projectPath: this.projectPath,
-          });
-        }
-      } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : String(error);
-        logger.error(
-          'Failed to create entrance criterion task',
-          error instanceof Error ? error : new Error(errorMessage),
-          {
-            phaseTaskId,
-            criterion,
-            projectPath: this.projectPath,
-          }
-        );
-        // Continue with other criteria even if one fails
-      }
-    }
-
-    // Set phase task to depend on all entrance criteria tasks
-    if (createdTaskIds.length > 0) {
-      try {
-        for (const taskId of createdTaskIds) {
-          const dependencyCommand = `bd update ${phaseTaskId} --blocks ${taskId}`;
-          execSync(dependencyCommand, {
-            cwd: this.projectPath,
-            encoding: 'utf-8',
-            stdio: ['ignore', 'pipe', 'pipe'],
-          });
-        }
-
-        logger.info('Set phase dependencies on entrance criteria', {
-          phaseTaskId,
-          dependencyTasks: createdTaskIds,
-          projectPath: this.projectPath,
-        });
-      } catch (error) {
-        logger.error(
-          'Failed to set phase dependencies',
-          error instanceof Error ? error : new Error(String(error)),
-          {
-            phaseTaskId,
-            dependencyTasks: createdTaskIds,
-            projectPath: this.projectPath,
-          }
-        );
-      }
-    }
-
-    return createdTaskIds;
   }
 }

@@ -50,27 +50,19 @@ export class TaskBackendManager {
       };
     }
 
-    if (backend === 'beads') {
-      const beadsAvailable = TaskBackendManager.checkBeadsAvailability();
-      if (beadsAvailable.isAvailable) {
-        return {
-          backend: 'beads',
-          isAvailable: true,
-        };
-      } else {
-        return {
-          backend: 'beads',
-          isAvailable: false,
-          errorMessage:
-            beadsAvailable.errorMessage || 'Beads backend not available',
-        };
-      }
+    // backend === 'beads' is the only remaining case
+    const beadsAvailable = TaskBackendManager.checkBeadsAvailability();
+    if (beadsAvailable.isAvailable) {
+      return {
+        backend: 'beads',
+        isAvailable: true,
+      };
     }
-
-    // Should never reach here
     return {
-      backend: 'markdown',
-      isAvailable: true,
+      backend: 'beads',
+      isAvailable: false,
+      errorMessage:
+        beadsAvailable.errorMessage || 'Beads backend not available',
     };
   }
 

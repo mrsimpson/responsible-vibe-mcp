@@ -11,10 +11,11 @@ import { vi, expect } from 'vitest';
 import {
   ResponsibleVibeMCPServer,
   createResponsibleVibeMCPServer,
-  StartDevelopmentResult,
 } from '../../src/server.js';
 import type { ServerContext } from '../../src/types';
+import type { StartDevelopmentResult } from '../../src/tool-handlers/start-development.js';
 import { TempProject } from './temp-files.js';
+import { PluginRegistry } from '../../src/plugin-system/plugin-registry.js';
 
 /**
  * Mock project documents content
@@ -114,6 +115,7 @@ export class MockContextFactory {
   ) {
     return {
       projectPath,
+      pluginRegistry: new PluginRegistry(),
       workflowManager: {
         validateWorkflowName: vi.fn().mockReturnValue(true),
         getWorkflowNames: vi

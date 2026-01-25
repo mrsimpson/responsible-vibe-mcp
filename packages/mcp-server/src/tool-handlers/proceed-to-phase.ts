@@ -8,8 +8,6 @@
 import { ConversationRequiredToolHandler } from './base-tool-handler.js';
 import { validateRequiredArgs } from '../server-helpers.js';
 import type { ConversationContext } from '@codemcp/workflows-core';
-import { BeadsStateManager } from '@codemcp/workflows-core';
-import { ServerComponentsFactory } from '../components/server-components-factory.js';
 import { ServerContext } from '../types.js';
 
 /**
@@ -80,13 +78,26 @@ export class ProceedToPhaseHandler extends ConversationRequiredToolHandler<
       context
     );
 
-    // Validate beads task completion if in beads mode
-    await this.validateBeadsTaskCompletion(
+    // Execute plugin hooks before phase transition (replaces if-statement pattern)
+    const pluginContext = {
       conversationId,
+      planFilePath: conversationContext.planFilePath,
       currentPhase,
-      target_phase,
-      conversationContext.projectPath
-    );
+      workflow: conversationContext.workflowName,
+      projectPath: conversationContext.projectPath,
+      gitBranch: conversationContext.gitBranch,
+      targetPhase: target_phase,
+    };
+
+    // Execute plugin hooks safely - guard against missing plugin registry
+    if (context.pluginRegistry) {
+      await context.pluginRegistry.executeHook(
+        'beforePhaseTransition',
+        pluginContext,
+        currentPhase,
+        target_phase
+      );
+    }
 
     // Ensure state machine is loaded for this project
     this.ensureStateMachineForProject(context, conversationContext.projectPath);
@@ -136,6 +147,7 @@ export class ProceedToPhaseHandler extends ConversationRequiredToolHandler<
           transitionReason: transitionResult.transitionReason,
           isModeled: transitionResult.isModeled,
           planFileExists: planInfo.exists,
+          instructionSource: 'proceed_to_phase',
         }
       );
 
@@ -293,134 +305,6 @@ export class ProceedToPhaseHandler extends ConversationRequiredToolHandler<
           phase: targetPhase,
         });
       }
-    }
-  }
-
-  /**
-   * Validate that all beads tasks in the current phase are completed
-   * before proceeding to the next phase. Only applies when beads mode is active.
-   */
-  private async validateBeadsTaskCompletion(
-    conversationId: string,
-    currentPhase: string,
-    targetPhase: string,
-    projectPath: string
-  ): Promise<void> {
-    try {
-      // Use factory to create task backend client (strategy pattern)
-      const factory = new ServerComponentsFactory({ projectPath });
-      const taskBackendClient = factory.createTaskBackendClient();
-
-      if (!taskBackendClient) {
-        // Not in beads mode or beads not available, skip validation
-        this.logger.debug(
-          'Skipping beads task validation - no task backend client available',
-          {
-            conversationId,
-            currentPhase,
-            targetPhase,
-          }
-        );
-        return;
-      }
-
-      // Get beads state for this conversation
-      const beadsStateManager = new BeadsStateManager(projectPath);
-      const currentPhaseTaskId = await beadsStateManager.getPhaseTaskId(
-        conversationId,
-        currentPhase
-      );
-
-      if (!currentPhaseTaskId) {
-        // No beads state found for this conversation - fallback to graceful handling
-        this.logger.debug('No beads phase task ID found for current phase', {
-          conversationId,
-          currentPhase,
-          targetPhase,
-          projectPath,
-        });
-        return;
-      }
-
-      this.logger.debug(
-        'Checking for incomplete beads tasks using task backend client',
-        {
-          conversationId,
-          currentPhase,
-          currentPhaseTaskId,
-        }
-      );
-
-      // Use task backend client to validate task completion (strategy pattern)
-      const validationResult =
-        await taskBackendClient.validateTasksCompleted(currentPhaseTaskId);
-
-      if (!validationResult.valid) {
-        // Get the incomplete tasks from the validation result
-        const incompleteTasks = validationResult.openTasks;
-
-        // Create detailed error message with incomplete tasks
-        const taskDetails = incompleteTasks
-          .map(task => `  • ${task.id} - ${task.title || 'Untitled task'}`)
-          .join('\n');
-
-        const errorMessage = `Cannot proceed to ${targetPhase} - ${incompleteTasks.length} incomplete task(s) in current phase "${currentPhase}":
-
-${taskDetails}
-
-To proceed, check the in-progress-tasks using:
-
-  bd list --parent ${currentPhaseTaskId} --status open
-
-You can also defer tasks if they're no longer needed:
-  bd defer <task-id> --until tomorrow`;
-
-        this.logger.info(
-          'Blocking phase transition due to incomplete beads tasks',
-          {
-            conversationId,
-            currentPhase,
-            targetPhase,
-            currentPhaseTaskId,
-            incompleteTaskCount: incompleteTasks.length,
-            incompleteTaskIds: incompleteTasks.map(t => t.id),
-          }
-        );
-
-        throw new Error(errorMessage);
-      }
-
-      this.logger.info(
-        'All beads tasks completed in current phase, allowing transition',
-        {
-          conversationId,
-          currentPhase,
-          targetPhase,
-          currentPhaseTaskId,
-        }
-      );
-    } catch (error) {
-      // Re-throw validation errors (incomplete tasks)
-      if (
-        error instanceof Error &&
-        error.message.includes('Cannot proceed to')
-      ) {
-        throw error;
-      }
-
-      // Log other errors but allow transition (graceful degradation)
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
-      this.logger.warn(
-        'Beads task validation failed, allowing transition to proceed',
-        {
-          error: errorMessage,
-          conversationId,
-          currentPhase,
-          targetPhase,
-          projectPath,
-        }
-      );
     }
   }
 }

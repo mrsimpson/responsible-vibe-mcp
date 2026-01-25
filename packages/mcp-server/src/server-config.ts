@@ -34,7 +34,11 @@ import {
   generateWorkflowDescription,
 } from './server-helpers.js';
 import { notificationService } from './notification-service.js';
-import { ServerComponentsFactory } from './components/server-components-factory.js';
+import { PlanManager, InstructionGenerator } from '@codemcp/workflows-core';
+import { PluginRegistry } from './plugin-system/plugin-registry.js';
+import { BeadsPlugin } from './plugin-system/beads-plugin.js';
+import { BeadsPlanManager } from './components/beads/beads-plan-manager.js';
+import { BeadsInstructionGenerator } from './components/beads/beads-instruction-generator.js';
 
 const logger = createLogger('ServerConfig');
 
@@ -113,17 +117,34 @@ export async function initializeServerComponents(
   const transitionEngine = new TransitionEngine(projectPath);
   transitionEngine.setConversationManager(conversationManager);
 
-  // Use factory pattern for strategy-based component creation
-  const componentsFactory = new ServerComponentsFactory({
-    projectPath,
-    taskBackend: config.taskBackend, // Pass through task backend config if provided
-  });
-  const planManager = componentsFactory.createPlanManager();
-  const instructionGenerator = componentsFactory.createInstructionGenerator();
+  // Use beads components if TASK_BACKEND=beads, otherwise use defaults
+  // This enables beads features like plan file markers and beads CLI instructions
+  const isBeadsBackend = process.env.TASK_BACKEND === 'beads';
+  const planManager = isBeadsBackend
+    ? new BeadsPlanManager()
+    : new PlanManager();
+  const instructionGenerator = isBeadsBackend
+    ? new BeadsInstructionGenerator()
+    : new InstructionGenerator(planManager as InstanceType<typeof PlanManager>);
 
   // Always create interaction logger as it's critical for transition engine logic
   // (determining first call from initial state)
   const interactionLogger = new InteractionLogger(database);
+
+  // Initialize plugin registry and register plugins
+  const pluginRegistry = new PluginRegistry();
+
+  // Register BeadsPlugin if beads backend is configured
+  if (process.env.TASK_BACKEND === 'beads') {
+    const beadsPlugin = new BeadsPlugin({ projectPath });
+    if (beadsPlugin.isEnabled()) {
+      pluginRegistry.registerPlugin(beadsPlugin);
+      logger.info('BeadsPlugin registered successfully', {
+        enabled: beadsPlugin.isEnabled(),
+        sequence: beadsPlugin.getSequence(),
+      });
+    }
+  }
 
   // Create server context
   const context: ServerContext = {
@@ -134,6 +155,7 @@ export async function initializeServerComponents(
     workflowManager,
     interactionLogger,
     projectPath,
+    pluginRegistry,
   };
 
   // Initialize database

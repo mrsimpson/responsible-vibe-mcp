@@ -1,19 +1,25 @@
 /**
- * Unit tests for StartDevelopmentHandler Goal extraction functionality
+ * Unit tests for BeadsPlugin Goal extraction functionality
  *
  * Tests the extractGoalFromPlan method that extracts meaningful goal content
  * from development plan files for use in beads integration
  */
 
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { TestAccess } from '../utils/test-access.js';
-import { StartDevelopmentHandler } from '../../src/tool-handlers/start-development.js';
+import { BeadsPlugin } from '../../src/plugin-system/beads-plugin.js';
 
-describe('StartDevelopmentHandler - Goal Extraction', () => {
-  let handler: StartDevelopmentHandler;
+describe('BeadsPlugin - Goal Extraction', () => {
+  let plugin: BeadsPlugin;
 
   beforeEach(() => {
-    handler = new StartDevelopmentHandler();
+    // Mock environment variable for plugin enablement
+    vi.stubEnv('TASK_BACKEND', 'beads');
+    plugin = new BeadsPlugin({ projectPath: '/test/project' });
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
   });
 
   describe('extractGoalFromPlan', () => {
@@ -29,7 +35,7 @@ Build a user authentication system with JWT tokens and password reset functional
 `;
 
       const result = TestAccess.callMethod(
-        handler,
+        plugin,
         'extractGoalFromPlan',
         planContent
       );
@@ -51,7 +57,7 @@ Build a user authentication system with JWT tokens and password reset functional
 `;
 
       const result = TestAccess.callMethod(
-        handler,
+        plugin,
         'extractGoalFromPlan',
         planContent
       );
@@ -71,7 +77,7 @@ To be defined during exploration
 `;
 
       const result = TestAccess.callMethod(
-        handler,
+        plugin,
         'extractGoalFromPlan',
         planContent
       );
@@ -91,7 +97,7 @@ Fix bug
 `;
 
       const result = TestAccess.callMethod(
-        handler,
+        plugin,
         'extractGoalFromPlan',
         planContent
       );
@@ -117,7 +123,7 @@ The system should support different log levels and output formats.
 `;
 
       const result = TestAccess.callMethod(
-        handler,
+        plugin,
         'extractGoalFromPlan',
         planContent
       );
@@ -141,7 +147,7 @@ The system should support different log levels and output formats.`);
 `;
 
       const result = TestAccess.callMethod(
-        handler,
+        plugin,
         'extractGoalFromPlan',
         planContent
       );
@@ -151,15 +157,15 @@ The system should support different log levels and output formats.`);
 
     it('should return undefined for empty or null input', () => {
       expect(
-        TestAccess.callMethod(handler, 'extractGoalFromPlan', '')
+        TestAccess.callMethod(plugin, 'extractGoalFromPlan', '')
       ).toBeUndefined();
 
       expect(
-        TestAccess.callMethod(handler, 'extractGoalFromPlan', null)
+        TestAccess.callMethod(plugin, 'extractGoalFromPlan', null)
       ).toBeUndefined();
 
       expect(
-        TestAccess.callMethod(handler, 'extractGoalFromPlan', undefined)
+        TestAccess.callMethod(plugin, 'extractGoalFromPlan', undefined)
       ).toBeUndefined();
     });
 
@@ -175,7 +181,7 @@ Build a user authentication system with secure login and registration.
 `;
 
       const result = TestAccess.callMethod(
-        handler,
+        plugin,
         'extractGoalFromPlan',
         planContent
       );

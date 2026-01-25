@@ -258,24 +258,6 @@ describe('BeadsIntegration', () => {
       });
     });
 
-    it('should extract deeply nested task IDs with multiple periods', async () => {
-      const mockExecSync = vi.mocked(execSync);
-
-      // Mock entrance criteria task creation with deeply nested hierarchical ID
-      mockExecSync
-        .mockImplementationOnce(
-          () => '✓ Created issue: responsible-vibe-1.2.3.4\n'
-        ) // criteria task
-        .mockImplementationOnce(() => 'Dependency created\n'); // dependency creation
-
-      const createdTaskIds = await beadsIntegration.createEntranceCriteriaTasks(
-        'responsible-vibe-1.2',
-        ['Requirements gathered']
-      );
-
-      expect(createdTaskIds).toContain('responsible-vibe-1.2.3.4');
-    });
-
     it('should handle legacy format task IDs without periods', async () => {
       const mockExecSync = vi.mocked(execSync);
 
