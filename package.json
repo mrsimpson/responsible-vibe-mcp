@@ -51,7 +51,7 @@
   },
   "dependencies": {
     "@codemcp/workflows-core": "workspace:*",
-    "@modelcontextprotocol/sdk": "1.17.5",
+    "@modelcontextprotocol/sdk": "1.25.3",
     "@sqlite.org/sqlite-wasm": "3.50.4-build1",
     "@types/js-yaml": "4.0.9",
     "js-yaml": "4.1.1",
