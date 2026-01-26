@@ -61,7 +61,6 @@ interface WorkflowRecommendations {
  */
 export interface ResumeWorkflowResult {
   workflow_status: {
-    conversation_id: string;
     current_phase: string;
     project_path: string;
     git_branch: string;
@@ -132,7 +131,6 @@ export class ResumeWorkflowHandler extends ConversationRequiredToolHandler<
     const response: ResumeWorkflowResult = {
       // Core workflow resumption info
       workflow_status: {
-        conversation_id: conversationContext.conversationId,
         current_phase: conversationContext.currentPhase,
         project_path: conversationContext.projectPath,
         git_branch: conversationContext.gitBranch,

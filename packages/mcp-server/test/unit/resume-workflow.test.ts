@@ -41,7 +41,6 @@ describe('resume_workflow tool', () => {
     const result = await server.handleResumeWorkflow({});
 
     const workflowStatus = result.workflow_status;
-    expect(workflowStatus.conversation_id).toBeTypeOf('string');
     expect(workflowStatus.current_phase).toBeTypeOf('string');
     expect(workflowStatus.project_path).toBe(tempDir);
     expect(workflowStatus.git_branch).toBeTypeOf('string');

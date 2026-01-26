@@ -79,7 +79,6 @@ describe('Phase Persistence', () => {
     })) as StartDevelopmentResult;
 
     expect(startResult.phase).toBeDefined();
-    expect(startResult.conversation_id).toBeTruthy();
     const initialPhase = startResult.phase;
 
     // Verify initial phase is returned by whats_next
@@ -89,7 +88,6 @@ describe('Phase Persistence', () => {
     })) as WhatsNextResult;
 
     expect(whatsNextResult1.phase).toBe(initialPhase);
-    expect(whatsNextResult1.conversation_id).toBe(startResult.conversation_id);
 
     // Explicitly transition to a new phase
     const newPhase = 'design';

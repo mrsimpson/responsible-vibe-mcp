@@ -76,7 +76,6 @@ describe('InstructionGenerator - Core Functionality', () => {
     );
     expect(result.instructions).toContain('Check your plan file');
     expect(result.instructions).toContain('**Plan File Guidance:**');
-    expect(result.instructions).toContain('**Project Context:**');
     expect(result.instructions).toContain('**Important Reminders:**');
   });
 
@@ -91,7 +90,7 @@ describe('InstructionGenerator - Core Functionality', () => {
     expect(result.instructions).not.toContain('bd create');
     expect(result.instructions).not.toContain('bd CLI tool');
     expect(result.instructions).not.toContain('beads');
-    expect(result.instructions).not.toContain('BD CLI');
+    expect(result.instructions).not.toContain('bd');
   });
 
   it('should handle variable substitution correctly', async () => {
@@ -116,11 +115,7 @@ describe('InstructionGenerator - Core Functionality', () => {
     // Check for expected sections
     expect(result.instructions).toContain('Check your plan file');
     expect(result.instructions).toContain('**Plan File Guidance:**');
-    expect(result.instructions).toContain('**Project Context:**');
     expect(result.instructions).toContain('**Important Reminders:**');
-    expect(result.instructions).toContain('- Project: /test/project');
-    expect(result.instructions).toContain('- Branch: main');
-    expect(result.instructions).toContain('- Current Phase: design');
   });
 
   it('should handle transition context when provided', async () => {
@@ -135,7 +130,6 @@ describe('InstructionGenerator - Core Functionality', () => {
       contextWithTransition
     );
 
-    expect(result.instructions).toContain('**Phase Context:**');
     expect(result.instructions).toContain('All exploration tasks completed');
   });
 

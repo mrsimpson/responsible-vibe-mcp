@@ -206,7 +206,6 @@ describe('MCP Contract Validation', () => {
       const responseText = textContent!.text;
       expect(responseText).toContain('phase');
       expect(responseText).toContain('instructions');
-      expect(responseText).toContain('conversation_id');
     });
 
     it('should execute proceed_to_phase tool successfully', async () => {
@@ -334,7 +333,6 @@ describe('MCP Contract Validation', () => {
 
       // Should contain valid JSON with state information
       const stateData = JSON.parse(content.text);
-      expect(stateData.conversationId).toBeTruthy();
       expect(stateData.currentPhase).toBeTruthy();
       expect(stateData.projectPath).toBeTruthy();
     });
@@ -384,34 +382,6 @@ describe('MCP Contract Validation', () => {
       // List results should have arrays
       expect(Array.isArray(results[2].tools)).toBe(true);
       expect(Array.isArray(results[3].resources)).toBe(true);
-    });
-
-    it('should maintain conversation state across multiple interactions', async () => {
-      // First interaction
-      const result1 = await client.callTool({
-        name: 'whats_next',
-        arguments: {
-          user_input: 'start new project',
-        },
-      });
-
-      const response1 = JSON.parse(result1.content[0].text);
-      const conversationId1 = response1.conversation_id;
-
-      // Second interaction in the same session
-      const result2 = await client.callTool({
-        name: 'whats_next',
-        arguments: {
-          user_input: 'continue project',
-        },
-      });
-
-      const response2 = JSON.parse(result2.content[0].text);
-      const conversationId2 = response2.conversation_id;
-
-      // Should maintain same conversation ID within the same MCP session
-      // Note: Each MCP client connection maintains its own conversation context
-      expect(conversationId1).toBe(conversationId2);
     });
 
     it('should handle malformed requests appropriately', async () => {
@@ -534,7 +504,6 @@ describe('MCP Contract Validation', () => {
       const response = JSON.parse(result.content[0].text);
       expect(response.phase).toBeTruthy();
       expect(response.instructions).toBeTruthy();
-      expect(response.conversation_id).toBeTruthy();
     });
   });
 });

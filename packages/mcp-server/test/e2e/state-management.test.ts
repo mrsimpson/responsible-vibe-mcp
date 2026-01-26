@@ -285,7 +285,7 @@ states:
       const first = await client.callTool('whats_next', {
         user_input: 'start project',
       });
-      const firstResponse = assertToolSuccess(first);
+      assertToolSuccess(first);
 
       const proceedResult = await client.callTool('proceed_to_phase', {
         target_phase: 'design',
@@ -296,9 +296,6 @@ states:
 
       // Verify the proceed_to_phase result reflects the transition
       expect(proceedResponse.phase).toBe('design');
-      expect(firstResponse.conversation_id).toBe(
-        proceedResponse.conversation_id
-      );
     });
 
     it('should maintain conversation state consistency', async () => {
@@ -310,7 +307,6 @@ states:
       const stateResource = await client.readResource('state://current');
       const stateData = JSON.parse(stateResource.contents[0].text);
 
-      expect(stateData.conversationId).toBe(response.conversation_id);
       expect(stateData.currentPhase).toBe(response.phase);
     });
 

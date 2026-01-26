@@ -130,13 +130,6 @@ ${baseInstructions}
 ${taskGuidance}
 - Update the "Key Decisions" section with important choices made
 - Add relevant notes to help maintain context`;
-
-    // Add project context
-    enhanced += `\n\n**Project Context:**
-- Project: ${conversationContext.projectPath}
-- Branch: ${conversationContext.gitBranch}
-- Current Phase: ${phase}`;
-
     // Add transition context if this is a modeled transition
     if (isModeled && transitionReason) {
       enhanced += `\n\n**Phase Context:**

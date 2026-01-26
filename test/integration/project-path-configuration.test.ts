@@ -188,7 +188,6 @@ states:
         // Verify the custom workflow was loaded and used
         expect(result).toHaveProperty('phase');
         expect(result).toHaveProperty('instructions');
-        expect(result).toHaveProperty('conversation_id');
         expect(result).toHaveProperty('plan_file_path');
 
         // The key test: verify that the server is using the correct project path

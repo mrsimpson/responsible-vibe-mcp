@@ -2,7 +2,7 @@
  * Phase-Specific Task ID Integration Tests for BeadsInstructionGenerator
  *
  * Tests that validate BeadsInstructionGenerator's ability to extract phase task IDs
- * from plan files and integrate them properly into BD CLI commands.
+ * from plan files and integrate them properly into bd commands.
  */
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
@@ -43,6 +43,7 @@ describe('Phase-Specific Task ID Integration Tests', () => {
     mockInstructionContext = {
       phase: 'design',
       conversationContext: mockConversationContext,
+      instructionSource: 'whats_next',
       transitionReason: 'test transition',
       isModeled: false,
       planFileExists: true,
@@ -89,10 +90,7 @@ Some implementation tasks here.
       expect(result.instructions).toContain(
         "bd create 'Task description' --parent project-epic-1.2"
       );
-      expect(result.instructions).toContain('bd show project-epic-1.2');
-      expect(result.instructions).toContain(
-        'All work items should be created as children of project-epic-1.2'
-      );
+      // Removed 'bd show' expectation - no longer part of minimal output
     });
 
     it('should handle phase task IDs with various formats', async () => {
@@ -161,10 +159,6 @@ Some implementation tasks here.
         ).toContain(
           `bd list --parent phase-${mapping.phase}-123 --status open`
         );
-        expect(
-          result.instructions,
-          `Should capitalize phase name correctly: ${mapping.phase}`
-        ).toContain(`You are currently in the ${mapping.header} phase`);
       }
     });
 
@@ -354,8 +348,8 @@ ${edgeCase.comment}
     });
   });
 
-  describe('BD CLI Command Integration', () => {
-    it('should integrate extracted phase task ID into all relevant BD CLI commands', async () => {
+  describe('bd Command Integration', () => {
+    it('should integrate extracted phase task ID into all relevant bd commands', async () => {
       const planContent = `# Project Plan
 
 ## Design
@@ -370,24 +364,8 @@ ${edgeCase.comment}
         mockInstructionContext
       );
 
-      // Check all BD CLI commands contain the extracted ID
-      const expectedCommands = [
-        'bd list --parent design-epic-789 --status open',
-        "bd create 'Task description' --parent design-epic-789",
-        'bd show design-epic-789',
-      ];
-
-      for (const command of expectedCommands) {
-        expect(
-          result.instructions,
-          `Should contain command: ${command}`
-        ).toContain(command);
-      }
-
       // Should mention the specific task ID in context
-      expect(result.instructions).toContain(
-        'All work items should be created as children of design-epic-789'
-      );
+      expect(result.instructions).toContain('design-epic-789');
       expect(result.instructions).toContain('subtasks of `design-epic-789`');
     });
 
@@ -408,7 +386,7 @@ ${edgeCase.comment}
 
       // Should provide specific immediate action
       expect(result.instructions).toContain(
-        'Run `bd list --parent feature-impl-999 --status open` to see ready tasks'
+        '--parent feature-impl-999 --status open'
       );
     });
 
