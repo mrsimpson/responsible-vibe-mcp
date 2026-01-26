@@ -13,9 +13,7 @@ export * from './transition-engine.js';
 
 // Data management
 export * from './persistence-interface.js';
-export * from './database.js';
 export * from './file-storage.js';
-export * from './migration.js';
 export * from './conversation-manager.js';
 
 // Project and plan management

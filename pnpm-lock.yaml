@@ -14,9 +14,6 @@ importers:
       '@modelcontextprotocol/sdk':
         specifier: 1.25.3
         version: 1.25.3(hono@4.11.6)(zod@3.25.76)
-      '@sqlite.org/sqlite-wasm':
-        specifier: 3.51.2-build5
-        version: 3.51.2-build5
       '@types/js-yaml':
         specifier: 4.0.9
         version: 4.0.9
@@ -100,9 +97,6 @@ importers:
 
   packages/core:
     dependencies:
-      '@sqlite.org/sqlite-wasm':
-        specifier: 3.51.2-build5
-        version: 3.51.2-build5
       '@types/js-yaml':
         specifier: 4.0.9
         version: 4.0.9
@@ -1475,10 +1469,6 @@ packages:
 
   '@shikijs/vscode-textmate@10.0.2':
     resolution: {integrity: sha512-83yeghZ2xxin3Nj8z1NMd/NCuca+gsYXswywDy5bHvwlWL8tpTQmzGeUuHd9FC3E/SBEMvzJRwWEOz5gGes9Qg==}
-
-  '@sqlite.org/sqlite-wasm@3.51.2-build5':
-    resolution: {integrity: sha512-mMELstwZbR0Ld7utCSJ3L6MABXL0081UB2SO6qqjKiEKFNrFfqs98rCHxKuQc6TGgSgWw3Xm5ZhS8AFurHohew==}
-    engines: {node: '>=22'}
 
   '@standard-schema/spec@1.0.0':
     resolution: {integrity: sha512-m2bOd0f2RT9k8QJx1JN85cZYyH1RqFBdlwtkSlf4tBDYLCiiZnv1fIIwacK6cqwXavOydf0NPToMQgpKq+dVlA==}
@@ -4611,8 +4601,6 @@ snapshots:
       '@types/hast': 3.0.4
 
   '@shikijs/vscode-textmate@10.0.2': {}
-
-  '@sqlite.org/sqlite-wasm@3.51.2-build5': {}
 
   '@standard-schema/spec@1.0.0': {}
 
