@@ -111,7 +111,6 @@ describe('Workflow Integration', () => {
       const stateResource = await client.readResource('state://current');
       const stateData = JSON.parse(stateResource.contents[0].text);
       expect(stateData.currentPhase).toBe('finalize');
-      expect(stateData.conversationId).toBe(reqResponse.conversation_id);
     });
 
     it('should handle iterative development with phase revisiting', async () => {
@@ -197,18 +196,14 @@ describe('Workflow Integration', () => {
         user_input: 'project 1 feature',
         context: 'first project',
       });
-      const p1Response = assertToolSuccess(project1);
-      const p1ConversationId = p1Response.conversation_id;
+      assertToolSuccess(project1);
 
       // Continue with same project
       const project1Continue = await client.callTool('whats_next', {
         user_input: 'continue project 1',
         context: 'same project context',
       });
-      const p1ContinueResponse = assertToolSuccess(project1Continue);
-
-      // Should maintain same conversation
-      expect(p1ContinueResponse.conversation_id).toBe(p1ConversationId);
+      assertToolSuccess(project1Continue);
     });
 
     it('should maintain separate plan files for different contexts', async () => {
@@ -276,7 +271,6 @@ describe('Workflow Integration', () => {
       const response = assertToolSuccess(result);
       expect(response.phase).toBeTruthy();
       expect(response.instructions).toBeTruthy();
-      expect(response.conversation_id).toBeTruthy();
     });
 
     it('should handle rapid development iterations', async () => {
@@ -306,7 +300,6 @@ describe('Workflow Integration', () => {
       });
       const impl2Response = assertToolSuccess(impl2);
       expect(impl2Response.phase).toBe('implementation');
-      expect(impl2Response.conversation_id).toBeTruthy();
     });
   });
 
@@ -348,7 +341,6 @@ describe('Workflow Integration', () => {
 
       // Even if there are file system issues, basic functionality should work
       expect(response.phase).toBeTruthy();
-      expect(response.conversation_id).toBeTruthy();
     });
 
     it('should maintain functionality under stress', async () => {
@@ -366,7 +358,6 @@ describe('Workflow Integration', () => {
       for (const result of results) {
         const response = assertToolSuccess(result);
         expect(response.phase).toBeTruthy();
-        expect(response.conversation_id).toBeTruthy();
       }
 
       // Final state should be consistent

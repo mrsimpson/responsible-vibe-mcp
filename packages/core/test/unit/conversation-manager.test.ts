@@ -140,7 +140,6 @@ describe('ConversationManager', () => {
 
       // Verify result has expected structure
       expect(result).toHaveProperty('conversationId');
-      expect(result).toHaveProperty('projectPath', '/test/project/path');
       expect(result).toHaveProperty('gitBranch', 'default');
       expect(result).toHaveProperty('currentPhase', 'idle'); // Should be idle from mock state machine
       expect(result).toHaveProperty('planFilePath');

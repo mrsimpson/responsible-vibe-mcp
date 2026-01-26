@@ -30,8 +30,6 @@ export interface WhatsNextResult {
   phase: string;
   instructions: string;
   plan_file_path: string;
-  is_modeled_transition: boolean;
-  conversation_id: string;
 }
 
 /**
@@ -189,8 +187,6 @@ export class WhatsNextHandler extends ConversationRequiredToolHandler<
       phase: transitionResult.newPhase,
       instructions: finalInstructions,
       plan_file_path: conversationContext.planFilePath,
-      is_modeled_transition: transitionResult.isModeled,
-      conversation_id: conversationContext.conversationId,
     };
 
     // Log interaction

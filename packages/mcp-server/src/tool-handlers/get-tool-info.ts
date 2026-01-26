@@ -73,7 +73,6 @@ interface GetToolInfoResponse {
 
   workflow_states?: {
     current_phase?: string;
-    conversation_id?: string;
     plan_file_path?: string;
   };
 }
@@ -195,7 +194,6 @@ export class GetToolInfoHandler extends BaseToolHandler<
         await context.conversationManager.getConversationContext();
       workflowState = {
         current_phase: conversationContext.currentPhase,
-        conversation_id: conversationContext.conversationId,
         plan_file_path: conversationContext.planFilePath,
       };
     } catch (error) {

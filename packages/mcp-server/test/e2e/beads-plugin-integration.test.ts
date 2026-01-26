@@ -153,7 +153,7 @@ function validateBeadsInstructions(instructions: string): void {
   expect(instructions.toLowerCase()).toContain('task');
 
   // Should have beads-specific guidance
-  expect(instructions).toContain('🔧 BD CLI Task Management');
+  expect(instructions).toContain('bd');
 
   // Should mention using ONLY bd CLI
   expect(instructions).toContain('Use ONLY bd CLI tool');
@@ -506,11 +506,11 @@ describe('Beads Plugin Comprehensive Integration', () => {
 
       // VALIDATE: WITH beads mentions bd CLI
       expect(instructionsWithBeads.toLowerCase()).toContain('bd');
-      expect(instructionsWithBeads).toContain('BD CLI Task Management');
+      expect(instructionsWithBeads).toContain('bd Task Management');
 
       // VALIDATE: WITHOUT beads does NOT mention bd CLI
       expect(instructionsWithout.toLowerCase()).not.toContain('bd cli');
-      expect(instructionsWithout).not.toContain('BD CLI Task Management');
+      expect(instructionsWithout).not.toContain('bd Task Management');
     });
 
     it('should maintain identical response contracts regardless of beads', async () => {
@@ -548,12 +548,10 @@ describe('Beads Plugin Comprehensive Integration', () => {
       await scenarioWithout.cleanup();
 
       // VALIDATE: Both responses have identical properties
-      expect(responseWith).toHaveProperty('conversation_id');
       expect(responseWith).toHaveProperty('phase');
       expect(responseWith).toHaveProperty('plan_file_path');
       expect(responseWith).toHaveProperty('instructions');
 
-      expect(responseWithout).toHaveProperty('conversation_id');
       expect(responseWithout).toHaveProperty('phase');
       expect(responseWithout).toHaveProperty('plan_file_path');
       expect(responseWithout).toHaveProperty('instructions');
@@ -722,7 +720,6 @@ describe('Beads Plugin Comprehensive Integration', () => {
 
       // VALIDATE: Has all required response fields
       const response = assertToolSuccess(result) as StartDevelopmentResult;
-      expect(response).toHaveProperty('conversation_id');
       expect(response).toHaveProperty('phase');
       expect(response).toHaveProperty('plan_file_path');
       expect(response).toHaveProperty('instructions');
@@ -826,9 +823,6 @@ describe('Beads Plugin Comprehensive Integration', () => {
       expect(whatsNextResponse.phase).toBe('explore');
       expect(whatsNextResponse.plan_file_path).toBe(
         startResponse.plan_file_path
-      );
-      expect(whatsNextResponse.conversation_id).toBe(
-        startResponse.conversation_id
       );
 
       // VALIDATE: Plan file is still valid
@@ -1344,10 +1338,7 @@ describe('Beads Plugin Comprehensive Integration', () => {
         commit_behaviour: 'none',
       });
 
-      const startResponse = assertToolSuccess(
-        startResult
-      ) as StartDevelopmentResult;
-      const conversationId = startResponse.conversation_id;
+      assertToolSuccess(startResult) as StartDevelopmentResult;
 
       // Get whats_next
       const whatsNextResult = await client.callTool('whats_next', {
@@ -1361,10 +1352,6 @@ describe('Beads Plugin Comprehensive Integration', () => {
         whatsNextResult
       ) as WhatsNextResult;
 
-      // VALIDATE: Conversation ID preserved after hook execution
-      expect(whatsNextResponse.conversation_id).toBe(conversationId);
-
-      // VALIDATE: Phase information consistent
       expect(whatsNextResponse.phase).toBe('explore');
     });
   });
@@ -1510,11 +1497,9 @@ describe('Beads Plugin Comprehensive Integration', () => {
       ) as StartDevelopmentResult;
 
       // VALIDATE: All standard response properties present
-      expect(startResponse).toHaveProperty('conversation_id');
       expect(startResponse).toHaveProperty('phase');
       expect(startResponse).toHaveProperty('plan_file_path');
       expect(startResponse).toHaveProperty('instructions');
-      expect(startResponse).toHaveProperty('workflow');
 
       // VALIDATE: Can transition phases normally
       const transitionResult = await client.callTool('proceed_to_phase', {

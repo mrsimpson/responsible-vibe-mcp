@@ -38,8 +38,6 @@ export interface StartDevelopmentResult {
   phase: string;
   instructions: string;
   plan_file_path: string;
-  conversation_id: string;
-  workflow: YamlStateMachine;
   workflowDocumentationUrl?: string;
 }
 
@@ -134,8 +132,6 @@ export class StartDevelopmentHandler extends BaseToolHandler<
         phase: 'branch-prompt',
         instructions: `You're currently on the ${currentBranch} branch. It's recommended to create a feature branch for development. Propose a branch creation by suggesting a branch command to the user call start_development again.\n\nSuggested command: \`git checkout -b ${suggestedBranchName}\`\n\nPlease create a new branch and then call start_development again to begin development.`,
         plan_file_path: '',
-        conversation_id: '',
-        workflow: {} as YamlStateMachine,
       };
 
       this.logger.debug(
@@ -270,8 +266,6 @@ export class StartDevelopmentHandler extends BaseToolHandler<
       phase: transitionResult.newPhase,
       instructions: finalInstructions,
       plan_file_path: conversationContext.planFilePath,
-      conversation_id: conversationContext.conversationId,
-      workflow: stateMachine,
       workflowDocumentationUrl,
     };
 
@@ -377,8 +371,6 @@ export class StartDevelopmentHandler extends BaseToolHandler<
         phase: 'artifact-setup',
         instructions: setupGuidance,
         plan_file_path: '',
-        conversation_id: '',
-        workflow: {} as YamlStateMachine,
       };
     } catch (error) {
       this.logger.warn(

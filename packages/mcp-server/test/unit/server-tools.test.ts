@@ -305,7 +305,6 @@ describe('Server Tools', () => {
       expect(result).toHaveProperty('phase', 'idle');
       expect(result).toHaveProperty('instructions');
       expect(result).toHaveProperty('plan_file_path');
-      expect(result).toHaveProperty('conversation_id', 'test-id');
     });
   });
 });

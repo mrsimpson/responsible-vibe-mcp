@@ -101,20 +101,13 @@ export class BeadsInstructionGenerator implements IInstructionGenerator {
     baseInstructions: string,
     context: InstructionContext
   ): Promise<string> {
-    const {
-      phase,
-      conversationContext,
-      transitionReason,
-      isModeled,
-      planFileExists,
-    } = context;
+    const { planFileExists } = context;
 
     // Generate beads-specific task management guidance
-    const beadsTaskGuidance = await this.generateBeadsTaskGuidance(context);
+    const beadsTaskGuidance = await this.generateBeadsCLIGuidance(context);
 
     // Beads-optimized instruction structure
-    const enhanced = `You are in the ${phase} phase.
-${baseInstructions}
+    let enhanced = `${baseInstructions}
 
 **Plan File Guidance:**
 Use the plan file as memory for the current objective
@@ -122,92 +115,67 @@ Use the plan file as memory for the current objective
 - Add relevant notes to help maintain context
 - Do NOT enter tasks in the plan file, use beads CLI exclusively for task management
 
-**🔧 BD CLI Task Management:**
 ${beadsTaskGuidance}`;
-
-    // Add project context
-    const enhancedWithContext =
-      enhanced +
-      `\n\n**Project Context:**
-- Project: ${conversationContext.projectPath}
-- Branch: ${conversationContext.gitBranch}
-- Current Phase: ${phase}`;
-
-    // Add transition context if this is a modeled transition
-    let final = enhancedWithContext;
-    if (isModeled && transitionReason) {
-      final += `\n\n**Phase Context:**
-- ${transitionReason}`;
-    }
 
     // Add plan file creation note if needed
     if (!planFileExists) {
-      final +=
+      enhanced +=
         '\n\n**Note**: Plan file will be created when you first update it.';
     }
 
     // Add beads-specific reminders
-    final += `\n\n**Important Reminders:**
+    enhanced += `\n\n**Important Reminders:**
 - Use ONLY bd CLI tool for task management - do not use your own task management tools
 - Call whats_next() after the next user message to maintain the development workflow`;
 
-    return final;
+    return enhanced;
   }
 
   /**
    * Generate beads-specific task management guidance
    */
-  private async generateBeadsTaskGuidance(
+  private async generateBeadsCLIGuidance(
     context: InstructionContext
   ): Promise<string> {
-    const { phase, instructionSource } = context;
+    const { instructionSource } = context;
 
-    // For explicit phase transitions (proceed_to_phase), provide minimal guidance
-    // The detailed guidance is better suited for whats_next which analyzes context
-    if (instructionSource === 'proceed_to_phase') {
-      return `- Use bd CLI tool exclusively for task management
-- Do not use your own task management tools`;
-    }
+    // For whats_next, provide detailed guidance
+    if (instructionSource === 'whats_next') {
+      let additionalInstructions = `**bd Task Management:**
+      `;
 
-    // For implicit transitions (whats_next), provide detailed guidance
-    // Extract phase task ID from plan file (this would need to be implemented)
-    const phaseTaskId = await this.extractPhaseTaskId(context);
+      const phaseTaskId = await this.extractPhaseTaskId(context);
 
-    if (!phaseTaskId) {
-      return `- Use bd CLI tool exclusively
+      if (!phaseTaskId) {
+        return (
+          additionalInstructions +
+          `- Use bd CLI tool exclusively
 - **Start by listing ready tasks**: \`bd list --parent <phase-task-id> --status open\`
 - **Create new tasks**: \`bd create 'Task title' --parent <phase-task-id> -p <priority>\`
 - **Update status when working**: \`bd update <task-id> --status in_progress\`
 - **Complete tasks**: \`bd close <task-id>\`
 - **Focus on ready tasks first** - let beads handle dependencies
-- Add new tasks as they are identified during your work with the user`;
-    }
+- Add new tasks as they are identified during your work with the user`
+        );
+      }
 
-    return `
-You are currently in the ${this.capitalizePhase(phase)} phase. All work items should be created as children of ${phaseTaskId}.
-
-**Focus on ${this.capitalizePhase(phase)} Phase Tasks** (subtasks of \`${phaseTaskId}\`):
+      return (
+        additionalInstructions +
+        `
+**Focus on subtasks of \`${phaseTaskId}\`**:
 • \`bd list --parent ${phaseTaskId} --status open\` - List ready work items
 • \`bd update <task-id> --status in_progress\` - Start working on a specific task
 • \`bd close <task-id>\` - Mark task complete when finished
 
 **New Tasks for Current Phase**:
 • \`bd create 'Task description' --parent ${phaseTaskId} -p <priority>\` - Create work item under current phase
-• \`bd dep add <task-id> <depends-on-id>\` - Define dependencies for a task:
+• \`bd dep add <task-id> <depends-on-id>\` - Define dependencies for a task:`
+      );
+    }
 
-
-**Essential bd Commands**:
-• \`bd list --parent ${phaseTaskId} --status open\` - List ready work items
-• \`bd update <task-id> --status in_progress\` - Start working
-• \`bd close <task-id>\` - Complete work item
-• \`bd show ${phaseTaskId}\` - View phase and its work items
-
-**Immediate Action**: Run \`bd list --parent ${phaseTaskId} --status open\` to see ready tasks.`;
+    return '';
   }
 
-  /**
-   * Extract phase task ID from plan file (simplified implementation)
-   */
   private async extractPhaseTaskId(
     context: InstructionContext
   ): Promise<string | null> {

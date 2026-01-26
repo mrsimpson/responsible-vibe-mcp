@@ -70,7 +70,6 @@ describe('Markdown Backend Protection Tests', () => {
       expect(result.instructions).toContain(
         'Add relevant notes to help maintain context'
       );
-      expect(result.instructions).toContain('**Project Context:**');
       expect(result.instructions).toContain('**Important Reminders:**');
       expect(result.instructions).toContain(
         'Use ONLY the development plan for task management'
@@ -242,7 +241,6 @@ describe('Markdown Backend Protection Tests', () => {
       expect(result.instructions).toContain('Check your plan file at');
       expect(result.instructions).toContain('**Plan File Guidance:**');
       expect(result.instructions).toContain('Work on the tasks listed in');
-      expect(result.instructions).toContain('**Project Context:**');
     });
   });
 

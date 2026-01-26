@@ -69,7 +69,6 @@ describe('Core Functionality', () => {
 
       expect(response.phase).toBeTruthy();
       expect(response.instructions).toBeTruthy();
-      expect(response.conversation_id).toBeTruthy();
       expect(response.plan_file_path).toBeTruthy();
     });
 
@@ -148,29 +147,22 @@ describe('Core Functionality', () => {
 
   describe('Basic Conversation Management', () => {
     it('should create new conversations', async () => {
-      const result = await client.callTool('whats_next', {
+      await client.callTool('whats_next', {
         user_input: 'new feature request',
       });
-      const response = assertToolSuccess(result);
-
-      expect(response.conversation_id).toBeTruthy();
-      expect(response.conversation_id).toMatch(/^default-sm-/);
     });
 
     it('should maintain conversation state across calls', async () => {
       const first = await client.callTool('whats_next', {
         user_input: 'start project',
       });
-      const firstResponse = assertToolSuccess(first);
+      assertToolSuccess(first);
 
       const second = await client.callTool('whats_next', {
         user_input: 'continue project',
       });
-      const secondResponse = assertToolSuccess(second);
-
-      expect(firstResponse.conversation_id).toBe(
-        secondResponse.conversation_id
-      );
+      assertToolSuccess(second);
     });
   });
+  assertToolSuccess(result);
 });

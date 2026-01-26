@@ -171,10 +171,6 @@ describe('InstructionGenerator', () => {
       // Should contain enhanced instruction elements
       expect(result.instructions).toContain('Check your plan file');
       expect(result.instructions).toContain('**Plan File Guidance:**');
-      expect(result.instructions).toContain('**Project Context:**');
-      expect(result.instructions).toContain('Project: /test/project');
-      expect(result.instructions).toContain('Branch: main');
-      expect(result.instructions).toContain('Current Phase: design');
 
       // Should contain substituted variable
       expect(result.instructions).toContain(

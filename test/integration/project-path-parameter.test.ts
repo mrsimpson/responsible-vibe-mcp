@@ -128,7 +128,6 @@ describe('Project Path Parameter', () => {
       // Verify conversation and plan file are created in external directory
       expect(startResult.plan_file_path).toContain(externalDir);
       expect(startResult.plan_file_path).toContain('/.vibe/');
-      expect(startResult.conversation_id).toBeTruthy();
 
       // Verify .vibe directory structure exists
       const vibeDir = join(externalDir, '.vibe');
@@ -166,7 +165,6 @@ describe('Project Path Parameter', () => {
 
       // Should use default project path (process.cwd())
       expect(result.plan_file_path).toContain(process.cwd());
-      expect(result.conversation_id).toBeTruthy();
 
       await server.cleanup();
     });
@@ -270,7 +268,6 @@ describe('Project Path Parameter', () => {
         return;
       }
 
-      expect(result.conversation_id).toBeTruthy();
       expect(result.plan_file_path).toContain(externalDir);
 
       // Verify .vibe/.gitignore is created
