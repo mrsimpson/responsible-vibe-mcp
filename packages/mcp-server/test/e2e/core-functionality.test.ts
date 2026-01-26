@@ -164,5 +164,4 @@ describe('Core Functionality', () => {
       assertToolSuccess(second);
     });
   });
-  assertToolSuccess(result);
 });

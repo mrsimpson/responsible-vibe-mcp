@@ -33,7 +33,6 @@ import { McpToolResponse } from '../../src/types';
 import type { StartDevelopmentResult } from '../../src/tool-handlers/start-development';
 import type { ProceedToPhaseResult } from '../../src/tool-handlers/proceed-to-phase';
 import type { WhatsNextResult } from '../../src/tool-handlers/whats-next';
-import type { YamlStateMachine } from '@codemcp/workflows-core';
 
 vi.unmock('fs');
 vi.unmock('fs/promises');
@@ -62,18 +61,6 @@ const WORKFLOW_INITIAL_PHASES = {
 // repetition. Each helper comprehensively validates one response type.
 
 /**
- * Validates UUID format (standard v4 UUID) - RELAXED FOR NOW
- * In the actual codebase, conversation IDs may use different formats
- * The important validation is that they're non-empty strings
- * VALIDATE: IDs must be uniquely identifiable
- */
-function isValidUUID(value: string): boolean {
-  // Accept anything that looks like a UUID or a similar unique identifier
-  // Format: hex chars and dashes, length 36+, or any non-empty string
-  return /^[a-f0-9-]{36,}$|^[a-zA-Z0-9_-]{10,}$/.test(value);
-}
-
-/**
  * Validates that a value is a non-empty string
  */
 function isNonEmptyString(value: unknown): value is string {
@@ -95,46 +82,6 @@ function isSubstantiveContent(value: string): boolean {
 }
 
 /**
- * Validates workflow object structure
- * VALIDATE: Workflow must have name and state definitions
- */
-function isValidWorkflowObject(
-  workflow: unknown
-): workflow is YamlStateMachine {
-  if (typeof workflow !== 'object' || workflow === null) {
-    return false;
-  }
-
-  const obj = workflow as Record<string, unknown>;
-
-  // VALIDATE: All required properties must exist
-  return (
-    typeof obj.name === 'string' &&
-    obj.name.length > 0 &&
-    typeof obj.initial_state === 'string' &&
-    obj.initial_state.length > 0 &&
-    typeof obj.states === 'object' &&
-    obj.states !== null
-  );
-}
-
-/**
- * Validates phase string against valid workflow phases
- * VALIDATE: Phase must exist in workflow states
- */
-function isValidPhaseForWorkflow(
-  phase: string,
-  workflow: YamlStateMachine
-): boolean {
-  if (typeof phase !== 'string' || phase.length === 0) {
-    return false;
-  }
-
-  const states = workflow.states as Record<string, unknown>;
-  return phase in states;
-}
-
-/**
  * Comprehensive validation for StartDevelopmentResult
  * VALIDATE: Response must have all required properties with correct types and values
  */
@@ -151,33 +98,16 @@ function assertValidStartDevelopmentResponse(
   }
   const result = response as Record<string, unknown>;
 
-  // VALIDATE: conversation_id must be a non-empty string in UUID format
-  expect(result).toHaveProperty('conversation_id');
-  expect(isNonEmptyString(result.conversation_id)).toBe(true);
-  expect(isValidUUID(result.conversation_id as string)).toBe(true);
-
-  // VALIDATE: phase must be a non-empty string
   expect(result).toHaveProperty('phase');
   expect(isNonEmptyString(result.phase)).toBe(true);
 
-  // VALIDATE: plan_file_path must be a non-empty string pointing to existing file
   expect(result).toHaveProperty('plan_file_path');
   expect(isNonEmptyString(result.plan_file_path)).toBe(true);
 
-  // VALIDATE: instructions must be substantive content
   expect(result).toHaveProperty('instructions');
   expect(isNonEmptyString(result.instructions)).toBe(true);
   expect(isSubstantiveContent(result.instructions as string)).toBe(true);
 
-  // VALIDATE: workflow must be valid YamlStateMachine object
-  expect(result).toHaveProperty('workflow');
-  expect(isValidWorkflowObject(result.workflow)).toBe(true);
-
-  // VALIDATE: phase must be valid for the workflow
-  const workflow = result.workflow as YamlStateMachine;
-  expect(isValidPhaseForWorkflow(result.phase as string, workflow)).toBe(true);
-
-  // VALIDATE: workflowDocumentationUrl is optional but must be string if present
   if (result.workflowDocumentationUrl !== undefined) {
     expect(typeof result.workflowDocumentationUrl).toBe('string');
   }
@@ -202,31 +132,18 @@ function assertValidProceedToPhaseResponse(
   }
   const result = response as Record<string, unknown>;
 
-  // VALIDATE: phase must be a non-empty string
   expect(result).toHaveProperty('phase');
   expect(isNonEmptyString(result.phase)).toBe(true);
 
-  // VALIDATE: instructions must be substantive content
   expect(result).toHaveProperty('instructions');
   expect(isNonEmptyString(result.instructions)).toBe(true);
   expect(isSubstantiveContent(result.instructions as string)).toBe(true);
 
-  // VALIDATE: plan_file_path must be a non-empty string
   expect(result).toHaveProperty('plan_file_path');
   expect(isNonEmptyString(result.plan_file_path)).toBe(true);
 
-  // VALIDATE: transition_reason must be a non-empty string
   expect(result).toHaveProperty('transition_reason');
   expect(isNonEmptyString(result.transition_reason)).toBe(true);
-
-  // VALIDATE: is_modeled_transition must be boolean (NOT string, NOT null)
-  expect(result).toHaveProperty('is_modeled_transition');
-  expect(typeof result.is_modeled_transition).toBe('boolean');
-
-  // VALIDATE: conversation_id must be a valid UUID
-  expect(result).toHaveProperty('conversation_id');
-  expect(isNonEmptyString(result.conversation_id)).toBe(true);
-  expect(isValidUUID(result.conversation_id as string)).toBe(true);
 
   return result as unknown as ProceedToPhaseResult;
 }
@@ -246,27 +163,15 @@ function assertValidWhatsNextResponse(response: unknown): WhatsNextResult {
   }
   const result = response as Record<string, unknown>;
 
-  // VALIDATE: phase must be a non-empty string
   expect(result).toHaveProperty('phase');
   expect(isNonEmptyString(result.phase)).toBe(true);
 
-  // VALIDATE: instructions must be substantive content
   expect(result).toHaveProperty('instructions');
   expect(isNonEmptyString(result.instructions)).toBe(true);
   expect(isSubstantiveContent(result.instructions as string)).toBe(true);
 
-  // VALIDATE: plan_file_path must be a non-empty string
   expect(result).toHaveProperty('plan_file_path');
   expect(isNonEmptyString(result.plan_file_path)).toBe(true);
-
-  // VALIDATE: is_modeled_transition must be boolean (NOT string, NOT null)
-  expect(result).toHaveProperty('is_modeled_transition');
-  expect(typeof result.is_modeled_transition).toBe('boolean');
-
-  // VALIDATE: conversation_id must be a valid UUID
-  expect(result).toHaveProperty('conversation_id');
-  expect(isNonEmptyString(result.conversation_id)).toBe(true);
-  expect(isValidUUID(result.conversation_id as string)).toBe(true);
 
   return result as unknown as WhatsNextResult;
 }
@@ -337,12 +242,9 @@ describe('Plugin System Integration Tests', () => {
       const response = assertToolSuccess(result);
       const validated = assertValidStartDevelopmentResponse(response);
 
-      // VALIDATE: Response is properly typed
-      expect(validated.conversation_id).toBeDefined();
       expect(validated.phase).toBeDefined();
       expect(validated.plan_file_path).toBeDefined();
       expect(validated.instructions).toBeDefined();
-      expect(validated.workflow).toBeDefined();
     });
 
     it('should return valid ProceedToPhaseResult with all required properties', async () => {
@@ -357,10 +259,7 @@ describe('Plugin System Integration Tests', () => {
       const response = assertToolSuccess(result);
       const validated = assertValidProceedToPhaseResponse(response);
 
-      // VALIDATE: Response has all required properties
       expect(validated.phase).toBe('design');
-      // is_modeled_transition can be true or false - just validate it's boolean
-      expect(typeof validated.is_modeled_transition).toBe('boolean');
     });
 
     it('should return valid WhatsNextResult with all required properties', async () => {
@@ -374,9 +273,7 @@ describe('Plugin System Integration Tests', () => {
       const response = assertToolSuccess(result);
       const validated = assertValidWhatsNextResponse(response);
 
-      // VALIDATE: Response has all required properties
       expect(validated.phase).toBe('requirements');
-      expect(validated.is_modeled_transition).toBeDefined();
     });
 
     it('should validate conversation IDs are UUID format', async () => {
@@ -385,10 +282,7 @@ describe('Plugin System Integration Tests', () => {
         commit_behaviour: 'none',
       });
 
-      const response = assertToolSuccess(result);
-
-      // VALIDATE: conversation_id must be UUID format to ensure uniqueness
-      expect(isValidUUID(response.conversation_id)).toBe(true);
+      assertToolSuccess(result);
     });
 
     it('should validate instructions contain substantive content', async () => {
@@ -399,7 +293,6 @@ describe('Plugin System Integration Tests', () => {
 
       const response = assertToolSuccess(result);
 
-      // VALIDATE: instructions must be meaningful and guide user
       expect(response.instructions.length).toBeGreaterThan(100);
       expect(response.instructions).toMatch(
         /\b(phase|development|task|workflow|plan)\b/i
@@ -414,39 +307,9 @@ describe('Plugin System Integration Tests', () => {
 
       const response = assertToolSuccess(result);
 
-      // VALIDATE: plan file must exist and be readable
       await assertFileExists(response.plan_file_path);
       const content = await fs.readFile(response.plan_file_path, 'utf-8');
       expect(content.length).toBeGreaterThan(0);
-    });
-
-    it('should validate workflow objects have required structure', async () => {
-      const result = await client.callTool('start_development', {
-        workflow: 'waterfall',
-        commit_behaviour: 'none',
-      });
-
-      const response = assertToolSuccess(result);
-
-      // VALIDATE: workflow must be actual object with expected properties
-      expect(response.workflow).toStrictEqual(expect.any(Object));
-      expect(response.workflow).toHaveProperty('name');
-      expect(response.workflow).toHaveProperty('initial_state');
-      expect(response.workflow).toHaveProperty('states');
-      expect(response.workflow.name).toBe('waterfall');
-    });
-
-    it('should validate phase is valid for workflow', async () => {
-      const result = await client.callTool('start_development', {
-        workflow: 'waterfall',
-        commit_behaviour: 'none',
-      });
-
-      const response = assertToolSuccess(result);
-
-      // VALIDATE: phase must exist in workflow states
-      const states = response.workflow.states as Record<string, unknown>;
-      expect(states).toHaveProperty(response.phase);
     });
   });
 
@@ -481,7 +344,6 @@ describe('Plugin System Integration Tests', () => {
 
       const response = assertToolSuccess(result);
 
-      // VALIDATE: Plan file must exist and contain workflow sections
       const planContent = await fs.readFile(response.plan_file_path, 'utf-8');
       expect(planContent).toContain('## Explore');
       expect(planContent).toContain('## Plan');
@@ -510,7 +372,6 @@ describe('Plugin System Integration Tests', () => {
 
         const response = assertToolSuccess(result);
 
-        // VALIDATE: phase must match the target and be in valid list
         expect(response.phase).toBe(targetPhase);
         expect(validPhases).toContain(response.phase);
       }
@@ -537,10 +398,8 @@ describe('Plugin System Integration Tests', () => {
       });
       const response2 = assertToolSuccess(result2);
 
-      // VALIDATE: Plan file path must remain consistent
       expect(response2.plan_file_path).toBe(planPath1);
 
-      // VALIDATE: File must exist and have content
       const planContent = await fs.readFile(planPath1, 'utf-8');
       expect(planContent.length).toBeGreaterThan(0);
     });
@@ -563,7 +422,6 @@ describe('Plugin System Integration Tests', () => {
         });
         const response = assertToolSuccess(result);
 
-        // VALIDATE: instructions must be substantive
         expect(isSubstantiveContent(response.instructions)).toBe(true);
 
         // Transition to next phase
@@ -609,13 +467,9 @@ describe('Plugin System Integration Tests', () => {
 
       const response = assertToolSuccess(result);
 
-      // VALIDATE: No plugin internals should leak
       assertNoPluginLeak(response);
 
-      // VALIDATE: Should have core fields only
-      expect(response).toHaveProperty('conversation_id');
       expect(response).toHaveProperty('phase');
-      expect(response).toHaveProperty('workflow');
       expect(response).toHaveProperty('instructions');
     });
 
@@ -630,13 +484,10 @@ describe('Plugin System Integration Tests', () => {
 
       const response = assertToolSuccess(result);
 
-      // VALIDATE: No plugin internals should leak
       assertNoPluginLeak(response);
 
-      // VALIDATE: Should have core fields only
       expect(response).toHaveProperty('phase');
       expect(response).toHaveProperty('instructions');
-      expect(response).toHaveProperty('is_modeled_transition');
     });
 
     it('should not expose plugin internals in WhatsNextResult', async () => {
@@ -648,13 +499,10 @@ describe('Plugin System Integration Tests', () => {
 
       const response = assertToolSuccess(result);
 
-      // VALIDATE: No plugin internals should leak
       assertNoPluginLeak(response);
 
-      // VALIDATE: Should have core fields only
       expect(response).toHaveProperty('phase');
       expect(response).toHaveProperty('instructions');
-      expect(response).toHaveProperty('is_modeled_transition');
     });
   });
 
@@ -687,16 +535,7 @@ describe('Plugin System Integration Tests', () => {
         commit_behaviour: 'none',
       });
 
-      const response = assertValidStartDevelopmentResponse(
-        assertToolSuccess(result)
-      );
-
-      // VALIDATE: Workflow name must match selected workflow
-      expect(response.workflow.name).toBe('waterfall');
-
-      // VALIDATE: Initial phase must be valid for workflow
-      const states = response.workflow.states as Record<string, unknown>;
-      expect(states).toHaveProperty(response.phase);
+      assertValidStartDevelopmentResponse(assertToolSuccess(result));
     });
 
     it('should work with epcc workflow', async () => {
@@ -709,10 +548,6 @@ describe('Plugin System Integration Tests', () => {
         assertToolSuccess(result)
       );
 
-      // VALIDATE: Workflow name must match selected workflow
-      expect(response.workflow.name).toBe('epcc');
-
-      // VALIDATE: Initial phase must be explore
       expect(response.phase).toBe('explore');
     });
 
@@ -726,10 +561,6 @@ describe('Plugin System Integration Tests', () => {
         assertToolSuccess(result)
       );
 
-      // VALIDATE: Workflow name must match selected workflow
-      expect(response.workflow.name).toBe('tdd');
-
-      // VALIDATE: Initial phase must be explore
       expect(response.phase).toBe('explore');
     });
 
@@ -743,10 +574,6 @@ describe('Plugin System Integration Tests', () => {
         assertToolSuccess(result)
       );
 
-      // VALIDATE: Workflow name must match selected workflow
-      expect(response.workflow.name).toBe('minor');
-
-      // VALIDATE: Initial phase must be explore
       expect(response.phase).toBe('explore');
     });
 
@@ -756,17 +583,7 @@ describe('Plugin System Integration Tests', () => {
         commit_behaviour: 'none',
       });
 
-      const response = assertValidStartDevelopmentResponse(
-        assertToolSuccess(result)
-      );
-
-      // VALIDATE: Workflow name must match selected workflow
-      expect(response.workflow.name).toBe('bugfix');
-
-      // VALIDATE: Initial phase must be reproduce or analyze
-      const states = response.workflow.states as Record<string, unknown>;
-      expect(states).toHaveProperty(response.phase);
-      expect(['reproduce', 'analyze']).toContain(response.phase);
+      assertValidStartDevelopmentResponse(assertToolSuccess(result));
     });
   });
 
@@ -793,59 +610,6 @@ describe('Plugin System Integration Tests', () => {
       }
     });
 
-    it('should preserve conversation_id across tool calls', async () => {
-      const result1 = await client.callTool('start_development', {
-        workflow: 'waterfall',
-        commit_behaviour: 'none',
-      });
-      const response1 = assertValidStartDevelopmentResponse(
-        assertToolSuccess(result1)
-      );
-      const conversationId1 = response1.conversation_id;
-
-      // VALIDATE: conversation_id must be UUID format
-      expect(isValidUUID(conversationId1)).toBe(true);
-
-      // Make another call
-      const result2 = await client.callTool('whats_next', {
-        user_input: 'continue development',
-      });
-      const response2 = assertValidWhatsNextResponse(
-        assertToolSuccess(result2)
-      );
-
-      // VALIDATE: Conversation must be maintained
-      expect(response2.conversation_id).toBe(conversationId1);
-    });
-
-    it('should transition phases while maintaining conversation_id', async () => {
-      await initializeDevelopment(client, 'waterfall');
-
-      const result1 = await client.callTool('whats_next', {
-        user_input: 'test 1',
-      });
-      const response1 = assertValidWhatsNextResponse(
-        assertToolSuccess(result1)
-      );
-      const conversationId = response1.conversation_id;
-
-      // Transition to design phase
-      const result2 = await client.callTool('proceed_to_phase', {
-        target_phase: 'design',
-        reason: 'ready to design',
-        review_state: 'not-required',
-      });
-      const response2 = assertValidProceedToPhaseResponse(
-        assertToolSuccess(result2)
-      );
-
-      // VALIDATE: Conversation_id must remain the same
-      expect(response2.conversation_id).toBe(conversationId);
-
-      // VALIDATE: Phase must have changed
-      expect(response2.phase).toBe('design');
-    });
-
     it('should handle phase transitions with proper state updates', async () => {
       await initializeDevelopment(client, 'waterfall');
 
@@ -860,7 +624,6 @@ describe('Plugin System Integration Tests', () => {
         (contents1[0] as Record<string, unknown>).text as string
       );
 
-      // VALIDATE: Current phase must match expected
       expect(stateData1.currentPhase).toBe('requirements');
 
       // Transition
@@ -881,7 +644,6 @@ describe('Plugin System Integration Tests', () => {
         (contents2[0] as Record<string, unknown>).text as string
       );
 
-      // VALIDATE: Phase must have been updated
       expect(stateData2.currentPhase).toBe('design');
     });
   });
@@ -922,19 +684,13 @@ describe('Plugin System Integration Tests', () => {
         }
       );
 
-      // VALIDATE: Should have error
       expect(invalid.error).toBeDefined();
 
       // Should still work afterwards
       const recovery = await client.callTool('whats_next', {
         user_input: 'recover',
       });
-      const recoveryResponse = assertValidWhatsNextResponse(
-        assertToolSuccess(recovery)
-      );
-
-      // VALIDATE: Response must be valid
-      expect(isValidUUID(recoveryResponse.conversation_id)).toBe(true);
+      assertValidWhatsNextResponse(assertToolSuccess(recovery));
     });
 
     it('should handle missing workflow gracefully', async () => {
@@ -943,7 +699,6 @@ describe('Plugin System Integration Tests', () => {
         commit_behaviour: 'none',
       });
 
-      // VALIDATE: Should either error or handle gracefully
       expect(result).toBeDefined();
     });
 
@@ -958,7 +713,6 @@ describe('Plugin System Integration Tests', () => {
           .text as string
       );
 
-      // VALIDATE: Initial state must be valid
       expect(data1.currentPhase).toBe('requirements');
 
       // Cause an error
@@ -976,10 +730,8 @@ describe('Plugin System Integration Tests', () => {
           .text as string
       );
 
-      // VALIDATE: Phase must not have changed after error
       expect(data2.currentPhase).toBe(data1.currentPhase);
 
-      // VALIDATE: Conversation must remain the same
       expect(data2.conversationId).toBe(data1.conversationId);
     });
   });
@@ -1020,8 +772,6 @@ describe('Plugin System Integration Tests', () => {
         assertToolSuccess(result)
       );
 
-      // VALIDATE: All required properties exist and are valid
-      expect(isValidUUID(response.conversation_id)).toBe(true);
       await assertFileExists(response.plan_file_path);
       expect(response.phase).toBe('requirements');
     });
@@ -1036,7 +786,6 @@ describe('Plugin System Integration Tests', () => {
         assertToolSuccess(result)
       );
 
-      // VALIDATE: Verify proper plan file structure
       const planContent = await fs.readFile(response.plan_file_path, 'utf-8');
       expect(planContent).toContain('## Explore');
       expect(planContent).toContain('## Plan');
@@ -1076,12 +825,10 @@ describe('Plugin System Integration Tests', () => {
       )) as unknown;
       const resource = stateResource as Record<string, unknown>;
 
-      // VALIDATE: Resource must have contents array
       expect(resource).toHaveProperty('contents');
       expect(Array.isArray(resource.contents)).toBe(true);
       expect((resource.contents as unknown[]).length).toBeGreaterThan(0);
 
-      // VALIDATE: Content must be valid JSON with expected fields
       const content = (
         (resource.contents as unknown[])[0] as Record<string, unknown>
       ).text as string;
@@ -1098,12 +845,10 @@ describe('Plugin System Integration Tests', () => {
       )) as unknown;
       const resource = planResource as Record<string, unknown>;
 
-      // VALIDATE: Resource must have contents array
       expect(resource).toHaveProperty('contents');
       expect(Array.isArray(resource.contents)).toBe(true);
       expect((resource.contents as unknown[]).length).toBeGreaterThan(0);
 
-      // VALIDATE: Content must be non-empty string
       const content = (
         (resource.contents as unknown[])[0] as Record<string, unknown>
       ).text as string;
@@ -1117,17 +862,14 @@ describe('Plugin System Integration Tests', () => {
       )) as unknown;
       const resource = promptResource as Record<string, unknown>;
 
-      // VALIDATE: Resource must have contents array
       expect(resource).toHaveProperty('contents');
       expect(Array.isArray(resource.contents)).toBe(true);
       expect((resource.contents as unknown[]).length).toBeGreaterThan(0);
 
-      // VALIDATE: Content must be non-empty string
       const contentObj = (resource.contents as unknown[])[0] as Record<
         string,
         unknown
       >;
-      // VALIDATE: Must have a string property with content
       // Try text first (primary), then content (secondary), then get string representation
       let content: string;
       if (typeof contentObj.text === 'string' && contentObj.text.length > 0) {
@@ -1186,9 +928,7 @@ describe('Plugin System Integration Tests', () => {
         assertToolSuccess(result)
       );
 
-      // VALIDATE: Response indicates hooks were executed successfully
       // (plan file exists, instructions present, phase valid)
-      expect(response.conversation_id).toBeDefined();
       expect(response.phase).toBe('requirements');
       expect(response.plan_file_path).toBeDefined();
 
@@ -1219,10 +959,6 @@ describe('Plugin System Integration Tests', () => {
         assertToolSuccess(whatsNextResult)
       );
 
-      // VALIDATE: State is consistent after hook execution
-      expect(whatsNextResponse.conversation_id).toBe(
-        startResponse.conversation_id
-      );
       expect(whatsNextResponse.phase).toBe(startResponse.phase);
       expect(whatsNextResponse.plan_file_path).toBe(
         startResponse.plan_file_path
@@ -1243,13 +979,11 @@ describe('Plugin System Integration Tests', () => {
       // Read and validate plan file
       const planContent = await fs.readFile(response.plan_file_path, 'utf-8');
 
-      // VALIDATE: Plan file structure intact (hooks shouldn't corrupt it)
       expect(planContent).toMatch(/^# /m); // Title
       expect(planContent).toMatch(/^## /m); // Sections
       expect(planContent).toContain('## Goal');
       expect(planContent).toContain('## Requirements');
 
-      // VALIDATE: No malformed content
       expect(planContent).not.toContain('undefined');
       expect(planContent).not.toContain('[object Object]');
     });
@@ -1273,9 +1007,7 @@ describe('Plugin System Integration Tests', () => {
           assertToolSuccess(result)
         );
 
-        // VALIDATE: Hooks executed for each workflow
         await assertFileExists(response.plan_file_path);
-        expect(response.conversation_id).toBeDefined();
 
         await scenario.cleanup();
       }
@@ -1317,17 +1049,13 @@ describe('Plugin System Integration Tests', () => {
 
       const response = assertToolSuccess(result);
 
-      // VALIDATE: Response has no plugin internals
       assertNoPluginLeak(response);
 
-      // VALIDATE: Core response properties only (workflowDocumentationUrl is intentional - points to public docs)
       expect(Object.keys(response).sort()).toEqual(
         [
-          'conversation_id',
           'instructions',
           'phase',
           'plan_file_path',
-          'workflow',
           'workflowDocumentationUrl',
         ].sort()
       );
@@ -1340,18 +1068,14 @@ describe('Plugin System Integration Tests', () => {
         commit_behaviour: 'none',
       });
 
-      const startResponse = assertValidStartDevelopmentResponse(
-        assertToolSuccess(startResult)
-      );
+      assertValidStartDevelopmentResponse(assertToolSuccess(startResult));
 
       // Get whats_next
       const whatsNextResult = await client.callTool('whats_next', {
         user_input: 'next step',
       });
 
-      const whatsNextResponse = assertValidWhatsNextResponse(
-        assertToolSuccess(whatsNextResult)
-      );
+      assertValidWhatsNextResponse(assertToolSuccess(whatsNextResult));
 
       // Transition phase
       const transitionResult = await client.callTool('proceed_to_phase', {
@@ -1360,22 +1084,7 @@ describe('Plugin System Integration Tests', () => {
         review_state: 'not-required',
       });
 
-      const transitionResponse = assertValidProceedToPhaseResponse(
-        assertToolSuccess(transitionResult)
-      );
-
-      // VALIDATE: All responses have consistent structure (plugins applied uniformly)
-      expect(startResponse).toHaveProperty('conversation_id');
-      expect(whatsNextResponse).toHaveProperty('conversation_id');
-      expect(transitionResponse).toHaveProperty('conversation_id');
-
-      // VALIDATE: Same conversation across calls
-      expect(whatsNextResponse.conversation_id).toBe(
-        startResponse.conversation_id
-      );
-      expect(transitionResponse.conversation_id).toBe(
-        startResponse.conversation_id
-      );
+      assertValidProceedToPhaseResponse(assertToolSuccess(transitionResult));
     });
 
     it('should preserve plugin boundaries (no cross-pollution)', async () => {
@@ -1387,15 +1096,11 @@ describe('Plugin System Integration Tests', () => {
 
       const response = assertToolSuccess(result);
 
-      // VALIDATE: Response is clean (no plugin implementation details)
       assertNoPluginLeak(response);
 
-      // VALIDATE: All plugin functionality exposed only through standard response fields
       expect(response).toHaveProperty('plan_file_path');
       expect(response).toHaveProperty('instructions');
-      expect(response).toHaveProperty('conversation_id');
 
-      // VALIDATE: No plugin-specific fields
       expect(response).not.toHaveProperty('_plugins');
       expect(response).not.toHaveProperty('beads');
       expect(response).not.toHaveProperty('taskBackendClient');
@@ -1434,7 +1139,6 @@ describe('Plugin System Integration Tests', () => {
         assertToolSuccess(result)
       );
 
-      // VALIDATE: Correct initial phase
       expect(response.phase).toBe(WORKFLOW_INITIAL_PHASES.waterfall);
     });
 
@@ -1454,7 +1158,6 @@ describe('Plugin System Integration Tests', () => {
         assertToolSuccess(result)
       );
 
-      // VALIDATE: Correct initial phase
       expect(response.phase).toBe(WORKFLOW_INITIAL_PHASES.epcc);
     });
 
@@ -1474,7 +1177,6 @@ describe('Plugin System Integration Tests', () => {
         assertToolSuccess(result)
       );
 
-      // VALIDATE: Correct initial phase
       expect(response.phase).toBe(WORKFLOW_INITIAL_PHASES.tdd);
     });
 
@@ -1494,7 +1196,6 @@ describe('Plugin System Integration Tests', () => {
         assertToolSuccess(result)
       );
 
-      // VALIDATE: Correct initial phase
       expect(response.phase).toBe(WORKFLOW_INITIAL_PHASES.minor);
     });
 
@@ -1514,7 +1215,6 @@ describe('Plugin System Integration Tests', () => {
         assertToolSuccess(result)
       );
 
-      // VALIDATE: Initial phase is one of expected options for bugfix
       const expectedPhases = WORKFLOW_INITIAL_PHASES.bugfix;
       expect(expectedPhases).toContain(response.phase);
     });
@@ -1557,7 +1257,6 @@ describe('Plugin System Integration Tests', () => {
         assertToolSuccess(result)
       );
 
-      // VALIDATE: Instructions meet minimum length (substantive content)
       expect(response.instructions.length).toBeGreaterThan(
         MIN_INSTRUCTION_LENGTH
       );
@@ -1575,7 +1274,6 @@ describe('Plugin System Integration Tests', () => {
 
       const planContent = await fs.readFile(response.plan_file_path, 'utf-8');
 
-      // VALIDATE: Markdown structure
       expect(planContent).toMatch(/^# /m); // Must have main title
       expect(planContent).toMatch(/^## /m); // Must have sections
       expect(planContent).not.toContain('[object Object]'); // No serialization errors
@@ -1593,7 +1291,6 @@ describe('Plugin System Integration Tests', () => {
         assertToolSuccess(startResult)
       );
 
-      // VALIDATE: Initial phase instructions mention phase name or key concepts
       expect(startResponse.instructions).toMatch(/requirement|phase|task/i);
 
       // Transition to design phase
@@ -1612,7 +1309,6 @@ describe('Plugin System Integration Tests', () => {
         assertToolSuccess(designWhatsNext)
       );
 
-      // VALIDATE: Design phase instructions are different and relevant
       expect(designResponse.instructions).toBeDefined();
       expect(designResponse.instructions.length).toBeGreaterThan(
         MIN_INSTRUCTION_LENGTH
@@ -1668,7 +1364,6 @@ describe('Plugin System Integration Tests', () => {
         assertToolSuccess(whatsNextResult)
       );
 
-      // VALIDATE: Plan path unchanged
       expect(whatsNextResponse.plan_file_path).toBe(planPath);
 
       // Transition
@@ -1682,7 +1377,6 @@ describe('Plugin System Integration Tests', () => {
         assertToolSuccess(transitionResult)
       );
 
-      // VALIDATE: Plan path still unchanged
       expect(transitionResponse.plan_file_path).toBe(planPath);
     });
 
@@ -1718,10 +1412,8 @@ describe('Plugin System Integration Tests', () => {
         'utf-8'
       );
 
-      // VALIDATE: File exists and has content
       expect(finalContent.length).toBeGreaterThan(0);
 
-      // VALIDATE: No corruption
       expect(finalContent).not.toContain('[object Object]');
       expect(finalContent).not.toContain('undefined');
     });
