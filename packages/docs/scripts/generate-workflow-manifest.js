@@ -33,4 +33,4 @@ export const AVAILABLE_WORKFLOWS = ${JSON.stringify(workflows, null, 2)};
   }
 }
 
-generateWorkflowManifest();
+await generateWorkflowManifest();

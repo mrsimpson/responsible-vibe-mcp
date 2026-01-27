@@ -76,7 +76,7 @@ async function main() {
 }
 
 // Run the script
-main().catch(error => {
+await main().catch(error => {
   console.error('Unhandled error:', error);
   process.exit(1);
 });
