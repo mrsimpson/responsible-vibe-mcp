@@ -39,9 +39,8 @@ export async function startTestServer(
   const tempDir = options.projectPath || process.cwd(); // Use current directory as fallback
 
   const { Client } = await import('@modelcontextprotocol/sdk/client/index.js');
-  const { StdioClientTransport } = await import(
-    '@modelcontextprotocol/sdk/client/stdio.js'
-  );
+  const { StdioClientTransport } =
+    await import('@modelcontextprotocol/sdk/client/stdio.js');
 
   const transport = new StdioClientTransport({
     command: 'node',

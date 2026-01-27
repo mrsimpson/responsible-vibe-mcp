@@ -19,9 +19,10 @@ import {
  * Abstract base class for tool handlers
  * Provides common functionality and enforces consistent patterns
  */
-export abstract class BaseToolHandler<TArgs = unknown, TResult = unknown>
-  implements ToolHandler<TArgs, TResult>
-{
+export abstract class BaseToolHandler<
+  TArgs = unknown,
+  TResult = unknown,
+> implements ToolHandler<TArgs, TResult> {
   protected readonly logger: ReturnType<typeof createLogger>;
 
   constructor() {

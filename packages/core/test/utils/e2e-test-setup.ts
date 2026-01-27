@@ -229,9 +229,8 @@ export class DirectServerInterface {
    */
   async getSystemPrompt(): Promise<unknown> {
     // Use the system prompt handler directly with the default workflow
-    const { SystemPromptResourceHandler } = await import(
-      '../../packages/mcp-server/src/resource-handlers/system-prompt.js'
-    );
+    const { SystemPromptResourceHandler } =
+      await import('../../packages/mcp-server/src/resource-handlers/system-prompt.js');
     const handler = new SystemPromptResourceHandler();
 
     // Create a minimal context - system prompt doesn't need full server context
