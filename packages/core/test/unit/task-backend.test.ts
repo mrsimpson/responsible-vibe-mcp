@@ -32,9 +32,26 @@ describe('TaskBackendManager', () => {
   });
 
   describe('detectTaskBackend', () => {
-    it('should default to markdown when TASK_BACKEND is not set', () => {
+    it('should auto-detect beads when TASK_BACKEND is not set and bd is available', () => {
       delete process.env['TASK_BACKEND'];
 
+      const mockExecSync = vi.mocked(execSync);
+      beadsMockHelpers.setupBeadsAvailable(mockExecSync);
+
+      const config = TaskBackendManager.detectTaskBackend();
+
+      expect(config).toEqual({
+        backend: 'beads',
+        isAvailable: true,
+      });
+    });
+
+    it('should fall back to markdown when TASK_BACKEND is not set and bd is not available', () => {
+      delete process.env['TASK_BACKEND'];
+
+      const mockExecSync = vi.mocked(execSync);
+      beadsMockHelpers.setupBeadsNotFound(mockExecSync);
+
       const config = TaskBackendManager.detectTaskBackend();
 
       expect(config).toEqual({
@@ -43,9 +60,12 @@ describe('TaskBackendManager', () => {
       });
     });
 
-    it('should default to markdown when TASK_BACKEND is empty', () => {
+    it('should fall back to markdown when TASK_BACKEND is empty and bd is not available', () => {
       process.env['TASK_BACKEND'] = '';
 
+      const mockExecSync = vi.mocked(execSync);
+      beadsMockHelpers.setupBeadsNotFound(mockExecSync);
+
       const config = TaskBackendManager.detectTaskBackend();
 
       expect(config).toEqual({
@@ -54,13 +74,30 @@ describe('TaskBackendManager', () => {
       });
     });
 
-    it('should default to markdown when TASK_BACKEND is invalid', () => {
+    it('should fall back to markdown when TASK_BACKEND is invalid and bd is not available', () => {
       process.env['TASK_BACKEND'] = 'invalid-backend';
+
+      const mockExecSync = vi.mocked(execSync);
+      beadsMockHelpers.setupBeadsNotFound(mockExecSync);
 
       const config = TaskBackendManager.detectTaskBackend();
 
       expect(config).toEqual({
         backend: 'markdown',
+        isAvailable: true,
+      });
+    });
+
+    it('should auto-detect beads when TASK_BACKEND is invalid but bd is available', () => {
+      process.env['TASK_BACKEND'] = 'invalid-backend';
+
+      const mockExecSync = vi.mocked(execSync);
+      beadsMockHelpers.setupBeadsAvailable(mockExecSync);
+
+      const config = TaskBackendManager.detectTaskBackend();
+
+      expect(config).toEqual({
+        backend: 'beads',
         isAvailable: true,
       });
     });

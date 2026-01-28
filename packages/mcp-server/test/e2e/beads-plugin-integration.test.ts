@@ -418,9 +418,9 @@ describe('Beads Plugin Comprehensive Integration', () => {
       );
 
       await cleanupWith();
-      delete process.env.TASK_BACKEND;
 
-      // WITHOUT BEADS
+      // WITHOUT BEADS - explicitly set markdown to disable auto-detection
+      process.env.TASK_BACKEND = 'markdown';
       const scenarioWithout = await createSuiteIsolatedE2EScenario({
         suiteName: 'beads-comparison-without',
         tempProjectFactory: createTempProjectWithDefaultStateMachine,
@@ -441,6 +441,7 @@ describe('Beads Plugin Comprehensive Integration', () => {
       );
 
       await cleanupWithout();
+      delete process.env.TASK_BACKEND;
 
       // VALIDATE: WITH beads has beads markers
       expect(planContentWith).toContain('<!-- beads-phase-id:');
@@ -477,9 +478,9 @@ describe('Beads Plugin Comprehensive Integration', () => {
       const instructionsWithBeads = responseWith.instructions;
 
       await scenarioWith.cleanup();
-      delete process.env.TASK_BACKEND;
 
-      // WITHOUT BEADS
+      // WITHOUT BEADS - explicitly set markdown to disable auto-detection
+      process.env.TASK_BACKEND = 'markdown';
       const scenarioWithout = await createSuiteIsolatedE2EScenario({
         suiteName: 'beads-instructions-comparison-without',
         tempProjectFactory: createTempProjectWithDefaultStateMachine,
@@ -503,6 +504,7 @@ describe('Beads Plugin Comprehensive Integration', () => {
       const instructionsWithout = responseWithout.instructions;
 
       await scenarioWithout.cleanup();
+      delete process.env.TASK_BACKEND;
 
       // VALIDATE: WITH beads mentions bd CLI
       expect(instructionsWithBeads.toLowerCase()).toContain('bd');
@@ -863,12 +865,13 @@ describe('Beads Plugin Comprehensive Integration', () => {
       expect(planContent).toContain('<!-- beads-phase-id:');
     });
 
-    it('should NOT apply beads when TASK_BACKEND is not set', async () => {
-      // Ensure env var is NOT set
+    it('should auto-detect and apply beads when TASK_BACKEND is not set and bd is available', async () => {
+      // Ensure env var is NOT set - auto-detection will check for bd command
       delete process.env.TASK_BACKEND;
+      setupBeadsCliMock();
 
       const scenario = await createSuiteIsolatedE2EScenario({
-        suiteName: 'beads-activation-without',
+        suiteName: 'beads-activation-auto',
         tempProjectFactory: createTempProjectWithDefaultStateMachine,
       });
 
@@ -882,15 +885,17 @@ describe('Beads Plugin Comprehensive Integration', () => {
 
       await scenario.cleanup();
 
-      // VALIDATE: Beads features NOT enabled
-      expect(planContent).not.toContain('<!-- beads-phase-id:');
+      // VALIDATE: Beads features auto-detected and enabled
+      expect(planContent).toContain('<!-- beads-phase-id:');
     });
 
-    it('should NOT apply beads when TASK_BACKEND has different value', async () => {
+    it('should auto-detect beads when TASK_BACKEND has invalid value and bd is available', async () => {
+      // Invalid values are treated as "not set" - triggers auto-detection
       process.env.TASK_BACKEND = 'other-backend';
+      setupBeadsCliMock();
 
       const scenario = await createSuiteIsolatedE2EScenario({
-        suiteName: 'beads-activation-other',
+        suiteName: 'beads-activation-invalid',
         tempProjectFactory: createTempProjectWithDefaultStateMachine,
       });
 
@@ -905,7 +910,31 @@ describe('Beads Plugin Comprehensive Integration', () => {
       await scenario.cleanup();
       delete process.env.TASK_BACKEND;
 
-      // VALIDATE: Beads features NOT enabled
+      // VALIDATE: Beads features auto-detected and enabled
+      expect(planContent).toContain('<!-- beads-phase-id:');
+    });
+
+    it('should NOT apply beads when TASK_BACKEND=markdown explicitly', async () => {
+      // Explicitly setting markdown should disable beads even if bd is available
+      process.env.TASK_BACKEND = 'markdown';
+
+      const scenario = await createSuiteIsolatedE2EScenario({
+        suiteName: 'beads-activation-disabled',
+        tempProjectFactory: createTempProjectWithDefaultStateMachine,
+      });
+
+      const result = await scenario.client.callTool('start_development', {
+        workflow: 'epcc',
+        commit_behaviour: 'none',
+      });
+
+      const response = assertToolSuccess(result) as StartDevelopmentResult;
+      const planContent = await fs.readFile(response.plan_file_path, 'utf-8');
+
+      await scenario.cleanup();
+      delete process.env.TASK_BACKEND;
+
+      // VALIDATE: Beads features NOT enabled when markdown explicitly set
       expect(planContent).not.toContain('<!-- beads-phase-id:');
     });
   });
