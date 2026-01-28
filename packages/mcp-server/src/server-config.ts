@@ -8,6 +8,7 @@
 import { z } from 'zod';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { ResourceTemplate } from '@modelcontextprotocol/sdk/server/mcp.js';
+import type { Variables } from '@modelcontextprotocol/sdk/shared/uriTemplate.js';
 import { SetLevelRequestSchema } from '@modelcontextprotocol/sdk/types.js';
 import * as path from 'node:path';
 
@@ -578,10 +579,9 @@ export function registerMcpResources(
 
   // Development plan resource
   mcpServer.resource(
-    'development-plan',
+    'Current Development Plan',
     'plan://current',
     {
-      name: 'Current Development Plan',
       description:
         'The active development plan document (markdown) that tracks project progress, tasks, and decisions. This file serves as long-term memory for the development process and should be continuously updated by the LLM.',
       mimeType: 'text/markdown',
@@ -608,10 +608,9 @@ export function registerMcpResources(
 
   // Conversation state resource
   mcpServer.resource(
-    'conversation-state',
+    'Current Conversation State',
     'state://current',
     {
-      name: 'Current Conversation State',
       description:
         'Current conversation state and phase information (JSON) including conversation ID, project context, current development phase, and plan file location. Use this to understand the current state of the development workflow.',
       mimeType: 'application/json',
@@ -645,10 +644,9 @@ export function registerMcpResources(
 
   // System prompt resource
   mcpServer.resource(
-    'system-prompt',
+    'System Prompt for LLM Integration',
     'system-prompt://',
     {
-      name: 'System Prompt for LLM Integration',
       description:
         'Complete system prompt for LLM integration with responsible-vibe-mcp. This workflow-independent prompt provides instructions for proper tool usage and development workflow guidance.',
       mimeType: 'text/plain',
@@ -705,15 +703,14 @@ export function registerMcpResources(
   });
 
   mcpServer.resource(
-    'workflows',
+    'Workflow Definitions',
     workflowTemplate,
     {
-      name: 'Workflow Definitions',
       description:
         'Access workflow definition files by name. Use the list_workflows tool to discover available workflows.',
       mimeType: 'application/x-yaml',
     },
-    async (uri, _variables) => {
+    async (uri: URL, _variables: Variables) => {
       const handler = resourceRegistry.resolve(uri.href);
       if (!handler) {
         throw new Error(`Workflow resource handler not found for ${uri.href}`);

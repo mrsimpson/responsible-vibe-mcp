@@ -3,7 +3,8 @@
   "compilerOptions": {
     "declaration": true,
     "declarationMap": true,
-    "sourceMap": true
+    "sourceMap": true,
+    "noEmit": false
   },
   "exclude": ["**/*.test.ts", "**/*.spec.ts", "dist", "node_modules"]
 }

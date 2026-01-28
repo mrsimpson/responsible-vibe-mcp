@@ -72,9 +72,8 @@ export class TemplateManager {
     // Strategy 5: From package directory (for development)
     try {
       const require = createRequire(import.meta.url);
-      const packagePath = require.resolve(
-        '@codemcp/workflows-core/package.json'
-      );
+      const packagePath =
+        require.resolve('@codemcp/workflows-core/package.json');
       const packageDir = dirname(packagePath);
       strategies.push(join(packageDir, 'resources/templates'));
     } catch (_error) {

@@ -86,7 +86,7 @@ const isMainModule =
   process.argv[1]?.endsWith('index.js');
 
 if (isMainModule) {
-  main().catch(error => {
+  await main().catch(error => {
     logger.error('Unhandled error in main', error);
     process.exit(1);
   });

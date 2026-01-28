@@ -124,9 +124,8 @@ export class StateMachineLoader {
     // Strategy 5: From package directory (for development)
     try {
       const require = createRequire(import.meta.url);
-      const packagePath = require.resolve(
-        '@codemcp/workflows-core/package.json'
-      );
+      const packagePath =
+        require.resolve('@codemcp/workflows-core/package.json');
       const packageDir = path.dirname(packagePath);
       strategies.push(path.join(packageDir, 'resources/workflows', filename));
     } catch (_error) {

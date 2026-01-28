@@ -19,11 +19,11 @@
   },
   "dependencies": {
     "@codemcp/workflows-core": "workspace:*",
-    "@modelcontextprotocol/sdk": "1.17.5"
+    "@modelcontextprotocol/sdk": "1.25.3"
   },
   "devDependencies": {
-    "@types/node": "^20.19.23",
+    "@types/node": "^22.0.0",
     "typescript": "^5.9.3",
-    "vitest": "4.0.5"
+    "vitest": "4.0.18"
   }
 }

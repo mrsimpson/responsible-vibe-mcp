@@ -30,14 +30,12 @@ export {
  * Call this at the start of your test suite to ensure coverage
  */
 export async function setupContractTesting(): Promise<void> {
-  const { discoverAndRegisterImplementations: discover } = await import(
-    './implementation-registry.js'
-  );
+  const { discoverAndRegisterImplementations: discover } =
+    await import('./implementation-registry.js');
   await discover();
 
-  const { ImplementationRegistry: registry } = await import(
-    './implementation-registry.js'
-  );
+  const { ImplementationRegistry: registry } =
+    await import('./implementation-registry.js');
   const summary = registry.getRegistrationSummary();
   console.info('Contract test setup complete:', summary);
 }

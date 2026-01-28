@@ -3,7 +3,7 @@
  *
  * Implements the IPersistence interface using a file-based approach with
  * directory-per-conversation structure. Provides transparent, human-readable
- * persistence without SQLite dependencies.
+ * persistence.
  *
  * Directory Structure:
  *   .vibe/conversations/{conversationId}/
@@ -16,7 +16,6 @@ import { join, dirname } from 'node:path';
 import { createLogger } from './logger.js';
 import type { IPersistence } from './persistence-interface.js';
 import type { ConversationState, InteractionLog } from './types.js';
-import { autoMigrateIfNeeded } from './migration.js';
 
 const logger = createLogger('FileStorage');
 
@@ -28,10 +27,9 @@ export class FileStorage implements IPersistence {
   private basePath: string;
 
   /**
-   * @param basePath - Path to the storage location (e.g., .vibe/conversation.sqlite for backward compat)
+   * @param basePath - Path to the storage location (e.g., .vibe/conversations)
    */
   constructor(basePath: string) {
-    // basePath points to where conversation.sqlite was for backward compatibility
     this.basePath = basePath;
     this.conversationsDir = join(dirname(basePath), 'conversations');
   }
@@ -39,13 +37,9 @@ export class FileStorage implements IPersistence {
   /**
    * Initialize file-based storage
    * Creates the conversations directory if it doesn't exist
-   * Automatically migrates from legacy SQLite if needed
    */
   async initialize(): Promise<void> {
     try {
-      // Check for legacy SQLite and migrate if needed
-      await autoMigrateIfNeeded(this.basePath);
-
       // Create conversations directory
       await fs.mkdir(this.conversationsDir, { recursive: true });
       logger.debug('FileStorage initialized', {

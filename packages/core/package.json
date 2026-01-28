@@ -21,13 +21,12 @@
     "format": "prettier --write ."
   },
   "dependencies": {
-    "@sqlite.org/sqlite-wasm": "3.50.4-build1",
     "@types/js-yaml": "4.0.9",
     "js-yaml": "4.1.1",
     "zod": "^3.25.76"
   },
   "devDependencies": {
     "rimraf": "^6.0.1",
-    "vitest": "4.0.5"
+    "vitest": "4.0.18"
   }
 }
