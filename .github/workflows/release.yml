@@ -2,7 +2,24 @@ name: Release and Publish
 
 on:
   push:
-    branches: [main, fix-build-after-monorepo]
+    branches: [main]
+    paths-ignore:
+      - '*.md'
+      - 'LICENSE'
+      - '.editorconfig'
+      - '.gitignore'
+      - 'renovate.json'
+      - '.github/**'
+      - '.husky/**'
+      - '.vscode/**'
+      - '.idea/**'
+      - '.vibe/**'
+      - '.claude/**'
+      - '.crowd/**'
+      - '.windsurf/**'
+      - '.amazonq/**'
+      - 'examples/**'
+      - 'packages/docs/**'
 
 permissions:
   contents: write
