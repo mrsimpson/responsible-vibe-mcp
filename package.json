@@ -58,7 +58,7 @@
   },
   "devDependencies": {
     "@modelcontextprotocol/inspector": "0.19.0",
-    "@tsconfig/node24": "24.0.0",
+    "@tsconfig/node24": "24.0.4",
     "@tsconfig/strictest": "2.0.8",
     "@types/jsdom": "27.0.0",
     "@types/node": "^22.0.0",
