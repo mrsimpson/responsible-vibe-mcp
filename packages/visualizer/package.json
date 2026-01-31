@@ -1,6 +1,6 @@
 {
   "name": "@codemcp/workflows-visualizer",
-  "version": "4.10.10",
+  "version": "4.10.11",
   "type": "module",
   "main": "dist/index.ts",
   "module": "dist/index.ts",
