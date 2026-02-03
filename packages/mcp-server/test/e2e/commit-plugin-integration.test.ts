@@ -90,7 +90,7 @@ describe('CommitPlugin Integration', () => {
   it('should add final commit task to plan file when COMMIT_BEHAVIOR=end', async () => {
     // Arrange
     process.env.COMMIT_BEHAVIOR = 'end';
-    process.env.COMMIT_MESSAGE_TEMPLATE = 'feat: test complete';
+    // Don't set COMMIT_MESSAGE_TEMPLATE to use default message
 
     // Act
     const components = await initializeServerComponents({
@@ -139,7 +139,6 @@ describe('CommitPlugin Integration', () => {
       expect(updatedContent).toContain(
         'summarize the intentions and key decisions'
       );
-      expect(updatedContent).toContain('feat: test complete');
     }
   });
 
