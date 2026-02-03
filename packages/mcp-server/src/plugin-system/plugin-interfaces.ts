@@ -135,7 +135,6 @@ export interface IPluginRegistry {
 
 export interface StartDevelopmentArgs {
   workflow: string;
-  commit_behaviour: string;
   require_reviews?: boolean;
   project_path?: string;
 }

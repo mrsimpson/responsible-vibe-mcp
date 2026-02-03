@@ -176,7 +176,6 @@ export class ConversationManager {
         | 'currentPhase'
         | 'planFilePath'
         | 'workflowName'
-        | 'gitCommitConfig'
         | 'requireReviewsBeforePhaseTransition'
       >
     >

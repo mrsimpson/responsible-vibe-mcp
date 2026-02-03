@@ -155,20 +155,10 @@ export class ProceedToPhaseHandler extends ConversationRequiredToolHandler<
     While doing this, also denote dependencies for each task.
     `;
 
-    // Add commit instructions if configured
-    let finalInstructions = instructions.instructions;
-    if (
-      conversationContext.gitCommitConfig?.enabled &&
-      conversationContext.gitCommitConfig.commitOnPhase
-    ) {
-      const commitMessage = `Phase transition: ${currentPhase} → ${target_phase}`;
-      finalInstructions += `\n\n**Git Commit Required**: Create a commit for this phase transition using:\n\`\`\`bash\ngit add . && git commit -m "${commitMessage}"\n\`\`\``;
-    }
-
-    // Prepare response
+    // Prepare response (commit behavior now handled by CommitPlugin)
     const response: ProceedToPhaseResult = {
       phase: transitionResult.newPhase,
-      instructions: finalInstructions,
+      instructions: instructions.instructions,
       plan_file_path: conversationContext.planFilePath,
       transition_reason: transitionResult.transitionReason,
     };
