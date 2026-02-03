@@ -1,7 +1,5 @@
 # Beads Integration for Responsible-Vibe-MCP
 
-> ⚠️ **Experimental Feature**: Beads integration is experimental. Requires `bd` CLI to be installed.
-
 Integration between responsible-vibe-mcp and [beads distributed issue tracker](https://github.com/steveyegge/beads) for enhanced AI agent task management.
 
 ## Overview
@@ -10,35 +8,30 @@ Integration between responsible-vibe-mcp and [beads distributed issue tracker](h
 
 **Backends**:
 
-- **Markdown** (default): Checkbox tasks in plan files
-- **Beads** (experimental): Rich task management with dependencies, priorities, and git integration
+- **Markdown**: Checkbox tasks in plan files
+- **Beads**: Rich task management with dependencies, priorities, and git integration
 
 ## Configuration
 
+Beads is **auto-detected**: if the `bd` command is available, it is used automatically. No configuration needed.
+
+To explicitly override auto-detection:
+
 ```bash
-# Enable beads backend
-export TASK_BACKEND=beads
-
-# Fallback to markdown (default)
-export TASK_BACKEND=markdown
-# or unset TASK_BACKEND
+export TASK_BACKEND=markdown  # Force markdown even if bd is available
+export TASK_BACKEND=beads     # Force beads (errors if bd unavailable)
 ```
-
-or add this to the MCP env config in your agent.
-
-**Auto-detection**: System validates `bd` command availability and falls back to markdown if unavailable.
 
 ## Quick Setup
 
 1. Install beads CLI (`bd` command must be in PATH)
-2. `export TASK_BACKEND=beads`
-3. Use `start_development()` as normal
+2. Use `start_development()` as normal — beads is detected automatically
 
 ## Usage
 
 ### Development Workflow
 
-When `TASK_BACKEND=beads`:
+When beads is active:
 
 1. **Project epic**: Created automatically for all development tasks
 2. **Phase tasks**: One task per workflow phase with sequential dependencies
@@ -77,7 +70,7 @@ bd list --parent bd-a1b2 --recursive       # All project tasks
 **Beads setup failed**: Ensure git repo, run `bd init` if needed  
 **Phase task IDs missing**: Re-run `start_development()` to regenerate beads integration
 
-**Switch backends**: Change `TASK_BACKEND` environment variable and restart development session.
+**Switch backends**: Set `TASK_BACKEND=markdown` to disable beads, or unset it to re-enable auto-detection.
 
 ## Technical Notes
 
