@@ -34,7 +34,11 @@ import {
   generateWorkflowDescription,
 } from './server-helpers.js';
 import { notificationService } from './notification-service.js';
-import { PlanManager, InstructionGenerator } from '@codemcp/workflows-core';
+import {
+  PlanManager,
+  InstructionGenerator,
+  TaskBackendManager,
+} from '@codemcp/workflows-core';
 import { PluginRegistry } from './plugin-system/plugin-registry.js';
 import { BeadsPlugin } from './plugin-system/beads-plugin.js';
 import { CommitPlugin } from './plugin-system/commit-plugin.js';
@@ -118,9 +122,19 @@ export async function initializeServerComponents(
   const transitionEngine = new TransitionEngine(projectPath);
   transitionEngine.setConversationManager(conversationManager);
 
-  // Use beads components if TASK_BACKEND=beads, otherwise use defaults
-  // This enables beads features like plan file markers and beads CLI instructions
-  const isBeadsBackend = process.env.TASK_BACKEND === 'beads';
+  // Detect task backend using auto-detection logic:
+  // - If TASK_BACKEND env var is set, use that value
+  // - If not set, auto-detect based on 'bd' command availability
+  const taskBackendConfig = TaskBackendManager.detectTaskBackend();
+  const isBeadsBackend =
+    taskBackendConfig.backend === 'beads' && taskBackendConfig.isAvailable;
+
+  logger.info('Task backend configuration', {
+    backend: taskBackendConfig.backend,
+    isAvailable: taskBackendConfig.isAvailable,
+    autoDetected: !process.env['TASK_BACKEND'],
+  });
+
   const planManager = isBeadsBackend
     ? new BeadsPlanManager()
     : new PlanManager();
@@ -148,14 +162,15 @@ export async function initializeServerComponents(
     }
   }
 
-  // Register BeadsPlugin if beads backend is configured
-  if (process.env.TASK_BACKEND === 'beads') {
+  // Register BeadsPlugin if beads backend is detected and available
+  if (isBeadsBackend) {
     const beadsPlugin = new BeadsPlugin({ projectPath });
     if (beadsPlugin.isEnabled()) {
       pluginRegistry.registerPlugin(beadsPlugin);
       logger.info('BeadsPlugin registered successfully', {
         enabled: beadsPlugin.isEnabled(),
         sequence: beadsPlugin.getSequence(),
+        autoDetected: !process.env['TASK_BACKEND'],
       });
     }
   }

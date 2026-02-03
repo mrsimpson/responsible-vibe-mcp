@@ -528,6 +528,10 @@ cat .vibe/conversations/my-project-main-abc123/interactions.jsonl | jq .
 
 The system supports multiple task management backends through a factory pattern for component substitution.
 
+### Backend Detection
+
+At startup, the system auto-detects the task backend. If the `bd` command is available, beads is used; otherwise markdown is used. This can be overridden via the `TASK_BACKEND` environment variable (`markdown` or `beads`).
+
 ### Component Factory
 
 The ServerComponentsFactory creates appropriate implementations based on detected task backend configuration.

@@ -25,15 +25,39 @@ export interface TaskBackendConfig {
 export class TaskBackendManager {
   /**
    * Detect and validate the requested task backend
+   *
+   * When TASK_BACKEND is not set:
+   * - Auto-detects if beads (bd) command is available
+   * - Uses beads if bd command exists, markdown otherwise
+   *
+   * When TASK_BACKEND is explicitly set:
+   * - Uses the specified backend (markdown or beads)
+   * - For beads, validates availability and provides setup instructions if not available
    */
   static detectTaskBackend(): TaskBackendConfig {
     const envBackend = process.env['TASK_BACKEND']?.toLowerCase().trim();
 
-    // Default to markdown if not set or invalid
-    if (!envBackend || !['markdown', 'beads'].includes(envBackend)) {
-      logger.debug('Using default markdown backend', {
+    // Handle invalid values by treating as not set
+    if (envBackend && !['markdown', 'beads'].includes(envBackend)) {
+      logger.debug('Invalid TASK_BACKEND value, treating as not set', {
         envBackend,
-        reason: envBackend ? 'invalid value' : 'not set',
+      });
+    }
+
+    // Auto-detect backend when not explicitly configured
+    if (!envBackend || !['markdown', 'beads'].includes(envBackend)) {
+      const beadsAvailable = TaskBackendManager.checkBeadsAvailability();
+      if (beadsAvailable.isAvailable) {
+        logger.info('Auto-detected beads backend (bd command available)', {
+          reason: 'TASK_BACKEND not set, bd command found',
+        });
+        return {
+          backend: 'beads',
+          isAvailable: true,
+        };
+      }
+      logger.debug('Using markdown backend (bd command not available)', {
+        reason: 'TASK_BACKEND not set, bd command not found',
       });
       return {
         backend: 'markdown',
@@ -44,15 +68,17 @@ export class TaskBackendManager {
     const backend = envBackend as TaskBackend;
 
     if (backend === 'markdown') {
+      logger.debug('Using explicitly configured markdown backend');
       return {
         backend: 'markdown',
         isAvailable: true,
       };
     }
 
-    // backend === 'beads' is the only remaining case
+    // backend === 'beads' is the only remaining case (explicitly configured)
     const beadsAvailable = TaskBackendManager.checkBeadsAvailability();
     if (beadsAvailable.isAvailable) {
+      logger.debug('Using explicitly configured beads backend');
       return {
         backend: 'beads',
         isAvailable: true,
@@ -69,7 +95,7 @@ export class TaskBackendManager {
   /**
    * Check if beads command is available and functional
    */
-  private static checkBeadsAvailability(): {
+  static checkBeadsAvailability(): {
     isAvailable: boolean;
     errorMessage?: string;
   } {
@@ -140,18 +166,23 @@ To use beads as your task backend, you need to install beads:
    bd --version
    \`\`\`
 
-### Configuration
-After installation, set the task backend:
+### Auto-Detection
+The system automatically detects the task backend:
+- If the \`bd\` command is available, beads backend is used automatically
+- If the \`bd\` command is not found, markdown backend is used
+
+### Explicit Configuration (Optional)
+You can explicitly set the backend via environment variable:
 \`\`\`bash
-export TASK_BACKEND=beads
+export TASK_BACKEND=beads     # Force beads backend
+export TASK_BACKEND=markdown  # Force markdown backend
 \`\`\`
 
-Then restart the responsible-vibe-mcp server and try again.
-
 ### Alternative: Use Markdown Backend
-If you prefer to continue with traditional plan file task management:
+If you prefer to continue with traditional plan file task management,
+simply ensure the \`bd\` command is not installed, or set:
 \`\`\`bash
-export TASK_BACKEND=markdown  # or unset TASK_BACKEND
+export TASK_BACKEND=markdown
 \`\`\``;
   }
 
