@@ -39,27 +39,6 @@ Head over to a new empty dir and ask your agent: _"Build a UNO-like card game"_ 
 
 ✅ **Multi-agent collaboration** with specialized roles (business-analyst, architect, developer)
 
-## Multi-Agent Collaboration (Crowd Workflows)
-
-Enable teams of specialized AI agents to collaborate on development tasks with [crowd-mcp](https://github.com/mrsimpson/crowd-mcp):
-
-- 👥 **Team-based development**: Business-analyst, architect, and developer agents work together
-- 🔄 **Structured handoffs**: Clear responsibility transfers between agents
-- 💬 **Built-in collaboration**: Agents consult each other via messaging
-- 📋 **Specialized workflows**: sdd-feature-crowd, sdd-bugfix-crowd, sdd-greenfield-crowd
-
-**Quick Start:**
-
-```bash
-# Copy pre-configured agent definitions
-npx responsible-vibe-mcp@latest agents copy
-
-# List available agent configurations
-npx responsible-vibe-mcp@latest agents list
-```
-
-See **[Crowd MCP Integration Guide →](packages/docs/user/crowd-mcp-integration.md)** for setup and usage.
-
 ## Universal MCP Support
 
 Works in any agent that supports the Model-Context-Protocol. Whenever a new IDE or Terminal UI rises: You don't need to change the way you work.
@@ -81,6 +60,27 @@ And since may developers tend to through structured processing off the cliff onc
 Check the 📖 **[Complete Documentation →](https://mrsimpson.github.io/responsible-vibe-mcp/user/how-it-works.html)**
 
 There is also a recorded session on ["how to tame your stubborn software agent"](https://www.youtube.com/watch?v=qKTdqmlnXMg) as part of the video podcast [Software-Architektur.tv](https://software-architektur.tv/) (German, auto-translated subtitles are okay-ish) which gives a more detailed insight into the basic ideas and how it's supposed to work.
+
+## ⚠️ Experimental: Multi-Agent Collaboration (Crowd Workflows)
+
+Enable teams of specialized AI agents to collaborate on development tasks with [crowd-mcp](https://github.com/mrsimpson/crowd-mcp):
+
+- 👥 **Team-based development**: Business-analyst, architect, and developer agents work together
+- 🔄 **Structured handoffs**: Clear responsibility transfers between agents
+- 💬 **Built-in collaboration**: Agents consult each other via messaging
+- 📋 **Specialized workflows**: sdd-feature-crowd, sdd-bugfix-crowd, sdd-greenfield-crowd
+
+**Quick Start:**
+
+```bash
+# Copy pre-configured agent definitions
+npx responsible-vibe-mcp@latest agents copy
+
+# List available agent configurations
+npx responsible-vibe-mcp@latest agents list
+```
+
+See **[Crowd MCP Integration Guide →](packages/docs/user/crowd-mcp-integration.md)** for setup and usage.
 
 ---
 
