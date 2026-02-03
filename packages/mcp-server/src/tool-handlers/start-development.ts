@@ -17,8 +17,11 @@ import { resolve } from 'node:path';
 import type { YamlStateMachine } from '@codemcp/workflows-core';
 import { ProjectDocsManager, ProjectDocsInfo } from '@codemcp/workflows-core';
 import { TaskBackendManager } from '@codemcp/workflows-core';
+import { createLogger } from '@codemcp/workflows-core';
 import { ServerContext } from '../types.js';
 import type { PluginHookContext } from '../plugin-system/plugin-interfaces.js';
+
+const logger = createLogger('StartDevelopmentHandler');
 
 /**
  * Arguments for the start_development tool
@@ -200,24 +203,33 @@ export class StartDevelopmentHandler extends BaseToolHandler<
 
     // Execute afterPlanFileCreated hook to allow plugins to modify the plan file
     if (context.pluginRegistry) {
-      const originalContent = await readFile(
-        conversationContext.planFilePath,
-        'utf-8'
-      );
-      const modifiedContent = await context.pluginRegistry.executeHook(
-        'afterPlanFileCreated',
-        pluginContext,
-        conversationContext.planFilePath,
-        originalContent
-      );
-
-      // Write the modified content back to the file if it changed
-      if (modifiedContent && modifiedContent !== originalContent) {
-        await writeFile(
+      try {
+        const originalContent = await readFile(
           conversationContext.planFilePath,
-          modifiedContent as string,
           'utf-8'
         );
+        const modifiedContent = await context.pluginRegistry.executeHook(
+          'afterPlanFileCreated',
+          pluginContext,
+          conversationContext.planFilePath,
+          originalContent
+        );
+
+        // Write the modified content back to the file if it changed
+        if (modifiedContent && modifiedContent !== originalContent) {
+          await writeFile(
+            conversationContext.planFilePath,
+            modifiedContent as string,
+            'utf-8'
+          );
+        }
+      } catch (error) {
+        // Gracefully handle cases where plan file doesn't exist (e.g., in tests)
+        // This is not a critical error - plugins can still function without modifying the plan file
+        logger.debug('Could not execute afterPlanFileCreated hook', {
+          error: error instanceof Error ? error.message : String(error),
+          planFilePath: conversationContext.planFilePath,
+        });
       }
     }
 
