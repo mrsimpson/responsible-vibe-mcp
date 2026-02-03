@@ -29,7 +29,7 @@
   },
   "scripts": {
     "build": "turbo run build",
-    "build:visualizer": "cd packages/visualizer && npm install && npm run build",
+    "build:visualizer": "cd packages/visualizer && pnpm install && pnpm run build",
     "pack:dist": "pnpm pack",
     "inspector": "npx @modelcontextprotocol/inspector",
     "dev": "turbo run dev --filter=@codemcp/workflows-core --filter=@codemcp/workflows",
