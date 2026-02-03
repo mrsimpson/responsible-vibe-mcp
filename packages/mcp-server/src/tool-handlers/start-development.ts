@@ -12,21 +12,22 @@ import {
 } from '../server-helpers.js';
 import { basename } from 'node:path';
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
+import { readFile, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
-import { GitCommitConfig } from '@codemcp/workflows-core';
-import { GitManager } from '@codemcp/workflows-core';
 import type { YamlStateMachine } from '@codemcp/workflows-core';
 import { ProjectDocsManager, ProjectDocsInfo } from '@codemcp/workflows-core';
 import { TaskBackendManager } from '@codemcp/workflows-core';
+import { createLogger } from '@codemcp/workflows-core';
 import { ServerContext } from '../types.js';
 import type { PluginHookContext } from '../plugin-system/plugin-interfaces.js';
+
+const logger = createLogger('StartDevelopmentHandler');
 
 /**
  * Arguments for the start_development tool
  */
 export interface StartDevelopmentArgs {
   workflow: string;
-  commit_behaviour?: 'step' | 'phase' | 'end' | 'none';
   require_reviews?: boolean;
   project_path?: string;
 }
@@ -74,30 +75,9 @@ export class StartDevelopmentHandler extends BaseToolHandler<
       context.projectPath
     );
 
-    // Process git commit configuration
-    const isGitRepository = GitManager.isGitRepository(projectPath);
-
-    // Translate commit_behaviour to internal git config
-    const commitBehaviour =
-      args.commit_behaviour ?? (isGitRepository ? 'end' : 'none');
-    const gitCommitConfig: GitCommitConfig = {
-      enabled: commitBehaviour !== 'none',
-      commitOnStep: commitBehaviour === 'step',
-      commitOnPhase: commitBehaviour === 'phase',
-      commitOnComplete:
-        commitBehaviour === 'end' ||
-        commitBehaviour === 'step' ||
-        commitBehaviour === 'phase',
-      initialMessage: 'Development session',
-      startCommitHash:
-        GitManager.getCurrentCommitHash(projectPath) || undefined,
-    };
-
     this.logger.debug('Processing start_development request', {
       selectedWorkflow,
       projectPath: projectPath,
-      commitBehaviour,
-      gitCommitConfig,
     });
 
     // Validate workflow selection (ensure project workflows are loaded first)
@@ -180,13 +160,12 @@ export class StartDevelopmentHandler extends BaseToolHandler<
         selectedWorkflow
       );
 
-    // Update conversation state with workflow, phase, and git commit configuration
+    // Update conversation state with workflow and phase
     await context.conversationManager.updateConversationState(
       conversationContext.conversationId,
       {
         currentPhase: transitionResult.newPhase,
         workflowName: selectedWorkflow,
-        gitCommitConfig: gitCommitConfig,
         requireReviewsBeforePhaseTransition: requireReviews,
       }
     );
@@ -206,7 +185,7 @@ export class StartDevelopmentHandler extends BaseToolHandler<
       conversationContext.gitBranch
     );
 
-    // Execute plugin hooks after successful development start
+    // Prepare plugin context for hooks
     const pluginContext: PluginHookContext = {
       conversationId: conversationContext.conversationId,
       planFilePath: conversationContext.planFilePath,
@@ -222,14 +201,45 @@ export class StartDevelopmentHandler extends BaseToolHandler<
       },
     };
 
-    // Execute plugin hooks safely - guard against missing plugin registry
+    // Execute afterPlanFileCreated hook to allow plugins to modify the plan file
+    if (context.pluginRegistry) {
+      try {
+        const originalContent = await readFile(
+          conversationContext.planFilePath,
+          'utf-8'
+        );
+        const modifiedContent = await context.pluginRegistry.executeHook(
+          'afterPlanFileCreated',
+          pluginContext,
+          conversationContext.planFilePath,
+          originalContent
+        );
+
+        // Write the modified content back to the file if it changed
+        if (modifiedContent && modifiedContent !== originalContent) {
+          await writeFile(
+            conversationContext.planFilePath,
+            modifiedContent as string,
+            'utf-8'
+          );
+        }
+      } catch (error) {
+        // Gracefully handle cases where plan file doesn't exist (e.g., in tests)
+        // This is not a critical error - plugins can still function without modifying the plan file
+        logger.debug('Could not execute afterPlanFileCreated hook', {
+          error: error instanceof Error ? error.message : String(error),
+          planFilePath: conversationContext.planFilePath,
+        });
+      }
+    }
+
+    // Execute afterStartDevelopment hook
     if (context.pluginRegistry) {
       await context.pluginRegistry.executeHook(
         'afterStartDevelopment',
         pluginContext,
         {
           workflow: selectedWorkflow,
-          commit_behaviour: args.commit_behaviour ?? 'end',
           require_reviews: args.require_reviews,
           project_path: projectPath,
         },

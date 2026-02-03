@@ -61,4 +61,73 @@ export class GitManager {
       return null;
     }
   }
+
+  /**
+   * Create a commit with the given message
+   */
+  static createCommit(message: string, projectPath: string): boolean {
+    try {
+      if (!this.isGitRepository(projectPath)) {
+        logger.debug('Not a git repository, skipping commit', { projectPath });
+        return false;
+      }
+
+      // Stage all changes
+      execSync('git add .', {
+        cwd: projectPath,
+        encoding: 'utf-8',
+        stdio: ['ignore', 'pipe', 'ignore'],
+      });
+
+      // Create commit
+      execSync(`git commit -m "${message}"`, {
+        cwd: projectPath,
+        encoding: 'utf-8',
+        stdio: ['ignore', 'pipe', 'ignore'],
+      });
+
+      logger.debug('Created commit successfully', { projectPath, message });
+      return true;
+    } catch (error) {
+      logger.debug('Failed to create commit', {
+        projectPath,
+        message,
+        error: error instanceof Error ? error.message : String(error),
+      });
+      return false;
+    }
+  }
+
+  /**
+   * Check if there are uncommitted changes
+   */
+  static hasUncommittedChanges(projectPath: string): boolean {
+    try {
+      if (!this.isGitRepository(projectPath)) {
+        logger.debug('Not a git repository, no uncommitted changes', {
+          projectPath,
+        });
+        return false;
+      }
+
+      const status = execSync('git status --porcelain', {
+        cwd: projectPath,
+        encoding: 'utf-8',
+        stdio: ['ignore', 'pipe', 'ignore'],
+      }).trim();
+
+      const hasChanges = status.length > 0;
+      logger.debug('Checked for uncommitted changes', {
+        projectPath,
+        hasChanges,
+      });
+      return hasChanges;
+    } catch (error) {
+      logger.debug('Failed to check for uncommitted changes', {
+        projectPath,
+        error: error instanceof Error ? error.message : String(error),
+      });
+      return false;
+    }
+  }
 }

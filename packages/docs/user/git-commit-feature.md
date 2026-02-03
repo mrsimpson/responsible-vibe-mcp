@@ -1,158 +1,56 @@
-# Git Commit Feature
+# Git Commits
 
-⚠️ **Work in Progress**: This feature doesn't work reliably with all LLMs. Some AI agents may not properly trigger automatic commits. Manual git control is recommended for production use.
-
-The responsible-vibe-mcp server supports configurable automatic git commits during development interactions. This feature allows users to control when the system creates commits, providing better integration with git workflows.
-
-## ⚠️ Known Limitations
-
-- **LLM Compatibility**: Not all AI agents properly trigger automatic commits
-- **Timing Issues**: Some agents may commit at unexpected times
-- **Reliability**: Manual git control is more reliable for important projects
-- **Status**: This feature is experimental and under active development
-
-## Overview
-
-The git commit feature provides four levels of commit automation:
-
-1. **`step`**: Commit after each development step (most granular)
-2. **`phase`**: Commit before each phase transition (milestone commits)
-3. **`end`**: Single final commit at development completion (default)
-4. **`none`**: No automatic commits (manual git control) **← Recommended**
+responsible-vibe-mcp server supports configurable automatic git commits during development. This allows for simpler rollbacks – independent of whether the agent itself supports rollbacks (which usually only roll-back conversation history).
 
 ## Configuration
 
-Git commit behavior is configured when starting development using the `start_development` tool:
+Git commit behavior is configured via **environment variables** before starting the server:
 
-```javascript
-start_development({
-  workflow: 'waterfall',
-  commit_behaviour: 'end', // Options: "step", "phase", "end", "none"
-});
+```bash
+# Set commit behavior
+export COMMIT_BEHAVIOR=end  # Options: "step", "phase", "end", "none"
+
+# Optional: Custom commit message template.
+export COMMIT_MESSAGE_TEMPLATE="feat: custom commit message format"
 ```
 
-### Commit Behavior Options
+### Environment Variables
+
+#### `COMMIT_BEHAVIOR` (Required)
 
 - **`step`**: Creates commits after each development step, providing detailed progress tracking
 - **`phase`**: Creates commits before phase transitions, marking major milestones
 - **`end`**: Creates a single commit when development is complete (recommended default)
 - **`none`**: Disables automatic commits, giving you full manual control
 
-## Default Behavior
+All intermediate commits will simply add all artifacts and create a WIP commit with a generic message.
 
-The system automatically chooses sensible defaults:
+The commit at the end of the development will be instructed with an optional custom template via a task in the development plan.
 
-- **Git repositories**: Defaults to `"end"` (single final commit)
-- **Non-git projects**: Automatically uses `"none"` (no commits possible)
+#### `COMMIT_MESSAGE_TEMPLATE` (Optional)
 
-## Usage Examples
-
-### Recommended Usage (Default)
-
-```javascript
-// Single final commit (recommended for most cases)
-start_development({
-  workflow: 'waterfall',
-  commit_behaviour: 'end',
-});
-```
-
-### Detailed Progress Tracking
-
-```javascript
-// Commit after each step for detailed history
-start_development({
-  workflow: 'epcc',
-  commit_behaviour: 'step',
-});
-```
-
-### Milestone Tracking
-
-```javascript
-// Commit at major phase transitions
-start_development({
-  workflow: 'bugfix',
-  commit_behaviour: 'phase',
-});
-```
-
-### Manual Git Control
-
-```javascript
-// No automatic commits
-start_development({
-  workflow: 'minor',
-  commit_behaviour: 'none',
-});
-```
-
-## Commit Message Format
-
-The system creates descriptive commit messages based on the development context:
-
-### Step Commits (`"step"`)
-
-```
-WIP: [workflow] - [current phase] step completion
-
-Example: "WIP: waterfall - requirements step completion"
-```
-
-### Phase Commits (`"phase"`)
-
-```
-WIP: [workflow] - transition to [next phase]
-
-Example: "WIP: waterfall - transition to design phase"
-```
-
-### Final Commits (`"end"`)
-
-```
-[conventional commit format based on development context]
-
-Example: "feat: implement user authentication system"
-```
-
-## Technical Details
-
-### Git Repository Detection
-
-The system automatically detects if the current project is a git repository. If not, commit operations are silently skipped regardless of the `commit_behaviour` setting.
-
-### Commit Creation Logic
-
-- **Change Detection**: Only creates commits when there are actual changes to commit
-- **Staging**: Automatically stages all changes before committing (`git add .`)
-- **Error Handling**: Gracefully handles git errors without interrupting development flow
-
-## Integration with Workflows
-
-The git commit feature works with all available workflows:
-
-- **waterfall**: Commits at requirements, design, implementation, qa, testing phases
-- **epcc**: Commits at explore, plan, code, commit phases
-- **bugfix**: Commits at reproduce, analyze, fix, verify phases
-- **minor**: Commits at explore and implement phases
-- **greenfield**: Commits at ideation, architecture, plan, code, document phases
-- **custom**: Works with any custom workflow definition
-
-## Best Practices
-
-1. **Use `"end"` for most cases**: Single final commit keeps history clean while preserving work
-2. **Use `"phase"` for milestone tracking**: Good for longer development sessions
-3. **Use `"step"` for detailed tracking**: Helpful when debugging or learning the workflow
-4. **Use `"none"` for manual control**: When you have specific git workflow requirements
+Customize the commit message format. Default: "Create a conventional commit. In the message, first summarize the intentions and key decisions from the development plan. Then, add a brief summary of the key changes and their side effects and dependencies"
 
 ## Troubleshooting
+
+### Plugin Not Active
+
+- Verify `COMMIT_BEHAVIOR` environment variable is set before starting the server
+- Check server logs for "CommitPlugin registered successfully" message
+- Ensure the value is one of: `step`, `phase`, `end`, `none`
 
 ### No Commits Created
 
 - Verify the directory is a git repository (`git status`)
 - Check that there are actual file changes to commit
 - Ensure git configuration is correct (`git config user.name` and `git config user.email`)
-- Check that `commit_behaviour` is not set to `"none"`
+- For step/phase modes: commits are created automatically during phase transitions
+
+### No Final Commit Task in Plan File
+
+- Ensure `COMMIT_BEHAVIOR` was set when `start_development` was called
+- The task is added to the final phase (usually "Commit") of the plan file
+- Check that the `afterPlanFileCreated` hook was executed during plan creation
 
 ### Git Errors
 
@@ -160,9 +58,3 @@ The git commit feature works with all available workflows:
 - Check git repository status and permissions
 - Verify git configuration is correct
 - Ensure no merge conflicts or other git issues
-
-### Unexpected Commit Behavior
-
-- Remember that `commit_behaviour` is set once at the start of development
-- Different workflows may have different phase structures affecting when commits occur
-- Check the development plan file to see which phase you're currently in

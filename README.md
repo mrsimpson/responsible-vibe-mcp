@@ -47,7 +47,7 @@ Works in any agent that supports the Model-Context-Protocol. Whenever a new IDE 
 
 There are zillions of "game changer next gen IDEs" out there, each claiming they will revolutionalize how software is going to be created.
 
-In the end, they all just manipulate context of a transformer based LLM – it's all [just noodle soup](https://mrsimpson.github.io/slides-context-is-all-you-need/22). And they are fast at changing wha't going to be part of the context, and it's even getting accelerated by parallel agents.
+In the end, they all just manipulate context of a transformer based LLM – it's all [just noodle soup](https://mrsimpson.github.io/slides-context-is-all-you-need/22). And they are fast at changing what's going to be part of the context, and it's even getting accelerated by parallel agents.
 
 The problem: **The faster agents become, the harder it is to engineer**. I strongly believe that software engineering is a **creative process** which majorly happens inside the engineers brain.
 

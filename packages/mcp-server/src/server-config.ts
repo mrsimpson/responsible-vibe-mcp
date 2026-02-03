@@ -18,7 +18,6 @@ import { ConversationManager } from '@codemcp/workflows-core';
 import { TransitionEngine } from '@codemcp/workflows-core';
 import { InteractionLogger } from '@codemcp/workflows-core';
 import { WorkflowManager } from '@codemcp/workflows-core';
-import { GitManager } from '@codemcp/workflows-core';
 import { TemplateManager } from '@codemcp/workflows-core';
 import { createLogger, setMcpLoggingLevel } from '@codemcp/workflows-core';
 
@@ -38,6 +37,7 @@ import { notificationService } from './notification-service.js';
 import { PlanManager, InstructionGenerator } from '@codemcp/workflows-core';
 import { PluginRegistry } from './plugin-system/plugin-registry.js';
 import { BeadsPlugin } from './plugin-system/beads-plugin.js';
+import { CommitPlugin } from './plugin-system/commit-plugin.js';
 import { BeadsPlanManager } from './components/beads/beads-plan-manager.js';
 import { BeadsInstructionGenerator } from './components/beads/beads-instruction-generator.js';
 
@@ -134,6 +134,19 @@ export async function initializeServerComponents(
 
   // Initialize plugin registry and register plugins
   const pluginRegistry = new PluginRegistry();
+
+  // Register CommitPlugin if commit behavior is configured
+  if (process.env.COMMIT_BEHAVIOR) {
+    const commitPlugin = new CommitPlugin({ projectPath });
+    if (commitPlugin.isEnabled()) {
+      pluginRegistry.registerPlugin(commitPlugin);
+      logger.info('CommitPlugin registered successfully', {
+        enabled: commitPlugin.isEnabled(),
+        sequence: commitPlugin.getSequence(),
+        behavior: process.env.COMMIT_BEHAVIOR,
+      });
+    }
+  }
 
   // Register BeadsPlugin if beads backend is configured
   if (process.env.TASK_BACKEND === 'beads') {
@@ -325,12 +338,7 @@ export async function registerMcpTools(
     createToolHandler('conduct_review', toolRegistry, responseRenderer, context)
   );
 
-  // Register start_development tool with dynamic commit_behaviour description
-  const isGitRepo = GitManager.isGitRepository(context.projectPath);
-  const commitBehaviourDescription = isGitRepo
-    ? 'Git commit behavior: "step" (commit after each step), "phase" (commit before phase transitions), "end" (final commit only), "none" (no automatic commits). Use "end" unless the user specifically requests different behavior.'
-    : 'Git commit behavior: Use "none" as this is not a git repository. Other options ("step", "phase", "end") are not applicable for non-git projects.';
-
+  // Register start_development tool
   mcpServer.registerTool(
     'start_development',
     {
@@ -344,9 +352,6 @@ export async function registerMcpTools(
               context.workflowManager.getAvailableWorkflows()
             )
           ),
-        commit_behaviour: z
-          .enum(['step', 'phase', 'end', 'none'])
-          .describe(commitBehaviourDescription),
         require_reviews: z
           .boolean()
           .optional()

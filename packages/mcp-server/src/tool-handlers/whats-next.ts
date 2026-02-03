@@ -170,22 +170,13 @@ export class WhatsNextHandler extends ConversationRequiredToolHandler<
         }
       );
 
-    // Add commit instructions if configured
-    let finalInstructions = instructions.instructions;
-    if (
-      conversationContext.gitCommitConfig?.enabled &&
-      conversationContext.gitCommitConfig.commitOnStep
-    ) {
-      const commitMessage = requestContext || 'Step completion';
-      finalInstructions += `\n\n**Git Commit Required**: Create a commit for this step using:\n\`\`\`bash\ngit add . && git commit -m "${commitMessage}"\n\`\`\``;
-    }
-
+    // Note: Commit behavior now handled by CommitPlugin
     // Note: Beads-specific instructions are now handled by BeadsInstructionGenerator via strategy pattern
 
     // Prepare response
     const response: WhatsNextResult = {
       phase: transitionResult.newPhase,
-      instructions: finalInstructions,
+      instructions: instructions.instructions,
       plan_file_path: conversationContext.planFilePath,
     };
 

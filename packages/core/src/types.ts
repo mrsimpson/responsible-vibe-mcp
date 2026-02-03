@@ -39,7 +39,6 @@ export interface ConversationState {
   currentPhase: string;
   planFilePath: string;
   workflowName: string;
-  gitCommitConfig?: GitCommitConfig;
   requireReviewsBeforePhaseTransition: boolean;
   createdAt: string;
   updatedAt: string;
@@ -55,6 +54,5 @@ export interface ConversationContext {
   currentPhase: string;
   planFilePath: string;
   workflowName: string;
-  gitCommitConfig?: GitCommitConfig;
   requireReviewsBeforePhaseTransition?: boolean;
 }
