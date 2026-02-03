@@ -75,5 +75,6 @@
     "schedule": ["before 4am on monday"],
     "addLabels": ["lockfile-maintenance"]
   },
-  "suppressNotifications": ["prIgnoreNotification"]
+  "suppressNotifications": ["prIgnoreNotification"],
+  "allowScripts": false
 }
