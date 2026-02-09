@@ -16,11 +16,25 @@ import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { execSync } from 'node:child_process';
 import type { PluginHookContext } from '../../src/plugin-system/plugin-interfaces.js';
+import { TaskBackendManager } from '@codemcp/workflows-core';
 
 // Mock child_process to intercept beads commands
 vi.mock('node:child_process', () => ({
   execSync: vi.fn(),
 }));
+
+// Mock TaskBackendManager to control beads detection in unit tests
+vi.mock('@codemcp/workflows-core', async importOriginal => {
+  const original =
+    await importOriginal<typeof import('@codemcp/workflows-core')>();
+  return {
+    ...original,
+    TaskBackendManager: {
+      ...original.TaskBackendManager,
+      detectTaskBackend: vi.fn(),
+    },
+  };
+});
 
 import { BeadsPlugin } from '../../src/plugin-system/beads-plugin.js';
 
@@ -94,15 +108,27 @@ Test all functionality`;
     await mkdir(join(testProjectPath, '.vibe'), { recursive: true });
     await writeFile(testPlanFilePath, createPlanFileContent());
 
-    vi.stubEnv('TASK_BACKEND', 'beads');
     vi.clearAllMocks();
+
+    // Mock TaskBackendManager.detectTaskBackend() to return beads as available
+    vi.mocked(TaskBackendManager.detectTaskBackend).mockReturnValue({
+      backend: 'beads',
+      isAvailable: true,
+    });
+
+    // Mock bd --version to return success (for other uses of execSync)
+    vi.mocked(execSync).mockImplementation((command: string) => {
+      if (command === 'bd --version') {
+        return Buffer.from('beads v1.0.0\n');
+      }
+      throw new Error(`Unexpected command: ${command}`);
+    });
   });
 
   afterEach(async () => {
     if (existsSync(testProjectPath)) {
       await rm(testProjectPath, { recursive: true, force: true });
     }
-    vi.unstubAllEnvs();
     vi.clearAllMocks();
   });
 
@@ -146,19 +172,26 @@ Test all functionality`;
     });
 
     it('A4: should be enabled when TASK_BACKEND is beads', () => {
-      vi.stubEnv('TASK_BACKEND', 'beads');
       const plugin = new BeadsPlugin({ projectPath: testProjectPath });
       expect(plugin.isEnabled()).toBe(true);
     });
 
-    it('A5: should not be enabled when TASK_BACKEND is not beads', () => {
-      vi.stubEnv('TASK_BACKEND', 'none');
+    it('A5: should not be enabled when TASK_BACKEND is explicitly set to markdown', () => {
+      // Mock TaskBackendManager to return markdown backend
+      vi.mocked(TaskBackendManager.detectTaskBackend).mockReturnValue({
+        backend: 'markdown',
+        isAvailable: true,
+      });
       const plugin = new BeadsPlugin({ projectPath: testProjectPath });
       expect(plugin.isEnabled()).toBe(false);
     });
 
     it('A6: should not crash when plugin not enabled', () => {
-      vi.stubEnv('TASK_BACKEND', 'none');
+      // Mock TaskBackendManager to return markdown backend
+      vi.mocked(TaskBackendManager.detectTaskBackend).mockReturnValue({
+        backend: 'markdown',
+        isAvailable: true,
+      });
       const plugin = new BeadsPlugin({ projectPath: testProjectPath });
       const isEnabled = plugin.isEnabled();
       expect(isEnabled).toBe(false);

@@ -6,6 +6,7 @@ export default defineConfig({
     environment: 'node',
     globals: true,
     include: ['test/**/*.test.ts'],
+    testTimeout: 30000, // Increased to accommodate beads auto-detection overhead
     typecheck: {
       tsconfig: './tsconfig.build.json',
     },

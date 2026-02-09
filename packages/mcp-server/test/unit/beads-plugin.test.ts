@@ -4,14 +4,32 @@
 
 import { BeadsPlugin } from '../../src/plugin-system/beads-plugin.js';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { TaskBackendManager } from '@codemcp/workflows-core';
+
+// Mock TaskBackendManager to control beads detection
+vi.mock('@codemcp/workflows-core', async importOriginal => {
+  const original =
+    await importOriginal<typeof import('@codemcp/workflows-core')>();
+  return {
+    ...original,
+    TaskBackendManager: {
+      ...original.TaskBackendManager,
+      detectTaskBackend: vi.fn(),
+    },
+  };
+});
 
 describe('BeadsPlugin', () => {
   let plugin: BeadsPlugin;
   const mockProjectPath = '/test/project/path';
 
   beforeEach(() => {
-    // Mock environment variable
-    vi.stubEnv('TASK_BACKEND', 'beads');
+    // Mock TaskBackendManager.detectTaskBackend() to return beads as available
+    vi.mocked(TaskBackendManager.detectTaskBackend).mockReturnValue({
+      backend: 'beads',
+      isAvailable: true,
+    });
+
     plugin = new BeadsPlugin({ projectPath: mockProjectPath });
   });
 
@@ -28,8 +46,13 @@ describe('BeadsPlugin', () => {
       expect(plugin.isEnabled()).toBe(true);
     });
 
-    it('should not be enabled when TASK_BACKEND is not beads', () => {
-      vi.stubEnv('TASK_BACKEND', 'none');
+    it('should not be enabled when TASK_BACKEND is explicitly set to markdown', () => {
+      // Mock TaskBackendManager to return markdown backend
+      vi.mocked(TaskBackendManager.detectTaskBackend).mockReturnValue({
+        backend: 'markdown',
+        isAvailable: true,
+      });
+      vi.stubEnv('TASK_BACKEND', 'markdown');
       const testPlugin = new BeadsPlugin({ projectPath: mockProjectPath });
       expect(testPlugin.isEnabled()).toBe(false);
     });
