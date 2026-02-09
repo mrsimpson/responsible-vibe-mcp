@@ -30,8 +30,6 @@ describe('BeadsPlugin', () => {
       isAvailable: true,
     });
 
-    // Mock environment variable (for reference, though isEnabled now uses TaskBackendManager)
-    vi.stubEnv('TASK_BACKEND', 'beads');
     plugin = new BeadsPlugin({ projectPath: mockProjectPath });
   });
 

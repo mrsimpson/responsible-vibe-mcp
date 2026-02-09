@@ -108,7 +108,6 @@ Test all functionality`;
     await mkdir(join(testProjectPath, '.vibe'), { recursive: true });
     await writeFile(testPlanFilePath, createPlanFileContent());
 
-    vi.stubEnv('TASK_BACKEND', 'beads');
     vi.clearAllMocks();
 
     // Mock TaskBackendManager.detectTaskBackend() to return beads as available
@@ -130,7 +129,6 @@ Test all functionality`;
     if (existsSync(testProjectPath)) {
       await rm(testProjectPath, { recursive: true, force: true });
     }
-    vi.unstubAllEnvs();
     vi.clearAllMocks();
   });
 
@@ -174,7 +172,6 @@ Test all functionality`;
     });
 
     it('A4: should be enabled when TASK_BACKEND is beads', () => {
-      vi.stubEnv('TASK_BACKEND', 'beads');
       const plugin = new BeadsPlugin({ projectPath: testProjectPath });
       expect(plugin.isEnabled()).toBe(true);
     });
@@ -185,7 +182,6 @@ Test all functionality`;
         backend: 'markdown',
         isAvailable: true,
       });
-      vi.stubEnv('TASK_BACKEND', 'markdown');
       const plugin = new BeadsPlugin({ projectPath: testProjectPath });
       expect(plugin.isEnabled()).toBe(false);
     });
@@ -196,7 +192,6 @@ Test all functionality`;
         backend: 'markdown',
         isAvailable: true,
       });
-      vi.stubEnv('TASK_BACKEND', 'markdown');
       const plugin = new BeadsPlugin({ projectPath: testProjectPath });
       const isEnabled = plugin.isEnabled();
       expect(isEnabled).toBe(false);
