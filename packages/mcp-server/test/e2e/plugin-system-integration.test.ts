@@ -215,9 +215,8 @@ describe('Plugin System Integration Tests', () => {
     let cleanup: () => Promise<void>;
 
     beforeEach(async () => {
-      if (process.env.TASK_BACKEND) {
-        delete process.env.TASK_BACKEND;
-      }
+      // Explicitly disable beads auto-detection for this test suite
+      vi.stubEnv('TASK_BACKEND', 'markdown');
 
       const scenario = await createSuiteIsolatedE2EScenario({
         suiteName: 'contract-validation',
@@ -318,9 +317,8 @@ describe('Plugin System Integration Tests', () => {
     let cleanup: () => Promise<void>;
 
     beforeEach(async () => {
-      if (process.env.TASK_BACKEND) {
-        delete process.env.TASK_BACKEND;
-      }
+      // Explicitly disable beads auto-detection for this test suite
+      vi.stubEnv('TASK_BACKEND', 'markdown');
 
       const scenario = await createSuiteIsolatedE2EScenario({
         suiteName: 'semantic-validation',
@@ -441,9 +439,8 @@ describe('Plugin System Integration Tests', () => {
     let cleanup: () => Promise<void>;
 
     beforeEach(async () => {
-      if (process.env.TASK_BACKEND) {
-        delete process.env.TASK_BACKEND;
-      }
+      // Explicitly disable beads auto-detection for this test suite
+      vi.stubEnv('TASK_BACKEND', 'markdown');
 
       const scenario = await createSuiteIsolatedE2EScenario({
         suiteName: 'plugin-isolation',
@@ -511,9 +508,8 @@ describe('Plugin System Integration Tests', () => {
     let cleanup: () => Promise<void>;
 
     beforeEach(async () => {
-      if (process.env.TASK_BACKEND) {
-        delete process.env.TASK_BACKEND;
-      }
+      // Explicitly disable beads auto-detection for this test suite
+      vi.stubEnv('TASK_BACKEND', 'markdown');
 
       const scenario = await createSuiteIsolatedE2EScenario({
         suiteName: 'multi-workflow',
@@ -592,9 +588,8 @@ describe('Plugin System Integration Tests', () => {
     let cleanup: () => Promise<void>;
 
     beforeEach(async () => {
-      if (process.env.TASK_BACKEND) {
-        delete process.env.TASK_BACKEND;
-      }
+      // Explicitly disable beads auto-detection for this test suite
+      vi.stubEnv('TASK_BACKEND', 'markdown');
 
       const scenario = await createSuiteIsolatedE2EScenario({
         suiteName: 'state-consistency',
@@ -653,9 +648,8 @@ describe('Plugin System Integration Tests', () => {
     let cleanup: () => Promise<void>;
 
     beforeEach(async () => {
-      if (process.env.TASK_BACKEND) {
-        delete process.env.TASK_BACKEND;
-      }
+      // Explicitly disable beads auto-detection for this test suite
+      vi.stubEnv('TASK_BACKEND', 'markdown');
 
       const scenario = await createSuiteIsolatedE2EScenario({
         suiteName: 'error-handling',
@@ -741,6 +735,7 @@ describe('Plugin System Integration Tests', () => {
     let cleanup: () => Promise<void>;
 
     beforeEach(async () => {
+      // Don't set TASK_BACKEND - tests auto-detection behavior
       if (process.env.TASK_BACKEND) {
         delete process.env.TASK_BACKEND;
       }
@@ -799,9 +794,8 @@ describe('Plugin System Integration Tests', () => {
     let cleanup: () => Promise<void>;
 
     beforeEach(async () => {
-      if (process.env.TASK_BACKEND) {
-        delete process.env.TASK_BACKEND;
-      }
+      // Explicitly disable beads auto-detection for this test suite
+      vi.stubEnv('TASK_BACKEND', 'markdown');
 
       const scenario = await createSuiteIsolatedE2EScenario({
         suiteName: 'resource-access',
@@ -899,9 +893,8 @@ describe('Plugin System Integration Tests', () => {
     let cleanup: () => Promise<void>;
 
     beforeEach(async () => {
-      if (process.env.TASK_BACKEND) {
-        delete process.env.TASK_BACKEND;
-      }
+      // Explicitly disable beads auto-detection for this test suite
+      vi.stubEnv('TASK_BACKEND', 'markdown');
 
       const scenario = await createSuiteIsolatedE2EScenario({
         suiteName: 'plugin-hook-execution',
@@ -1023,9 +1016,8 @@ describe('Plugin System Integration Tests', () => {
     let cleanup: () => Promise<void>;
 
     beforeEach(async () => {
-      if (process.env.TASK_BACKEND) {
-        delete process.env.TASK_BACKEND;
-      }
+      // Explicitly disable beads auto-detection for this test suite
+      vi.stubEnv('TASK_BACKEND', 'markdown');
 
       const scenario = await createSuiteIsolatedE2EScenario({
         suiteName: 'plugin-architecture',
@@ -1118,9 +1110,8 @@ describe('Plugin System Integration Tests', () => {
       if (cleanup) {
         await cleanup();
       }
-      if (process.env.TASK_BACKEND) {
-        delete process.env.TASK_BACKEND;
-      }
+      // Explicitly disable beads auto-detection for this test suite
+      vi.stubEnv('TASK_BACKEND', 'markdown');
     });
 
     it('should initialize waterfall with correct initial phase', async () => {
@@ -1229,9 +1220,8 @@ describe('Plugin System Integration Tests', () => {
     let cleanup: () => Promise<void>;
 
     beforeEach(async () => {
-      if (process.env.TASK_BACKEND) {
-        delete process.env.TASK_BACKEND;
-      }
+      // Explicitly disable beads auto-detection for this test suite
+      vi.stubEnv('TASK_BACKEND', 'markdown');
 
       const scenario = await createSuiteIsolatedE2EScenario({
         suiteName: 'quality-across-workflows',
@@ -1325,9 +1315,8 @@ describe('Plugin System Integration Tests', () => {
     let cleanup: () => Promise<void>;
 
     beforeEach(async () => {
-      if (process.env.TASK_BACKEND) {
-        delete process.env.TASK_BACKEND;
-      }
+      // Explicitly disable beads auto-detection for this test suite
+      vi.stubEnv('TASK_BACKEND', 'markdown');
 
       const scenario = await createSuiteIsolatedE2EScenario({
         suiteName: 'state-persistence',

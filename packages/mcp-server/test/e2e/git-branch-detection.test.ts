@@ -31,6 +31,11 @@ describe('Git Branch Detection', () => {
   });
 
   describe('Plan File Naming Based on Branch', () => {
+    beforeEach(() => {
+      // Explicitly disable beads auto-detection to test markdown format
+      vi.stubEnv('TASK_BACKEND', 'markdown');
+    });
+
     it('should use branch name in plan file when on feature branch (not default)', async () => {
       // Create a temp project on a feature branch
       const scenario = await createSuiteIsolatedE2EScenario({

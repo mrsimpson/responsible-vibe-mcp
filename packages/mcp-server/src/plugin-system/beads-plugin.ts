@@ -22,6 +22,7 @@ import {
   BeadsIntegration,
   createLogger,
   PlanManager,
+  TaskBackendManager,
 } from '@codemcp/workflows-core';
 import { BeadsTaskBackendClient } from '../components/beads/beads-task-backend-client.js';
 
@@ -30,7 +31,8 @@ const logger = createLogger('BeadsPlugin');
 /**
  * BeadsPlugin class implementing the IPlugin interface
  *
- * Activation: Only when process.env.TASK_BACKEND === 'beads'
+ * Activation: When beads backend is detected (either via TASK_BACKEND=beads env var
+ *             or auto-detection when bd CLI is available)
  * Priority: Sequence 100 (middle priority)
  * Encapsulation: All beads functionality contained within this plugin
  */
@@ -60,9 +62,15 @@ export class BeadsPlugin implements IPlugin {
   }
 
   isEnabled(): boolean {
-    const enabled = process.env.TASK_BACKEND === 'beads';
+    // Use TaskBackendManager to properly detect beads backend,
+    // which supports both explicit TASK_BACKEND env var and auto-detection
+    const taskBackendConfig = TaskBackendManager.detectTaskBackend();
+    const enabled =
+      taskBackendConfig.backend === 'beads' && taskBackendConfig.isAvailable;
     logger.debug('BeadsPlugin enablement check', {
-      TASK_BACKEND: process.env.TASK_BACKEND,
+      backend: taskBackendConfig.backend,
+      isAvailable: taskBackendConfig.isAvailable,
+      autoDetected: !process.env['TASK_BACKEND'],
       enabled,
     });
     return enabled;

@@ -30,6 +30,9 @@ describe('Plan Management', () => {
   let cleanup: () => Promise<void>;
 
   beforeEach(async () => {
+    // Explicitly disable beads auto-detection to test markdown format
+    vi.stubEnv('TASK_BACKEND', 'markdown');
+
     const scenario = await createSuiteIsolatedE2EScenario({
       suiteName: 'plan-management',
       tempProjectFactory: createTempProjectWithDefaultStateMachine,
