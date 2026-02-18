@@ -46,11 +46,12 @@ if (isLocal) {
 
 import { startVisualizationTool } from './visualization-launcher.js';
 import { generateConfig, GeneratorRegistry } from './config-generator.js';
+import { generateSkill, SkillGeneratorRegistry } from './skill-generator.js';
 
 /**
  * Parse command line arguments and handle CLI commands
  */
-function parseCliArgs(): { shouldExit: boolean } {
+async function parseCliArgs(): Promise<{ shouldExit: boolean }> {
   const args = process.argv.slice(2);
 
   // Handle help flag
@@ -59,22 +60,42 @@ function parseCliArgs(): { shouldExit: boolean } {
     return { shouldExit: true };
   }
 
-  // Handle system prompt flag
-  if (args.includes('--system-prompt')) {
-    showSystemPrompt();
-    return { shouldExit: true };
+  // Get the first argument as command
+  const command = args[0];
+
+  // Handle setup commands
+  if (command === 'setup') {
+    const subcommand = args[1];
+    if (subcommand === 'list') {
+      handleSetupList();
+      return { shouldExit: true };
+    } else if (subcommand) {
+      // Parse --mode flag
+      const modeIndex = args.findIndex(arg => arg === '--mode');
+      const mode = modeIndex !== -1 ? args[modeIndex + 1] : 'skill';
+      if (mode !== 'skill' && mode !== 'config') {
+        console.error('❌ Error: --mode must be "skill" or "config"');
+        process.exit(1);
+      }
+      await handleSetup(subcommand, mode);
+      return { shouldExit: true };
+    } else {
+      console.error('❌ Error: setup requires a target');
+      console.error('Usage: setup <target> [--mode config|skill]');
+      console.error('       setup list');
+      process.exit(1);
+    }
   }
 
   // Handle workflow commands
-  const workflowIndex = args.findIndex(arg => arg === 'workflow');
-  if (workflowIndex !== -1) {
-    const subcommand = args[workflowIndex + 1];
+  if (command === 'workflow') {
+    const subcommand = args[1];
     if (subcommand === 'list') {
       handleWorkflowList();
       return { shouldExit: true };
     } else if (subcommand === 'copy') {
-      const sourceWorkflow = args[workflowIndex + 2];
-      const customName = args[workflowIndex + 3];
+      const sourceWorkflow = args[2];
+      const customName = args[3];
       if (!sourceWorkflow || !customName) {
         console.error(
           '❌ Error: workflow copy requires source workflow and custom name'
@@ -86,75 +107,119 @@ function parseCliArgs(): { shouldExit: boolean } {
       return { shouldExit: true };
     } else {
       console.error('❌ Unknown workflow subcommand:', subcommand);
-      console.error('Available: workflow list, workflow copy <custom-name>');
+      console.error('Available: workflow list, workflow copy <source> <name>');
       process.exit(1);
     }
   }
 
-  // Handle agents commands
-  const agentsIndex = args.findIndex(arg => arg === 'agents');
-  if (agentsIndex !== -1) {
-    const subcommand = args[agentsIndex + 1];
+  // Handle crowd commands (renamed from agents)
+  if (command === 'crowd') {
+    const subcommand = args[1];
     if (subcommand === 'list') {
-      handleAgentsList();
+      handleCrowdList();
       return { shouldExit: true };
     } else if (subcommand === 'copy') {
       // Check for --output-dir flag
       const outputDirIndex = args.findIndex(arg => arg === '--output-dir');
       const outputDir =
         outputDirIndex !== -1 ? args[outputDirIndex + 1] : undefined;
-      handleAgentsCopy(outputDir);
+      handleCrowdCopy(outputDir);
       return { shouldExit: true };
     } else {
-      console.error('❌ Unknown agents subcommand:', subcommand);
-      console.error('Available: agents list, agents copy [--output-dir DIR]');
+      console.error('❌ Unknown crowd subcommand:', subcommand);
+      console.error('Available: crowd list, crowd copy [--output-dir DIR]');
       process.exit(1);
     }
   }
 
-  // Handle generate config flag
-  const generateConfigIndex = args.findIndex(
-    arg => arg === '--generate-config'
-  );
-  if (generateConfigIndex !== -1) {
-    const agent = args[generateConfigIndex + 1];
-    if (!agent) {
-      console.error('❌ Error: --generate-config requires an agent parameter');
-      console.error('Usage: --generate-config <agent>');
-      console.error(
-        `Supported agents: ${GeneratorRegistry.getGeneratorNames().join(', ')}`
-      );
-      process.exit(1);
-    }
-    handleGenerateConfig(agent);
+  // Handle visualize subcommand (also default with no args)
+  if (command === 'visualize' || args.length === 0) {
+    startVisualizationTool();
     return { shouldExit: true };
   }
 
-  // Handle validate workflow flag
-  const validateIndex = args.findIndex(arg => arg === '--validate');
-  if (validateIndex !== -1) {
-    const workflowPath = args[validateIndex + 1];
+  // Handle validate subcommand
+  if (command === 'validate') {
+    const workflowPath = args[1];
     if (!workflowPath) {
-      console.error('❌ Error: --validate requires a workflow file path');
-      console.error('Usage: --validate <workflow-file.yaml>');
+      console.error('❌ Error: validate requires a workflow file path');
+      console.error('Usage: validate <workflow-file.yaml>');
       process.exit(1);
     }
     handleValidateWorkflow(workflowPath);
     return { shouldExit: true };
   }
 
-  // Handle visualization flag (default behavior)
-  if (
-    args.includes('--visualize') ||
-    args.includes('--viz') ||
-    args.length === 0
-  ) {
-    startVisualizationTool();
+  // Handle system-prompt subcommand
+  if (command === 'system-prompt') {
+    showSystemPrompt();
+    return { shouldExit: true };
+  }
+
+  // =================================================================
+  // DEPRECATED FLAGS - Show deprecation notice and new command syntax
+  // =================================================================
+
+  // Handle deprecated --generate-config flag
+  if (args.includes('--generate-config')) {
+    const targetIndex = args.findIndex(arg => arg === '--generate-config') + 1;
+    const target = args[targetIndex] || '<target>';
+    console.warn('⚠️  DEPRECATED: --generate-config is deprecated.');
+    console.warn(`   Use instead: setup ${target} --mode config`);
+    console.warn('');
+    console.warn('   Run "setup list" to see available targets.');
+    return { shouldExit: true };
+  }
+
+  // Handle deprecated --validate flag
+  if (args.includes('--validate')) {
+    const fileIndex = args.findIndex(arg => arg === '--validate') + 1;
+    const file = args[fileIndex] || '<workflow.yaml>';
+    console.warn('⚠️  DEPRECATED: --validate is deprecated.');
+    console.warn(`   Use instead: validate ${file}`);
+    return { shouldExit: true };
+  }
+
+  // Handle deprecated --system-prompt flag
+  if (args.includes('--system-prompt')) {
+    console.warn('⚠️  DEPRECATED: --system-prompt is deprecated.');
+    console.warn('   Use instead: system-prompt');
+    return { shouldExit: true };
+  }
+
+  // Handle deprecated --visualize/--viz flags
+  if (args.includes('--visualize') || args.includes('--viz')) {
+    console.warn('⚠️  DEPRECATED: --visualize/--viz is deprecated.');
+    console.warn('   Use instead: visualize');
+    console.warn('   Or simply run with no arguments (default behavior).');
+    return { shouldExit: true };
+  }
+
+  // Handle deprecated 'agents' subcommand (renamed to 'crowd')
+  if (command === 'agents') {
+    const subcommand = args[1] || '';
+    console.warn('⚠️  DEPRECATED: "agents" subcommand is renamed to "crowd".');
+    console.warn(`   Use instead: crowd ${subcommand}`);
+    return { shouldExit: true };
+  }
+
+  // Handle deprecated 'skill' subcommand (merged into 'setup')
+  if (command === 'skill') {
+    const subcommand = args[1];
+    if (subcommand === 'list') {
+      console.warn('⚠️  DEPRECATED: "skill list" is deprecated.');
+      console.warn('   Use instead: setup list');
+    } else {
+      console.warn(
+        '⚠️  DEPRECATED: "skill" subcommand is merged into "setup".'
+      );
+      console.warn(`   Use instead: setup ${subcommand || '<target>'}`);
+    }
     return { shouldExit: true };
   }
 
   // Unknown arguments
-  console.error('❌ Unknown arguments:', args.join(' '));
+  console.error('❌ Unknown command:', args.join(' '));
   showHelp();
   return { shouldExit: true };
 }
@@ -258,18 +323,14 @@ function handleWorkflowCopy(sourceWorkflow: string, customName: string): void {
       join(process.cwd(), 'resources', 'workflows', `${sourceWorkflow}.yaml`),
     ];
 
-    let sourceContent = null;
-    for (const sourcePath of possibleSourcePaths) {
-      if (existsSync(sourcePath)) {
-        sourceContent = readFileSync(sourcePath, 'utf8');
-        break;
-      }
-    }
-
-    if (!sourceContent) {
+    // Find the source content
+    const foundPath = possibleSourcePaths.find(p => existsSync(p));
+    if (!foundPath) {
       console.error(`❌ Could not find source workflow: ${sourceWorkflow}`);
       process.exit(1);
     }
+
+    const sourceContent = readFileSync(foundPath, 'utf8');
 
     // Create .vibe/workflows directory if it doesn't exist
     const vibeDir = join(process.cwd(), '.vibe');
@@ -309,9 +370,82 @@ function handleWorkflowCopy(sourceWorkflow: string, customName: string): void {
 }
 
 /**
- * Handle agents list command
+ * Handle setup command - combines skill and config generation
  */
-function handleAgentsList(): void {
+async function handleSetup(
+  target: string,
+  mode: 'skill' | 'config'
+): Promise<void> {
+  try {
+    // Check if target is valid (use exists() to support aliases)
+    const isSkillTarget = SkillGeneratorRegistry.exists(target);
+    const isConfigTarget = GeneratorRegistry.exists(target);
+
+    if (!isSkillTarget && !isConfigTarget) {
+      const skillTargets = SkillGeneratorRegistry.getGeneratorNames();
+      const configTargets = GeneratorRegistry.getGeneratorNames();
+      const allTargets = [...new Set([...skillTargets, ...configTargets])];
+      console.error(`❌ Unknown target: ${target}`);
+      console.error(`Available targets: ${allTargets.join(', ')}`);
+      process.exit(1);
+    }
+
+    if (mode === 'config') {
+      if (!isConfigTarget) {
+        const configTargets = GeneratorRegistry.getGeneratorNames();
+        console.error(`❌ Target "${target}" does not support config mode`);
+        console.error(`Config mode targets: ${configTargets.join(', ')}`);
+        process.exit(1);
+      }
+      await generateConfig(target, process.cwd());
+    } else {
+      // skill mode (default)
+      if (!isSkillTarget) {
+        const skillTargets = SkillGeneratorRegistry.getGeneratorNames();
+        console.error(`❌ Target "${target}" does not support skill mode`);
+        console.error(`Skill mode targets: ${skillTargets.join(', ')}`);
+        console.error(`💡 Try: setup ${target} --mode config`);
+        process.exit(1);
+      }
+      await generateSkill(target, process.cwd());
+    }
+  } catch (error) {
+    console.error(`❌ Failed to generate ${mode}: ${error}`);
+    process.exit(1);
+  }
+}
+
+/**
+ * Handle setup list command - shows all available targets
+ */
+function handleSetupList(): void {
+  const skillTargets = SkillGeneratorRegistry.getGeneratorNames();
+  const configTargets = GeneratorRegistry.getGeneratorNames();
+  const allTargets = [...new Set([...skillTargets, ...configTargets])].sort();
+
+  console.log('📋 Available setup targets:\n');
+  console.log('  Target'.padEnd(20) + 'Modes');
+  console.log('  ' + '-'.repeat(35));
+
+  for (const target of allTargets) {
+    const modes: string[] = [];
+    if (skillTargets.includes(target)) modes.push('skill');
+    if (configTargets.includes(target)) modes.push('config');
+    console.log(`  ${target.padEnd(18)} ${modes.join(', ')}`);
+  }
+
+  console.log('\n💡 Usage:');
+  console.log('   setup <target>              Generate skill files (default)');
+  console.log(
+    '   setup <target> --mode config  Generate full agent configuration'
+  );
+  console.log('   setup <target> --mode skill   Generate skill files only');
+}
+
+/**
+ * Handle crowd list command (renamed from agents list)
+ */
+function handleCrowdList(): void {
   try {
     // Find agents directory
     const possibleAgentsPaths = [
@@ -337,11 +471,11 @@ function handleAgentsList(): void {
     );
 
     if (files.length === 0) {
-      console.log('📋 No agent configurations found');
+      console.log('📋 No crowd agent configurations found');
       return;
     }
 
-    console.log('📋 Available agent configurations:\n');
+    console.log('📋 Available crowd agent configurations:\n');
     for (const file of files) {
       const agentPath = join(agentsDir, file);
       const content = readFileSync(agentPath, 'utf8');
@@ -358,18 +492,18 @@ function handleAgentsList(): void {
     }
 
     console.log(
-      '\n💡 Use "agents copy" to copy these configurations to your project'
+      '\n💡 Use "crowd copy" to copy these configurations to your project'
     );
   } catch (error) {
-    console.error('Error listing agents:', error);
+    console.error('Error listing crowd agents:', error);
     process.exit(1);
   }
 }
 
 /**
- * Handle agents copy command
+ * Handle crowd copy command (renamed from agents copy)
  */
-function handleAgentsCopy(outputDir?: string): void {
+function handleCrowdCopy(outputDir?: string): void {
   try {
     // Find source agents directory
     const possibleAgentsPaths = [
@@ -404,12 +538,12 @@ function handleAgentsCopy(outputDir?: string): void {
     );
 
     if (files.length === 0) {
-      console.error('❌ No agent configurations found to copy');
+      console.error('❌ No crowd agent configurations found to copy');
       process.exit(1);
     }
 
     console.log(
-      `📋 Copying ${files.length} agent configuration(s) to ${targetDir}\n`
+      `📋 Copying ${files.length} crowd agent configuration(s) to ${targetDir}\n`
     );
 
     // Copy each file
@@ -432,24 +566,12 @@ function handleAgentsCopy(outputDir?: string): void {
     }
 
     console.log(
-      `\n🎉 Copied ${copiedCount} agent configuration(s)${skippedCount > 0 ? ` (skipped ${skippedCount} existing)` : ''}`
+      `\n🎉 Copied ${copiedCount} crowd agent configuration(s)${skippedCount > 0 ? ` (skipped ${skippedCount} existing)` : ''}`
     );
-    console.log(`\n💡 Agent configurations are now in: ${targetDir}`);
+    console.log(`\n💡 Crowd agent configurations are now in: ${targetDir}`);
     console.log('💡 Configure these agents in your crowd-mcp setup');
   } catch (error) {
-    console.error('Error copying agents:', error);
-    process.exit(1);
-  }
-}
-
-/**
- * Handle generate config command
- */
-async function handleGenerateConfig(agent: string): Promise<void> {
-  try {
-    await generateConfig(agent, process.cwd());
-  } catch (error) {
-    console.error(`❌ Failed to generate configuration: ${error}`);
+    console.error('Error copying crowd agents:', error);
     process.exit(1);
   }
 }
@@ -458,31 +580,41 @@ async function handleGenerateConfig(agent: string): Promise<void> {
  * Show help information
  */
 function showHelp(): void {
+  const skillTargets = SkillGeneratorRegistry.getGeneratorNames();
+  const configTargets = GeneratorRegistry.getGeneratorNames();
+  const allTargets = [...new Set([...skillTargets, ...configTargets])].sort();
+
   console.log(`
 Responsible Vibe CLI Tools
 
 USAGE:
-  responsible-vibe-mcp [OPTIONS]
-  responsible-vibe-mcp workflow <SUBCOMMAND>
-  responsible-vibe-mcp agents <SUBCOMMAND>
+  responsible-vibe-mcp [COMMAND]
+  responsible-vibe-mcp                      Start the interactive visualizer (default)
 
-OPTIONS:
-  --help, -h                    Show this help message
-  --system-prompt               Show the system prompt for LLM integration
-  --visualize, --viz            Start the interactive workflow visualizer (default)
-  --generate-config <agent>     Generate configuration files for AI coding agents
-  --validate <workflow.yaml>    Validate a workflow file
+SETUP COMMANDS:
+  setup <target>                Generate skill files for a coding tool (default mode)
+  setup <target> --mode config  Generate full agent configuration
+  setup <target> --mode skill   Generate skill files only
+  setup list                    List available targets
 
 WORKFLOW COMMANDS:
   workflow list                 List available workflows
   workflow copy <source> <name> Copy a workflow with custom name
 
-AGENTS COMMANDS:
-  agents list                   List available agent configurations
-  agents copy [--output-dir]    Copy agent configs to .crowd/agents/
+CROWD AGENT COMMANDS:
+  crowd list                    List available crowd agent configurations
+  crowd copy [--output-dir DIR] Copy crowd agent configs to project
 
-SUPPORTED AGENTS:
-${GeneratorRegistry.getHelpText()}
+UTILITY COMMANDS:
+  visualize                     Start the interactive workflow visualizer
+  validate <workflow.yaml>      Validate a workflow file
+  system-prompt                 Show the system prompt for LLM integration
+
+OPTIONS:
+  --help, -h                    Show this help message
+
+AVAILABLE TARGETS:
+  ${allTargets.join(', ')}
 
 DESCRIPTION:
   CLI tools for the responsible-vibe development workflow system.
@@ -518,8 +650,8 @@ function showSystemPrompt(): void {
 /**
  * Main CLI entry point
  */
-export function runCli() {
-  const { shouldExit } = parseCliArgs();
+export async function runCli() {
+  const { shouldExit } = await parseCliArgs();
 
   if (shouldExit) {
     return;

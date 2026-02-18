@@ -11,13 +11,7 @@ import { GeneratorRegistry } from '../src/config-generator.js';
  */
 describe('GeneratorRegistry', () => {
   // Test with the actual built-in generators
-  const builtInGenerators = [
-    'amazonq-cli',
-    'claude',
-    'gemini',
-    'opencode',
-    'copilot-vscode',
-  ];
+  const builtInGenerators = ['kiro', 'claude', 'gemini', 'opencode', 'copilot'];
 
   beforeAll(() => {
     // Verify the registry is properly initialized
@@ -32,13 +26,18 @@ describe('GeneratorRegistry', () => {
     });
 
     it('should have registered generators with aliases', () => {
-      // 'vscode' is an alias for 'copilot-vscode'
+      // 'vscode' and 'copilot-vscode' are aliases for 'copilot'
+      expect(GeneratorRegistry.exists('copilot')).toBe(true);
       expect(GeneratorRegistry.exists('copilot-vscode')).toBe(true);
       expect(GeneratorRegistry.exists('vscode')).toBe(true);
+      // 'amazonq-cli' and 'amazonq' are aliases for 'kiro'
+      expect(GeneratorRegistry.exists('kiro')).toBe(true);
+      expect(GeneratorRegistry.exists('amazonq-cli')).toBe(true);
+      expect(GeneratorRegistry.exists('amazonq')).toBe(true);
     });
 
     it('should handle case-insensitive lookups', () => {
-      expect(GeneratorRegistry.exists('AMAZONQ-CLI')).toBe(true);
+      expect(GeneratorRegistry.exists('KIRO')).toBe(true);
       expect(GeneratorRegistry.exists('Claude')).toBe(true);
       expect(GeneratorRegistry.exists('VSCODE')).toBe(true);
     });
@@ -57,15 +56,20 @@ describe('GeneratorRegistry', () => {
     });
 
     it('should create a generator instance by alias', () => {
-      // 'vscode' is an alias for 'copilot-vscode'
+      // 'vscode' and 'copilot-vscode' are aliases for 'copilot'
       const vscodeGenerator = GeneratorRegistry.createGenerator('vscode');
-      const copilotGenerator =
+      const copilotGenerator = GeneratorRegistry.createGenerator('copilot');
+      const copilotVscodeGenerator =
         GeneratorRegistry.createGenerator('copilot-vscode');
 
       expect(vscodeGenerator).toBeDefined();
       expect(copilotGenerator).toBeDefined();
-      // Both should be instances of the same class
+      expect(copilotVscodeGenerator).toBeDefined();
+      // All should be instances of the same class
       expect(vscodeGenerator.constructor.name).toBe(
+        copilotGenerator.constructor.name
+      );
+      expect(copilotVscodeGenerator.constructor.name).toBe(
         copilotGenerator.constructor.name
       );
     });
@@ -92,7 +96,7 @@ describe('GeneratorRegistry', () => {
       } catch (error) {
         const message = (error as Error).message;
         expect(message).toContain('Supported agents:');
-        expect(message).toContain('amazonq-cli');
+        expect(message).toContain('kiro');
         expect(message).toContain('claude');
       }
     });
@@ -112,11 +116,9 @@ describe('GeneratorRegistry', () => {
     it('should not include duplicate entries for aliases', () => {
       const generators = GeneratorRegistry.getAllGenerators();
 
-      // Count occurrences of 'copilot-vscode' (which has 'vscode' as an alias)
-      const vscodeGenerators = generators.filter(
-        g => g.name === 'copilot-vscode'
-      );
-      expect(vscodeGenerators.length).toBe(1);
+      // Count occurrences of 'copilot' (which has 'vscode' and 'copilot-vscode' as aliases)
+      const copilotGenerators = generators.filter(g => g.name === 'copilot');
+      expect(copilotGenerators.length).toBe(1);
     });
 
     it('should return generator metadata with required fields', () => {
@@ -149,10 +151,14 @@ describe('GeneratorRegistry', () => {
     it('should not include aliases in the names list', () => {
       const names = GeneratorRegistry.getGeneratorNames();
 
-      // 'vscode' is an alias for 'copilot-vscode'
-      // It should not appear in the names list
+      // 'vscode' and 'copilot-vscode' are aliases for 'copilot'
+      // They should not appear in the names list
       expect(names).not.toContain('vscode');
-      expect(names).toContain('copilot-vscode');
+      expect(names).not.toContain('copilot-vscode');
+      expect(names).toContain('copilot');
+      // 'amazonq-cli' is an alias for 'kiro'
+      expect(names).not.toContain('amazonq-cli');
+      expect(names).toContain('kiro');
     });
   });
 
@@ -202,9 +208,14 @@ describe('GeneratorRegistry', () => {
     });
 
     it('should return true for aliases', () => {
-      // 'vscode' is an alias for 'copilot-vscode'
+      // 'vscode' and 'copilot-vscode' are aliases for 'copilot'
       expect(GeneratorRegistry.exists('vscode')).toBe(true);
       expect(GeneratorRegistry.exists('copilot-vscode')).toBe(true);
+      expect(GeneratorRegistry.exists('copilot')).toBe(true);
+      // 'amazonq-cli' and 'amazonq' are aliases for 'kiro'
+      expect(GeneratorRegistry.exists('amazonq-cli')).toBe(true);
+      expect(GeneratorRegistry.exists('amazonq')).toBe(true);
+      expect(GeneratorRegistry.exists('kiro')).toBe(true);
     });
 
     it('should return false for unknown generators', () => {
@@ -214,7 +225,7 @@ describe('GeneratorRegistry', () => {
     });
 
     it('should be case-insensitive', () => {
-      expect(GeneratorRegistry.exists('AMAZONQ-CLI')).toBe(true);
+      expect(GeneratorRegistry.exists('KIRO')).toBe(true);
       expect(GeneratorRegistry.exists('Claude')).toBe(true);
       expect(GeneratorRegistry.exists('VSCODE')).toBe(true);
       expect(GeneratorRegistry.exists('gemini')).toBe(true);
