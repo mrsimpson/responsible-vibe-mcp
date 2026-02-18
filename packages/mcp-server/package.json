@@ -1,6 +1,6 @@
 {
   "name": "@codemcp/workflows",
-  "version": "5.0.0",
+  "version": "5.0.1",
   "description": "MCP server implementation for responsible-vibe",
   "type": "module",
   "main": "dist/index.js",
