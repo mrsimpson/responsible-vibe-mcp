@@ -78,6 +78,21 @@ export abstract class SkillGenerator {
   protected getDefaultMcpConfig(): object {
     const isWindows = process.platform.startsWith('win');
 
+    return {
+      'responsible-vibe-mcp': {
+        command: isWindows
+          ? ['cmd', '/c', 'npx', '@codemcp/workflows@latest']
+          : ['npx', '@codemcp/workflows@latest'],
+      },
+    };
+  }
+
+  /**
+   * Get MCP config in command + args format (used by Kiro/Amazon Q CLI)
+   */
+  protected getKiroMcpConfig(): object {
+    const isWindows = process.platform.startsWith('win');
+
     if (isWindows) {
       return {
         'responsible-vibe-mcp': {
@@ -254,8 +269,35 @@ class OpenCodeSkillGenerator extends SkillGenerator {
     const skillContent = await this.getSkillTemplate();
     await this.writeFile(paths.skillFile, skillContent);
 
-    // Generate MCP config
-    await this.writeMcpConfig(paths);
+    // Generate MCP config with OpenCode-specific format
+    await this.writeOpencodeMcpConfig(paths);
+  }
+
+  /**
+   * Write OpenCode-specific MCP configuration
+   * OpenCode uses a different format: type: "local" and command as array
+   */
+  private async writeOpencodeMcpConfig(paths: SkillPaths): Promise<void> {
+    const isWindows = process.platform.startsWith('win');
+
+    const mcpConfig = {
+      'responsible-vibe-mcp': {
+        type: 'local' as const,
+        command: isWindows
+          ? ['cmd', '/c', 'npx', '@codemcp/workflows@latest']
+          : ['npx', '@codemcp/workflows@latest'],
+      },
+    };
+
+    const configContent = {
+      $schema: 'https://opencode.ai/config.json',
+      mcp: mcpConfig,
+    };
+
+    await this.writeFile(
+      paths.mcpConfigPath,
+      JSON.stringify(configContent, null, 2)
+    );
   }
 }
 
@@ -276,7 +318,8 @@ class CopilotSkillGenerator extends SkillGenerator {
 
 /**
  * Kiro Skill Generator
- * Generates skills for Kiro (uses POWER.md template with bundled mcp.json)
+ * Generates skills for Kiro IDE (uses POWER.md template with bundled mcp.json)
+ * Uses command + args format for MCP config
  */
 class KiroSkillGenerator extends SkillGenerator {
   async generate(outputDir: string): Promise<void> {
@@ -286,8 +329,51 @@ class KiroSkillGenerator extends SkillGenerator {
     const skillContent = await this.getPowerTemplate();
     await this.writeFile(paths.skillFile, skillContent);
 
-    // Kiro bundles MCP config inside the power directory
-    await this.writeMcpConfig(paths);
+    // Kiro bundles MCP config inside the power directory (command + args format)
+    await this.writeKiroMcpConfig(paths);
+  }
+
+  /**
+   * Write Kiro-specific MCP configuration (command + args format)
+   */
+  private async writeKiroMcpConfig(paths: SkillPaths): Promise<void> {
+    const mcpConfig = this.getKiroMcpConfig();
+    const configContent = { mcpServers: mcpConfig };
+
+    await this.writeFile(
+      paths.mcpConfigPath,
+      JSON.stringify(configContent, null, 2)
+    );
+  }
+}
+
+/**
+ * Kiro CLI Skill Generator
+ * Generates skills for Kiro CLI (uses SKILL.md + mcp config)
+ * Unlike Kiro IDE, the CLI does not support powers
+ * Uses command + args format for MCP config (Amazon Q CLI format)
+ */
+class KiroCliSkillGenerator extends SkillGenerator {
+  async generate(outputDir: string): Promise<void> {
+    const paths = getSkillPaths('kiro-cli', outputDir);
+    const skillContent = await this.getSkillTemplate();
+    await this.writeFile(paths.skillFile, skillContent);
+
+    // Generate MCP config with Kiro-specific format (command + args)
+    await this.writeKiroMcpConfig(paths);
+  }
+
+  /**
+   * Write Kiro-specific MCP configuration (command + args format)
+   */
+  private async writeKiroMcpConfig(paths: SkillPaths): Promise<void> {
+    const mcpConfig = this.getKiroMcpConfig();
+    const configContent = { mcpServers: mcpConfig };
+
+    await this.writeFile(
+      paths.mcpConfigPath,
+      JSON.stringify(configContent, null, 2)
+    );
   }
 }
 
@@ -406,9 +492,15 @@ SkillGeneratorRegistry.register({
 
 SkillGeneratorRegistry.register({
   name: 'kiro',
-  description: 'Generate power for Kiro (POWER.md + bundled mcp.json)',
-  aliases: ['amazonq', 'amazonq-cli'],
+  description: 'Generate power for Kiro IDE (POWER.md + bundled mcp.json)',
   generatorClass: KiroSkillGenerator,
+});
+
+SkillGeneratorRegistry.register({
+  name: 'kiro-cli',
+  description: 'Generate skill for Kiro/Amazon Q CLI (SKILL.md + mcp.json)',
+  aliases: ['amazonq', 'amazonq-cli'],
+  generatorClass: KiroCliSkillGenerator,
 });
 
 /**

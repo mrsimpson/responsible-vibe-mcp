@@ -11,7 +11,14 @@ import { GeneratorRegistry } from '../src/config-generator.js';
  */
 describe('GeneratorRegistry', () => {
   // Test with the actual built-in generators
-  const builtInGenerators = ['kiro', 'claude', 'gemini', 'opencode', 'copilot'];
+  const builtInGenerators = [
+    'kiro',
+    'kiro-cli',
+    'claude',
+    'gemini',
+    'opencode',
+    'copilot',
+  ];
 
   beforeAll(() => {
     // Verify the registry is properly initialized
