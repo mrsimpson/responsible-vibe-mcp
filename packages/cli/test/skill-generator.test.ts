@@ -32,12 +32,16 @@ describe('Skill Generator', () => {
       expect(platforms).toContain('opencode');
       expect(platforms).toContain('copilot');
       expect(platforms).toContain('kiro');
+      expect(platforms).toContain('kiro-cli');
     });
 
     it('should recognize aliases', () => {
       expect(SkillGeneratorRegistry.exists('claude-code')).toBe(true);
       expect(SkillGeneratorRegistry.exists('gemini-cli')).toBe(true);
       expect(SkillGeneratorRegistry.exists('github-copilot')).toBe(true);
+      // kiro-cli aliases
+      expect(SkillGeneratorRegistry.exists('amazonq')).toBe(true);
+      expect(SkillGeneratorRegistry.exists('amazonq-cli')).toBe(true);
     });
   });
 
@@ -92,7 +96,13 @@ describe('Skill Generator', () => {
 
       expect(config.mcpServers).toBeDefined();
       expect(config.mcpServers['responsible-vibe-mcp']).toBeDefined();
-      expect(config.mcpServers['responsible-vibe-mcp'].command).toBe('npx');
+      // command should be an array
+      expect(
+        Array.isArray(config.mcpServers['responsible-vibe-mcp'].command)
+      ).toBe(true);
+      expect(config.mcpServers['responsible-vibe-mcp'].command).toContain(
+        'npx'
+      );
     });
   });
 
@@ -137,9 +147,19 @@ describe('Skill Generator', () => {
       const configPath = join(tempDir, 'opencode.json');
       const config = JSON.parse(readFileSync(configPath, 'utf-8'));
 
-      // OpenCode uses 'mcp' key, not 'mcpServers'
+      // OpenCode uses 'mcp' key with specific structure
+      expect(config.$schema).toBe('https://opencode.ai/config.json');
       expect(config.mcp).toBeDefined();
       expect(config.mcp['responsible-vibe-mcp']).toBeDefined();
+      expect(config.mcp['responsible-vibe-mcp'].type).toBe('local');
+      // command should be an array
+      expect(Array.isArray(config.mcp['responsible-vibe-mcp'].command)).toBe(
+        true
+      );
+      expect(config.mcp['responsible-vibe-mcp'].command).toContain('npx');
+      expect(config.mcp['responsible-vibe-mcp'].command).toContain(
+        '@codemcp/workflows@latest'
+      );
     });
   });
 
@@ -234,6 +254,99 @@ describe('Skill Generator', () => {
 
       expect(config.mcpServers).toBeDefined();
       expect(config.mcpServers['responsible-vibe-mcp']).toBeDefined();
+      // Kiro uses command + args format
+      expect(config.mcpServers['responsible-vibe-mcp'].command).toBe('npx');
+      expect(config.mcpServers['responsible-vibe-mcp'].args).toContain(
+        '@codemcp/workflows@latest'
+      );
+    });
+  });
+
+  describe('Kiro CLI Skill Generation', () => {
+    it('should generate skill files in correct location', async () => {
+      await generateSkill('kiro-cli', tempDir);
+
+      // Kiro CLI uses skills directory and SKILL.md (not powers)
+      const skillPath = join(
+        tempDir,
+        '.kiro',
+        'skills',
+        'responsible-vibe',
+        'SKILL.md'
+      );
+      expect(existsSync(skillPath)).toBe(true);
+
+      // MCP config is in .kiro/settings directory per Kiro CLI docs
+      const mcpPath = join(tempDir, '.kiro', 'settings', 'mcp.json');
+      expect(existsSync(mcpPath)).toBe(true);
+    });
+
+    it('should generate valid SKILL.md with frontmatter', async () => {
+      await generateSkill('kiro-cli', tempDir);
+
+      const skillPath = join(
+        tempDir,
+        '.kiro',
+        'skills',
+        'responsible-vibe',
+        'SKILL.md'
+      );
+      const content = readFileSync(skillPath, 'utf-8');
+
+      // Check YAML frontmatter - should be SKILL.md format, not POWER.md
+      expect(content).toMatch(/^---\n/);
+      expect(content).toContain('name: responsible-vibe');
+      expect(content).toContain('allowed-tools:');
+      expect(content).toContain('license: MIT');
+
+      // Should NOT contain POWER.md-specific fields
+      expect(content).not.toContain('displayName:');
+      expect(content).not.toContain('keywords:');
+
+      // Verify it includes the dynamic system prompt content
+      expect(content).toContain('whats_next');
+      expect(content).toContain('responsible-vibe-mcp');
+    });
+
+    it('should generate MCP config with command + args format', async () => {
+      await generateSkill('kiro-cli', tempDir);
+
+      const mcpPath = join(tempDir, '.kiro', 'settings', 'mcp.json');
+      const config = JSON.parse(readFileSync(mcpPath, 'utf-8'));
+
+      expect(config.mcpServers).toBeDefined();
+      expect(config.mcpServers['responsible-vibe-mcp']).toBeDefined();
+      // Kiro CLI uses command + args format (not array)
+      expect(config.mcpServers['responsible-vibe-mcp'].command).toBe('npx');
+      expect(config.mcpServers['responsible-vibe-mcp'].args).toContain(
+        '@codemcp/workflows@latest'
+      );
+    });
+
+    it('should work with amazonq alias', async () => {
+      await generateSkill('amazonq', tempDir);
+
+      const skillPath = join(
+        tempDir,
+        '.kiro',
+        'skills',
+        'responsible-vibe',
+        'SKILL.md'
+      );
+      expect(existsSync(skillPath)).toBe(true);
+    });
+
+    it('should work with amazonq-cli alias', async () => {
+      await generateSkill('amazonq-cli', tempDir);
+
+      const skillPath = join(
+        tempDir,
+        '.kiro',
+        'skills',
+        'responsible-vibe',
+        'SKILL.md'
+      );
+      expect(existsSync(skillPath)).toBe(true);
     });
   });
 

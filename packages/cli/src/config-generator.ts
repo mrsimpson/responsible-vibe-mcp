@@ -130,19 +130,11 @@ abstract class ConfigGenerator {
   protected getDefaultMcpConfig(): object {
     const isWindows = process.platform.startsWith('win');
 
-    if (isWindows) {
-      return {
-        'responsible-vibe-mcp': {
-          command: 'cmd',
-          args: ['/c', 'npx', '@codemcp/workflows@latest'],
-        },
-      };
-    }
-
     return {
       'responsible-vibe-mcp': {
-        command: 'npx',
-        args: ['@codemcp/workflows@latest'],
+        command: isWindows
+          ? ['cmd', '/c', 'npx', '@codemcp/workflows@latest']
+          : ['npx', '@codemcp/workflows@latest'],
       },
     };
   }
@@ -337,15 +329,17 @@ class OpencodeConfigGenerator extends ConfigGenerator {
   async generate(outputDir: string): Promise<void> {
     const systemPrompt = this.getSystemPrompt();
     const configPath = join(outputDir, 'opencode.json');
+    const isWindows = process.platform.startsWith('win');
 
     // Generate new config structure
     const newConfig: Record<string, unknown> = {
       $schema: 'https://opencode.ai/config.json',
       mcp: {
         'responsible-vibe-mcp': {
-          command: ['npx', 'responsible-vibe-mcp'],
           type: 'local',
-          enabled: true,
+          command: isWindows
+            ? ['cmd', '/c', 'npx', '@codemcp/workflows@latest']
+            : ['npx', '@codemcp/workflows@latest'],
         },
       },
       agent: {
@@ -500,6 +494,12 @@ GeneratorRegistry.register({
   name: 'kiro',
   description: 'Generate .amazonq/cli-agents/vibe.json (Kiro/Amazon Q)',
   aliases: ['amazonq-cli', 'amazonq'],
+  generatorClass: AmazonQConfigGenerator,
+});
+
+GeneratorRegistry.register({
+  name: 'kiro-cli',
+  description: 'Generate .amazonq/cli-agents/vibe.json (Kiro/Amazon Q CLI)',
   generatorClass: AmazonQConfigGenerator,
 });
 

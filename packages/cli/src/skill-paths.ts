@@ -31,6 +31,7 @@ export type SkillPlatform =
   | 'claude'
   | 'opencode'
   | 'kiro'
+  | 'kiro-cli'
   | 'copilot'
   | 'gemini';
 
@@ -85,6 +86,20 @@ export function getSkillPaths(platform: string, outputDir: string): SkillPaths {
       };
     }
 
+    case 'kiro-cli': {
+      // Kiro CLI uses standard skills format (SKILL.md + mcp config)
+      // unlike Kiro IDE which uses powers
+      // MCP config goes in .kiro/settings/mcp.json per Kiro CLI docs
+      const skillDir = join(outputDir, '.kiro', 'skills', 'responsible-vibe');
+      return {
+        skillDir,
+        skillFile: join(skillDir, 'SKILL.md'),
+        mcpConfigPath: join(outputDir, '.kiro', 'settings', 'mcp.json'),
+        mcpConfigKey: 'mcpServers',
+        isKiroPower: false,
+      };
+    }
+
     case 'copilot': {
       const skillDir = join(outputDir, '.github', 'skills', 'responsible-vibe');
       return {
@@ -109,7 +124,7 @@ export function getSkillPaths(platform: string, outputDir: string): SkillPaths {
 
     default:
       throw new Error(
-        `Unsupported skill platform: ${platform}. Supported platforms: claude, opencode, kiro, copilot, gemini`
+        `Unsupported skill platform: ${platform}. Supported platforms: claude, opencode, kiro, kiro-cli, copilot, gemini`
       );
   }
 }
@@ -118,7 +133,7 @@ export function getSkillPaths(platform: string, outputDir: string): SkillPaths {
  * Get all supported skill platforms
  */
 export function getSupportedSkillPlatforms(): SkillPlatform[] {
-  return ['claude', 'opencode', 'kiro', 'copilot', 'gemini'];
+  return ['claude', 'opencode', 'kiro', 'kiro-cli', 'copilot', 'gemini'];
 }
 
 /**
