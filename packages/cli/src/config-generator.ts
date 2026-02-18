@@ -497,8 +497,9 @@ class GeneratorRegistry {
 
 // Register all available generators
 GeneratorRegistry.register({
-  name: 'amazonq-cli',
-  description: 'Generate .amazonq/cli-agents/vibe.json',
+  name: 'kiro',
+  description: 'Generate .amazonq/cli-agents/vibe.json (Kiro/Amazon Q)',
+  aliases: ['amazonq-cli', 'amazonq'],
   generatorClass: AmazonQConfigGenerator,
 });
 
@@ -521,9 +522,9 @@ GeneratorRegistry.register({
 });
 
 GeneratorRegistry.register({
-  name: 'copilot-vscode',
+  name: 'copilot',
   description: 'Generate .vscode/mcp.json, .github/agents/Vibe.agent.md',
-  aliases: ['vscode'],
+  aliases: ['copilot-vscode', 'vscode'],
   generatorClass: VSCodeConfigGenerator,
 });
 

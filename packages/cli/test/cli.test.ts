@@ -16,19 +16,19 @@ const mocks = vi.hoisted(() => ({
   generateConfig: vi.fn(),
   GeneratorRegistry: {
     getGeneratorNames: vi.fn(() => [
-      'amazonq-cli',
+      'kiro',
       'claude',
       'gemini',
       'opencode',
-      'copilot-vscode',
+      'copilot',
     ]),
     getHelpText: vi.fn(
       () =>
-        `  amazonq-cli          Generate .amazonq/cli-agents/vibe.json
+        `  kiro                Generate .amazonq/cli-agents/vibe.json (Kiro/Amazon Q)
   claude               Generate CLAUDE.md, .mcp.json, settings.json
   gemini               Generate settings.json, GEMINI.md
   opencode             Generate opencode.json
-  copilot-vscode       Generate .vscode/mcp.json, .github/agents/Vibe.agent.md`
+  copilot              Generate .vscode/mcp.json, .github/agents/Vibe.agent.md`
     ),
   },
 }));
@@ -174,7 +174,7 @@ describe('CLI', () => {
         expect.stringContaining('Responsible Vibe CLI Tools')
       );
       expect(consoleLogSpy).toHaveBeenCalledWith(
-        expect.stringContaining('--generate-config <agent>')
+        expect.stringContaining('setup <target>')
       );
     });
 
@@ -190,48 +190,76 @@ describe('CLI', () => {
   });
 
   describe('Generate Config Command', () => {
-    it('should handle --generate-config with valid agent', () => {
-      process.argv = ['node', 'cli.js', '--generate-config', 'amazonq-cli'];
+    it('should show deprecation warning for --generate-config', () => {
+      process.argv = ['node', 'cli.js', '--generate-config', 'kiro'];
 
-      // generateConfig is already mocked in beforeEach
+      // Mock console.warn for deprecation notices
+      const consoleWarnSpy = vi
+        .spyOn(console, 'warn')
+        .mockImplementation(() => {});
+
       runCli();
 
-      // Should not show error or help
-      expect(consoleErrorSpy).not.toHaveBeenCalled();
+      // Should show deprecation warning
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        '⚠️  DEPRECATED: --generate-config is deprecated.'
+      );
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        '   Use instead: setup kiro --mode config'
+      );
+
+      consoleWarnSpy.mockRestore();
     });
 
-    it('should show error when --generate-config has no agent', () => {
+    it('should show deprecation warning when --generate-config has no agent', () => {
       process.argv = ['node', 'cli.js', '--generate-config'];
 
-      expect(() => runCli()).toThrow('process.exit called');
+      const consoleWarnSpy = vi
+        .spyOn(console, 'warn')
+        .mockImplementation(() => {});
 
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
-        '❌ Error: --generate-config requires an agent parameter'
+      runCli();
+
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        '⚠️  DEPRECATED: --generate-config is deprecated.'
       );
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
-        'Supported agents: amazonq-cli, claude, gemini, opencode, copilot-vscode'
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        '   Use instead: setup <target> --mode config'
       );
+
+      consoleWarnSpy.mockRestore();
     });
   });
 
   describe('System Prompt Command', () => {
-    it('should handle --system-prompt flag', () => {
+    it('should handle system-prompt subcommand', () => {
       // Don't throw on process.exit for this test
       processExitSpy.mockImplementation(() => undefined as never);
 
-      process.argv = ['node', 'cli.js', '--system-prompt'];
+      process.argv = ['node', 'cli.js', 'system-prompt'];
 
       runCli();
 
-      // Debug: check if error was called
-      if (consoleErrorSpy.mock.calls.length > 0) {
-        console.log(
-          'Console error was called with:',
-          consoleErrorSpy.mock.calls
-        );
-      }
-
       expect(consoleLogSpy).toHaveBeenCalledWith('Mock system prompt');
+    });
+
+    it('should show deprecation warning for --system-prompt flag', () => {
+      process.argv = ['node', 'cli.js', '--system-prompt'];
+
+      const consoleWarnSpy = vi
+        .spyOn(console, 'warn')
+        .mockImplementation(() => {});
+
+      runCli();
+
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        '⚠️  DEPRECATED: --system-prompt is deprecated.'
+      );
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        '   Use instead: system-prompt'
+      );
+
+      consoleWarnSpy.mockRestore();
     });
   });
 
@@ -358,13 +386,13 @@ describe('CLI', () => {
   });
 
   describe('Unknown Arguments', () => {
-    it('should show error for unknown arguments', () => {
+    it('should show error for unknown command', () => {
       process.argv = ['node', 'cli.js', '--unknown-flag'];
 
       runCli();
 
       expect(consoleErrorSpy).toHaveBeenCalledWith(
-        '❌ Unknown arguments:',
+        '❌ Unknown command:',
         '--unknown-flag'
       );
       expect(consoleLogSpy).toHaveBeenCalledWith(
@@ -384,8 +412,8 @@ describe('CLI', () => {
       expect(consoleErrorSpy).not.toHaveBeenCalled();
     });
 
-    it('should start visualization tool with --visualize flag', () => {
-      process.argv = ['node', 'cli.js', '--visualize'];
+    it('should start visualization tool with visualize subcommand', () => {
+      process.argv = ['node', 'cli.js', 'visualize'];
 
       // spawn is already mocked in beforeEach, so no actual processes will be spawned
       runCli();
@@ -393,13 +421,36 @@ describe('CLI', () => {
       expect(consoleErrorSpy).not.toHaveBeenCalled();
     });
 
-    it('should start visualization tool with --viz flag', () => {
-      process.argv = ['node', 'cli.js', '--viz'];
+    it('should show deprecation warning for --visualize flag', () => {
+      process.argv = ['node', 'cli.js', '--visualize'];
 
-      // spawn is already mocked in beforeEach, so no actual processes will be spawned
+      const consoleWarnSpy = vi
+        .spyOn(console, 'warn')
+        .mockImplementation(() => {});
+
       runCli();
 
-      expect(consoleErrorSpy).not.toHaveBeenCalled();
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        '⚠️  DEPRECATED: --visualize/--viz is deprecated.'
+      );
+
+      consoleWarnSpy.mockRestore();
+    });
+
+    it('should show deprecation warning for --viz flag', () => {
+      process.argv = ['node', 'cli.js', '--viz'];
+
+      const consoleWarnSpy = vi
+        .spyOn(console, 'warn')
+        .mockImplementation(() => {});
+
+      runCli();
+
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        '⚠️  DEPRECATED: --visualize/--viz is deprecated.'
+      );
+
+      consoleWarnSpy.mockRestore();
     });
   });
 });
