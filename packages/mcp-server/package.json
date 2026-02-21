@@ -7,6 +7,10 @@
   "bin": {
     "responsible-vibe-mcp": "dist/index.js"
   },
+  "files": [
+    "dist/**/*",
+    "SKILL.md"
+  ],
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "clean:build": "rimraf ./dist",

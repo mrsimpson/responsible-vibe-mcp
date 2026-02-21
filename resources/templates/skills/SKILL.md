@@ -14,4 +14,10 @@ metadata:
   version: '${VERSION}'
   repository: https://github.com/mrsimpson/responsible-vibe-mcp
   author: mrsimpson
+requires-mcp-servers:
+  - name: responsible-vibe-workflows
+    package: '@codemcp/workflows'
+    description: 'Structured development workflows for AI-assisted coding'
+    command: npx
+    args: ['-y', '@codemcp/workflows']
 ---

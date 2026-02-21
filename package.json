@@ -28,7 +28,7 @@
     "url": "git+https://github.com/mrsimpson/vibe-feature-mcp.git"
   },
   "scripts": {
-    "build": "turbo run build",
+    "build": "turbo run build && node scripts/generate-skill.js",
     "build:visualizer": "cd packages/visualizer && pnpm install && pnpm run build",
     "pack:dist": "pnpm pack",
     "inspector": "npx @modelcontextprotocol/inspector",
