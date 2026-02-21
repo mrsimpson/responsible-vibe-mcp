@@ -9,7 +9,7 @@
   },
   "files": [
     "dist/**/*",
-    "SKILL.md"
+    "skill/**/*"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.build.json",

@@ -2,7 +2,7 @@
 SYSTEM_PROMPT.md
 
 # Generated skill file
-packages/mcp-server/SKILL.md
+packages/mcp-server/skill/
 
 # Logs
 logs
