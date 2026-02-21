@@ -1,6 +1,9 @@
 .vibe/*.sqlite
 SYSTEM_PROMPT.md
 
+# Generated skill file
+packages/mcp-server/SKILL.md
+
 # Logs
 logs
 *.log
