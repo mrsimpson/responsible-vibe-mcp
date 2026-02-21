@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { readFileSync, writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -22,7 +22,11 @@ const skillTemplate = readFileSync(
 // Replace version placeholder
 const skillContent = skillTemplate.replace('${VERSION}', version);
 
-// Write to @codemcp/workflows package directory
-writeFileSync(join(projectRoot, 'packages/mcp-server/SKILL.md'), skillContent);
+// Create skill directory and write file
+const skillDir = join(projectRoot, 'packages/mcp-server/skill');
+mkdirSync(skillDir, { recursive: true });
+writeFileSync(join(skillDir, 'SKILL.md'), skillContent);
 
-console.log(`Generated packages/mcp-server/SKILL.md with version ${version}`);
+console.log(
+  `Generated packages/mcp-server/skill/SKILL.md with version ${version}`
+);
