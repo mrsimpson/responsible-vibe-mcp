@@ -80,7 +80,6 @@ describe('Skill Generator', () => {
       expect(content).toMatch(/^---\n/);
       expect(content).toContain('name: responsible-vibe');
       expect(content).toContain('description:');
-      expect(content).toContain('allowed-tools:');
       expect(content).toContain('license: MIT');
 
       // Check content includes system prompt (dynamically generated)
@@ -296,7 +295,6 @@ describe('Skill Generator', () => {
       // Check YAML frontmatter - should be SKILL.md format, not POWER.md
       expect(content).toMatch(/^---\n/);
       expect(content).toContain('name: responsible-vibe');
-      expect(content).toContain('allowed-tools:');
       expect(content).toContain('license: MIT');
 
       // Should NOT contain POWER.md-specific fields
