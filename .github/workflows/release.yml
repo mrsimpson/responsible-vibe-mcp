@@ -76,8 +76,6 @@ jobs:
   release:
     needs: test
     runs-on: ubuntu-latest
-    outputs:
-      new_tag: ${{ steps.version.outputs.new_tag }}
     steps:
       - name: Generate GitHub App Token
         id: generate_token
@@ -181,54 +179,3 @@ jobs:
           git status && pnpm publish --access public --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-  build-cli:
-    needs: release
-    if: needs.release.outputs.new_tag != ''
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9.15.9
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: '22'
-          cache: 'pnpm'
-
-      - name: Install dependencies
-        run: pnpm install
-
-      - name: Build project
-        run: |
-          pnpm add @rollup/rollup-linux-x64-gnu --save-dev || echo "Failed to install Rollup platform dependency"
-          pnpm run build
-
-      - name: Setup Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: '1.24'
-
-      - name: Install clihub
-        run: go install github.com/thellimist/clihub@latest
-
-      - name: Generate workflows CLI binaries
-        run: |
-          export PATH="$(go env GOPATH)/bin:$PATH"
-          clihub generate \
-            --stdio "node packages/cli/dist/index.js" \
-            --name workflows \
-            --platform linux/amd64,darwin/arm64,darwin/amd64,windows/amd64
-
-      - name: Upload binaries to GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ needs.release.outputs.new_tag }}
-          files: out/**
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
