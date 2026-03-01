@@ -9,7 +9,14 @@ permissions:
 
 jobs:
   build-cli:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - runner: ubuntu-latest
+            platform: linux/amd64,windows/amd64
+          - runner: macos-latest
+            platform: darwin/arm64,darwin/amd64
+    runs-on: ${{ matrix.runner }}
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -32,7 +39,7 @@ jobs:
 
       - name: Build project
         run: |
-          pnpm add @rollup/rollup-linux-x64-gnu --save-dev || echo "Failed to install Rollup platform dependency"
+          pnpm add @rollup/rollup-linux-x64-gnu --save-dev || echo "No Linux Rollup dependency needed"
           pnpm run build
 
       - name: Setup Go
@@ -49,7 +56,11 @@ jobs:
           clihub generate \
             --stdio "node packages/cli/dist/index.js" \
             --name workflows \
-            --platform linux/amd64,darwin/arm64,darwin/amd64,windows/amd64
+            --platform ${{ matrix.platform }}
+
+      - name: Sign macOS binaries
+        if: runner.os == 'macOS'
+        run: find out -type f -exec codesign --sign - --force {} \;
 
       - name: Upload binaries to GitHub Release
         uses: softprops/action-gh-release@v2
