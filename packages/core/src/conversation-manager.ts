@@ -10,6 +10,7 @@ import { execSync } from 'node:child_process';
 import { resolve } from 'node:path';
 import { existsSync } from 'node:fs';
 import { createLogger } from './logger.js';
+import { getPathBasename } from './path-validation-utils.js';
 import type { IPersistence } from './persistence-interface.js';
 import type { ConversationState, ConversationContext } from './types.js';
 import { WorkflowManager } from './workflow-manager.js';
@@ -279,8 +280,8 @@ export class ConversationManager {
     projectPath: string,
     gitBranch: string
   ): string {
-    // Extract project name from path
-    const projectName = projectPath.split('/').pop() || 'unknown-project';
+    // Extract project name from path (cross-platform: handles both / and \)
+    const projectName = getPathBasename(projectPath, 'unknown-project');
 
     // Clean branch name for use in ID
     const cleanBranch = gitBranch

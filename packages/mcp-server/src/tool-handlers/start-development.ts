@@ -444,7 +444,7 @@ export class StartDevelopmentHandler extends BaseToolHandler<
     const variableToDocMap: { [key: string]: string } = {};
     for (const [variable, path] of Object.entries(variableSubstitutions)) {
       // Extract document type from path (e.g., 'architecture' from 'architecture.md')
-      const filename = path.split('/').pop() || '';
+      const filename = basename(path);
       const docType = filename.replace('.md', '');
       variableToDocMap[variable] = docType;
     }

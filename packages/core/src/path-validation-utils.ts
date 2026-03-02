@@ -6,7 +6,7 @@
  */
 
 import { access, stat } from 'node:fs/promises';
-import { resolve, isAbsolute, join, normalize } from 'node:path';
+import { resolve, isAbsolute, join, normalize, basename } from 'node:path';
 import { createLogger } from './logger.js';
 
 const logger = createLogger('PathValidationUtils');
@@ -258,4 +258,47 @@ export class PathValidationUtils {
       ],
     };
   }
+}
+
+/**
+ * Cross-platform utility to extract the last component of a path.
+ * Handles both forward slashes (/) and backslashes (\) regardless of
+ * the platform the code is running on.
+ *
+ * Note: Node.js's `path.basename()` only handles the native path separator
+ * for the current platform. This function normalizes paths to handle both
+ * Unix and Windows paths on any platform.
+ *
+ * @param filePath - The file path to extract from
+ * @param fallback - Fallback value if path is empty (default: 'unknown')
+ * @returns The last component of the path, or the fallback value
+ *
+ * @example
+ * // Unix-style paths
+ * getPathBasename('/home/user/project') // 'project'
+ *
+ * // Windows-style paths (works on any platform)
+ * getPathBasename('c:\\work\\project') // 'project'
+ *
+ * // Mixed paths
+ * getPathBasename('c:/work/project') // 'project'
+ */
+export function getPathBasename(
+  filePath: string,
+  fallback: string = 'unknown'
+): string {
+  if (!filePath) {
+    return fallback;
+  }
+
+  // Normalize backslashes to forward slashes for cross-platform support
+  // This ensures Windows paths are handled correctly on Unix and vice versa
+  const normalizedPath = filePath.replace(/\\/g, '/');
+
+  // Remove trailing slashes
+  const trimmedPath = normalizedPath.replace(/\/+$/, '');
+
+  // Use basename on the normalized path
+  const result = basename(trimmedPath);
+  return result || fallback;
 }
