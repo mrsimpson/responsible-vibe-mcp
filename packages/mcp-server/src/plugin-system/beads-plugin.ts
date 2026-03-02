@@ -23,6 +23,7 @@ import {
   createLogger,
   PlanManager,
   TaskBackendManager,
+  getPathBasename,
 } from '@codemcp/workflows-core';
 import { BeadsTaskBackendClient } from '../components/beads/beads-task-backend-client.js';
 
@@ -161,8 +162,10 @@ export class BeadsPlugin implements IPlugin {
 
     try {
       const beadsIntegration = new BeadsIntegration(context.projectPath);
-      const projectName =
-        context.projectPath.split('/').pop() || 'Unknown Project';
+      const projectName = getPathBasename(
+        context.projectPath,
+        'Unknown Project'
+      );
 
       // Extract goal from plan file if it exists and has meaningful content
       let goalDescription: string | undefined;
@@ -180,7 +183,7 @@ export class BeadsPlugin implements IPlugin {
       }
 
       // Extract plan filename for use in epic title
-      const planFilename = context.planFilePath.split('/').pop();
+      const planFilename = getPathBasename(context.planFilePath);
 
       // Try to create project epic
       let epicId: string;

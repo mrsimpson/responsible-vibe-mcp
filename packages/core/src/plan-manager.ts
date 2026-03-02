@@ -10,6 +10,7 @@ import { writeFile, readFile, access } from 'node:fs/promises';
 import { dirname } from 'node:path';
 import { mkdir } from 'node:fs/promises';
 import { createLogger } from './logger.js';
+import { getPathBasename } from './path-validation-utils.js';
 
 import type { YamlStateMachine } from './state-machine-types.js';
 import type { TaskBackendConfig } from './task-backend.js';
@@ -110,7 +111,7 @@ export class PlanManager implements IPlanManager {
         directory: dirname(planFilePath),
       });
 
-      const projectName = projectPath.split('/').pop() || 'Unknown Project';
+      const projectName = getPathBasename(projectPath, 'Unknown Project');
       const branchInfo = gitBranch !== 'no-git' ? ` (${gitBranch} branch)` : '';
 
       const initialContent = this.generateInitialPlanContent(

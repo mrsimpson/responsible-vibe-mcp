@@ -11,6 +11,7 @@ import {
   type YamlStateMachine,
   type TaskBackendConfig,
   createLogger,
+  getPathBasename,
 } from '@codemcp/workflows-core';
 import { writeFile, readFile, access } from 'node:fs/promises';
 import { dirname } from 'node:path';
@@ -114,7 +115,7 @@ export class BeadsPlanManager implements IPlanManager {
         directory: dirname(planFilePath),
       });
 
-      const projectName = projectPath.split('/').pop() || 'Unknown Project';
+      const projectName = getPathBasename(projectPath, 'Unknown Project');
       const branchInfo = gitBranch !== 'no-git' ? ` (${gitBranch} branch)` : '';
 
       const initialContent = this.generateBeadsInitialPlanContent(
