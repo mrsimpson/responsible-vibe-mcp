@@ -27,30 +27,39 @@ states:
   conversion_planning:
     description: 'Plan the complete system replacement strategy and approach'
     default_instructions: >
-      You are in the conversion planning phase for big-bang conversion workflow.
+      **STEP 1: Reference Architecture Documentation**
+      - Check if `$ARCHITECTURE_DOC` exists
+      - Review current system understanding from documentation
+      - If unavailable, search for architecture docs (README.md, docs/, ARCHITECTURE.md)
+      - Enhance `$ARCHITECTURE_DOC` with your findings
 
-      **Your Tasks:**
-      1. **Reference Architecture Documentation**: Check if $ARCHITECTURE_DOC exists and reference it for system understanding
-      2. **Search for Architecture**: If $ARCHITECTURE_DOC is not available, search the project for architecture documentation (README.md, docs/, ARCHITECTURE.md, etc.). Enhance the existing $ARCHITECTURE_DOC with your findings
-      3. **Reference Existing Tests**: If available, reference existing boundary tests and system baselines
-      4. **Analyze Current System**: Examine the codebase to understand system architecture and functionality
-      5. **Define Conversion Scope**: Establish what will be replaced and what will remain
-      6. **Plan Conversion Strategy**: Design the approach for complete system replacement
-      7. **Risk Assessment**: Identify risks and mitigation strategies for big-bang approach
-      8. **Timeline Planning**: Establish realistic timeline for conversion execution
+      **STEP 2: Analyze Current System**
+      - Examine codebase to understand system architecture
+      - Review existing boundary tests and system baselines if available
+      - Document current functionality and constraints
 
-      **Interview the User (Business & Operational Context):**
-      - "What business constraints or deadlines do we need to consider for this conversion?"
-      - "What is the acceptable downtime window for this conversion?"
-      - "What are the rollback criteria if the conversion encounters issues?"
+      **STEP 3: Define Conversion Scope**
+      - Establish what will be replaced
+      - Identify what will remain unchanged
+      - Document scope boundaries clearly
 
-      **Best Practices to Apply:**
-      - **Comprehensive Planning**: Plan every aspect of the conversion thoroughly
-      - **Risk Mitigation**: Identify and plan for potential failure scenarios
-      - **Rollback Strategy**: Always have a plan to revert if conversion fails
-      - **Stakeholder Communication**: Keep all stakeholders informed of the plan
-      - **Incremental Validation**: Plan validation checkpoints throughout conversion
-      - **Resource Planning**: Ensure adequate resources for conversion execution
+      **STEP 4: Plan Conversion Strategy**
+      - Design the approach for complete system replacement
+      - Identify risks and mitigation strategies
+      - Establish realistic timeline for conversion execution
+
+      **STEP 5: Interview the User (Business & Operational Context)**
+      - What business constraints or deadlines apply to this conversion?
+      - What is the acceptable downtime window?
+      - What are the rollback criteria if conversion encounters issues?
+
+      **STEP 6: Apply Best Practices**
+      - Plan every aspect of conversion thoroughly
+      - Identify and plan for potential failure scenarios
+      - Have a plan to revert if conversion fails
+      - Keep all stakeholders informed of the plan
+      - Plan validation checkpoints throughout conversion
+      - Ensure adequate resources for conversion execution
 
       Update the plan file with conversion planning decisions and mark completed tasks.
     transitions:
@@ -65,38 +74,48 @@ states:
   target_architecture_design:
     description: 'Design the architecture for the new system in target technology'
     default_instructions: >
-      You are in the target architecture design phase. Design the new system architecture in the target technology stack.
+      **STEP 1: Reference Architecture Documentation**
+      - Check if `$ARCHITECTURE_DOC` exists
+      - Review current system understanding from documentation
 
-      **Your Tasks:**
-      1. **Reference Architecture Documentation**: Check if $ARCHITECTURE_DOC exists and reference it for current system understanding
-      2. **Create/Update Design Documentation**: Check if $DESIGN_DOC exists and reference it. If not available, create or enhance $DESIGN_DOC with your design decisions
-      3. **Analyze Current Architecture**: Examine the existing system architecture and patterns
-      4. **Technology Stack Selection**: Finalize the target technology stack and frameworks
-      5. **Architecture Pattern Design**: Choose appropriate architectural patterns for the new system
-      6. **Component Design**: Design how current components will be reimplemented
-      7. **Integration Design**: Plan how the new system will integrate with external systems
-      8. **Data Architecture**: Design data storage and management for the new system
-      9. **Deployment Architecture**: Plan how the new system will be deployed and operated
+      **STEP 2: Create/Update Design Documentation**
+      - Check if `$DESIGN_DOC` exists and reference it
+      - If unavailable, create or enhance `$DESIGN_DOC` with your design decisions
 
-      **Interview the User (Requirements & Constraints):**
-      - "What are the performance requirements for the new system?"
-      - "Are there any scalability requirements we need to design for?"
-      - "Are there any budget constraints that affect technology choices?"
+      **STEP 3: Analyze Current Architecture**
+      - Examine existing system architecture and patterns
+      - Identify architectural constraints and requirements
 
-      **Best Practices to Apply:**
-      - **Modern Architecture Patterns**: Leverage modern architectural approaches
-      - **Scalability Design**: Design for future growth and scalability
-      - **Maintainability**: Choose patterns that improve long-term maintainability
-      - **Technology Alignment**: Align with organizational technology standards
-      - **Performance Optimization**: Design for optimal performance characteristics
-      - **Security by Design**: Incorporate security considerations from the start
+      **STEP 4: Select Technology Stack**
+      - Finalize the target technology stack and frameworks
+      - Align with organizational technology standards
 
-      **Architecture Design Framework:**
-      - **Functional Preservation**: Ensure new architecture supports all current functionality
-      - **Modern Patterns**: Apply microservices, event-driven, or other modern patterns as appropriate
-      - **Technology Best Practices**: Follow best practices for the target technology stack
-      - **Integration Strategy**: Design clean integration patterns with external systems
-      - **Data Migration**: Plan how current data will be migrated to new system
+      **STEP 5: Design Architecture Patterns**
+      - Choose appropriate architectural patterns for new system
+      - Design component reimplementation approach
+      - Plan external system integration strategy
+      - Design data storage and management approach
+      - Plan deployment and operational architecture
+
+      **STEP 6: Interview the User (Requirements & Constraints)**
+      - What are the performance requirements for the new system?
+      - Are there any scalability requirements we need to design for?
+      - Are there any budget constraints that affect technology choices?
+
+      **STEP 7: Apply Best Practices**
+      - Leverage modern architectural approaches
+      - Design for future growth and scalability
+      - Choose patterns that improve long-term maintainability
+      - Align with organizational technology standards
+      - Design for optimal performance characteristics
+      - Incorporate security considerations from the start
+
+      **STEP 8: Validate Design Framework**
+      - Ensure new architecture supports all current functionality
+      - Apply microservices, event-driven, or other modern patterns as appropriate
+      - Follow best practices for the target technology stack
+      - Design clean integration patterns with external systems
+      - Plan data migration from current system to new system
 
       Update the plan file with architecture design decisions and validate with the user.
     transitions:
@@ -116,38 +135,42 @@ states:
   behavioral_comparison_setup:
     description: 'Set up mechanisms to compare behavior between current and new systems'
     default_instructions: >
-      You are in the behavioral comparison setup phase. Design and implement mechanisms to validate functional equivalence.
+      **STEP 1: Design Comparison Strategy**
+      - Design approach for comparing current and new system behavior
+      - Choose appropriate comparison mechanisms for your infrastructure
+      - Plan how to implement the chosen comparison approach
 
-      **Your Tasks:**
-      1. **Comparison Strategy Design**: Design approach for comparing current and new system behavior
-      2. **Mechanism Selection**: Choose appropriate comparison mechanisms for your infrastructure
-      3. **Implementation Planning**: Plan how to implement the chosen comparison approach
-      4. **Data Capture Design**: Design how to capture and compare system behavior
-      5. **Validation Criteria**: Define what constitutes successful behavioral equivalence
-      6. **Automation Planning**: Plan automated comparison and validation processes
+      **STEP 2: Design Data Capture**
+      - Design how to capture system behavior
+      - Design how to compare behavior between systems
+      - Define what constitutes successful behavioral equivalence
 
-      **Interview the User (Infrastructure & Operational Context):**
-      - "What level of traffic or load do you need to validate against?"
-      - "Are there any operational constraints for running parallel systems?"
+      **STEP 3: Plan Automation**
+      - Plan automated comparison processes
+      - Plan automated validation processes
+      - Define measurement and reporting mechanisms
 
-      **Best Practice Mechanisms to Suggest:**
-      - **Sidecar Pattern**: Deploy comparison logic alongside applications
-      - **Proxy/Gateway**: Route traffic through comparison proxy
-      - **Shadow Traffic**: Send duplicate traffic to both systems
-      - **Event Streaming**: Compare system events and state changes
-      - **API Response Comparison**: Compare API responses between systems
-      - **Database State Comparison**: Compare database states after operations
-      - **Log Analysis**: Compare system logs and behavior patterns
-      - **Synthetic Testing**: Use automated tests to compare behavior
+      **STEP 4: Suggest Best Practice Mechanisms**
+      - Sidecar Pattern: Deploy comparison logic alongside applications
+      - Proxy/Gateway: Route traffic through comparison proxy
+      - Shadow Traffic: Send duplicate traffic to both systems
+      - Event Streaming: Compare system events and state changes
+      - API Response Comparison: Compare API responses between systems
+      - Database State Comparison: Compare database states after operations
+      - Log Analysis: Compare system logs and behavior patterns
+      - Synthetic Testing: Use automated tests to compare behavior
 
-      **Implementation Approaches:**
-      - **Traffic Mirroring**: Mirror production traffic to new system
-      - **Parallel Execution**: Run both systems in parallel with comparison
-      - **Staged Rollout**: Gradually shift traffic while comparing
-      - **A/B Testing**: Compare systems with controlled traffic splits
-      - **Canary Deployment**: Test new system with small traffic percentage
+      **STEP 5: Recommend Implementation Approaches**
+      - Traffic Mirroring: Mirror production traffic to new system
+      - Parallel Execution: Run both systems in parallel with comparison
+      - Staged Rollout: Gradually shift traffic while comparing
+      - A/B Testing: Compare systems with controlled traffic splits
+      - Canary Deployment: Test new system with small traffic percentage
 
-      Interview the user about their infrastructure and suggest appropriate mechanisms.
+      **STEP 6: Interview the User (Infrastructure & Operational Context)**
+      - What level of traffic or load do you need to validate against?
+      - Are there any operational constraints for running parallel systems?
+
       Update the plan file with comparison setup decisions.
     transitions:
       - trigger: 'refine_comparison'
@@ -166,37 +189,49 @@ states:
   implementation_strategy:
     description: 'Plan detailed implementation approach for the new system'
     default_instructions: >
-      You are in the implementation strategy phase. Plan the systematic approach for building the new system.
+      **STEP 1: Reference Design Documentation**
+      - Check `$DESIGN_DOC` for target architecture and design decisions
+      - Review implementation constraints and requirements
 
-      **Your Tasks:**
-      1. **Reference Design Documentation**: Check $DESIGN_DOC for target architecture and design decisions
-      2. **Implementation Phases**: Break down implementation into manageable phases
-      3. **Development Approach**: Plan development methodology and practices
-      4. **Quality Assurance**: Plan testing and quality assurance throughout implementation
-      5. **Integration Strategy**: Plan how to integrate new components as they're built
-      6. **Validation Checkpoints**: Plan regular validation against functional equivalence
-      7. **Team Coordination**: Plan how development team will coordinate work
-      8. **Risk Management**: Plan how to manage implementation risks
+      **STEP 2: Break Down Implementation**
+      - Break implementation into manageable phases
+      - Define logical phases that deliver business value
+      - Establish sequence and dependencies
 
-      **Interview the User (Team & Process):**
-      - "What development methodology does your team prefer (Agile, Scrum, etc.)?"
-      - "How large is the development team for this conversion?"
+      **STEP 3: Plan Development Approach**
+      - Plan development methodology and practices
+      - Plan testing and quality assurance throughout implementation
+      - Plan how development team will coordinate work
 
-      **Best Practices to Apply:**
-      - **Iterative Development**: Build and validate incrementally
-      - **Continuous Integration**: Integrate and test frequently
-      - **Test-Driven Development**: Write tests before implementation
-      - **Code Quality**: Maintain high code quality standards
-      - **Documentation**: Document decisions and implementation details
-      - **Regular Validation**: Validate against legacy system frequently
+      **STEP 4: Plan Integration Strategy**
+      - Plan how to integrate new components as they're built
+      - Plan regular validation against functional equivalence
+      - Plan continuous integration and testing practices
 
-      **Implementation Strategy Framework:**
-      - **Phase Planning**: Logical phases that deliver business value
-      - **Validation Gates**: Regular checkpoints to validate functional equivalence
-      - **Quality Assurance**: Comprehensive testing at each phase
-      - **Risk Mitigation**: Address highest risks first
-      - **Team Coordination**: Clear communication and coordination processes
-      - **Progress Tracking**: Measurable progress indicators
+      **STEP 5: Plan Risk Management**
+      - Identify highest risks first
+      - Address implementation risks systematically
+      - Plan contingency approaches for high-risk areas
+
+      **STEP 6: Interview the User (Team & Process)**
+      - What development methodology does your team prefer (Agile, Scrum, etc.)?
+      - How large is the development team for this conversion?
+
+      **STEP 7: Apply Best Practices**
+      - Build and validate incrementally
+      - Integrate and test frequently
+      - Write tests before implementation
+      - Maintain high code quality standards
+      - Document decisions and implementation details
+      - Validate against legacy system frequently
+
+      **STEP 8: Create Strategy Framework**
+      - Define logical phases that deliver business value
+      - Establish regular checkpoints to validate functional equivalence
+      - Plan comprehensive testing at each phase
+      - Address highest risks first
+      - Establish clear communication and coordination processes
+      - Define measurable progress indicators
 
       Update the plan file with implementation strategy and validate with the user.
     transitions:
@@ -216,30 +251,36 @@ states:
   parallel_implementation:
     description: 'Build new system while maintaining test compatibility and validation'
     default_instructions: >
-      You are in the parallel implementation phase. Build the new system systematically with regular validation.
+      **STEP 1: Reference Design Documentation**
+      - Check `$DESIGN_DOC` for implementation guidance and architectural decisions
 
-      **Your Tasks:**
-      1. **Follow Design Documentation**: Reference $DESIGN_DOC for implementation guidance and architectural decisions
-      2. **Systematic Implementation**: Build new system components according to implementation strategy
-      3. **Test Compatibility**: Ensure new system passes existing functional equivalence tests
-      4. **Regular Validation**: Validate new system behavior against legacy system regularly
-      5. **Quality Assurance**: Maintain high code quality and testing standards
-      6. **Integration Testing**: Test integration between new components as they're built
-      7. **Performance Validation**: Ensure new system meets performance requirements
-      8. **Documentation**: Document implementation decisions and system behavior
+      **STEP 2: Build System Components**
+      - Build new system components according to implementation strategy
+      - Ensure new system passes existing functional equivalence tests
+      - Validate new system behavior against legacy system regularly
 
-      **Interview the User (Implementation Priorities):**
-      - "Which components or business domains should we implement first?"
+      **STEP 3: Maintain Quality Standards**
+      - Maintain high code quality and testing standards
+      - Test integration between new components as they're built
+      - Ensure new system meets performance requirements
 
-      **Best Practices to Apply:**
-      - **Incremental Development**: Build and validate one component at a time
-      - **Continuous Testing**: Run tests continuously as implementation progresses
-      - **Regular Integration**: Integrate new components frequently
-      - **Performance Monitoring**: Monitor performance throughout implementation
-      - **Code Reviews**: Maintain code quality through regular reviews
-      - **Documentation**: Keep implementation documentation current
+      **STEP 4: Document Implementation**
+      - Document implementation decisions as they're made
+      - Document system behavior and design rationale
+      - Keep implementation documentation current
 
-      **Implementation Guidelines:**
+      **STEP 5: Interview the User (Implementation Priorities)**
+      - Which components or business domains should we implement first?
+
+      **STEP 6: Apply Best Practices**
+      - Build and validate one component at a time
+      - Run tests continuously as implementation progresses
+      - Integrate new components frequently
+      - Monitor performance throughout implementation
+      - Maintain code quality through regular reviews
+      - Keep implementation documentation current
+
+      **STEP 7: Follow Implementation Guidelines**
       - Start with core business functionality
       - Validate each component against existing tests
       - Maintain backward compatibility during development
@@ -475,44 +516,60 @@ states:
   conversion_readiness:
     description: 'Validate conversion readiness and finalize preparation for production execution'
     default_instructions: >
-      You are in the conversion readiness phase. The CONVERSION_PLAN.md file has been created at .vibe/CONVERSION_PLAN.md.
+      The `CONVERSION_PLAN.md` file has been created at `.vibe/CONVERSION_PLAN.md`.
 
-      **Your Tasks:**
-      1. **Final System Validation**: Validate that new system passes all functional equivalence tests
-      2. **Behavioral Comparison Validation**: Confirm behavioral comparison mechanisms work correctly
-      3. **Performance Validation**: Ensure new system meets performance requirements
-      4. **Integration Validation**: Validate all external system integrations work correctly
-      5. **Conversion Plan Review**: Review and customize the CONVERSION_PLAN.md for your specific environment
-      6. **Team Readiness**: Ensure operations team is ready for production conversion
-      7. **Final Go/No-Go Assessment**: Make final assessment of conversion readiness
+      **STEP 1: Validate System Functionality**
+      - Validate that new system passes all functional equivalence tests
+      - Ensure behavioral comparison mechanisms work correctly
+      - Verify new system meets performance requirements
 
-      **Review and Present to User:**
-      - Review new system functional equivalence test results and present findings
-      - Present behavioral comparison mechanism status and validation results
-      - Review CONVERSION_PLAN.md completeness and present customization needs
-      - Present final conversion readiness assessment and any remaining concerns
+      **STEP 2: Validate Integrations**
+      - Validate all external system integrations work correctly
+      - Test integration endpoints and data flows
+      - Confirm integration error handling works properly
 
-      **Best Practices to Apply:**
-      - **Comprehensive Validation**: Validate every aspect of system readiness
-      - **Risk Assessment**: Assess and mitigate all identified risks
-      - **Team Preparation**: Ensure all teams are prepared for conversion
-      - **Documentation Review**: Ensure all documentation is complete and accurate
-      - **Contingency Planning**: Have backup plans for all scenarios
-      - **Stakeholder Communication**: Keep stakeholders informed of readiness status
+      **STEP 3: Review Conversion Plan**
+      - Review `.vibe/CONVERSION_PLAN.md` for completeness
+      - Customize the plan for your specific environment
+      - Ensure rollback procedures are documented and tested
 
-      **Conversion Readiness Checklist:**
+      **STEP 4: Ensure Team Readiness**
+      - Confirm operations team is ready for production conversion
+      - Verify all teams have necessary documentation
+      - Confirm emergency contacts and escalation procedures are defined
+
+      **STEP 5: Assess Final Readiness**
+      - Make final assessment of conversion readiness
+      - Identify and address any remaining concerns
+      - Validate all risk mitigation strategies are in place
+
+      **STEP 6: Review and Present Findings to User**
+      - Review new system functional equivalence test results
+      - Present behavioral comparison mechanism status
+      - Review `CONVERSION_PLAN.md` customization needs
+      - Present final conversion readiness assessment
+
+      **STEP 7: Apply Best Practices**
+      - Validate every aspect of system readiness
+      - Assess and mitigate all identified risks
+      - Ensure all teams are prepared for conversion
+      - Ensure all documentation is complete and accurate
+      - Have backup plans for all scenarios
+      - Keep stakeholders informed of readiness status
+
+      **STEP 8: Verify Conversion Readiness Checklist**
       - New system passes all boundary tests (functional equivalence proven)
       - Behavioral comparison mechanism validates system equivalence
       - Performance requirements are met or exceeded
       - All external integrations work correctly
-      - CONVERSION_PLAN.md is customized for your environment
+      - `CONVERSION_PLAN.md` is customized for your environment
       - Operations team is trained and ready
       - Rollback procedures are tested and ready
 
-      **Final Deliverables:**
+      **STEP 9: Confirm Final Deliverables**
       - Fully functional new system with proven equivalence
       - Operational behavioral comparison mechanism
-      - Comprehensive CONVERSION_PLAN.md for production execution
+      - Comprehensive `CONVERSION_PLAN.md` for production execution
       - Validated rollback procedures
       - Ready operations team
 
