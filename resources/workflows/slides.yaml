@@ -24,17 +24,15 @@ states:
   ideate:
     description: 'Brainstorm presentation concept and define strategic foundation'
     default_instructions: |
-      You are in the ideation phase for presentation development. This is where you define the foundation of your presentation.
+      **Clarify the presentation foundation** with the user by gathering essential information:
 
-      Focus on understanding the core purpose and audience:
       - Brainstorm presentation topic and key messages
       - Define target audience and their knowledge level
       - Set presentation goals and success criteria
       - Research topic and gather reference materials
       - Define scope, time constraints, and context
 
-      Work with the user to clarify these fundamental aspects before moving to structure.
-      Update the plan file with ideation progress and key decisions.
+      **Update** the plan file with ideation progress and key decisions before proceeding to structure.
 
     transitions:
       - trigger: ideation_complete
@@ -44,7 +42,8 @@ states:
       - trigger: abandon_presentation
         to: ideate
         instructions: |
-          Presentation development abandoned. Clean up any ideation work and prepare for new presentation topics.
+          **Abandon ideation work** - Clean up any ideation work and prepare for new presentation topics.
+
           The plan file will remain for future reference if needed.
         additional_instructions: 'Presentation development abandoned. Prepare for new presentation topics.'
         transition_reason: 'User decided to abandon current presentation development'
@@ -52,9 +51,8 @@ states:
   structure:
     description: 'Organize content flow and logical progression'
     default_instructions: |
-      Working on presentation structure phase. Focus on organizing your content logically and effectively.
+      **Create a detailed presentation structure** by organizing your content logically and effectively:
 
-      Key activities for this phase:
       - Create detailed presentation outline with main sections
       - Define slide sequence and narrative flow
       - Plan smooth transitions between topics
@@ -62,14 +60,13 @@ states:
       - Estimate timing for each section and overall presentation
       - Consider audience engagement points and interaction opportunities
 
-      Work with the user to create a solid structural foundation before moving to content drafting.
-      Update the plan file with structural decisions and progress.
+      **Update** the plan file with structural decisions and progress before moving to content drafting.
 
     transitions:
       - trigger: structure_complete
         to: draft
         additional_instructions: |
-          Structure complete! ✅ You have a well-organized outline and clear content flow.
+          **Structure phase complete!** You have a well-organized outline and clear content flow.
 
           Update the plan file with drafting tasks and mark completed structural work.
         transition_reason: 'Content structure and flow established, ready for content creation'
@@ -82,7 +79,8 @@ states:
       - trigger: abandon_presentation
         to: ideate
         instructions: |
-          Presentation development abandoned during structuring. Clean up structural work and return to ideation.
+          **Abandon structural work** - Clean up structural work and return to ideation.
+
           The plan file and any completed work will remain for future reference.
         additional_instructions: 'Presentation abandoned during structure phase. Clean up and prepare for new topics.'
         transition_reason: 'User decided to abandon presentation during structure phase'
@@ -90,9 +88,8 @@ states:
   draft:
     description: 'Create content, speaker notes, and visual planning'
     default_instructions: |
-      Working on content drafting phase. This is where you create the actual presentation content and materials.
+      **Create content and speaker notes** to establish the presentation material and delivery guide:
 
-      Key activities for this phase:
       - Write clear, engaging content for each slide/section
       - Create comprehensive speaker notes as a main deliverable
       - Make strategic decisions about visual vs. spoken content split
@@ -101,14 +98,13 @@ states:
       - Create placeholders and specifications for visual content
       - Ensure content aligns with timing and audience needs
 
-      Focus on creating high-quality content that serves both the slides and the speaker.
-      Update the plan file with drafting progress and content decisions.
+      **Update** the plan file with drafting progress and content decisions before moving to styling.
 
     transitions:
       - trigger: draft_complete
         to: style
         additional_instructions: |
-          Draft complete! ✅ You have solid content, speaker notes, and visual planning.
+          **Draft phase complete!** You have solid content, speaker notes, and visual planning.
 
           Update the plan file with styling tasks and mark completed drafting work.
         transition_reason: 'Content and speaker notes complete, ready for visual design and styling'
@@ -121,7 +117,8 @@ states:
       - trigger: abandon_presentation
         to: ideate
         instructions: |
-          Presentation development abandoned during drafting. Clean up content work and return to ideation.
+          **Abandon drafting work** - Clean up content work and return to ideation.
+
           The plan file and any completed work will remain for future reference.
         additional_instructions: 'Presentation abandoned during draft phase. Clean up and prepare for new topics.'
         transition_reason: 'User decided to abandon presentation during draft phase'
@@ -129,9 +126,8 @@ states:
   style:
     description: 'Apply design, create visuals, and enhance presentation aesthetics'
     default_instructions: |
-      Working on styling and visual design phase. This is where you bring visual appeal and consistency to your presentation.
+      **Apply visual design and create presentation aesthetics** to bring professional appeal and consistency:
 
-      Key activities for this phase:
       - Evaluate presentation requirements and choose appropriate tool/platform
       - Select themes, templates, and establish visual design approach
       - Source existing visuals, images, and graphic elements
@@ -141,14 +137,13 @@ states:
       - Ensure visual elements effectively support and enhance the content
       - Test visual consistency across all slides/sections
 
-      Focus on creating a visually appealing and professional presentation.
-      Update the plan file with styling progress and design decisions.
+      **Update** the plan file with styling progress and design decisions before moving to review.
 
     transitions:
       - trigger: style_complete
         to: review
         additional_instructions: |
-          Styling complete! ✅ You have a visually appealing presentation with consistent design.
+          **Style phase complete!** You have a visually appealing presentation with consistent design.
 
           Update the plan file with review tasks and mark completed styling work.
         transition_reason: 'Visual design and styling complete, ready for content and delivery review'
@@ -161,7 +156,8 @@ states:
       - trigger: abandon_presentation
         to: ideate
         instructions: |
-          Presentation development abandoned during styling. Clean up design work and return to ideation.
+          **Abandon styling work** - Clean up design work and return to ideation.
+
           The plan file and any completed work will remain for future reference.
         additional_instructions: 'Presentation abandoned during style phase. Clean up and prepare for new topics.'
         transition_reason: 'User decided to abandon presentation during style phase'
@@ -169,9 +165,8 @@ states:
   review:
     description: 'Validate content quality and presentation effectiveness'
     default_instructions: |
-      Working on review and validation phase. This is where you ensure your presentation is ready for delivery.
+      **Validate presentation quality** by reviewing content, timing, visuals, and delivery readiness:
 
-      Key activities for this phase:
       - Review content flow, narrative coherence, and logical progression
       - Test presentation timing and pacing for your allocated time
       - Verify visual quality, consistency, and professional appearance
@@ -181,14 +176,13 @@ states:
       - Ensure all interactive elements and visuals work correctly
       - Refine speaker notes and delivery preparation
 
-      Focus on validating that your presentation achieves its goals effectively.
-      Update the plan file with review progress and any refinements made.
+      **Update** the plan file with review progress and refinements before moving to delivery preparation.
 
     transitions:
       - trigger: review_complete
         to: deliver
         additional_instructions: |
-          Review complete! ✅ Your presentation has been validated and refined for delivery.
+          **Review phase complete!** Your presentation has been validated and refined for delivery.
 
           Update the plan file with delivery preparation tasks and mark completed review work.
         transition_reason: 'Presentation reviewed and validated, ready for final delivery preparation'
@@ -206,7 +200,8 @@ states:
       - trigger: abandon_presentation
         to: ideate
         instructions: |
-          Presentation development abandoned during review. Clean up review work and return to ideation.
+          **Abandon review work** - Clean up review work and return to ideation.
+
           The plan file and any completed work will remain for future reference.
         additional_instructions: 'Presentation abandoned during review phase. Clean up and prepare for new topics.'
         transition_reason: 'User decided to abandon presentation during review phase'
@@ -214,9 +209,8 @@ states:
   deliver:
     description: 'Prepare final presentation for delivery'
     default_instructions: |
-      Working on delivery preparation phase. This is the final phase to ensure your presentation is ready for successful delivery.
+      **Prepare final delivery** by exporting formats, testing setup, and ensuring flawless execution:
 
-      Key activities for this phase:
       - Export presentation to all required formats (native, PDF, backup formats)
       - Finalize speaker setup, notes, and delivery materials
       - Configure and test presentation environment and technical setup
@@ -226,14 +220,13 @@ states:
       - Ensure all backup plans and alternatives are ready
       - Final check of timing, flow, and delivery readiness
 
-      Focus on ensuring flawless delivery execution and professional presentation.
-      Update the plan file with delivery preparation progress.
+      **Update** the plan file with delivery preparation progress to ensure successful delivery.
 
     transitions:
       - trigger: delivery_complete
         to: ideate
         additional_instructions: |
-          Presentation delivery complete! ✅ Your presentation has been successfully delivered.
+          **Delivery phase complete!** Your presentation has been successfully delivered.
 
           Mark all delivery tasks as complete in the plan file and prepare for new work.
         transition_reason: 'Presentation delivery completed successfully, ready for new projects'
@@ -246,7 +239,8 @@ states:
       - trigger: abandon_presentation
         to: ideate
         instructions: |
-          Presentation development abandoned before delivery. Clean up delivery preparation and return to ideation.
+          **Abandon delivery preparation** - Clean up delivery preparation and return to ideation.
+
           The plan file and completed work will remain for future reference.
         additional_instructions: 'Presentation abandoned before delivery. Clean up and prepare for new topics.'
         transition_reason: 'User decided to abandon presentation before delivery'
