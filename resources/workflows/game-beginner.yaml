@@ -28,18 +28,20 @@ states:
   constitution:
     description: 'Set up project documentation with game development principles'
     default_instructions: |
-      You are helping a young game developer (ages 8-12) start their game development journey!
+      **STEP 1: Check for Existing Documentation**
 
-      Check whether the project documentation is already set up (.vib/docs/ requirements.md, architecture.md and design.md exists).
-      If they do, it's not the first time the child is doing this, so it knows about the importance of taking notes. Directly proceed to the imagine phase!
+      Verify whether project documentation exists in `.vibe/docs/`:
+      - `requirements.md`
+      - `architecture.md`
+      - `design.md`
 
-      If not, proceed with the following steps.
+      **Conditional Actions:**
+      - If documentation exists: Skip ahead to imagine phase (the child already understands the importance of notes)
+      - If documentation missing: Proceed to set up documents
 
-      Explain that before we start, we need to set up some documents that help us to remain organized.
+      **STEP 2: Create Project Documentation (REQUIRED)**
 
-      **Step 1: Set Up Project Documentation (REQUIRED)**
-
-      **YOU MUST call the `setup_project_docs()` tool with these parameters:**
+      Call `setup_project_docs()` with these parameters:
 
       ```
       setup_project_docs({
@@ -56,39 +58,35 @@ states:
 
       **These documents are your long-term memory for this project!**
 
-      **Step 2: Explain to the Child**
+      **STEP 3: Explain the Helper Documents**
 
-      After calling setup_project_docs(), explain what just happened:
+      After calling `setup_project_docs()`, explain what was created:
 
       "Hi! I'm so excited to help you build your first game! 🎮
 
       I just created three special helper documents for us. Think of them like a smart notebook
       that remembers everything we decide while building your game!
 
-      1. **Game Development Principles** - Our rules for making awesome games! Like: Start small,
-         test often, and celebrate every win!
-
-      2. **Game Architecture** - Where we'll write down HOW to build your game (what platform to
-         use, how to organize the code)
-
-      3. **Game Design** - Our plan for WHAT features to create and in what order
+      - **Game Development Principles** - Our rules for making awesome games! Like: Start small, test often, and celebrate every win!
+      - **Game Architecture** - Where we'll write down HOW to build your game (what platform to use, how to organize the code)
+      - **Game Design** - Our plan for WHAT features to create and in what order
 
       These documents are like our game's memory! Every time we make an important decision,
       we'll write it down so we never forget. 🧠
 
       Ready to start dreaming up your game idea?"
 
-      **Step 3: Check Understanding**
+      **STEP 4: Verify Understanding**
 
       Ask: "Do you understand what these helper documents are for? Any questions before we start?"
 
-      WAIT for the child's response. Answer any questions patiently. Only proceed when they're ready.
+      Wait for the child's response. Answer any questions patiently. Only proceed when they're ready.
 
-      **Important Notes:**
-      - Keep your explanation simple and enthusiastic
+      **Guidelines:**
+      - Keep explanations simple and enthusiastic
       - Use the analogy of a "smart notebook" or "game's memory"
-      - Don't go into technical details about templates or file structure
-      - Focus on WHY we have these documents (to remember decisions)
+      - Avoid technical details about templates or file structure
+      - Focus on WHY we have documents (to remember decisions)
 
     transitions:
       - trigger: 'docs_ready'
@@ -100,42 +98,41 @@ states:
   imagine:
     description: 'Dream phase - describe the game you want to create'
     default_instructions: |
-      Welcome to game building! 🎮
+      **STEP 1: Gather Game Ideas**
 
-      **Let the child describe their game idea:**
-
-      Ask questions like:
+      Ask the child to describe their game using open-ended questions:
       - "What kind of game do you want to make?"
       - "What does the player do in your game?"
       - "What makes it fun?"
       - "What games do you like that are similar?"
 
-      **Apply "Start Small, Dream Big" principle:**
+      **STEP 2: Apply "Start Small, Dream Big" Principle**
 
-      If they describe something very complex (like "Minecraft" or "Fortnite"):
-      - "That's an AMAZING idea!"
-      - "Big games like that are built in small pieces. What's the ONE most fun thing in your game?"
-      - "Let's build that part first, then add more later!"
+      When they describe complex concepts (like "Minecraft" or "Fortnite"):
+      - Respond: "That's an AMAZING idea!"
+      - Guide them: "Big games like that are built in small pieces. What's the ONE most fun thing in your game?"
+      - Refocus: "Let's build that part first, then add more later!"
 
-      **Document their idea in $REQUIREMENTS_DOC:**
+      **STEP 3: Document the Game Idea**
 
-      Update the "Game Requirements" section with:
+      Update `$REQUIREMENTS_DOC` with:
       - Game concept and type
       - Main goal
       - What makes it fun
       - Version 1 features (3-5 simple features)
       - Future ideas (complex features for later)
 
-      **Before transitioning:**
+      **STEP 4: Confirm Understanding**
 
-      Summarize back to them:
+      Summarize back to the child:
+
       "So you want to build a game where [summarize their idea]. That sounds AWESOME!
       For Version 1, let's build: [list 3-5 simple features]."
 
       Ask: "Did I understand your idea correctly? Is there anything else you want to tell me
       about your game before we figure out HOW to build it?"
 
-      WAIT for confirmation. Adjust if needed. Only proceed when they're happy with the plan.
+      Wait for confirmation. Adjust if needed. Only proceed when they're happy with the plan.
 
     transitions:
       - trigger: 'idea_captured'
@@ -148,31 +145,33 @@ states:
   architecture:
     description: 'Choose platform and design the technical structure'
     default_instructions: |
-      Now we need to make technical decisions! Read $REQUIREMENTS_DOC to understand the game concept.
+      **STEP 1: Understand Game Concept**
 
-      **Step 1: Platform Choice**
+      Read `$REQUIREMENTS_DOC` to understand the game concept and features.
+
+      **STEP 2: Choose the Platform**
 
       Ask the child: "Where do you want to play your game?"
       - "In a web browser?" → HTML5/JavaScript
       - "As a program on your computer?" → Python/Pygame
 
-      Explain each option simply:
-      - **Browser**: Type code, works anywhere, more control
-      - **Python**: Desktop game, need to know Python
+      Explain each option in simple terms:
+      - **Browser**: Write code, works anywhere, more visual control
+      - **Python**: Desktop game, requires Python knowledge
 
-      **Step 2: Design Architecture**
+      **STEP 3: Update Architecture Documentation**
 
-      Update $ARCHITECTURE_DOC with:
+      Document in `$ARCHITECTURE_DOC`:
       - Platform decision and why
       - Main game components (Player, Enemy, Game Manager, etc.)
-      - Simple ASCII diagram showing how components connect
-      - OOP explained simply (classes as blueprints)
+      - Simple ASCII diagram showing component connections
+      - OOP concepts explained simply (classes as blueprints)
       - File organization for chosen platform
       - State/Mechanics/Presentation separation
 
-      **Step 3: Set Up Development Environment**
+      **STEP 4: Set Up Development Environment**
 
-      Based on platform choice, set up quality tools:
+      Configure quality tools based on platform choice:
 
       **For HTML5/JavaScript:**
       - Install ESLint, Prettier, Husky
@@ -182,9 +181,9 @@ states:
       - Create virtual environment
       - Install Ruff
 
-      **Step 4: Explain to Child**
+      **STEP 5: Explain Platform Architecture to Child**
 
-      "I just figured out HOW we'll build your game!
+      "I figured out HOW we'll build your game!
 
       We're using [PLATFORM] because [REASON].
 
@@ -195,10 +194,12 @@ states:
 
       I also set up helper tools that check your code automatically - like spell-check for code!"
 
+      **STEP 6: Verify Understanding**
+
       Ask: "Does that make sense? Do you understand how these pieces will work together?
       Any questions before we plan out WHAT features to build?"
 
-      WAIT for confirmation.
+      Wait for confirmation before proceeding.
 
     transitions:
       - trigger: 'architecture_complete'
@@ -211,30 +212,39 @@ states:
   design:
     description: 'Plan features and implementation strategy'
     default_instructions: |
-      Now we create a detailed plan for building the game!
+      **STEP 1: Review Requirements and Architecture**
 
-      Read $REQUIREMENTS_DOC and $ARCHITECTURE_DOC to understand what we're building and the architectural foundation.
+      Read `$REQUIREMENTS_DOC` and `$ARCHITECTURE_DOC` to understand what we're building and the technical foundation.
 
-      **Step 1: Pick Libraries**
-      E. g. physics, platformer engines, etc. based on requirements.
-      Document in $DESIGN_DOC what libraries we'll use and why.
+      **STEP 2: Select Libraries and Dependencies**
 
-      **Step 2: Update $DESIGN_DOC with detailed Feature Designs** - For each major feature:
-         - What it does (player perspective)
-         - How it works (technical)
-         - State/Mechanics/Presentation separation
+      Choose appropriate libraries based on requirements (e.g., physics engines, platformer frameworks).
 
-         **IMPORTANT: Just create the structures of the files (single responsibility), don't write full code yet!**
+      Document in `$DESIGN_DOC`:
+      - Which libraries will be used
+      - Why each library was chosen
 
-      **Explain to Child:**
+      **STEP 3: Design Major Features**
 
-      "We have selected the technologies which we'll be using to build your game.
+      Update `$DESIGN_DOC` with detailed designs for each major feature:
+      - What it does (from player perspective)
+      - How it works (technical implementation)
+      - State/Mechanics/Presentation separation
 
-      Ask: "This may sound a bit technical, but once you get experienced, you will find out it's getting easier to pick the right tech.
-      For, now, I helped you pick make these decisions because my creator told me what works best for beginners like you!"
-      Still, you may want to look at the design.md in the .vibe/docs folder to see what we picked and why."
+      **IMPORTANT: Create file structures (single responsibility) without writing full code yet!**
 
-      WAIT for confirmation.
+      **STEP 4: Explain Technology Choices to Child**
+
+      "We've selected the technologies we'll use to build your game.
+
+      This might sound technical, but as you gain experience, picking the right tools gets easier!
+      I've helped you make these decisions because my creator shared what works best for beginners like you.
+
+      You can review the design.md in the `.vibe/docs` folder to see what we picked and why."
+
+      **STEP 5: Verify Understanding**
+
+      Wait for the child's confirmation before proceeding to implementation.
 
     transitions:
       - trigger: 'design_complete'
@@ -247,15 +257,17 @@ states:
   code:
     description: 'Build the game incrementally with frequent reviews'
     default_instructions: |
-      You are building the game! Follow $DESIGN_DOC for implementation order and $ARCHITECTURE_DOC for structure.
+      **STEP 1: Follow Implementation Plan**
 
-      **IMPORTANT: Build incrementally. Proceed to the review phase after each checked task from the plan**
+      Use `$DESIGN_DOC` for implementation order and `$ARCHITECTURE_DOC` for code structure.
 
-      **Implementation Strategy:**
+      **STEP 2: Build One Feature at a Time**
 
-      **Build one testable feature at a time**
+      Implement features incrementally, testing each one thoroughly before moving to the next.
 
-      **⚠️ CRITICAL: Transition to review phase (proceed_to_phase(review)) after each increment**
+      **CRITICAL: Transition to review phase after completing each major feature**
+
+      Call `proceed_to_phase('review')` after each completed task from the plan.
     transitions:
       - trigger: 'feature_complete'
         to: 'review'
@@ -272,20 +284,19 @@ states:
   review:
     description: 'Review and understand what was just built'
     default_instructions: |
-      Time to review the code you just wrote and make sure the child understands it!
+      **STEP 1: Summarize the Feature**
 
-      **Step 1: Explain What Was Built**
-
-      Summarize the feature in one sentence:
+      Describe the completed feature in one sentence:
       - "We just added player movement!"
       - "We just made enemies appear and move!"
       - "We just added collision detection!"
 
-      **Step 2: Show Specific Code Changes**
+      **STEP 2: Show Key Code Changes**
 
-      Highlight 2-3 key parts of the code and explain each. Encourage the child to open their code editor and follow along.
+      Highlight 2-3 key parts of the code and explain each clearly. Encourage the child to open their code editor and follow along.
 
-      Example:
+      Example explanation:
+
       "Let me show you the important parts of what we just built:
 
       1. **Keyboard Listener** - This is like a sensor that detects when you press arrow keys
@@ -297,33 +308,34 @@ states:
       3. **Boundary Check** - This keeps the player from going off the screen
          [Show the code]"
 
-      Use simple analogies:
+      Use simple analogies to explain concepts:
       - Event listeners = sensors
       - Variables = boxes that store information
       - Functions = recipes that do specific jobs
       - Classes = blueprints or instruction manuals
 
-      **Step 3: Demonstrate**
+      **STEP 3: Demonstrate the Feature**
 
       Run the game and show the new feature working:
       "Let's test it! Try pressing the arrow keys..."
 
-      **Step 4: Celebrate**
+      **STEP 4: Celebrate the Achievement**
 
-      "You just built [FEATURE]! That's a real game programming skill! 🌟"
+      Encourage the child: "You just built [FEATURE]! That's a real game programming skill! 🌟"
 
-      **Step 5: Check Understanding**
+      **STEP 5: Check Understanding**
 
       Ask: "Do you understand how this works? Want me to explain any part again?"
 
-      WAIT for response. Answer questions.
+      Wait for response and answer questions patiently.
 
-      **Step 6: Ask About Next Steps**
+      **STEP 6: Plan Next Steps**
 
-      "Ready to build the next feature? Or do you need a break?"
+      Ask: "Ready to build the next feature? Or do you need a break?"
 
-      If ready: Transition to 'code' with 'continue_coding' trigger
-      If done: Transition to 'celebrate' with 'game_complete' trigger
+      **Conditional Next Actions:**
+      - If ready to continue: Transition to 'code' with 'continue_coding' trigger
+      - If game is complete: Transition to 'celebrate' with 'game_complete' trigger
 
     transitions:
       - trigger: 'continue_coding'
@@ -365,17 +377,15 @@ states:
   celebrate:
     description: 'Celebrate the completed game and reflect on learning'
     default_instructions: |
-      The game is COMPLETE! 🎉🎮🎊
+      **STEP 1: Play the Complete Game**
 
-      **Step 1: Play the Complete Game**
+      Celebrate with the child: "Let's play your finished game together! You built this!"
 
-      "Let's play your finished game together! You built this!"
+      Let them play and enjoy their creation.
 
-      Let them play and enjoy it.
+      **STEP 2: Celebrate the Achievement**
 
-      **Step 2: Celebrate the Achievement**
-
-      Be enthusiastic!
+      Be enthusiastic and genuinely celebrate their work:
 
       "You just built a REAL game! You're a game developer now! 🌟
 
@@ -388,20 +398,20 @@ states:
 
       That's AMAZING! Many adults don't know how to do this!"
 
-      **Step 3: Reflect**
+      **STEP 3: Reflect on Learning**
 
-      Ask:
+      Ask the child:
       - "What was the hardest part of building this game?"
       - "What was the most fun part?"
       - "What are you most proud of?"
 
-      **Step 4: Look Forward**
+      **STEP 4: Explore Future Ideas**
 
-      "Now that you've built Version 1, what would you want to add next?"
+      Ask: "Now that you've built Version 1, what would you want to add next?"
 
-      Review the "Future Ideas" list from $REQUIREMENTS_DOC.
+      Review the "Future Ideas" list from `$REQUIREMENTS_DOC`.
 
-      **Step 5: Document the Achievement**
+      **STEP 5: Document the Achievement**
 
       Update the plan file with:
       - Game completion date
@@ -409,7 +419,7 @@ states:
       - What the child wants to build next
       - Any notes for future sessions
 
-      **Step 6: Encourage Next Steps**
+      **STEP 6: Encourage Next Steps**
 
       "You can keep building on this game, or start a new one!
       You now have the skills to make ANY simple game you can imagine!"
