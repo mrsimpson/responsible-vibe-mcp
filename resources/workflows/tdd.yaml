@@ -27,12 +27,17 @@ states:
   explore:
     description: 'Research and exploration phase - understanding the problem space and codebase'
     default_instructions: |
-      You are in the TDD exploration phase.
-      Your main objective now is to gather context about what needs to be developed. Focus on the WHY and WHAT, not the HOW.
-      Research the codebase, understand existing patterns,
-      If you are not certain about conventions or rules, ask the user about them.
-       Read relevant files and documentation. If $REQUIREMENTS_DOC exists, understand and document requirements there, otherwise document them in your task management system.
-       Don't write code or tests yet - focus on understanding. Document your findings and create tasks as needed.
+      **STEP 1:** Gather context about what needs to be developed. Focus on the WHY and WHAT, not the HOW.
+
+      **STEP 2:** Research the codebase and understand existing patterns.
+      - Ask the user about conventions or rules if uncertain
+      - Read relevant files and documentation
+      - If `$REQUIREMENTS_DOC` exists, understand and document requirements there, otherwise document in your task management system
+
+      **STEP 3:** Document your findings and create tasks as needed.
+      - Don't write code or tests yet
+      - Focus on understanding the problem space
+      - Prepare for the RED phase of the TDD cycle
     transitions:
       - trigger: 'exploration_complete'
         to: 'red'
@@ -50,19 +55,23 @@ states:
   red:
     description: 'RED phase - Write a failing test that defines the expected behavior'
     default_instructions: |
-      You are in the RED phase of TDD. Write a failing test that defines the expected behavior.
+      Write a failing test that defines the expected behavior for the feature.
 
-      **CRITICAL QUALITY GATE**: Before writing the test, ask the user about:
-      1. What type of test is appropriate (unit, integration, acceptance, etc.)
-      2. Validate with the user that your test actually tests what needs to be developed
+      **STEP 1:** Validate test approach with the user before writing.
+      - Determine what type of test is appropriate (unit, integration, acceptance, etc.)
+      - Confirm your test will validate the actual requirements
+      - Ensure alignment with the feature specification
 
-      Write a test that:
-      - Clearly defines the expected behavior
-      - Will fail initially (since the functionality doesn't exist yet)
-      - Is specific and focused on one aspect of the functionality
-      - Uses appropriate assertions (not assert(true) or similar meaningless checks)
+      **STEP 2:** Write a focused, meaningful test.
+      - Clearly define the expected behavior
+      - Will fail initially since functionality doesn't exist yet
+      - Focus on one specific aspect of the functionality
+      - Use appropriate assertions (not meaningless checks like assert(true))
 
-       Run the test to confirm it fails for the right reason. Document the test and update task progress as needed.
+      **STEP 3:** Validate test failure.
+      - Run the test to confirm it fails for the right reason
+      - Document the test and expected failure mode
+      - Update task progress
     transitions:
       - trigger: 'test_written_and_failing'
         to: 'green'
@@ -81,22 +90,23 @@ states:
   green:
     description: 'GREEN phase - Write only the necessary code to make the test pass'
     default_instructions: |
-      You are in the GREEN phase of TDD. Write only the necessary code to make the failing test pass with a proper implementation.
+      Implement the necessary code to make the failing test pass with proper functionality.
 
-      **CRITICAL QUALITY GATE**: Verify your implementation has NO dirty hacks such as:
-      - assert(true) or similar meaningless assertions
-      - Hardcoded return values that don't represent real logic
-      - Shortcuts that bypass the actual functionality
-      - Copy-paste code without understanding
+      **STEP 1:** Write real, working implementation.
+      - Make the test pass with actual logic, not shortcuts
+      - Write only what's necessary (no over-engineering)
+      - Avoid dirty hacks such as hardcoded return values or meaningless assertions
+      - Focus on solving the actual problem
 
-      Focus on:
-      - Making the test pass with real, working code
-      - Writing only what's necessary (no over-engineering)
-      - Ensuring the solution actually solves the problem
-      - Implementing proper logic, not shortcuts
-      - Running the test to confirm it passes
+      **STEP 2:** Validate implementation quality.
+      - Run the test to confirm it passes
+      - Verify no shortcuts or copy-paste code without understanding
+      - Ensure the solution actually solves the problem
+      - Check that logic is proper, not a bypass
 
-       Document your implementation approach and update task progress as needed.
+      **STEP 3:** Document and track progress.
+      - Document your implementation approach
+      - Update task progress
     transitions:
       - trigger: 'test_passing'
         to: 'refactor'
@@ -119,23 +129,24 @@ states:
   refactor:
     description: 'REFACTOR phase - Improve code quality while keeping tests green (cleanup phase)'
     default_instructions: |
-      You are in the REFACTOR phase of TDD. This is the cleanup phase - improve code quality while keeping all tests green.
+      Improve code quality while keeping all tests green. This is the cleanup phase where you enhance readability and maintainability.
 
-      Focus on:
-      - Removing code duplication
-      - Improving variable and function names
-      - Extracting methods for better organization
-      - Simplifying complex logic
-      - Enhancing readability and maintainability
-      - Applying appropriate design patterns
+      **STEP 1:** Identify improvement opportunities.
+      - Remove code duplication
+      - Improve variable and function names
+      - Extract methods for better organization
+      - Simplify complex logic
+      - Apply appropriate design patterns
 
-      **Safety Rules**:
+      **STEP 2:** Make incremental improvements safely.
       - Run tests after each refactoring change
-      - If any test breaks, immediately revert the change
-      - Make small, incremental improvements
-      - Stop when code is clean and no obvious improvements remain
+      - Immediately revert any change that breaks tests
+      - Make small, focused improvements
+      - Stop when code is clean with no obvious improvements remaining
 
-       Document significant refactoring decisions and update task progress as needed.
+      **STEP 3:** Document and complete.
+      - Document significant refactoring decisions
+      - Update task progress
     transitions:
       - trigger: 'refactoring_complete'
         to: 'red'
