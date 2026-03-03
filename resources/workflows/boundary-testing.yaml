@@ -27,14 +27,20 @@ states:
   architecture_analysis:
     description: 'Analyze existing system architecture and identify system boundaries'
     default_instructions: >
-      You are in the architecture analysis phase for boundary testing workflow.
+      **STEP 1: Reference Architecture Documentation**
+      Check if `$ARCHITECTURE_DOC` exists and reference it for system understanding.
 
-      **Your Tasks:**
-      1. **Reference Architecture Documentation**: Check if $ARCHITECTURE_DOC exists and reference it for system understanding
-      2. **Search for Architecture**: If $ARCHITECTURE_DOC is not available, search the project for architecture documentation (README.md, docs/, ARCHITECTURE.md, etc.). Enhance the existing $ARCHITECTURE_DOC with your findings
-      3. **Analyze Codebase**: Examine the codebase to understand system structure, technology stack, and architectural patterns
-      4. **Identify System Boundaries**: Map external interfaces, APIs, and integration points
-      5. **Document Findings**: Update the plan file with architecture analysis findings
+      **STEP 2: Search for Architecture**
+      If `$ARCHITECTURE_DOC` is not available, search the project for architecture documentation (README.md, docs/, ARCHITECTURE.md, etc.). Enhance the existing `$ARCHITECTURE_DOC` with your findings.
+
+      **STEP 3: Analyze Codebase**
+      Examine the codebase to understand system structure, technology stack, and architectural patterns.
+
+      **STEP 4: Identify System Boundaries**
+      Map external interfaces, APIs, and integration points.
+
+      **STEP 5: Document Findings**
+      Update the plan file with architecture analysis findings.
 
       **Interview the User (External Factors Only):**
       - "Who are the main consumers or users of this system?"
@@ -58,16 +64,26 @@ states:
   interface_discovery:
     description: 'Discover and catalog all system interfaces, APIs, and external boundaries'
     default_instructions: >
-      You are in the interface discovery phase. Use your architecture analysis to systematically identify all system interfaces.
+      **STEP 1: Catalog APIs**
+      Identify all REST APIs, SOAP services, GraphQL endpoints, or other web services.
 
-      **Your Tasks:**
-      1. **Catalog APIs**: Identify all REST APIs, SOAP services, GraphQL endpoints, or other web services
-      2. **Database Interfaces**: Document database connections, schemas, and data access patterns
-      3. **File System Interfaces**: Identify file I/O operations, configuration files, and data files
-      4. **Message Interfaces**: Find message queues, event streams, or pub/sub mechanisms
-      5. **External Service Calls**: Document calls to external systems, third-party APIs, or services
-      6. **User Interfaces**: Identify web UIs, desktop applications, or command-line interfaces
-      7. **Document Interface Contracts**: For each interface, document expected inputs, outputs, and protocols
+      **STEP 2: Document Database Interfaces**
+      Document database connections, schemas, and data access patterns.
+
+      **STEP 3: Identify File System Interfaces**
+      Identify file I/O operations, configuration files, and data files.
+
+      **STEP 4: Find Message Interfaces**
+      Find message queues, event streams, or pub/sub mechanisms.
+
+      **STEP 5: Document External Service Calls**
+      Document calls to external systems, third-party APIs, or services.
+
+      **STEP 6: Identify User Interfaces**
+      Identify web UIs, desktop applications, or command-line interfaces.
+
+      **STEP 7: Document Interface Contracts**
+      For each interface, document expected inputs, outputs, and protocols.
 
       **Interview the User (External Context Only):**
       - "What are the expected response times for different types of requests?"
@@ -96,14 +112,20 @@ states:
   business_domain_analysis:
     description: 'Organize system interfaces by business domains and logical boundaries using DDD principles'
     default_instructions: >
-      You are in the business domain analysis phase. Apply Domain-Driven Design principles to organize interfaces by business boundaries.
+      **STEP 1: Apply DDD Principles**
+      Use Domain-Driven Design concepts to identify bounded contexts and business domains.
 
-      **Your Tasks:**
-      1. **Apply DDD Principles**: Use Domain-Driven Design concepts to identify bounded contexts and business domains
-      2. **Group Interfaces**: Organize discovered interfaces by business functionality and logical boundaries
-      3. **Identify Business Capabilities**: Map interfaces to business capabilities and use cases
-      4. **Define Domain Boundaries**: Establish clear boundaries between different business domains
-      5. **Document Domain Model**: Create a clear mapping of business domains to system interfaces
+      **STEP 2: Group Interfaces**
+      Organize discovered interfaces by business functionality and logical boundaries.
+
+      **STEP 3: Identify Business Capabilities**
+      Map interfaces to business capabilities and use cases.
+
+      **STEP 4: Define Domain Boundaries**
+      Establish clear boundaries between different business domains.
+
+      **STEP 5: Document Domain Model**
+      Create a clear mapping of business domains to system interfaces.
 
       **Interview the User (Business Context Only):**
       - "What are the main business capabilities or functions this system provides?"
@@ -118,10 +140,10 @@ states:
       - Think about how business users would naturally group functionality
 
       **Domain Organization Methodologies:**
-      - **Event Storming**: Consider business events and workflows
-      - **Capability Mapping**: Group by business capabilities
-      - **Data Flow Analysis**: Follow data ownership and lifecycle
-      - **User Journey Mapping**: Group by user workflows and scenarios
+      - Event Storming: Consider business events and workflows
+      - Capability Mapping: Group by business capabilities
+      - Data Flow Analysis: Follow data ownership and lifecycle
+      - User Journey Mapping: Group by user workflows and scenarios
 
       Update the plan file with domain organization and validate with the user.
     transitions:
@@ -142,15 +164,23 @@ states:
   test_strategy_design:
     description: 'Design comprehensive testing strategy organized by business boundaries'
     default_instructions: >
-      You are in the test strategy design phase. Create a comprehensive testing approach based on business domain organization.
+      **STEP 1: Design Domain-Based Testing**
+      Create test strategies for each business domain identified.
 
-      **Your Tasks:**
-      1. **Design Domain-Based Testing**: Create test strategies for each business domain identified
-      2. **Define Test Objectives**: Establish clear objectives for what the tests should validate
-      3. **Plan Test Types**: Design mix of unit, integration, API, and end-to-end tests
-      4. **Test Data Strategy**: Plan test data management and test environment setup
-      5. **Coverage Strategy**: Ensure comprehensive coverage of all business boundaries
-      6. **Validation Approach**: Define how to validate that tests meet their objectives
+      **STEP 2: Define Test Objectives**
+      Establish clear objectives for what the tests should validate.
+
+      **STEP 3: Plan Test Types**
+      Design mix of unit, integration, API, and end-to-end tests.
+
+      **STEP 4: Plan Test Data Strategy**
+      Plan test data management and test environment setup.
+
+      **STEP 5: Ensure Coverage**
+      Ensure comprehensive coverage of all business boundaries.
+
+      **STEP 6: Define Validation Approach**
+      Define how to validate that tests meet their objectives.
 
       **Interview the User (Requirements & Constraints):**
       - "Are there specific compliance or regulatory testing requirements?"
@@ -158,19 +188,19 @@ states:
       - "Are there any budget or timeline constraints for test development?"
 
       **Best Practices to Apply:**
-      - **Test Pyramid**: Balance unit tests, integration tests, and end-to-end tests
-      - **Contract Testing**: Test API contracts and interface agreements
-      - **Property-Based Testing**: Test business rules and invariants
-      - **Boundary Testing**: Focus on edge cases and boundary conditions
-      - **Error Path Testing**: Ensure error handling is properly tested
-      - **Data-Driven Testing**: Use realistic data scenarios
+      - Test Pyramid: Balance unit tests, integration tests, and end-to-end tests
+      - Contract Testing: Test API contracts and interface agreements
+      - Property-Based Testing: Test business rules and invariants
+      - Boundary Testing: Focus on edge cases and boundary conditions
+      - Error Path Testing: Ensure error handling is properly tested
+      - Data-Driven Testing: Use realistic data scenarios
 
       **Testing Strategy Framework:**
-      - **Functional Validation**: Ensure system functions meet business requirements
-      - **Business Rule Validation**: Core business logic behaves correctly
-      - **Integration Testing**: External system interactions work correctly
-      - **Error Handling**: Failures and exceptions are handled appropriately
-      - **Performance Baseline**: Establish performance expectations
+      - Functional Validation: Ensure system functions meet business requirements
+      - Business Rule Validation: Core business logic behaves correctly
+      - Integration Testing: External system interactions work correctly
+      - Error Handling: Failures and exceptions are handled appropriately
+      - Performance Baseline: Establish performance expectations
 
       Update the plan file with detailed test strategy and validate with the user.
     transitions:
@@ -191,28 +221,38 @@ states:
   test_suite_implementation:
     description: 'Implement comprehensive test suite organized by business domains'
     default_instructions: >
-      You are in the test suite implementation phase. Build the comprehensive test suite based on your strategy.
+      **STEP 1: Implement Domain Tests**
+      Create test suites for each business domain.
 
-      **Your Tasks:**
-      1. **Implement Domain Tests**: Create test suites for each business domain
-      2. **API Testing**: Implement comprehensive API tests for all discovered interfaces
-      3. **Integration Testing**: Build tests for external system interactions
-      4. **End-to-End Testing**: Create business workflow tests that span multiple domains
-      5. **Test Data Management**: Implement test data setup and teardown
-      6. **Test Organization**: Structure tests clearly by business domain and functionality
-      7. **Documentation**: Document test purposes, expected outcomes, and maintenance procedures
+      **STEP 2: Implement API Testing**
+      Implement comprehensive API tests for all discovered interfaces.
+
+      **STEP 3: Build Integration Tests**
+      Build tests for external system interactions.
+
+      **STEP 4: Create End-to-End Tests**
+      Create business workflow tests that span multiple domains.
+
+      **STEP 5: Implement Test Data Management**
+      Implement test data setup and teardown.
+
+      **STEP 6: Structure Tests**
+      Structure tests clearly by business domain and functionality.
+
+      **STEP 7: Document Test Suite**
+      Document test purposes, expected outcomes, and maintenance procedures.
 
       **Interview the User (Priorities & Preferences):**
       - "Which business domain should we prioritize for test implementation?"
       - "Are there any specific test frameworks or tools you prefer or are required to use?"
 
       **Best Practices to Apply:**
-      - **Clear Test Organization**: Group tests by business domain and functionality
-      - **Descriptive Test Names**: Make test purposes clear from names
-      - **Independent Tests**: Ensure tests can run independently and in any order
-      - **Reliable Test Data**: Use consistent, predictable test data
-      - **Fast Feedback**: Prioritize fast-running tests for quick validation
-      - **Maintainable Tests**: Write tests that are easy to understand and modify
+      - Clear Test Organization: Group tests by business domain and functionality
+      - Descriptive Test Names: Make test purposes clear from names
+      - Independent Tests: Ensure tests can run independently and in any order
+      - Reliable Test Data: Use consistent, predictable test data
+      - Fast Feedback: Prioritize fast-running tests for quick validation
+      - Maintainable Tests: Write tests that are easy to understand and modify
 
       **Implementation Guidelines:**
       - Start with the most critical business domains
@@ -237,15 +277,23 @@ states:
   validation:
     description: 'Validate test coverage and establish comprehensive system testing baseline'
     default_instructions: >
-      You are in the validation phase. Validate the comprehensive test suite and establish system testing baseline.
+      **STEP 1: Test Coverage Analysis**
+      Validate that all business domains and interfaces are covered.
 
-      **Your Tasks:**
-      1. **Test Coverage Analysis**: Validate that all business domains and interfaces are covered
-      2. **Baseline Establishment**: Run all tests against the system to establish baseline behavior
-      3. **Test Quality Review**: Ensure tests are reliable, maintainable, and comprehensive
-      4. **Documentation Review**: Validate that test documentation is complete and clear
-      5. **Execution Validation**: Ensure all tests run successfully and provide clear results
-      6. **Handoff Preparation**: Prepare test suite for ongoing use and maintenance
+      **STEP 2: Establish Baseline**
+      Run all tests against the system to establish baseline behavior.
+
+      **STEP 3: Review Test Quality**
+      Ensure tests are reliable, maintainable, and comprehensive.
+
+      **STEP 4: Review Documentation**
+      Validate that test documentation is complete and clear.
+
+      **STEP 5: Validate Execution**
+      Ensure all tests run successfully and provide clear results.
+
+      **STEP 6: Prepare for Handoff**
+      Prepare test suite for ongoing use and maintenance.
 
       **Review and Present to User:**
       - Review test coverage across all business domains and present findings
@@ -254,12 +302,12 @@ states:
       - Present test execution results and reliability assessment
 
       **Best Practices to Apply:**
-      - **Coverage Validation**: Ensure all critical paths are tested
-      - **Baseline Documentation**: Document expected results and behaviors
-      - **Test Reliability**: Verify tests are stable and repeatable
-      - **Clear Reporting**: Ensure test results are easy to understand
-      - **Maintenance Planning**: Document how to maintain and update tests
-      - **Knowledge Transfer**: Ensure team understands test suite organization
+      - Coverage Validation: Ensure all critical paths are tested
+      - Baseline Documentation: Document expected results and behaviors
+      - Test Reliability: Verify tests are stable and repeatable
+      - Clear Reporting: Ensure test results are easy to understand
+      - Maintenance Planning: Document how to maintain and update tests
+      - Knowledge Transfer: Ensure team understands test suite organization
 
       **Validation Checklist:**
       - All business domains have comprehensive test coverage
@@ -288,33 +336,27 @@ states:
   finalize:
     description: 'Code cleanup and documentation finalization'
     default_instructions: >
-      You are in the finalize phase. This phase ensures code quality and documentation accuracy through systematic cleanup and review.
-
       **STEP 1: Code Cleanup**
-      Systematically clean up development artifacts:
+      Systematically clean up development artifacts.
 
-      1. **Remove Debug Output**: Search for and remove all temporary debug output statements used during test development.
-         Look for language-specific debug output methods (console logging, print statements, debug output functions).
-         Remove any debugging statements that were added for development purposes.
+      - Remove Debug Output: Search for and remove all temporary debug output statements used during test development. Look for language-specific debug output methods (console logging, print statements, debug output functions). Remove any debugging statements that were added for development purposes.
 
-      2. **Review TODO/FIXME Comments**: 
-         - Address each TODO/FIXME comment by either implementing the solution or documenting why it's deferred
-         - Remove completed TODOs
-         - Convert remaining TODOs to proper issue tracking if needed
+      - Review TODO/FIXME Comments: Address each TODO/FIXME comment by either implementing the solution or documenting why it's deferred. Remove completed TODOs. Convert remaining TODOs to proper issue tracking if needed.
 
-      3. **Remove Debugging Code Blocks**:
-         - Remove temporary debugging code, test code blocks, and commented-out code
-         - Clean up any experimental code that's no longer needed
-         - Ensure proper error handling replaces temporary debug logging
+      - Remove Debugging Code Blocks: Remove temporary debugging code, test code blocks, and commented-out code. Clean up any experimental code that's no longer needed. Ensure proper error handling replaces temporary debug logging.
 
       **STEP 2: Documentation Review**
-      Review and update documentation to reflect final test implementation:
+      Review and update documentation to reflect final test implementation.
 
-      1. **Compare Against Implementation**: Review documentation against actual implemented test suite
-      2. **Update Changed Sections**: Only modify documentation sections that have functional changes
-      3. **Remove Development Progress**: Remove references to development iterations, progress notes, and temporary decisions
-      4. **Focus on Final State**: Ensure documentation describes the final test suite state, not the development process
-      5. **Verify Test Documentation**: Ensure test documentation and maintenance procedures are complete and accurate
+      - Compare Against Implementation: Review documentation against actual implemented test suite.
+
+      - Update Changed Sections: Only modify documentation sections that have functional changes.
+
+      - Remove Development Progress: Remove references to development iterations, progress notes, and temporary decisions.
+
+      - Focus on Final State: Ensure documentation describes the final test suite state, not the development process.
+
+      - Verify Test Documentation: Ensure test documentation and maintenance procedures are complete and accurate.
 
       **STEP 3: Final Validation**
       - Run existing tests to ensure cleanup didn't break functionality
