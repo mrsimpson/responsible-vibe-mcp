@@ -27,13 +27,14 @@ states:
   reproduce:
     description: 'Reproduce and understand the bug'
     default_instructions: |
-      You are in the bug reproduction phase. Work to reliably reproduce the reported bug by gathering specific information:
-        • What are the exact OS, browser/runtime versions, and hardware specs?
-        • What is the precise sequence of actions that trigger the bug?
-        • What error messages, logs, or stack traces are available?
-        • Does this happen every time or intermittently?
-        • How many users are affected and what is the business impact?
-       Create test cases that demonstrate the problem. Document your findings and create tasks as needed.
+      Gather specific information to reliably reproduce the reported bug:
+      - What are the exact OS, browser/runtime versions, and hardware specs?
+      - What is the precise sequence of actions that trigger the bug?
+      - What error messages, logs, or stack traces are available?
+      - Does this happen every time or intermittently?
+      - How many users are affected and what is the business impact?
+
+      Create test cases that demonstrate the problem. Document your findings and create tasks as needed.
     transitions:
       - trigger: 'bug_reproduced'
         to: 'analyze'
@@ -54,7 +55,7 @@ states:
 
   analyze:
     description: 'Analyze the bug and identify root cause'
-    default_instructions: 'You are in the bug analysis phase. Examine the code paths involved in the bug, identify the root cause, and understand why the issue occurs. Use debugging tools, add logging, and trace through the problematic code. Document your analysis and create tasks as needed.'
+    default_instructions: Examine the code paths involved in the bug, identify the root cause, and understand why the issue occurs. Use debugging tools, add logging, and trace through the problematic code. Document your analysis and create tasks as needed.
     transitions:
       - trigger: 'need_more_reproduction'
         to: 'reproduce'
@@ -79,9 +80,10 @@ states:
   fix:
     description: 'Implement the bug fix'
     default_instructions: |
-      Implement the solution based on your analysis. If $DESIGN_DOC exists, follow the design from $DESIGN_DOC. Before implementing, assess the approach:
-        • How critical is this system? What is the blast radius if the fix causes issues?
-        • Should this be a minimal fix or a more comprehensive solution?
+      Implement the solution based on your analysis. If `$DESIGN_DOC` exists, follow the design from `$DESIGN_DOC`. Before implementing, assess the approach:
+      - How critical is this system? What is the blast radius if the fix causes issues?
+      - Should this be a minimal fix or a more comprehensive solution?
+
       Make targeted changes that address the root cause without introducing new issues. Be careful to maintain existing functionality while fixing the bug.
     transitions:
       - trigger: 'need_more_analysis'
@@ -106,7 +108,7 @@ states:
 
   verify:
     description: 'Verify the fix and ensure no regressions'
-    default_instructions: 'You are in the bug verification phase. Test the fix thoroughly to ensure the original bug is resolved and no new issues were introduced. Run existing tests, create new ones if needed, and verify the solution is robust.'
+    default_instructions: Test the fix thoroughly to ensure the original bug is resolved and no new issues were introduced. Run existing tests, create new ones if needed, and verify the solution is robust.
     transitions:
       - trigger: 'fix_needs_adjustment'
         to: 'fix'
@@ -129,43 +131,31 @@ states:
 
   finalize:
     description: 'Code cleanup and documentation finalization'
-    default_instructions: >
-      You are in the finalize phase. This phase ensures code quality and documentation accuracy through systematic cleanup and review.
+    default_instructions: |
+      Ensure code quality and documentation accuracy through systematic cleanup and review.
 
       **STEP 1: Code Cleanup**
       Systematically clean up development artifacts:
-
-      1. **Remove Debug Output**: Search for and remove all temporary debug output statements used during bug investigation.
-         Look for language-specific debug output methods (console logging, print statements, debug output functions).
-         Remove any debugging statements that were added for investigation purposes.
-
-      2. **Review TODO/FIXME Comments**:
-         - Address each TODO/FIXME comment by either implementing the solution or documenting why it's deferred
-         - Remove completed TODOs
-         - Convert remaining TODOs to proper issue tracking if needed
-
-      3. **Remove Debugging Code Blocks**:
-         - Remove temporary debugging code, test code blocks, and commented-out code
-         - Clean up any experimental code that's no longer needed
-         - Ensure proper error handling replaces temporary debug logging
+      - Remove all temporary debug output statements used during bug investigation (console logging, print statements, debug output functions)
+      - Address each TODO/FIXME comment by either implementing the solution or documenting why it's deferred
+      - Remove completed TODOs and convert remaining ones to proper issue tracking if needed
+      - Remove temporary debugging code, test code blocks, and commented-out code
+      - Ensure proper error handling replaces temporary debug logging
 
       **STEP 2: Documentation Review**
       Review and update documentation to reflect the bug fix:
-
-       1. **Update Long-Term Memory Documents**: Based on what was actually implemented:
-          • If $DESIGN_DOC exists, update $DESIGN_DOC if design details were refined or changed during the fix
-      2. **Compare Against Implementation**: Review documentation against the actual bug fix implemented
-      3. **Update Changed Sections**: Only modify documentation sections that have functional changes
-      4. **Remove Development Progress**: Remove references to investigation iterations, progress notes, and temporary decisions
-      5. **Focus on Final State**: Ensure documentation describes the final fixed state, not the debugging process
-      6. **Ask User to Review Document Updates**: Ask the document changes
+      - If `$DESIGN_DOC` exists, update it if design details were refined or changed during the fix
+      - Compare documentation against the actual bug fix implementation
+      - Update only the documentation sections that have functional changes
+      - Remove references to investigation iterations, progress notes, and temporary decisions
+      - Ensure documentation describes the final fixed state, not the debugging process
+      - Ask the user to review document updates
 
       **STEP 3: Final Validation**
       - Run existing tests to ensure cleanup didn't break functionality
       - Verify documentation accuracy with a final review
       - Ensure bug fix is ready for production
-
-       Update task progress and mark completed work as you finalize the bug fix.
+      - Update task progress and mark completed work as you finalize the bug fix
     transitions:
       - trigger: 'need_fix_changes'
         to: 'fix'
