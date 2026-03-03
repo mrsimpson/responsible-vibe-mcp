@@ -37,8 +37,9 @@ export default defineConfig({
         text: 'Workflows',
         items: [
           { text: 'Workflow-Selection', link: '/user/workflow-selection' },
-          { text: 'Explore All Workflows', link: '/workflows' },
+          { text: 'Packaged Workflows', link: '/user/packaged-workflows' },
           { text: 'Custom Workflows', link: '/user/custom-workflows' },
+          { text: 'Explore All Workflows', link: '/workflows' },
           {
             text: 'Crowd MCP Integration',
             link: '/user/crowd-mcp-integration',
