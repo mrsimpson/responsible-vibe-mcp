@@ -75,12 +75,12 @@ states:
     description: 'Design the architecture for the new system in target technology'
     default_instructions: >
       **STEP 1: Reference Architecture Documentation**
-      - Check if `$ARCHITECTURE_DOC` exists
-      - Review current system understanding from documentation
+      - If `$ARCHITECTURE_DOC` exists: Review current system understanding from it
+      - Otherwise: Elaborate architectural options and present them to the user
 
       **STEP 2: Create/Update Design Documentation**
-      - Check if `$DESIGN_DOC` exists and reference it
-      - If unavailable, create or enhance `$DESIGN_DOC` with your design decisions
+      - If `$DESIGN_DOC` exists: Reference it for existing design decisions
+      - Otherwise: Document design decisions in the plan file
 
       **STEP 3: Analyze Current Architecture**
       - Examine existing system architecture and patterns
@@ -190,7 +190,8 @@ states:
     description: 'Plan detailed implementation approach for the new system'
     default_instructions: >
       **STEP 1: Reference Design Documentation**
-      - Check `$DESIGN_DOC` for target architecture and design decisions
+      - If `$DESIGN_DOC` exists: Check it for target architecture and design decisions
+      - Otherwise: Elaborate design options and present them to the user
       - Review implementation constraints and requirements
 
       **STEP 2: Break Down Implementation**
@@ -252,7 +253,8 @@ states:
     description: 'Build new system while maintaining test compatibility and validation'
     default_instructions: >
       **STEP 1: Reference Design Documentation**
-      - Check `$DESIGN_DOC` for implementation guidance and architectural decisions
+      - If `$DESIGN_DOC` exists: Check it for implementation guidance and architectural decisions
+      - Otherwise: Elaborate implementation options and present them to the user
 
       **STEP 2: Build System Components**
       - Build new system components according to implementation strategy
