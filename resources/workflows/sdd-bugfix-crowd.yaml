@@ -31,8 +31,7 @@ states:
     default_instructions: |
       **Team Collaboration Mode**
 
-      You are $VIBE_ROLE working in a collaborative team on this bug fix.
-      Current phase: REPRODUCE
+      You are `$VIBE_ROLE` working in a collaborative team on this bug fix.
 
       Developer is responsible. Business-analyst and architect are consulted.
 
@@ -43,9 +42,9 @@ states:
         role: business-analyst
         transition_reason: 'Bug reproduced, preparing to specify correct behavior'
         additional_instructions: |
-          **You are CONSULTED during the reproduce phase.**
+          **Consultant Role in Reproduce Phase**
 
-          Developer is investigating the bug. You are in consultative mode.
+          The developer is investigating the bug. Your role is to provide consultative support.
 
           **Your Responsibilities:**
           - Monitor messages for questions about expected behavior
@@ -53,12 +52,12 @@ states:
           - Explain the correct functionality from user perspective
 
           **Important Constraints:**
-          - Do NOT edit the plan file (only developer can in this phase)
+          - Do NOT edit the plan file (only developer can edit)
           - Do NOT attempt to proceed to next phase
 
-          **Handoff Notice:**
-          - When developer completes reproduce phase, YOU become RESPONSIBLE
-          - You will take the lead in the specify phase
+          **Transition Notice:**
+          - When developer completes the reproduce phase, you become RESPONSIBLE
+          - You will lead the specify phase
           - Prepare to document the correct behavior specification
 
       # Architect is CONSULTED during reproduce phase
@@ -67,9 +66,9 @@ states:
         role: architect
         transition_reason: 'Bug reproduced, transitioning to specification'
         additional_instructions: |
-          **You are CONSULTED during the reproduce phase.**
+          **Consultant Role in Reproduce Phase**
 
-          Developer is investigating the bug. You are in consultative mode.
+          The developer is investigating the bug. Your role is to provide consultative support.
 
           **Your Responsibilities:**
           - Monitor messages for questions about system design
@@ -77,11 +76,11 @@ states:
           - Explain expected component interactions
 
           **Important Constraints:**
-          - Do NOT edit the plan file (only developer can)
+          - Do NOT edit the plan file (only developer can edit)
           - Do NOT attempt to proceed to next phase
 
           **How to Help:**
-          - Use get_my_messages to check for developer's questions
+          - Use get_my_messages to check for developer questions
           - Provide architectural context for the buggy component
 
       # Developer is RESPONSIBLE for reproduce phase
@@ -90,43 +89,39 @@ states:
         role: developer
         transition_reason: 'Bug reproduced successfully, handing off to business-analyst'
         additional_instructions: |
-          **You are RESPONSIBLE for the reproduce phase.**
+          **Responsible for Reproduce Phase**
 
           You have exclusive control during this phase:
           - Only you can edit the plan file
           - Only you can proceed to the next phase
 
-          **Bug Reproduction Tasks:**
+          **STEP 1: Gather Information**
+          - Collect exact OS, browser/runtime versions, hardware specs
+          - Document precise sequence of actions triggering the bug
+          - Obtain error messages, logs, stack traces
+          - Determine frequency (always or intermittent?)
+          - Assess business impact
 
-          1. **Gather Information**:
-             - Exact OS, browser/runtime versions, hardware specs
-             - Precise sequence of actions triggering the bug
-             - Error messages, logs, stack traces
-             - Frequency (always or intermittent?)
-             - Business impact
+          **STEP 2: Create Reproduction**
+          - Develop minimal, reliable reproduction steps
+          - Document exact environment and conditions
+          - Create test data/scenarios that trigger the issue
+          - Verify bug occurs consistently
 
-          2. **Create Reproduction**:
-             - Develop minimal, reliable reproduction steps
-             - Document exact environment and conditions
-             - Create test data/scenarios that trigger the issue
-             - Verify bug occurs consistently
+          **STEP 3: Understand the Problem**
+          - Identify current (buggy) behavior
+          - Determine correct behavior
+          - Distinguish symptoms vs. root cause
+          - Identify related issues or edge cases
 
-          3. **Understand the Problem**:
-             - What is current (buggy) behavior?
-             - What should correct behavior be?
-             - Symptoms vs. root cause?
-             - Related issues or edge cases?
+          **STEP 4: Collaborate When Needed**
+          - Use send_message to business-analyst: "What is the expected behavior for [scenario]?"
+          - Use send_message to architect: "How should this component interact with [other component]?"
 
-          4. **Collaborate When Needed:**
-             - Use send_message to business-analyst: "What is the expected behavior for [scenario]?"
-             - Use send_message to architect: "How should this component interact with [other component]?"
-
-          **Output**: Create `$VIBE_DIR/specs/$BRANCH_NAME/reproduction.md`
+          **Deliverable**: Create `$VIBE_DIR/specs/$BRANCH_NAME/reproduction.md`
 
           **Handoff to Business-Analyst:**
-
-          Before proceeding to specify phase:
-          1. Use send_message to business-analyst: "Bug reproduced successfully. Please take the lead for specify phase to document correct behavior. See: $VIBE_DIR/specs/$BRANCH_NAME/reproduction.md"
+          1. Use send_message to business-analyst: "Bug reproduced successfully. Please take the lead for specify phase to document correct behavior. See: `$VIBE_DIR/specs/$BRANCH_NAME/reproduction.md`"
           2. Use send_message to architect: "Bug reproduced, business-analyst will specify correct behavior"
           3. Use send_message_to_operator: "Reproduction complete, handing off to business-analyst"
           4. Call proceed_to_phase - you transition to CONSULTED in specify phase
@@ -145,8 +140,7 @@ states:
     default_instructions: |
       **Team Collaboration Mode**
 
-      You are $VIBE_ROLE working in a collaborative team on this bug fix.
-      Current phase: SPECIFY
+      You are `$VIBE_ROLE` working in a collaborative team on this bug fix.
 
       Business-analyst is responsible. Developer and architect are consulted.
 
@@ -157,35 +151,31 @@ states:
         role: business-analyst
         transition_reason: 'Bug specification completed, developer will create tests'
         additional_instructions: |
-          **You are RESPONSIBLE for the specify phase.**
+          **Responsible for Specify Phase**
 
           You have exclusive control during this phase:
           - Only you can edit the plan file
           - Only you can proceed to the next phase
 
-          **Specification Tasks:**
+          **STEP 1: Define Correct Behavior**
+          - Determine what should happen in the failing scenario
+          - Document expected outcomes for users
+          - Specify system behavior in edge cases
+          - Clarify business rules to enforce
 
-          1. **Define Correct Behavior**:
-             - What should happen in the scenario that currently fails?
-             - Expected outcomes for users
-             - System behavior in edge cases
-             - Business rules to enforce
+          **STEP 2: Handle Ambiguities**
+          - Make informed decisions about unclear requirements
+          - Use [NEEDS CLARIFICATION: question] only for critical ambiguities (max 3)
+          - Prioritize: correctness > user experience > technical details
 
-          2. **Handle Ambiguities**:
-             - Make informed decisions about unclear requirements
-             - Use [NEEDS CLARIFICATION: question] only for critical ambiguities (max 3)
-             - Prioritize: correctness > user experience > technical details
+          **STEP 3: Collaborate**
+          - Use send_message to developer: "Does this specification clearly define the fix?"
+          - Use send_message to architect: "Does this align with system design intent?"
 
-          3. **Collaborate:**
-             - Use send_message to developer: "Does this specification clearly define the fix?"
-             - Use send_message to architect: "Does this align with system design intent?"
-
-          **Output**: Create `$VIBE_DIR/specs/$BRANCH_NAME/bug-spec.md`
+          **Deliverable**: Create `$VIBE_DIR/specs/$BRANCH_NAME/bug-spec.md`
 
           **Handoff to Developer:**
-
-          Before proceeding to test phase:
-          1. Use send_message to developer: "Bug specification complete. Please take the lead for test phase to create failing tests. See: $VIBE_DIR/specs/$BRANCH_NAME/bug-spec.md"
+          1. Use send_message to developer: "Bug specification complete. Please take the lead for test phase to create failing tests. See: `$VIBE_DIR/specs/$BRANCH_NAME/bug-spec.md`"
           2. Use send_message to architect: "Specification ready, developer will create tests and fix"
           3. Use send_message_to_operator: "Bug spec complete, handing off to developer for testing"
           4. Call proceed_to_phase - you transition to CONSULTED in test phase
@@ -196,9 +186,9 @@ states:
         role: architect
         transition_reason: 'Bug specification completed, transitioning to test phase'
         additional_instructions: |
-          **You are CONSULTED during the specify phase.**
+          **Consultant Role in Specify Phase**
 
-          Business-analyst is defining correct behavior. You are in consultative mode.
+          The business-analyst is defining correct behavior. Your role is to provide consultative support.
 
           **Your Responsibilities:**
           - Monitor messages for questions about system design intent
@@ -206,7 +196,7 @@ states:
           - Validate specification against architectural principles
 
           **Important Constraints:**
-          - Do NOT edit the plan file (only business-analyst can)
+          - Do NOT edit the plan file (only business-analyst can edit)
           - Do NOT attempt to proceed to next phase
 
       # Developer is CONSULTED during specify phase
@@ -215,9 +205,9 @@ states:
         role: developer
         transition_reason: 'Bug specification completed, preparing to create tests'
         additional_instructions: |
-          **You are CONSULTED during the specify phase.**
+          **Consultant Role in Specify Phase**
 
-          Business-analyst is defining correct behavior. You are in consultative mode.
+          The business-analyst is defining correct behavior. Your role is to provide consultative support.
 
           **Your Responsibilities:**
           - Monitor messages for questions about testability
@@ -225,12 +215,12 @@ states:
           - Identify any technical constraints
 
           **Important Constraints:**
-          - Do NOT edit the plan file (only business-analyst can)
+          - Do NOT edit the plan file (only business-analyst can edit)
           - Do NOT attempt to proceed to next phase
 
-          **Handoff Notice:**
-          - When business-analyst completes specify phase, YOU become RESPONSIBLE
-          - You will take the lead in test phase
+          **Transition Notice:**
+          - When business-analyst completes the specify phase, you become RESPONSIBLE
+          - You will lead the test phase
           - Prepare to create failing tests that capture the bug
 
   test:
@@ -238,8 +228,7 @@ states:
     default_instructions: |
       **Team Collaboration Mode**
 
-      You are $VIBE_ROLE working in a collaborative team on this bug fix.
-      Current phase: TEST
+      You are `$VIBE_ROLE` working in a collaborative team on this bug fix.
 
       Developer is responsible for creating tests.
 
@@ -250,9 +239,9 @@ states:
         role: business-analyst
         transition_reason: 'Tests created, architect will plan the fix'
         additional_instructions: |
-          **You are CONSULTED during the test phase.**
+          **Consultant Role in Test Phase**
 
-          Developer is creating tests. You are in consultative mode.
+          The developer is creating tests. Your role is to provide consultative support.
 
           **Your Responsibilities:**
           - Monitor messages for questions about acceptance criteria
@@ -260,7 +249,7 @@ states:
           - Ensure tests verify correct business behavior
 
           **Important Constraints:**
-          - Do NOT edit the plan file (only developer can)
+          - Do NOT edit the plan file (only developer can edit)
           - Do NOT attempt to proceed to next phase
 
       # Architect is CONSULTED during test phase
@@ -269,21 +258,21 @@ states:
         role: architect
         transition_reason: 'Tests created, preparing to plan fix approach'
         additional_instructions: |
-          **You are CONSULTED during the test phase.**
+          **Consultant Role in Test Phase**
 
-          Developer is creating tests. You are in consultative mode.
+          The developer is creating tests. Your role is to provide consultative support.
 
           **Your Responsibilities:**
           - Monitor messages for questions about test architecture
           - Provide guidance on integration testing approach
 
           **Important Constraints:**
-          - Do NOT edit the plan file (only developer can)
+          - Do NOT edit the plan file (only developer can edit)
           - Do NOT attempt to proceed to next phase
 
-          **Handoff Notice:**
-          - When developer completes test phase, YOU become RESPONSIBLE
-          - You will take the lead in plan phase
+          **Transition Notice:**
+          - When developer completes the test phase, you become RESPONSIBLE
+          - You will lead the plan phase
           - Prepare to design the fix approach
 
       # Developer is RESPONSIBLE for test phase
@@ -292,37 +281,35 @@ states:
         role: developer
         transition_reason: 'Tests created, handing off to architect for fix planning'
         additional_instructions: |
-          **You are RESPONSIBLE for the test phase.**
+          **Responsible for Test Phase**
 
           You have exclusive control during this phase:
           - Only you can edit the plan file
           - Only you can proceed to the next phase
 
-          **Test Creation Tasks:**
+          **STEP 1: Create Failing Tests for Current Bug**
+          - Create tests demonstrating current buggy behavior
+          - These should fail initially (Red phase of TDD)
+          - Cover main reproduction case and related scenarios
+          - Include edge cases and boundary conditions
 
-          1. **Failing Tests for Current Bug**:
-             - Create tests demonstrating current buggy behavior
-             - These should fail initially (Red phase of TDD)
-             - Cover main reproduction case and related scenarios
-             - Include edge cases and boundary conditions
+          **STEP 2: Create Tests for Expected Behavior**
+          - Create tests specifying correct behavior from bug-spec.md
+          - These should pass once bug is fixed
+          - Cover all functional requirements
+          - Include user scenarios and success criteria
 
-          2. **Tests for Expected Behavior**:
-             - Create tests specifying correct behavior from bug-spec.md
-             - These should pass once bug is fixed
-             - Cover all functional requirements
-             - Include user scenarios and success criteria
+          **STEP 3: Create Regression Tests**
+          - Tests for related functionality that shouldn't be affected
+          - Ensure fix doesn't break existing features
 
-          3. **Regression Tests**:
-             - Tests for related functionality that shouldn't be affected
-             - Ensure fix doesn't break existing features
+          **STEP 4: Collaborate**
+          - Use send_message to business-analyst: "Do these tests cover all scenarios from the spec?"
+          - Use send_message to architect: "Is the test architecture appropriate?"
 
-          4. **Collaborate:**
-             - Use send_message to business-analyst: "Do these tests cover all scenarios from the spec?"
-             - Use send_message to architect: "Is the test architecture appropriate?"
+          **Deliverable**: Create `$VIBE_DIR/specs/$BRANCH_NAME/tests.md`
 
           **Handoff to Architect:**
-
-          Before proceeding to plan phase:
           1. Use send_message to architect: "Tests created and failing as expected. Please take the lead for plan phase to design the fix approach."
           2. Use send_message to business-analyst: "Tests ready, architect will plan the fix"
           3. Use send_message_to_operator: "Tests complete, handing off to architect for fix planning"
@@ -333,8 +320,7 @@ states:
     default_instructions: |
       **Team Collaboration Mode**
 
-      You are $VIBE_ROLE working in a collaborative team on this bug fix.
-      Current phase: PLAN
+      You are `$VIBE_ROLE` working in a collaborative team on this bug fix.
 
       Architect is responsible. Business-analyst and developer are consulted.
 
@@ -345,9 +331,9 @@ states:
         role: business-analyst
         transition_reason: 'Fix plan complete, developer will implement'
         additional_instructions: |
-          **You are CONSULTED during the plan phase.**
+          **Consultant Role in Plan Phase**
 
-          Architect is designing the fix approach. You are in consultative mode.
+          The architect is designing the fix approach. Your role is to provide consultative support.
 
           **Your Responsibilities:**
           - Monitor messages for questions about business rules
@@ -355,7 +341,7 @@ states:
           - Ensure fix aligns with user expectations
 
           **Important Constraints:**
-          - Do NOT edit the plan file (only architect can)
+          - Do NOT edit the plan file (only architect can edit)
           - Do NOT attempt to proceed to next phase
 
       # Architect is RESPONSIBLE for plan phase
@@ -364,42 +350,38 @@ states:
         role: architect
         transition_reason: 'Fix plan completed, handing off to developer'
         additional_instructions: |
-          **You are RESPONSIBLE for the plan phase.**
+          **Responsible for Plan Phase**
 
           You have exclusive control during this phase:
           - Only you can edit the plan file
           - Only you can proceed to the next phase
 
-          **Fix Planning Tasks:**
+          **STEP 1: Load Context**
+          - Read bug spec: `$VIBE_DIR/specs/$BRANCH_NAME/bug-spec.md`
+          - Review reproduction: `$VIBE_DIR/specs/$BRANCH_NAME/reproduction.md`
+          - Understand test requirements
+          - Analyze existing codebase
 
-          1. **Load Context**:
-             - Read bug spec: `$VIBE_DIR/specs/$BRANCH_NAME/bug-spec.md`
-             - Review reproduction: `$VIBE_DIR/specs/$BRANCH_NAME/reproduction.md`
-             - Understand test requirements
-             - Analyze existing codebase
+          **STEP 2: Perform Root Cause Analysis**
+          - Identify underlying cause of the bug
+          - Understand why current implementation fails
+          - Map problem to specific code areas or logic flaws
 
-          2. **Root Cause Analysis**:
-             - Identify underlying cause of the bug
-             - Understand why current implementation fails
-             - Map problem to specific code areas or logic flaws
+          **STEP 3: Design Fix Strategy**
+          - Design minimal, targeted fix addressing root cause
+          - Ensure fix aligns with existing architecture patterns
+          - Consider impact on related functionality
+          - Plan for backward compatibility if needed
 
-          3. **Fix Strategy**:
-             - Design minimal, targeted fix addressing root cause
-             - Ensure fix aligns with existing architecture patterns
-             - Consider impact on related functionality
-             - Plan for backward compatibility if needed
+          **STEP 4: Collaborate**
+          - Use send_message to business-analyst: "Does this fix approach meet business needs?"
+          - Use send_message to developer: "Is this fix approach implementable?"
+          - Incorporate their feedback
 
-          4. **Collaborate:**
-             - Use send_message to business-analyst: "Does this fix approach meet business needs?"
-             - Use send_message to developer: "Is this fix approach implementable?"
-             - Incorporate their feedback
-
-          **Output**: Create `$VIBE_DIR/specs/$BRANCH_NAME/fix-plan.md`
+          **Deliverable**: Create `$VIBE_DIR/specs/$BRANCH_NAME/fix-plan.md`
 
           **Handoff to Developer:**
-
-          Before proceeding to fix phase:
-          1. Use send_message to developer: "Fix plan complete. Please take the lead for fix phase. See: $VIBE_DIR/specs/$BRANCH_NAME/fix-plan.md"
+          1. Use send_message to developer: "Fix plan complete. Please take the lead for fix phase. See: `$VIBE_DIR/specs/$BRANCH_NAME/fix-plan.md`"
           2. Use send_message to business-analyst: "Plan ready, developer will implement fix"
           3. Use send_message_to_operator: "Fix plan complete, handing off to developer"
           4. Call proceed_to_phase - you transition to CONSULTED in fix phase
@@ -410,24 +392,23 @@ states:
         role: developer
         transition_reason: 'Fix plan completed, preparing to implement'
         additional_instructions: |
-          **You are CONSULTED during the plan phase.**
+          **Consultant Role in Plan Phase**
 
-          Architect is designing fix approach. You are in consultative mode.
+          The architect is designing fix approach. Your role is to provide consultative support.
 
           **Your Responsibilities:**
           - Monitor messages for questions about implementation
-          - Provide feedback on:
-            * Fix implementability and complexity
-            * Potential implementation challenges
-            * Testing approach
+          - Provide feedback on fix implementability and complexity
+          - Identify potential implementation challenges
+          - Discuss testing approach
 
           **Important Constraints:**
-          - Do NOT edit the plan file (only architect can)
+          - Do NOT edit the plan file (only architect can edit)
           - Do NOT attempt to proceed to next phase
 
-          **Handoff Notice:**
-          - When architect completes plan phase, YOU become RESPONSIBLE
-          - You will take the lead in fix phase
+          **Transition Notice:**
+          - When architect completes the plan phase, you become RESPONSIBLE
+          - You will lead the fix phase
           - Prepare to implement the minimal fix
 
   fix:
@@ -435,8 +416,7 @@ states:
     default_instructions: |
       **Team Collaboration Mode**
 
-      You are $VIBE_ROLE working in a collaborative team on this bug fix.
-      Current phase: FIX
+      You are `$VIBE_ROLE` working in a collaborative team on this bug fix.
 
       Developer is responsible. Architect and business-analyst are consulted.
 
@@ -447,9 +427,9 @@ states:
         role: business-analyst
         transition_reason: 'Fix implemented, team will verify'
         additional_instructions: |
-          **You are CONSULTED during the fix phase.**
+          **Consultant Role in Fix Phase**
 
-          Developer is implementing the fix. You are in consultative mode.
+          The developer is implementing the fix. Your role is to provide consultative support.
 
           **Your Responsibilities:**
           - Monitor messages for requirements clarifications
@@ -457,7 +437,7 @@ states:
           - Approve acceptance criteria when asked
 
           **Important Constraints:**
-          - Do NOT edit the plan file (only developer can)
+          - Do NOT edit the plan file (only developer can edit)
           - Do NOT attempt to proceed to next phase
 
       # Architect is CONSULTED during fix phase
@@ -466,19 +446,18 @@ states:
         role: architect
         transition_reason: 'Fix implemented, team will verify'
         additional_instructions: |
-          **You are CONSULTED during the fix phase.**
+          **Consultant Role in Fix Phase**
 
-          Developer is implementing the fix. You are in consultative mode.
+          The developer is implementing the fix. Your role is to provide consultative support.
 
           **Your Responsibilities:**
           - Monitor messages for architecture questions
-          - Provide guidance on:
-            * Design patterns and best practices
-            * Integration approaches
-            * Technical trade-offs
+          - Provide guidance on design patterns and best practices
+          - Recommend integration approaches
+          - Discuss technical trade-offs
 
           **Important Constraints:**
-          - Do NOT edit the plan file (only developer can)
+          - Do NOT edit the plan file (only developer can edit)
           - Do NOT attempt to proceed to next phase
 
       # Developer is RESPONSIBLE for fix phase
@@ -487,36 +466,35 @@ states:
         role: developer
         transition_reason: 'Fix implemented and tests passing, ready for verification'
         additional_instructions: |
-          **You are RESPONSIBLE for the fix phase.**
+          **Responsible for Fix Phase**
 
           You have exclusive control during this phase:
           - Only you can edit the plan file
           - Only you can proceed to the next phase
 
-          **Fix Implementation Tasks:**
+          **STEP 1: Execute Fix Strategy**
+          - Execute fix strategy from `$VIBE_DIR/specs/$BRANCH_NAME/fix-plan.md`
+          - Make targeted changes to address root cause
+          - Avoid over-engineering
+          - Keep changes minimal and focused
 
-          1. **Follow the Plan**: Execute fix strategy from `$VIBE_DIR/specs/$BRANCH_NAME/fix-plan.md`
-             - Make targeted changes to address root cause
-             - Avoid over-engineering
-             - Keep changes minimal and focused
+          **STEP 2: Implement with TDD**
+          - Run failing tests to confirm they capture the bug
+          - Implement changes to make tests pass (Green phase)
+          - Ensure all tests pass
 
-          2. **Test-Driven Implementation**:
-             - Run failing tests to confirm they capture the bug
-             - Implement changes to make tests pass (Green phase)
-             - Ensure all tests pass
+          **STEP 3: Collaborate When Blocked**
+          - Use send_message to architect: "How should I handle [technical issue]?"
+          - Use send_message to business-analyst: "What is correct behavior for [edge case]?"
 
-          3. **Collaborate When Blocked:**
-             - Use send_message to architect: "How should I handle [technical issue]?"
-             - Use send_message to business-analyst: "What is correct behavior for [edge case]?"
+          **STEP 4: Validate**
+          - Verify original reproduction case no longer occurs
+          - Run full test suite to check for regressions
+          - Test edge cases and boundary conditions
 
-          4. **Validation:**
-             - Verify original reproduction case no longer occurs
-             - Run full test suite to check for regressions
-             - Test edge cases and boundary conditions
+          **Continue to Verify Phase**
 
-          **You remain RESPONSIBLE in verify phase** (continue driving to completion)
-
-          **Before proceeding:**
+          You remain RESPONSIBLE in verify phase. Before proceeding:
           1. Use send_message_to_operator: "Fix implemented and tests passing, moving to verification"
           2. Only you can call proceed_to_phase
 
@@ -525,8 +503,7 @@ states:
     default_instructions: |
       **Team Collaboration Mode**
 
-      You are $VIBE_ROLE working in a collaborative team on this bug fix.
-      Current phase: VERIFY
+      You are `$VIBE_ROLE` working in a collaborative team on this bug fix.
 
       Developer is responsible. Team validates together.
 
@@ -537,16 +514,16 @@ states:
         role: business-analyst
         transition_reason: 'Verification complete, bug fixed'
         additional_instructions: |
-          **You are CONSULTED during the verify phase.**
+          **Consultant Role in Verify Phase**
 
-          Developer is verifying the fix. You are in consultative mode.
+          The developer is verifying the fix. Your role is to provide consultative support.
 
           **Your Responsibilities:**
           - Monitor messages for validation requests
           - Perform user acceptance validation:
-            * Does fix address original user problem?
-            * Are all scenarios from spec working?
-            * Is user experience improved?
+            - Does fix address original user problem?
+            - Are all scenarios from spec working?
+            - Is user experience improved?
 
           **How to Help:**
           - Use get_my_messages to check for verification requests
@@ -559,9 +536,9 @@ states:
         role: architect
         transition_reason: 'Verification complete, bug fixed'
         additional_instructions: |
-          **You are CONSULTED during the verify phase.**
+          **Consultant Role in Verify Phase**
 
-          Developer is verifying the fix. You are in consultative mode.
+          The developer is verifying the fix. Your role is to provide consultative support.
 
           **Your Responsibilities:**
           - Monitor messages for architecture validation requests
@@ -579,37 +556,35 @@ states:
         role: developer
         transition_reason: 'Verification complete, bug fix ready for deployment'
         additional_instructions: |
-          **You are RESPONSIBLE for the verify phase.**
+          **Responsible for Verify Phase**
 
           You have exclusive control during this phase:
           - Only you can edit the plan file
           - Only you can mark verification complete
 
-          **Verification Tasks:**
+          **STEP 1: Verify Bug Resolution**
+          - Confirm original reproduction case no longer occurs
+          - Verify all scenarios from bug-spec.md work correctly
+          - Test in original environment where bug was reported
+          - Validate success criteria are met
 
-          1. **Bug Resolution Verification**:
-             - Confirm original reproduction case no longer occurs
-             - Verify all scenarios from bug-spec.md work correctly
-             - Test in original environment where bug was reported
-             - Validate success criteria are met
+          **STEP 2: Perform Regression Testing**
+          - Run full test suite
+          - Test related features and integration points
+          - Verify performance hasn't degraded
+          - Check for new edge case failures
 
-          2. **Regression Testing**:
-             - Run full test suite
-             - Test related features and integration points
-             - Verify performance hasn't degraded
-             - Check for new edge case failures
+          **STEP 3: Get Team Validation**
+          - Use send_message to business-analyst: "Please perform user acceptance validation"
+          - Use send_message to architect: "Please review architectural integrity"
+          - Wait for their approval
 
-          3. **Team Validation:**
-             - Use send_message to business-analyst: "Please perform user acceptance validation"
-             - Use send_message to architect: "Please review architectural integrity"
-             - Wait for their approval
+          **STEP 4: Complete and Document**
+          - Update relevant documentation if behavior changed
+          - Document fix approach for future reference
+          - Use send_message_to_operator: "Bug fix verified and approved by team, ready for deployment"
 
-          4. **Final Steps:**
-             - Update relevant documentation if behavior changed
-             - Document fix approach for future reference
-             - Use send_message_to_operator: "Bug fix verified and approved by team, ready for deployment"
-
-          This is a terminal state - bug fix is complete.
+          **This is the terminal state** - bug fix is complete.
 
       # Regression detected - return to fix
       - trigger: 'regression_detected'
