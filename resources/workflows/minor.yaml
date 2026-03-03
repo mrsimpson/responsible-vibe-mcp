@@ -27,12 +27,21 @@ states:
   explore:
     description: 'Analysis and design phase - understanding and planning without implementation'
     default_instructions: >
-      You are in the exploration phase for minor enhancement.
-      This phase should be efficient since it's a minor enhancement.
       Understand the problem, analyze existing patterns, and design your approach.
-       Consider the scope and impact of the change. If $REQUIREMENTS_DOC exists, document requirements there, otherwise document them in your task management system. If $DESIGN_DOC exists, respect the design approach in $DESIGN_DOC.
-       Document your analysis and design decisions and create tasks as needed.
-      Focus on analysis and design only - do not write any code yet.
+      Consider the scope and impact of the change.
+
+      **STEP 1: Analyze Requirements**
+      - If `$REQUIREMENTS_DOC` exists: Use it to understand the required changes
+      - Otherwise: Document requirements in your task management system
+
+      **STEP 2: Review Design Approach**
+      - If `$DESIGN_DOC` exists: Respect the design approach documented in `$DESIGN_DOC`
+      - Otherwise: Design your approach based on the problem analysis
+
+      **STEP 3: Document Decisions**
+      - Document your analysis and design decisions
+      - Create tasks to guide implementation
+      - Focus on analysis and design only - do not write any code yet
     transitions:
       - trigger: 'exploration_complete'
         to: 'implement'
@@ -49,7 +58,21 @@ states:
 
   implement:
     description: 'Combined implementation phase - code, test, and commit'
-    default_instructions: "This phase combines coding, testing, and commit preparation. If $DESIGN_DOC exists, follow your design from $DESIGN_DOC. If $REQUIREMENTS_DOC exists, ensure the relevant requirements from $REQUIREMENTS_DOC are met, otherwise ensure existing requirements are met based on your task context. Write clean, focused code for the minor enhancement. Test your changes to ensure they work correctly and don't break existing functionality. Prepare documentation and commit when ready. Update task progress as needed."
+    default_instructions: >
+      Write clean, focused code for the minor enhancement, test your changes, and prepare for commit.
+
+      **STEP 1: Review Design and Requirements**
+      - If `$DESIGN_DOC` exists: Follow your design from `$DESIGN_DOC`
+      - If `$REQUIREMENTS_DOC` exists: Ensure the relevant requirements from `$REQUIREMENTS_DOC` are met
+      - Otherwise: Ensure existing requirements are met based on your task context
+
+      **STEP 2: Implement Changes**
+      - Write clean, focused code for the minor enhancement
+      - Test your changes to ensure they work correctly and don't break existing functionality
+
+      **STEP 3: Prepare for Finalization**
+      - Update task progress as needed
+      - Prepare documentation and commit when ready
     transitions:
       - trigger: 'need_more_analysis'
         to: 'explore'
@@ -71,43 +94,42 @@ states:
   finalize:
     description: 'Code cleanup and documentation finalization'
     default_instructions: >
-      You are in the finalize phase. This phase ensures code quality and documentation accuracy through systematic cleanup and review.
+      Ensure code quality and documentation accuracy through systematic cleanup and review.
 
       **STEP 1: Code Cleanup**
       Systematically clean up development artifacts:
 
-      1. **Remove Debug Output**: Search for and remove all temporary debug output statements used during development.
-         Look for language-specific debug output methods (console logging, print statements, debug output functions).
-         Remove any debugging statements that were added for development purposes.
+      - **Remove Debug Output**: Search for and remove all temporary debug output statements used during development.
+        Look for language-specific debug output methods (console logging, print statements, debug output functions).
+        Remove any debugging statements that were added for development purposes.
 
-      2. **Review TODO/FIXME Comments**:
-         - Address each TODO/FIXME comment by either implementing the solution or documenting why it's deferred
-         - Remove completed TODOs
-         - Convert remaining TODOs to proper issue tracking if needed
+      - **Review TODO/FIXME Comments**:
+        - Address each TODO/FIXME comment by either implementing the solution or documenting why it's deferred
+        - Remove completed TODOs
+        - Convert remaining TODOs to proper issue tracking if needed
 
-      3. **Remove Debugging Code Blocks**:
-         - Remove temporary debugging code, test code blocks, and commented-out code
-         - Clean up any experimental code that's no longer needed
-         - Ensure proper error handling replaces temporary debug logging
+      - **Remove Debugging Code Blocks**:
+        - Remove temporary debugging code, test code blocks, and commented-out code
+        - Clean up any experimental code that's no longer needed
+        - Ensure proper error handling replaces temporary debug logging
 
       **STEP 2: Documentation Review**
       Review and update documentation to reflect final implementation:
 
-       1. **Update Long-Term Memory Documents**: Based on what was actually implemented:
-          • If $REQUIREMENTS_DOC exists, update $REQUIREMENTS_DOC if requirements changed during development
-          • If $DESIGN_DOC exists, update $DESIGN_DOC if design details were refined or changed
-      2. **Compare Against Implementation**: Review documentation against actual implemented functionality
-      3. **Update Changed Sections**: Only modify documentation sections that have functional changes
-      4. **Remove Development Progress**: Remove references to development iterations, progress notes, and temporary decisions
-      5. **Focus on Final State**: Ensure documentation describes the final implemented state, not the development process
-      6. **Ask User to Review Document Updates**
+      - **Update Long-Term Memory Documents**: Based on what was actually implemented:
+        - If `$REQUIREMENTS_DOC` exists: Update `$REQUIREMENTS_DOC` if requirements changed during development
+        - If `$DESIGN_DOC` exists: Update `$DESIGN_DOC` if design details were refined or changed
+      - **Compare Against Implementation**: Review documentation against actual implemented functionality
+      - **Update Changed Sections**: Only modify documentation sections that have functional changes
+      - **Remove Development Progress**: Remove references to development iterations, progress notes, and temporary decisions
+      - **Focus on Final State**: Ensure documentation describes the final implemented state, not the development process
+      - **Ask User to Review Document Updates**
 
       **STEP 3: Final Validation**
       - Run existing tests to ensure cleanup didn't break functionality
       - Verify documentation accuracy with a final review
       - Ensure minor enhancement is ready for delivery
-
-       Update task progress and mark completed work as you finalize the minor enhancement.
+      - Update task progress and mark completed work as you finalize the minor enhancement
     transitions:
       - trigger: 'need_implementation_changes'
         to: 'implement'
