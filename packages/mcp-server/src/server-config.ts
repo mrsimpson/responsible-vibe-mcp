@@ -229,20 +229,43 @@ function createToolHandler(
 
 /**
  * Register MCP tools with the server
+ *
+ * @param disabledTools - Tool names to skip (not exposed via MCP).
+ *   Typically sourced from the DISABLE_MCP_TOOLS environment variable.
  */
 export async function registerMcpTools(
   mcpServer: McpServer,
   toolRegistry: ToolRegistry,
   responseRenderer: ResponseRenderer,
-  context: ServerContext
+  context: ServerContext,
+  disabledTools: ReadonlySet<string> = new Set()
 ): Promise<void> {
   logger.debug('Registering MCP tools');
+
+  if (disabledTools.size > 0) {
+    logger.info('MCP tools disabled via DISABLE_MCP_TOOLS', {
+      disabled: [...disabledTools],
+    });
+  }
+
+  /**
+   * Conditionally register a tool – skips if the name is in disabledTools.
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const registerTool = (name: string, schema: any, handler: any) => {
+    if (disabledTools.has(name)) {
+      logger.info(`Skipping disabled MCP tool: ${name}`);
+      return;
+    }
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    mcpServer.registerTool(name, schema, handler);
+  };
 
   // Initialize notification service
   notificationService.setMcpServer(mcpServer);
 
   // Register whats_next tool
-  mcpServer.registerTool(
+  registerTool(
     'whats_next',
     {
       description:
@@ -290,7 +313,7 @@ export async function registerMcpTools(
   );
 
   // Register proceed_to_phase tool
-  mcpServer.registerTool(
+  registerTool(
     'proceed_to_phase',
     {
       description:
@@ -330,7 +353,7 @@ export async function registerMcpTools(
   );
 
   // Register conduct_review tool
-  mcpServer.registerTool(
+  registerTool(
     'conduct_review',
     {
       description:
@@ -354,7 +377,7 @@ export async function registerMcpTools(
   );
 
   // Register start_development tool
-  mcpServer.registerTool(
+  registerTool(
     'start_development',
     {
       description:
@@ -397,7 +420,7 @@ export async function registerMcpTools(
   );
 
   // Register resume_workflow tool
-  mcpServer.registerTool(
+  registerTool(
     'resume_workflow',
     {
       description:
@@ -427,7 +450,7 @@ export async function registerMcpTools(
   );
 
   // Register reset_development tool
-  mcpServer.registerTool(
+  registerTool(
     'reset_development',
     {
       description:
@@ -460,7 +483,7 @@ export async function registerMcpTools(
   );
 
   // Register list_workflows tool
-  mcpServer.registerTool(
+  registerTool(
     'list_workflows',
     {
       description:
@@ -478,7 +501,7 @@ export async function registerMcpTools(
   );
 
   // Register get_tool_info tool
-  mcpServer.registerTool(
+  registerTool(
     'get_tool_info',
     {
       description:
@@ -501,7 +524,7 @@ export async function registerMcpTools(
   const templateManager = new TemplateManager();
   const availableTemplates = await templateManager.getAvailableTemplates();
 
-  mcpServer.registerTool(
+  registerTool(
     'setup_project_docs',
     {
       description:
@@ -559,7 +582,7 @@ export async function registerMcpTools(
   );
 
   // Register no_idea tool
-  mcpServer.registerTool(
+  registerTool(
     'no_idea',
     {
       description:

@@ -6,7 +6,7 @@
  */
 
 import { setMcpServerForLogging, createLogger } from '@codemcp/workflows-core';
-import { ServerConfig } from './types.js';
+import { ServerConfig, HandlerResult } from './types.js';
 import {
   initializeServerComponents,
   registerMcpTools,
@@ -78,12 +78,22 @@ export class ResponsibleVibeMCPServer {
       // Register MCP server for logging notifications
       setMcpServerForLogging(this.components.mcpServer);
 
+      // Build disabled-tool set from DISABLE_MCP_TOOLS env var
+      // e.g. DISABLE_MCP_TOOLS=no_idea,get_tool_info
+      const disabledMcpTools = new Set(
+        (process.env.DISABLE_MCP_TOOLS ?? '')
+          .split(',')
+          .map(t => t.trim())
+          .filter(Boolean)
+      );
+
       // Register tools and resources with MCP server
       await registerMcpTools(
         this.components.mcpServer,
         toolRegistry,
         responseRenderer,
-        this.components.context
+        this.components.context,
+        disabledMcpTools
       );
 
       registerMcpResources(
@@ -253,6 +263,37 @@ export class ResponsibleVibeMCPServer {
     }
 
     return result.data as ResetDevelopmentResult;
+  }
+
+  /**
+   * Generic tool execution by name
+   * Allows executing any registered tool without MCP transport
+   */
+  public async executeTool(
+    toolName: string,
+    args: unknown
+  ): Promise<HandlerResult> {
+    if (!this.components) {
+      throw new Error('Server not initialized. Call initialize() first.');
+    }
+    const handler = this.components.toolRegistry.get(toolName);
+    if (!handler) {
+      const available = this.components.toolRegistry.list().join(', ');
+      throw new Error(
+        `Unknown tool: "${toolName}". Available tools: ${available}`
+      );
+    }
+    return handler.handle(args, this.components.context);
+  }
+
+  /**
+   * List all available registered tool names
+   */
+  public listAvailableTools(): string[] {
+    if (!this.components) {
+      throw new Error('Server not initialized. Call initialize() first.');
+    }
+    return this.components.toolRegistry.list();
   }
 
   /**

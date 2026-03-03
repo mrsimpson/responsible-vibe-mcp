@@ -47,6 +47,7 @@ if (isLocal) {
 import { startVisualizationTool } from './visualization-launcher.js';
 import { generateConfig, GeneratorRegistry } from './config-generator.js';
 import { generateSkill, SkillGeneratorRegistry } from './skill-generator.js';
+import { McpClientExecutor, parseToolArgs } from './mcp-client-executor.js';
 
 /**
  * Parse command line arguments and handle CLI commands
@@ -130,6 +131,18 @@ async function parseCliArgs(): Promise<{ shouldExit: boolean }> {
       console.error('Available: crowd list, crowd copy [--output-dir DIR]');
       process.exit(1);
     }
+  }
+
+  // Handle execute command
+  if (command === 'execute') {
+    const toolName = args[1];
+    if (!toolName) {
+      await handleExecuteList();
+      return { shouldExit: true };
+    }
+    const toolArgs = parseToolArgs(args.slice(2));
+    await handleExecute(toolName, toolArgs);
+    return { shouldExit: true };
   }
 
   // Handle visualize subcommand (also default with no args)
@@ -577,6 +590,72 @@ function handleCrowdCopy(outputDir?: string): void {
 }
 
 /**
+ * Build the spawn parameters to start this same binary as an MCP server.
+ * When launched without arguments, the entry point starts the MCP server.
+ */
+function selfServerParams() {
+  return {
+    command: process.execPath, // node
+    args: [process.argv[1] ?? ''], // same script, no extra args → MCP server mode
+    env: { PROJECT_PATH: process.cwd() },
+    cwd: process.cwd(),
+  };
+}
+
+/**
+ * Execute a named tool via MCP and print each text content item to stdout.
+ */
+async function handleExecute(
+  toolName: string,
+  toolArgs: Record<string, unknown>
+): Promise<void> {
+  let executor: McpClientExecutor | undefined;
+  try {
+    executor = await McpClientExecutor.connect(selfServerParams());
+    const result = await executor.callTool(toolName, toolArgs);
+    if (result.isError) {
+      for (const item of result.content) {
+        console.error(item.text ?? JSON.stringify(item));
+      }
+      process.exit(1);
+    }
+    for (const item of result.content) {
+      console.log(item.text ?? JSON.stringify(item));
+    }
+  } catch (error) {
+    console.error('❌ Error:', (error as Error).message);
+    process.exit(1);
+  } finally {
+    await executor?.disconnect();
+  }
+}
+
+/**
+ * List all tools exposed by the server with their descriptions.
+ */
+async function handleExecuteList(): Promise<void> {
+  let executor: McpClientExecutor | undefined;
+  try {
+    executor = await McpClientExecutor.connect(selfServerParams());
+    const tools = await executor.listTools();
+    console.log('Available tools:\n');
+    for (const tool of tools) {
+      const desc = tool.description
+        ? `  ${tool.description.split('\n')[0]}`
+        : '';
+      console.log(`  ${tool.name}${desc ? '\n' + desc : ''}`);
+    }
+    console.log('\nUsage: execute <toolname> [--key value ...]');
+    console.log('       execute <toolname> --json \'{"key":"value"}\'');
+  } catch (error) {
+    console.error('❌ Error:', (error as Error).message);
+    process.exit(1);
+  } finally {
+    await executor?.disconnect();
+  }
+}
+
+/**
  * Show help information
  */
 function showHelp(): void {
@@ -604,6 +683,15 @@ WORKFLOW COMMANDS:
 CROWD AGENT COMMANDS:
   crowd list                    List available crowd agent configurations
   crowd copy [--output-dir DIR] Copy crowd agent configs to project
+
+TOOL EXECUTION COMMANDS:
+  execute                       List all available tools
+  execute <toolname> [FLAGS]    Execute a tool directly from the CLI
+    FLAGS:
+      --<key> <value>           Set a tool parameter (value auto-coerced from JSON)
+      --<key>=<value>           Alternative key=value form
+      --<flag>                  Set a boolean parameter to true
+      --json '<object>'         Pass all parameters as a JSON object
 
 UTILITY COMMANDS:
   visualize                     Start the interactive workflow visualizer
