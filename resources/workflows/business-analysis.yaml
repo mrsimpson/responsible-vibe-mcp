@@ -27,9 +27,7 @@ states:
   document_discovery:
     description: 'Gather business documents and create standardized Business Capability Modeling structure'
     default_instructions: >
-      You are in the document discovery phase. Gather documents and create standardized Business Capability Modeling structure.
-
-      **Step 1: Interactive Document Gathering**
+      **STEP 1: Gather Business Documents**
       Ask user to identify and provide available documents:
       - Business process documentation
       - Organizational charts
@@ -37,11 +35,11 @@ states:
       - Existing c4-analysis results
       - Business requirements documents
 
-      IMPORTANT: In this phase, do not read the documents yet!
+      IMPORTANT: Do not read the documents yet.
 
-      **Step 2: Create Document Processing Tasks**
+      **STEP 2: Create Document Processing Tasks**
       For each gathered document, create a processing task:
-      "- [ ] Summarize [document-name] using structured chapter-by-chapter approach"
+      `- [ ] Summarize [document-name] using structured chapter-by-chapter approach`
 
       Update task progress and create document processing tasks.
     transitions:
@@ -52,27 +50,24 @@ states:
   documents_consolidation:
     description: 'Process and consolidate gathered documents using structured summarization'
     default_instructions: >
-      You are in the documents consolidation phase. Process each document systematically using basic structured summarization.
-
-      **Step 1: Apply Structured Summarization Technique**
-      For each document, use this approach:
-
+      **STEP 1: Apply Structured Summarization Technique**
+      Process each document using this approach:
       1. Read document chapter by chapter
       2. Maintain original hierarchical structure
       3. Condense content while preserving key information
-      4. Create [document-name]-processed.md file
+      4. Create `[document-name]-processed.md` file
       5. Update task progress as complete
 
-      **Summarization Guidelines:**
+      **STEP 2: Follow Summarization Guidelines**
       - Create structured summary based exclusively on source document information
       - Identify chapters and hierarchy levels systematically
-      - Summarize level-by-level into [document-name]-processed.md
+      - Summarize level-by-level into `[document-name]-processed.md`
       - Write chapter summaries in natural language (no bullet points)
       - Include information about potential capabilities, services, processes, or actors
       - Maintain folder structure if documents have associated folders
 
-      **Step 2: Create Bibliography**
-      Create BIBLIOGRAPHY.md with:
+      **STEP 3: Create Bibliography**
+      Create `BIBLIOGRAPHY.md` with:
       - "sources" section listing all processed documents
       - "terms" section with important business terms and their source references
 
@@ -85,10 +80,8 @@ states:
   business_content_analysis:
     description: 'Identify and analyze business-relevant content from processed documents'
     default_instructions: >
-      You are in the business content analysis phase. Focus on identifying and analyzing business-relevant content.
-
-      **Step 1: Review Processed Documents**
-      Review all [document-name]-processed.md files from consolidation phase.
+      **STEP 1: Review Processed Documents**
+      Review all `[document-name]-processed.md` files from consolidation phase.
       Identify chapters that contain business-relevant content:
       - Business processes and workflows
       - Organizational roles and responsibilities
@@ -96,13 +89,13 @@ states:
       - Services and customer interactions
       - Business rules and policies
 
-      **Step 2: Create Business Analysis Tasks**
+      **STEP 2: Create Business Analysis Tasks**
       For each business-relevant chapter identified, create a task:
-      "- [ ] Extract business capabilities from [chapter-name]"
+      `- [ ] Extract business capabilities from [chapter-name]`
 
-      IMPORTANT: You MUST create these tasks before proceeding.
+      IMPORTANT: Create these tasks before proceeding.
 
-      **Step 3: Execute Business Analysis Tasks**
+      **STEP 3: Execute Business Analysis Tasks**
       For each business analysis task:
       1. Read the specific chapter in detail
       2. Extract business information focusing on:
@@ -113,52 +106,30 @@ states:
       3. Create detailed business summary emphasizing WHAT, WHY, WHO (not HOW)
       4. Update task progress as complete
 
-      **Step 4: Update Bibliography**
-      Update BIBLIOGRAPHY.md with business terms found during detailed analysis:
-      - check whether the "sources" section already contains an entry it. If not: create one (max 5 letters in brackets).
-      - In the "terms" section, check whether there is an entry for it - If not, create an entry for It
-      - add a reference to the source + chapter
+      **STEP 4: Update Bibliography with Business Terms**
+      Update `BIBLIOGRAPHY.md` with business terms found during detailed analysis:
+      - Check whether the "sources" section contains an entry. If not: create one (max 5 letters in brackets).
+      - In the "terms" section, check whether there is an entry for it. If not, create an entry.
+      - Add a reference to the source and chapter.
 
-      --- sample 1 ---
-
-      Document "operations manual" reads about "payment processing" in Chapter 5.2
-
-      => in BIBLIOGRAPHY.md
-
-      # Sources
-
-      - Operations Manual [OPMAN]
-
-      # Terms
-
+      Example (Document "operations manual" with "payment processing" in Chapter 5.2):
+      - Operations Manual `[OPMAN]`
       - payment processing
-        - OPMAN, 5.2
+        - `OPMAN, 5.2`
 
-      --- end of sample 1 ---
-
-      --- sample 2 ---
-
-      Document "requirements.md" reads about "payment processing" in Chapter 1.2.1
-
-      => in BIBLIOGRAPHY.md
-
-      # Sources
-
-      - Requirements [REQ]
-
-      # Terms
-
+      Example (Document "requirements.md" with "payment processing" in Chapter 1.2.1):
+      - Requirements `[REQ]`
       - payment processing
-        - REQ, 1.2.1
-
-      --- end of sample 2 ---
+        - `REQ, 1.2.1`
 
       Process business analysis tasks systematically, one at a time.
     transitions:
       - trigger: 'business_analysis_complete'
         to: 'capability_identification'
         additional_instructions: >
-          Create BUSINESS_ANALYSIS.md with the following template content:
+          **Create Standardized Analysis Documentation**
+
+          Create `BUSINESS_ANALYSIS.md` with the following template content:
           ```markdown
           # Business Analysis Report
 
@@ -194,7 +165,7 @@ states:
           <!-- Business capability recommendations -->
           ```
 
-          Create business-processes-detailed.md with template:
+          Create `business-processes-detailed.md` with template:
           ```markdown
           # Business Processes Detailed
 
@@ -211,7 +182,7 @@ states:
           <!-- Key roles in each process -->
           ```
 
-          Create business-functions-mapping.md with template:
+          Create `business-functions-mapping.md` with template:
           ```markdown
           # Business Functions Mapping
 
@@ -228,7 +199,7 @@ states:
           <!-- Key roles and their responsibilities -->
           ```
 
-          Create technical-business-mapping.md with template:
+          Create `technical-business-mapping.md` with template:
           ```markdown
           # Technical-Business Mapping
 
@@ -245,11 +216,11 @@ states:
           <!-- Business value of each technical component -->
           ```
 
-          Create Standardized Business Capability Modeling folder Structure
-            - business-analysis/business-domains/ (folder for details)
-            - business-analysis/business-capabilities/ (folder for details)
-            - business-analysis/business-processes/ (folder for details)
-            - business-analysis/business-actors/ (folder for details)
+          **Create Standardized Business Capability Modeling Folder Structure**
+          - `business-analysis/business-domains/` (folder for details)
+          - `business-analysis/business-capabilities/` (folder for details)
+          - `business-analysis/business-processes/` (folder for details)
+          - `business-analysis/business-actors/` (folder for details)
 
           Begin analyzing processed documents to identify business capabilities and domains.
           Update task progress as you complete business analysis work.
@@ -258,12 +229,10 @@ states:
   capability_identification:
     description: 'Identify business capabilities from processed documents'
     default_instructions: >
-      You are in the capability identification phase. Analyze processed documents to identify business capabilities.
+      IMPORTANT: Always reference the existing documents.
 
-      IMPORTANT: ALWAYS reference the existing documents!
-
-      **Step 1: Analyze Processed Documents**
-      Review all [document-name]-processed.md files from consolidation phase.
+      **STEP 1: Analyze Processed Documents**
+      Review all `[document-name]-processed.md` files from consolidation phase.
       Look for:
       - Business functions mentioned
       - Activities and processes described
@@ -271,36 +240,35 @@ states:
       - Organizational responsibilities
       - System functionalities with business purpose
 
-      **Step 2: Extract Potential Capabilities**
+      **STEP 2: Extract Potential Capabilities**
       From document analysis, create initial list of business capabilities.
       Group similar activities and functions together.
-      Use Business Capability Modeling naming: [Verb] + [Business Object] (e.g., "Manage Customers", "Process Orders")
+      Use Business Capability Modeling naming: `[Verb] + [Business Object]` (e.g., "Manage Customers", "Process Orders")
 
-      **Step 3: Identify Business Domains**
+      **STEP 3: Identify Business Domains**
       Group capabilities into logical business domains:
       - Customer-related capabilities → Customer Management
       - Order-related capabilities → Order Management
       - Financial capabilities → Financial Management
       - etc.
 
-      **Step 4: Present Findings to User**
+      **STEP 4: Present Findings to User**
       Show user the identified capabilities and domains:
-      "Based on the documents, I identified these business domains and capabilities:
-      [Present structured list]
 
-      Do these align with your understanding?
-      Are there any capabilities missing or incorrectly categorized?"
+      "Based on the documents, I identified these business domains and capabilities: [Present structured list]
 
-      **Step 5: Refine with User Input**
+      Do these align with your understanding? Are there any capabilities missing or incorrectly categorized?"
+
+      **STEP 5: Refine with User Input**
       Adjust the capability model based on user feedback.
-      Document final capability list in business-capabilities.md.
+      Document final capability list in `business-capabilities.md`.
 
     transitions:
       - trigger: 'capabilities_identified'
         to: 'capability_decomposition'
         additional_instructions: >
           For each identified capability, create decomposition tasks:
-          "- [ ] Decompose [capability-name] into sub-capabilities using document analysis"
+          `- [ ] Decompose [capability-name] into sub-capabilities using document analysis`
 
           Begin systematic decomposition of capabilities one at a time.
         transition_reason: 'Business capabilities identified, ready for detailed decomposition'
@@ -308,40 +276,38 @@ states:
   capability_decomposition:
     description: 'Break down business capabilities into detailed sub-capabilities using document analysis'
     default_instructions: >
-      You are in the capability decomposition phase. Analyze documents to identify sub-capabilities, then validate with user.
+      IMPORTANT: Always reference the existing documents.
 
-      IMPORTANT: ALWAYS reference the existing documents!
-
-      **Step 1: Analyze Documents for Sub-capabilities**
+      **STEP 1: Analyze Documents for Sub-capabilities**
       Review processed documents for the next unprocessed capability:
       - Look for detailed activities mentioned within this capability
       - Identify specific processes or functions described
       - Find decision points and workflow steps
       - Note different outcomes or deliverables mentioned
 
-      **Step 2: Extract Potential Sub-capabilities**
+      **STEP 2: Extract Potential Sub-capabilities**
       From document analysis, create initial list of sub-capabilities.
-      Use Business Capability Modeling naming: [Verb] + [Business Object]
+      Use Business Capability Modeling naming: `[Verb] + [Business Object]`
+
       Example: For "Customer Management" → "Verify Customer Identity", "Setup Customer Account", "Maintain Customer Data"
 
-      **Step 3: Present Findings to User**
+      **STEP 3: Present Findings to User**
       Show user the identified sub-capabilities:
-      "Based on the documents, I identified these sub-capabilities for [capability]:
-      [Present structured list]
 
-      Do these sub-capabilities accurately reflect [capability]?
-      Are any activities missing or incorrectly categorized?"
+      "Based on the documents, I identified these sub-capabilities for `[capability]`: [Present structured list]
 
-      **Step 4: Refine with User Input**
+      Do these sub-capabilities accurately reflect `[capability]`? Are any activities missing or incorrectly categorized?"
+
+      **STEP 4: Refine with User Input**
       Adjust the sub-capability model based on user feedback.
-      Document refined decomposition in business-capabilities/ detail folder.
+      Document refined decomposition in `business-capabilities/` detail folder.
       Mark capability as complete and ask: "Ready for the next capability?"
 
     transitions:
       - trigger: 'decomposition_complete'
         to: 'actor_analysis'
         additional_instructions: >
-          Create business-actors.md with template:
+          Create `business-actors.md` with template:
           ```markdown
           # Business Actors
 
@@ -363,7 +329,7 @@ states:
           ```
 
           For each capability, create actor analysis tasks:
-          "- [ ] Analyze business actors for [capability-name] using document analysis"
+          `- [ ] Analyze business actors for [capability-name] using document analysis`
 
           Begin systematic actor analysis one capability at a time.
           Update task progress as you complete decomposition work.
@@ -372,47 +338,44 @@ states:
   actor_analysis:
     description: 'Map business actors (roles and organizational units) to capabilities using systematic task-based approach'
     default_instructions: >
-      You are in the actor analysis phase. Identify WHO performs each capability using Business Capability Modeling approach.
-
-      **Step 1: Select Next Capability for Actor Analysis**
+      **STEP 1: Select Next Capability for Actor Analysis**
       From current tasks, select the next capability to analyze for business actors.
 
-      **Step 2: Analyze Documents for Business Actors**
+      **STEP 2: Analyze Documents for Business Actors**
       Review processed documents to identify:
       - **Business Roles**: Specific job roles (Customer Service Rep, Account Manager, etc.)
       - **Organizational Units**: Teams/departments (Sales Team, Finance Department, etc.)
       - **Decision-making Authority**: Who makes decisions for this capability
       - **Accountability**: Who is responsible for capability outcomes
 
-      **Step 3: Map Actors to Capabilities**
+      **STEP 3: Map Actors to Capabilities**
       For the selected capability, identify:
       - **Primary Owner**: Who is accountable for capability outcomes
       - **Performing Roles**: Which roles actually execute the capability
       - **Supporting Units**: Which organizational units support the capability
       - **Decision Authority**: Who has authority to change/approve within this capability
 
-      **Step 4: Create Actor Analysis Document**
-      Document the actor mappings in business-actors.md:
+      **STEP 4: Create Actor Analysis Document**
+      Document the actor mappings in `business-actors.md`:
       - **Primary Owner**: Who is accountable for capability outcomes
       - **Performing Roles**: Which roles actually execute the capability
       - **Supporting Units**: Which organizational units support the capability
       - **Decision Authority**: Who has authority to change/approve within this capability
 
       Then present to user for validation:
-      "I documented the business actors for [capability]. Please review the actor mappings - do they accurately reflect WHO performs this capability?"
+      "I documented the business actors for `[capability]`. Please review the actor mappings - do they accurately reflect WHO performs this capability?"
 
-      **Step 5: Refine and Document**
-      Update business-actors.md with capability-actor mappings.
+      **STEP 5: Refine and Document**
+      Update `business-actors.md` with capability-actor mappings.
       Update task progress as complete.
 
       Focus on capability ownership and role accountability, not just organizational structure.
-
-      Process one capability's functions at a time.
+      Process one capability at a time.
     transitions:
       - trigger: 'actor_analysis_complete'
         to: 'process_analysis'
         additional_instructions: >
-          Create business-processes.md with template:
+          Create `business-processes.md` with template:
           ```markdown
           # Business Processes
 
@@ -430,7 +393,7 @@ states:
           ```
 
           For each capability, create process analysis tasks:
-          "- [ ] Analyze business processes for [capability-name] using document analysis and actor context"
+          `- [ ] Analyze business processes for [capability-name] using document analysis and actor context`
 
           Begin systematic process analysis one capability at a time.
           Update task progress as you complete actor analysis work.
@@ -439,19 +402,17 @@ states:
   process_analysis:
     description: 'Analyze business processes using systematic task-based approach'
     default_instructions: >
-      You are in the process analysis phase. Create process analysis tasks for systematic processing.
-
-      **Step 1: Select Next Process Analysis Task**
+      **STEP 1: Select Next Process Analysis Task**
       From current process analysis tasks, select the next capability to process.
 
-      **Step 2: Analyze Documents for Process Information**
+      **STEP 2: Analyze Documents for Process Information**
       Review processed documents for process information:
       - Look for process steps, workflows, decision points
       - Identify process actors, inputs, outputs
       - Note process triggers and outcomes
       - Find process rules and constraints
 
-      **Step 3: Extract Processes**
+      **STEP 3: Extract Processes**
       Create process flows from document analysis.
       Document process characteristics:
       - Process name and purpose
@@ -460,24 +421,24 @@ states:
       - Process actors and responsibilities
       - Inputs, outputs, and deliverables
 
-      **Step 4: Present to User**
+      **STEP 4: Present to User**
       Show identified processes and ask for validation:
-      "Based on documents, I identified these processes for [capability]:
-      [Present process flows]
 
-      Do these processes accurately reflect how [capability] works?
-      Are any process steps missing or incorrectly sequenced?"
+      "Based on documents, I identified these processes for `[capability]`: [Present process flows]
 
-      **Step 5: Refine and Document**
-      Update business-processes-detailed.md and detail folder.
+      Do these processes accurately reflect how `[capability]` works? Are any process steps missing or incorrectly sequenced?"
+
+      **STEP 5: Refine and Document**
+      Update `business-processes-detailed.md` and detail folder.
       Update task progress as complete.
 
-      Process one capability's processes at a time.
+      Process one capability at a time.
     transitions:
       - trigger: 'process_analysis_complete'
         to: 'consistency'
         additional_instructions: >
           Present the Business Capability Consistency Framework to user:
+
           "I'll now validate consistency across all analysis documents using this framework:
 
           **Business Capability Consistency Framework:**
@@ -494,55 +455,54 @@ states:
   consistency:
     description: 'Validate consistency across all business capability analysis documents'
     default_instructions: >
-      You are in the consistency phase. Validate consistency across all analysis documents using the Business Capability Consistency Framework.
-
-      **Step 1: Re-discover Analysis Documents**
+      **STEP 1: Discover Analysis Documents**
       Scan workspace for all created analysis documents:
-      - business-domains.md and detail folders
-      - business-capabilities.md and detail folders
-      - business-processes.md and detail folders
-      - business-actors.md and detail folders
-      - BUSINESS_ANALYSIS.md
+      - `business-domains.md` and detail folders
+      - `business-capabilities.md` and detail folders
+      - `business-processes.md` and detail folders
+      - `business-actors.md` and detail folders
+      - `BUSINESS_ANALYSIS.md`
       - Any other analysis artifacts created
 
-      **Step 2: Apply Consistency Framework**
-      For each consistency check:
+      **STEP 2: Apply Consistency Framework**
+      Execute each consistency check:
 
-      **Capability-Process Alignment Check:**
-      - Do documented processes actually deliver the stated capabilities?
-      - Are there capabilities without supporting processes?
-      - Are there processes that don't map to any capability?
+      - **Capability-Process Alignment Check**:
+        - Do documented processes actually deliver the stated capabilities?
+        - Are there capabilities without supporting processes?
+        - Are there processes that don't map to any capability?
 
-      **Actor-Capability Ownership Check:**
-      - Is each capability assigned a clear primary owner (actor)?
-      - Are performing roles properly mapped to capabilities?
-      - Do actors have decision authority for their assigned capabilities?
+      - **Actor-Capability Ownership Check**:
+        - Is each capability assigned a clear primary owner (actor)?
+        - Are performing roles properly mapped to capabilities?
+        - Do actors have decision authority for their assigned capabilities?
 
-      **Process-Actor Mapping Check:**
-      - Do processes reference the correct performing actors?
-      - Are actor responsibilities aligned with process steps?
-      - Is there clear accountability in each process?
+      - **Process-Actor Mapping Check**:
+        - Do processes reference the correct performing actors?
+        - Are actor responsibilities aligned with process steps?
+        - Is there clear accountability in each process?
 
-      **Cross-Document Coherence Check:**
-      - Are capabilities named consistently across documents?
-      - Do actor definitions match across process and capability docs?
-      - Are business terms used consistently throughout?
+      - **Cross-Document Coherence Check**:
+        - Are capabilities named consistently across documents?
+        - Do actor definitions match across process and capability docs?
+        - Are business terms used consistently throughout?
 
-      **Completeness Validation:**
-      - Are all expected document sections present?
-      - Do internal links work correctly?
-      - Are references to other documents accurate?
+      - **Completeness Validation**:
+        - Are all expected document sections present?
+        - Do internal links work correctly?
+        - Are references to other documents accurate?
 
-      **Step 3: Document Issues and Fixes**
-      Create CONSISTENCY_REPORT.md documenting:
+      **STEP 3: Document Issues and Fixes**
+      Create `CONSISTENCY_REPORT.md` documenting:
       - Issues found during validation
       - Fixes applied to resolve inconsistencies
       - Remaining gaps or recommendations
 
-      **Step 4: Present Findings to User**
+      **STEP 4: Present Findings to User**
       Show consistency validation results and ask for confirmation:
-      "Consistency validation complete. Found [X] issues, resolved [Y].
-      Key findings: [summary of major consistency improvements]
+
+      "Consistency validation complete. Found `[X]` issues, resolved `[Y]`.
+      Key findings: `[summary of major consistency improvements]`
 
       Are you satisfied with the consistency of the business capability model?"
 
@@ -565,9 +525,7 @@ states:
   summary:
     description: 'Create consolidated summaries and illustrations for business capability analysis'
     default_instructions: >
-      You are in the summary phase. Create consolidated overviews and illustrations using user's preferred formats.
-
-      **Step 1: Create Consolidated Overviews**
+      **STEP 1: Create Consolidated Overviews**
       Build comprehensive summary documents:
       - **Executive Summary**: High-level business capability overview for leadership
       - **Capability Map**: Hierarchical view of all business capabilities
@@ -575,7 +533,7 @@ states:
       - **Process Overview**: Key processes supporting capabilities
       - **Navigation Guide**: How to use all analysis documents
 
-      **Step 2: Generate Illustrations**
+      **STEP 2: Generate Illustrations**
       Using user's chosen format(s) (ASCII/Mermaid/PlantUML):
       - Business capability hierarchy diagrams
       - Process flow diagrams
@@ -583,13 +541,13 @@ states:
       - Cross-functional process flows
       - Organizational responsibility charts
 
-      **Step 3: Fix Links and References**
+      **STEP 3: Fix Links and References**
       - Standardize internal document links
       - Create cross-references between related content
       - Build table of contents for navigation
       - Ensure all references are accurate and working
 
-      **Step 4: Update BUSINESS_ANALYSIS.md**
+      **STEP 4: Update BUSINESS_ANALYSIS.md**
       Finalize the main analysis document with:
       - Complete executive summary
       - Key findings and insights
@@ -597,10 +555,10 @@ states:
       - Links to all detailed analysis documents
       - Methodology explanation and validation results
 
-      **Step 5: Present Final Deliverables**
+      **STEP 5: Present Final Deliverables**
       Show completed analysis to user:
-      "Business Capability Analysis complete! Final deliverables:
-      [Present overview of all documents, diagrams, and summaries]
+
+      "Business Capability Analysis complete! Final deliverables: [Present overview of all documents, diagrams, and summaries]
 
       This provides comprehensive business architecture understanding for domain architects.
       Are you satisfied with the final analysis deliverables?"
@@ -628,9 +586,9 @@ states:
     default_instructions: >
       Business analysis is complete! The system has been thoroughly analyzed using Business Capability Modeling methodology.
 
-      Final deliverables:
+      **Final Deliverables:**
       - Comprehensive business architecture documentation (Business Capability Modeling-based)
-      - BUSINESS_ANALYSIS.md with complete analysis findings
+      - `BUSINESS_ANALYSIS.md` with complete analysis findings
       - Business capability maps and process flows
       - Technical-business alignment documentation
       - Business-friendly documentation for domain architects
