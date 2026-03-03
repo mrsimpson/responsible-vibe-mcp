@@ -27,35 +27,33 @@ states:
   reproduce:
     description: 'Reproduce and understand the bug systematically'
     default_instructions: |
-      You are systematically reproducing and understanding the bug to create a solid foundation for specification-driven fixing.
+      **Systematically reproduce and understand the bug** to create a solid foundation for specification-driven fixing.
 
-      **Bug Reproduction Process:**
+      **STEP 1: Gather Comprehensive Information**
+      - Identify exact OS, browser/runtime versions, and hardware specs
+      - Document the precise sequence of actions that trigger the bug
+      - Collect error messages, logs, or stack traces
+      - Determine if bug occurs consistently or intermittently
+      - Assess how many users are affected and the business impact
 
-      1. **Gather Comprehensive Information**:
-         - What are the exact OS, browser/runtime versions, and hardware specs?
-         - What is the precise sequence of actions that trigger the bug?
-         - What error messages, logs, or stack traces are available?
-         - Does this happen every time or intermittently?
-         - How many users are affected and what is the business impact?
+      **STEP 2: Create Reproduction Cases**
+      - Develop minimal, reliable reproduction steps
+      - Document the exact environment and conditions
+      - Create test data or scenarios that trigger the issue
+      - Verify the bug occurs consistently
 
-      2. **Create Reproduction Cases**:
-         - Develop minimal, reliable reproduction steps
-         - Document the exact environment and conditions
-         - Create test data or scenarios that trigger the issue
-         - Verify the bug occurs consistently
+      **STEP 3: Understand the Problem**
+      - Clarify current (buggy) behavior
+      - Specify correct behavior that should occur
+      - Distinguish symptoms from root cause
+      - Identify related issues or edge cases
 
-      3. **Understand the Problem**:
-         - What is the current (buggy) behavior?
-         - What should the correct behavior be?
-         - What are the symptoms vs. root cause?
-         - Are there related issues or edge cases?
+      **STEP 4: Document Findings**
+      - Create `$VIBE_DIR/specs/$BRANCH_NAME/reproduction.md` with detailed reproduction steps
+      - Include error logs, screenshots, or other evidence
+      - Document the gap between expected and actual behavior
 
-      4. **Document Findings**:
-         - Create `$VIBE_DIR/specs/$BRANCH_NAME/reproduction.md` with detailed reproduction steps
-         - Include error logs, screenshots, or other evidence
-         - Document the gap between expected and actual behavior
-
-      **Output**: Clear, reliable reproduction case that can be used to verify the fix later.
+      **Output**: Clear, reliable reproduction case to verify the fix later.
 
     transitions:
       - trigger: 'bug_reproduced'
@@ -65,35 +63,34 @@ states:
       - trigger: 'bug_not_reproducible'
         to: 'reproduce'
         instructions: >
-          Unable to reproduce the bug with current information. Gather more details about the environment,
-          conditions, or steps that might be missing. Contact the reporter for additional information if needed.
+          Gather more details about the environment, conditions, or steps that might be missing from the current information.
+          Contact the reporter for additional information if needed.
         transition_reason: 'Bug could not be reproduced, need more information'
 
   specify:
     description: 'Create specification of correct behavior'
     default_instructions: |
-      You are creating a clear specification of the correct behavior. This specification will guide the fix and prevent regressions.
+      **Create a clear specification of the correct behavior** to guide the fix and prevent regressions.
 
-      **Specification Process:**
+      **STEP 1: Define Correct Behavior**
+      - Describe what should happen in the scenario that currently fails
+      - Specify expected outcomes for users
+      - Clarify system behavior in edge cases
+      - Document business rules that should be enforced
 
-      1. **Define Correct Behavior**:
-         - What should happen in the scenario that currently fails?
-         - What are the expected outcomes for users?
-         - How should the system behave in edge cases?
-         - What are the business rules that should be enforced?
+      **STEP 2: Handle Ambiguities**
+      - Make informed decisions about unclear requirements
+      - Use `[NEEDS CLARIFICATION: question]` only for critical ambiguities (max 3)
+      - Prioritize: correctness > user experience > technical details
 
-      2. **Handle Ambiguities**:
-         - Make informed decisions about unclear requirements
-         - Use [NEEDS CLARIFICATION: question] only for critical ambiguities (max 3)
-         - Prioritize: correctness > user experience > technical details
+      **STEP 3: Ensure Quality Standards**
+      - Focus on user impact and business value
+      - Avoid implementation details
+      - Ensure all requirements are testable
+      - Make success criteria measurable
 
-      3. **Quality Standards**:
-         - Focus on user impact and business value
-         - Avoid implementation details
-         - Ensure all requirements are testable
-         - Make success criteria measurable
-
-      Create `$VIBE_DIR/specs/$BRANCH_NAME/bug-spec.md` using the template provided below.
+      **STEP 4: Document Specification**
+      - Create `$VIBE_DIR/specs/$BRANCH_NAME/bug-spec.md` using the template provided below
     additional_instructions: |
       **Bug Specification Template:**
 
@@ -185,41 +182,39 @@ states:
       - trigger: 'needs_clarification'
         to: 'specify'
         instructions: >
-          Bug specification has unresolved clarifications. Present structured questions to stakeholders,
-          wait for their responses, then update the specification accordingly.
+          Present structured questions to stakeholders about unresolved clarifications in the bug specification.
+          Wait for their responses, then update the specification accordingly.
         transition_reason: 'Bug specification needs clarification before proceeding'
 
   test:
     description: 'Create comprehensive tests that capture the bug and expected behavior'
     default_instructions: |
-      You are creating comprehensive tests that capture both the current bug and the expected correct behavior. These tests will guide the fix and prevent regressions.
+      **Create comprehensive tests** that capture both the current bug and the expected correct behavior to guide the fix and prevent regressions.
 
-      **Test Creation Process:**
+      **STEP 1: Create Failing Tests for Current Bug**
+      - Write tests that demonstrate the current buggy behavior
+      - These tests should fail initially (Red phase of TDD)
+      - Cover the main reproduction case and related scenarios
+      - Include edge cases and boundary conditions
 
-      1. **Failing Tests for Current Bug**:
-         - Create tests that demonstrate the current buggy behavior
-         - These tests should fail initially (Red phase of TDD)
-         - Cover the main reproduction case and related scenarios
-         - Include edge cases and boundary conditions
+      **STEP 2: Create Tests for Expected Behavior**
+      - Write tests that specify the correct behavior from `$VIBE_DIR/specs/$BRANCH_NAME/bug-spec.md`
+      - These tests should pass once the bug is fixed
+      - Cover all functional requirements from the specification
+      - Include user scenarios and success criteria
 
-      2. **Tests for Expected Behavior**:
-         - Create tests that specify the correct behavior from `$VIBE_DIR/specs/$BRANCH_NAME/bug-spec.md`
-         - These tests should pass once the bug is fixed
-         - Cover all functional requirements from the specification
-         - Include user scenarios and success criteria
+      **STEP 3: Create Regression Tests**
+      - Write tests for related functionality that should not be affected
+      - Ensure the fix doesn't break existing features
+      - Test integration points and dependencies
 
-      3. **Regression Tests**:
-         - Create tests for related functionality that should not be affected
-         - Ensure the fix doesn't break existing features
-         - Test integration points and dependencies
+      **STEP 4: Organize Test Suite**
+      - Group tests by functionality and user scenarios
+      - Use clear, descriptive test names
+      - Include both unit and integration tests as appropriate
+      - Document test setup and data requirements
 
-      4. **Test Organization**:
-         - Group tests by functionality and user scenarios
-         - Use clear, descriptive test names
-         - Include both unit and integration tests as appropriate
-         - Document test setup and data requirements
-
-      **Output**: Create comprehensive test suite in appropriate test files that will guide the fix implementation.
+      **Output**: Comprehensive test suite in appropriate test files to guide the fix implementation.
 
     transitions:
       - trigger: 'tests_created'
@@ -229,39 +224,37 @@ states:
   plan:
     description: 'Plan the fix approach with constitutional compliance'
     default_instructions: |
-      You are planning the fix approach, ensuring the solution aligns with system architecture and quality principles.
+      **Plan the fix approach** to ensure the solution aligns with system architecture and quality principles.
 
-      **Fix Planning Process:**
+      **STEP 1: Load Context**
+      - Read bug specification from `$VIBE_DIR/specs/$BRANCH_NAME/bug-spec.md`
+      - Review reproduction case from `$VIBE_DIR/specs/$BRANCH_NAME/reproduction.md`
+      - Understand the test requirements
+      - Analyze existing codebase and architecture
 
-      1. **Load Context**:
-         - Read bug specification (`$VIBE_DIR/specs/$BRANCH_NAME/bug-spec.md`)
-         - Review reproduction case (`$VIBE_DIR/specs/$BRANCH_NAME/reproduction.md`)
-         - Understand the test requirements
-         - Analyze existing codebase and architecture
+      **STEP 2: Perform Root Cause Analysis**
+      - Identify the underlying cause of the bug
+      - Understand why the current implementation fails
+      - Map the problem to specific code areas or logic flaws
+      - Consider systemic issues vs. isolated bugs
 
-      2. **Root Cause Analysis**:
-         - Identify the underlying cause of the bug
-         - Understand why the current implementation fails
-         - Map the problem to specific code areas or logic flaws
-         - Consider systemic issues vs. isolated bugs
+      **STEP 3: Design Fix Strategy**
+      - Design minimal, targeted fix that addresses root cause
+      - Ensure fix aligns with existing architectural patterns
+      - Consider impact on related functionality
+      - Plan for backward compatibility if needed
 
-      3. **Fix Strategy**:
-         - Design minimal, targeted fix that addresses root cause
-         - Ensure fix aligns with existing architectural patterns
-         - Consider impact on related functionality
-         - Plan for backward compatibility if needed
+      **STEP 4: Verify Constitutional/Quality Compliance**
+      - Ensure fix follows system design principles
+      - Verify approach maintains code quality standards
+      - Check that fix doesn't introduce technical debt
+      - Validate solution is maintainable and testable
 
-      4. **Constitutional/Quality Compliance**:
-         - Ensure fix follows system design principles
-         - Verify approach maintains code quality standards
-         - Check that fix doesn't introduce technical debt
-         - Validate solution is maintainable and testable
-
-      5. **Implementation Plan**:
-         - Break down fix into specific, actionable tasks
-         - Identify files and components that need changes
-         - Plan testing and validation approach
-         - Consider rollout and deployment strategy
+      **STEP 5: Create Implementation Plan**
+      - Break down fix into specific, actionable tasks
+      - Identify files and components that need changes
+      - Plan testing and validation approach
+      - Consider rollout and deployment strategy
 
       **Output**: Create `$VIBE_DIR/specs/$BRANCH_NAME/fix-plan.md` with detailed approach for implementing the bug fix.
 
@@ -273,40 +266,39 @@ states:
       - trigger: 'architectural_conflict'
         to: 'plan'
         instructions: >
-          Planned fix conflicts with system architecture or quality principles.
-          Revise the approach to ensure proper integration and maintainability.
+          Revise the approach to address conflicts with system architecture or quality principles.
+          Ensure proper integration and maintainability of the planned fix.
         transition_reason: 'Fix plan conflicts with architecture, needs revision'
 
   fix:
     description: 'Implement the minimal fix to make tests pass'
     default_instructions: |
-      You are implementing the bug fix following the plan and making the tests pass. Focus on minimal, targeted changes that address the root cause.
+      **Implement the bug fix** following the plan and making the tests pass with minimal, targeted changes.
 
-      **Fix Implementation Process:**
+      **STEP 1: Execute Fix Strategy**
+      - Follow the fix strategy from `$VIBE_DIR/specs/$BRANCH_NAME/fix-plan.md`
+      - Make targeted changes to address the root cause
+      - Avoid over-engineering or unnecessary modifications
+      - Keep changes minimal and focused
 
-      1. **Follow the Plan**: Execute the fix strategy from `$VIBE_DIR/specs/$BRANCH_NAME/fix-plan.md`
-         - Make targeted changes to address the root cause
-         - Avoid over-engineering or unnecessary modifications
-         - Keep changes minimal and focused
+      **STEP 2: Apply Test-Driven Implementation**
+      - Run the failing tests to confirm they capture the bug
+      - Implement changes to make the tests pass (Green phase)
+      - Ensure all new tests pass while maintaining existing functionality
 
-      2. **Test-Driven Implementation**:
-         - Run the failing tests to confirm they capture the bug
-         - Implement changes to make the tests pass (Green phase)
-         - Ensure all new tests pass while maintaining existing functionality
+      **STEP 3: Maintain Quality Standards**
+      - Follow existing code patterns and conventions
+      - Maintain or improve code readability
+      - Add appropriate error handling
+      - Include necessary logging or monitoring
 
-      3. **Quality Standards**:
-         - Follow existing code patterns and conventions
-         - Maintain or improve code readability
-         - Add appropriate error handling
-         - Include necessary logging or monitoring
+      **STEP 4: Validate Implementation**
+      - Verify the original reproduction case no longer occurs
+      - Run full test suite to check for regressions
+      - Test edge cases and boundary conditions
+      - Validate fix meets success criteria from specification
 
-      4. **Validation**:
-         - Verify the original reproduction case no longer occurs
-         - Run full test suite to check for regressions
-         - Test edge cases and boundary conditions
-         - Validate fix meets success criteria from specification
-
-      **Progress Tracking**:
+      **STEP 5: Track Progress**
       - Document any deviations from the original plan
       - Note any additional issues discovered during implementation
       - Update tests if new edge cases are found
@@ -319,49 +311,47 @@ states:
       - trigger: 'fix_blocked'
         to: 'plan'
         instructions: >
-          Fix implementation is blocked by technical issues or complexity.
           Return to planning to revise the approach or break down the problem further.
+          Fix implementation is blocked by technical issues or complexity that need to be resolved.
         transition_reason: 'Fix implementation blocked, need to revise plan'
 
       - trigger: 'tests_failing'
         to: 'test'
         instructions: >
-          Tests are failing in unexpected ways, indicating the test design may need revision.
           Review and update the test suite to better capture the requirements.
+          Tests are failing in unexpected ways, indicating the test design may need revision.
         transition_reason: 'Tests failing unexpectedly, need to revise test approach'
 
   verify:
     description: 'Verify the fix works and does not introduce regressions'
     default_instructions: |
-      You are verifying that the bug fix works correctly and doesn't introduce any regressions or new issues.
+      **Verify the bug fix** works correctly and doesn't introduce any regressions or new issues.
 
-      **Verification Process:**
+      **STEP 1: Verify Bug Resolution**
+      - Confirm the original reproduction case no longer occurs
+      - Verify all scenarios from `$VIBE_DIR/specs/$BRANCH_NAME/bug-spec.md` work correctly
+      - Test the fix in the original environment where the bug was reported
+      - Validate that success criteria are met
 
-      1. **Bug Resolution Verification**:
-         - Confirm the original reproduction case no longer occurs
-         - Verify all scenarios from `$VIBE_DIR/specs/$BRANCH_NAME/bug-spec.md` work correctly
-         - Test the fix in the original environment where the bug was reported
-         - Validate that success criteria are met
+      **STEP 2: Perform Regression Testing**
+      - Run full test suite to ensure no existing functionality is broken
+      - Test related features and integration points
+      - Verify performance hasn't degraded
+      - Check that the fix doesn't introduce new edge case failures
 
-      2. **Regression Testing**:
-         - Run full test suite to ensure no existing functionality is broken
-         - Test related features and integration points
-         - Verify performance hasn't degraded
-         - Check that the fix doesn't introduce new edge case failures
+      **STEP 3: Validate User Acceptance**
+      - Test from user perspective using real scenarios
+      - Verify the fix addresses the original user problem
+      - Ensure user experience is improved, not just technically correct
+      - Consider having original bug reporter validate the fix
 
-      3. **User Acceptance**:
-         - Test from user perspective using real scenarios
-         - Verify the fix addresses the original user problem
-         - Ensure user experience is improved, not just technically correct
-         - Consider having original bug reporter validate the fix
+      **STEP 4: Update Documentation**
+      - Update relevant documentation if behavior has changed
+      - Document the fix approach for future reference
+      - Prepare release notes or change log entries
+      - Consider if this fix reveals systemic issues to address
 
-      4. **Documentation and Communication**:
-         - Update relevant documentation if behavior has changed
-         - Document the fix approach for future reference
-         - Prepare release notes or change log entries
-         - Consider if this fix reveals systemic issues to address
-
-      **Final Validation**:
+      **Final Validation Checklist**:
       - All tests pass (both new and existing)
       - Original bug reproduction case fails (bug is fixed)
       - No regressions detected
@@ -371,22 +361,22 @@ states:
       - trigger: 'verification_complete'
         to: 'verify'
         instructions: >
-          Bug fix verification completed successfully. The bug has been resolved, all tests pass,
-          and no regressions have been detected. The fix is ready for deployment.
+          The bug has been resolved, all tests pass, and no regressions have been detected.
+          The fix is ready for deployment.
         transition_reason: 'Verification complete, bug fix ready for deployment'
 
       - trigger: 'regression_detected'
         to: 'fix'
         instructions: >
-          Regression detected during verification. The fix has introduced new issues or broken
-          existing functionality. Return to implementation to address the problems.
+          Return to implementation to address the problems.
+          The fix has introduced new issues or broken existing functionality.
         transition_reason: 'Regression detected, need to revise fix implementation'
 
       - trigger: 'fix_insufficient'
         to: 'specify'
         instructions: >
-          The fix doesn't fully address the original problem or reveals that the specification
-          was incomplete. Return to specification to better define the requirements.
+          Return to specification to better define the requirements.
+          The fix doesn't fully address the original problem or reveals incomplete specification.
         transition_reason: 'Fix insufficient, need to revise specification'
 
 # Global transitions available from any state
@@ -394,6 +384,5 @@ global_transitions:
   - trigger: 'abandon_bugfix'
     to: 'reproduce'
     instructions: >
-      Bug fix abandoned. If you want to restart, you'll begin again with reproducing
-      and understanding the bug.
+      If you want to restart, you'll begin again with reproducing and understanding the bug.
     transition_reason: 'Bug fix abandoned, restart from beginning'
