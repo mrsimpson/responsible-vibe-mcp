@@ -55,6 +55,7 @@ states:
       - Otherwise: Create tasks to track architectural decisions
 
       - If `$DESIGN_DOC` exists: Adhere to the design in it
+      - Otherwise: Elaborate design options and present them to the user
 
       Document the planning work thoroughly and create implementation tasks as part of the code phase as needed.
     transitions:
@@ -86,7 +87,9 @@ states:
       Follow your plan to build the solution:
 
       - If `$DESIGN_DOC` exists: Follow the design from it
+      - Otherwise: Elaborate design options and present them to the user
       - If `$ARCHITECTURE_DOC` exists: Build according to the architecture from it
+      - Otherwise: Elaborate architectural options and present them to the user
       - If `$REQUIREMENTS_DOC` exists: Ensure requirements from it are met
       - Otherwise: Ensure existing requirements are met based on your task context
 
@@ -147,9 +150,10 @@ states:
       Review and update documentation to reflect final implementation:
 
       1. **Update Long-Term Memory Documents**: Based on what was actually implemented:
-         - Update `$REQUIREMENTS_DOC` if requirements changed during development
-         - Update `$ARCHITECTURE_DOC` if architectural impacts were identified
-         - Update `$DESIGN_DOC` if design details were refined or changed
+         - If `$REQUIREMENTS_DOC` exists: Update it if requirements changed during development
+         - If `$ARCHITECTURE_DOC` exists: Update it if architectural impacts were identified
+         - If `$DESIGN_DOC` exists: Update it if design details were refined or changed
+         - Otherwise: Document any changes in the plan file
       2. **Compare Against Implementation**: Review documentation against actual implemented functionality
       3. **Update Changed Sections**: Only modify documentation sections that have functional changes
       4. **Remove Development Progress**: Remove references to development iterations, progress notes, and temporary decisions
