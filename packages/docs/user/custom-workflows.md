@@ -267,7 +267,3 @@ states:
 **Discoverable**: Rich metadata helps AI select appropriate workflows
 
 Your custom workflows integrate seamlessly with the built-in ones, giving you complete control over your development process.
-
----
-
-**Next**: [Git Commits](./git-commit-feature.md) – Configure automatic commit behavior
