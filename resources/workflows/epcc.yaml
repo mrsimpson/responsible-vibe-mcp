@@ -27,9 +27,14 @@ states:
   explore:
     description: 'Research and exploration phase - understanding the problem space'
     default_instructions: |
-      You are in the exploration phase. Research the codebase, understand existing patterns, and gather context about the problem space.
-      If you are not certain about conventions or rules, ask the user about them.
-      Read relevant files and documentation. If $REQUIREMENTS_DOC exists, understand and document requirements there, otherwise document them in your task management system. Don't write code yet - focus on understanding. Document your findings and create tasks as needed.
+      Research the codebase to understand existing patterns and gather context about the problem space.
+
+      - If uncertain about conventions or rules, ask the user about them
+      - Read relevant files and documentation
+      - If `$REQUIREMENTS_DOC` exists: Understand and document requirements there
+      - Otherwise: Document requirements in your task management system
+
+      Focus on understanding without writing code yet. Document your findings and create tasks as needed.
     transitions:
       - trigger: 'exploration_complete'
         to: 'plan'
@@ -38,7 +43,20 @@ states:
 
   plan:
     description: 'Planning phase - creating a detailed implementation strategy'
-    default_instructions: 'You are in the planning phase. Create a detailed implementation strategy based on your exploration. If $REQUIREMENTS_DOC exists, base your strategy on requirements from $REQUIREMENTS_DOC, otherwise use existing task context. Break down the work into specific, actionable tasks. Consider edge cases, dependencies, and potential challenges. If it impacts the general architecture and $ARCHITECTURE_DOC exists, document this in $ARCHITECTURE_DOC, otherwise create tasks to track architectural decisions. If $DESIGN_DOC exists, make sure to adhere to the design in $DESIGN_DOC. Document the planning work thoroughly and create implementation tasks as part of the code phase as needed.'
+    default_instructions: |
+      Create a detailed implementation strategy based on your exploration:
+
+      - If `$REQUIREMENTS_DOC` exists: Base your strategy on requirements from it
+      - Otherwise: Use existing task context
+
+      Break down the work into specific, actionable tasks. Consider edge cases, dependencies, and potential challenges.
+
+      - If architectural changes needed and `$ARCHITECTURE_DOC` exists: Document in `$ARCHITECTURE_DOC`
+      - Otherwise: Create tasks to track architectural decisions
+
+      - If `$DESIGN_DOC` exists: Adhere to the design in it
+
+      Document the planning work thoroughly and create implementation tasks as part of the code phase as needed.
     transitions:
       - trigger: 'need_more_exploration'
         to: 'explore'
@@ -64,7 +82,15 @@ states:
 
   code:
     description: 'Implementation phase - writing and building the solution'
-    default_instructions: 'Follow your plan and if $DESIGN_DOC exists, follow the design from $DESIGN_DOC to build the solution. If $ARCHITECTURE_DOC exists, build according to the architecture in $ARCHITECTURE_DOC. If $REQUIREMENTS_DOC exists, ensure requirements from $REQUIREMENTS_DOC are met, otherwise ensure existing requirements are met based on your task context. Write clean, well-structured code with proper error handling. Prevent regression by building, linting and executing existing tests. Stay flexible and adapt the plan as you learn more during implementation. Update task progress and create new tasks as needed for implementation work.'
+    default_instructions: |
+      Follow your plan to build the solution:
+
+      - If `$DESIGN_DOC` exists: Follow the design from it
+      - If `$ARCHITECTURE_DOC` exists: Build according to the architecture from it
+      - If `$REQUIREMENTS_DOC` exists: Ensure requirements from it are met
+      - Otherwise: Ensure existing requirements are met based on your task context
+
+      Write clean, well-structured code with proper error handling. Prevent regression by building, linting, and executing existing tests. Stay flexible and adapt the plan as you learn more during implementation. Update task progress and create new tasks as needed.
     transitions:
       - trigger: 'need_replanning'
         to: 'plan'
@@ -96,9 +122,10 @@ states:
   commit:
     description: 'Code cleanup and documentation finalization'
     default_instructions: >
-      You are in the commit phase. This phase ensures code quality and documentation accuracy through systematic cleanup and review.
+      Ensure code quality and documentation accuracy through systematic cleanup and review.
 
       **STEP 1: Code Cleanup**
+
       Systematically clean up development artifacts:
 
       1. **Remove Debug Output**: Search for and remove all temporary debug output statements used during development.
@@ -116,12 +143,13 @@ states:
          - Ensure proper error handling replaces temporary debug logging
 
       **STEP 2: Documentation Review**
+
       Review and update documentation to reflect final implementation:
 
       1. **Update Long-Term Memory Documents**: Based on what was actually implemented:
-         • Update $REQUIREMENTS_DOC if requirements changed during development
-         • Update $ARCHITECTURE_DOC if architectural impacts were identified
-         • Update $DESIGN_DOC if design details were refined or changed
+         - Update `$REQUIREMENTS_DOC` if requirements changed during development
+         - Update `$ARCHITECTURE_DOC` if architectural impacts were identified
+         - Update `$DESIGN_DOC` if design details were refined or changed
       2. **Compare Against Implementation**: Review documentation against actual implemented functionality
       3. **Update Changed Sections**: Only modify documentation sections that have functional changes
       4. **Remove Development Progress**: Remove references to development iterations, progress notes, and temporary decisions
@@ -129,11 +157,12 @@ states:
       6. **Ask User to Review Document Updates**
 
       **STEP 3: Final Validation**
+
       - Run existing tests to ensure cleanup didn't break functionality
       - Verify documentation accuracy with a final review
       - Ensure code is ready for production/delivery
 
-       Update task progress and mark completed work as you finalize the feature.
+      Update task progress and mark completed work as you finalize the feature.
     transitions:
       - trigger: 'need_code_changes'
         to: 'code'
