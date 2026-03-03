@@ -63,6 +63,7 @@ states:
 
       **STEP 1: Review Design and Requirements**
       - If `$DESIGN_DOC` exists: Follow your design from `$DESIGN_DOC`
+      - Otherwise: Elaborate design options and present them to the user
       - If `$REQUIREMENTS_DOC` exists: Ensure the relevant requirements from `$REQUIREMENTS_DOC` are met
       - Otherwise: Ensure existing requirements are met based on your task context
 

@@ -23,7 +23,9 @@ states:
   context:
     description: 'Define the architectural problem or decision that needs to be made'
     default_instructions: |
-      **STEP 1:** Check if `$ARCHITECTURE_DOC` exists to determine ADR storage location
+      **STEP 1:** Determine ADR storage location
+      - If `$ARCHITECTURE_DOC` exists: Use it to determine ADR storage location
+      - Otherwise: Document ADR decisions in the plan file
 
       **STEP 2:** Look for existing ADRs to understand current format and numbering
 
