@@ -28,14 +28,15 @@ states:
   requirements:
     description: 'Gathering and analyzing requirements'
     default_instructions: |
-      Make yourself familiar with the code base.
-      Focus on understanding their goals, scope, constraints, and success criteria, e. g.
-      • Who are the key stakeholders? (end users, business owners, technical teams)
-      • Which requirements are must-have vs nice-to-have?
-      • How will you measure success? What are the acceptance criteria?
-      • What are your time, budget, technical, or regulatory constraints?
-      • What existing systems must this integrate with?
-       Break down their needs into specific requirements in $REQUIREMENTS_DOC. Create actionable tasks referencing those requirements.
+      Familiarize yourself with the code base and understand project goals, scope, constraints, and success criteria.
+
+      - Who are the key stakeholders? (end users, business owners, technical teams)
+      - Which requirements are must-have vs nice-to-have?
+      - How will you measure success? What are the acceptance criteria?
+      - What are your time, budget, technical, or regulatory constraints?
+      - What existing systems must this integrate with?
+
+      Document all requirements in `$REQUIREMENTS_DOC`. Create actionable tasks referencing those requirements.
     transitions:
       - trigger: 'requirements_complete'
         to: 'design'
@@ -49,11 +50,11 @@ states:
   design:
     description: 'Technical design and architecture planning'
     default_instructions: |
-      You are in the design phase. Re-analyze important interfaces of the application.
-      Review requirements from $REQUIREMENTS_DOC and design the technical solution
-      Focus on HOW to implement what's needed including architecture, technologies, data models, API design, and quality goals.
-      Clarify performance expectations and technology preferences if not already obvious from the current analysis.
-       Document architectural decisions in $ARCHITECTURE_DOC and detailed design in $DESIGN_DOC. Create tasks and ensure the approach is solid before implementation."
+      Review requirements from `$REQUIREMENTS_DOC` and design the technical solution.
+
+      Focus on HOW to implement what's needed including architecture, technologies, data models, API design, and quality goals. Clarify performance expectations and technology preferences if not already obvious from the current analysis.
+
+      Document architectural decisions in `$ARCHITECTURE_DOC` and detailed design in `$DESIGN_DOC`. Create tasks and ensure the approach is solid before implementation.
     transitions:
       - trigger: 'need_more_requirements'
         to: 'requirements'
@@ -72,10 +73,13 @@ states:
   implementation:
     description: 'Building the solution according to design'
     default_instructions: |
-      Follow the architecture from $ARCHITECTURE_DOC and detailed design from $DESIGN_DOC to build the solution. Before starting, clarify the approach:
-      • Should this be implemented incrementally or all at once? Any specific order of implementation?
-      • Are there high-risk parts that need extra validation or careful implementation?
-       Ensure requirements from $REQUIREMENTS_DOC are met. Focus on code structure, error handling, security, and maintainability. Write clean, well-documented code and include basic testing. Update task progress during implementation work.
+      Follow the architecture from `$ARCHITECTURE_DOC` and detailed design from `$DESIGN_DOC` to build the solution.
+
+      Before starting, clarify the approach:
+      - Should this be implemented incrementally or all at once? Any specific order of implementation?
+      - Are there high-risk parts that need extra validation or careful implementation?
+
+      Ensure requirements from `$REQUIREMENTS_DOC` are met. Focus on code structure, error handling, security, and maintainability. Write clean, well-documented code and include basic testing. Update task progress during implementation work.
     transitions:
       - trigger: 'need_design_changes'
         to: 'design'
@@ -98,7 +102,19 @@ states:
 
   qa:
     description: 'Quality assurance and code review'
-    default_instructions: 'You are in the quality assurance phase. Take the following specific actions: 1) Syntax Check: Run syntax checking tools or validate syntax manually, 2) Build Project: Build the project to verify it compiles without errors, 3) Run Linter: Execute linting tools to ensure code style consistency, 4) Execute Tests: Run existing tests to verify functionality. Then conduct a multi-perspective code review from security, performance, UX, maintainability, and requirement compliance perspectives. Verify implementation matches $DESIGN_DOC specifications and fulfills the targeted requirements from $REQUIREMENTS_DOC. Update task progress and mark completed work during QA review.'
+    default_instructions: |
+      Perform systematic quality checks and code review:
+
+      **STEP 1: Automated Quality Checks**
+      - Run syntax checking tools or validate syntax manually
+      - Build the project to verify it compiles without errors
+      - Execute linting tools to ensure code style consistency
+      - Run existing tests to verify functionality
+
+      **STEP 2: Multi-Perspective Code Review**
+      Conduct code review from security, performance, UX, maintainability, and requirement compliance perspectives. Verify implementation matches `$DESIGN_DOC` specifications and fulfills targeted requirements from `$REQUIREMENTS_DOC`.
+
+      Update task progress and mark completed work during QA review.
     transitions:
       - trigger: 'need_implementation_fixes'
         to: 'implementation'
@@ -116,7 +132,12 @@ states:
 
   testing:
     description: 'Comprehensive testing and validation'
-    default_instructions: 'You are in the testing phase. Create comprehensive test plans, write and execute tests, validate feature completeness, and ensure everything works as expected. Focus on test coverage, edge cases, integration testing, and user acceptance validation.'
+    default_instructions: |
+      Create and execute comprehensive test plans to validate feature completeness.
+
+      - Write and execute tests with focus on test coverage and edge cases
+      - Conduct integration testing to ensure all components work together
+      - Validate user acceptance and ensure everything works as expected
     transitions:
       - trigger: 'need_implementation_fixes'
         to: 'implementation'
@@ -139,45 +160,44 @@ states:
 
   finalize:
     description: 'Code cleanup and documentation finalization'
-    default_instructions: >
-      You are in the finalize phase. This phase ensures code quality and documentation accuracy through systematic cleanup and review.
+    default_instructions: |
+      Complete the feature by cleaning up code and updating documentation.
 
       **STEP 1: Code Cleanup**
-      Systematically clean up development artifacts:
 
-      1. **Remove Debug Output**: Search for and remove all temporary debug output statements used during development.
-         Look for language-specific debug output methods (console logging, print statements, debug output functions).
-         Remove any debugging statements that were added for development purposes.
+      Remove debug output and temporary code:
+      - Search for and remove all temporary debug output statements used during development
+      - Look for language-specific debug output methods (console logging, print statements, debug output functions)
 
-      2. **Review TODO/FIXME Comments**:
-         - Address each TODO/FIXME comment by either implementing the solution or documenting why it's deferred
-         - Remove completed TODOs
-         - Convert remaining TODOs to proper issue tracking if needed
+      Review and address TODO/FIXME comments:
+      - Address each TODO/FIXME comment by either implementing the solution or documenting why it's deferred
+      - Remove completed TODOs
+      - Convert remaining TODOs to proper issue tracking if needed
 
-      3. **Remove Debugging Code Blocks**:
-         - Remove temporary debugging code, test code blocks, and commented-out code
-         - Clean up any experimental code that's no longer needed
-         - Ensure proper error handling replaces temporary debug logging
+      Remove debugging code blocks:
+      - Remove temporary debugging code, test code blocks, and commented-out code
+      - Clean up any experimental code that's no longer needed
+      - Ensure proper error handling replaces temporary debug logging
 
       **STEP 2: Documentation Review**
-      Review and update documentation to reflect final implementation:
 
-      1. **Update Long-Term Memory Documents**: Based on what was actually implemented:
-         • Update $REQUIREMENTS_DOC if requirements changed during development
-         • Update $ARCHITECTURE_DOC if architectural decisions evolved
-         • Update $DESIGN_DOC if design details were refined or changed
-      2. **Compare Against Implementation**: Review documentation against actual implemented functionality
-      3. **Update Changed Sections**: Only modify documentation sections that have functional changes
-      4. **Remove Development Progress**: Remove references to development iterations, progress notes, and temporary decisions
-      5. **Focus on Final State**: Ensure documentation describes the final implemented state, not the development process
-      6. **Ask User to Review Document Updates**
+      Review and update documentation to reflect final implementation:
+      - Update `$REQUIREMENTS_DOC` if requirements changed during development
+      - Update `$ARCHITECTURE_DOC` if architectural decisions evolved
+      - Update `$DESIGN_DOC` if design details were refined or changed
+      - Compare documentation against actual implemented functionality
+      - Only modify documentation sections that have functional changes
+      - Remove references to development iterations, progress notes, and temporary decisions
+      - Ensure documentation describes the final implemented state, not the development process
+      - Ask user to review document updates
 
       **STEP 3: Final Validation**
+
       - Run existing tests to ensure cleanup didn't break functionality
       - Verify documentation accuracy with a final review
       - Ensure code is ready for production/delivery
 
-       Update task progress and mark completed work as you finalize the feature.
+      Update task progress and mark completed work as you finalize the feature.
     transitions:
       - trigger: 'need_final_changes'
         to: 'implementation'
