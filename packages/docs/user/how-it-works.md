@@ -10,24 +10,7 @@ Next, we'll look into the components that make up Responsible Vibe and how they 
 
 ## The MCP Architecture
 
-```mermaid
-flowchart TD
-    A[🤓 You] -->|1. Talk to your agent| B[🤖 AI Agent]
-    B -->|2. calls| C[🛠️ whats_next]
-    C -->|3. checks phase| E@{ shape: paper-tape, label: "Instructions where to find
-    phase specific tasks"}
-    E -->|4. returns| B
-    B -->|5. reads| F[🤖 Phase-section in Plan]
-    F -->|6. Follows| G[🤖 Tasks and decisions
-    => Changes files,
-    writes code]
-    G -->|7. Updates| H[🤖 Plan]
-    H -->|8. Reverts with a summary| A
-
-    style A fill:#f5e1fe
-    style C fill:#e1f5fe
-    style E fill:#fff3e0
-```
+![MCP Interaction Pattern](../images/mcp-interaction-pattern.png)
 
 Here's the actual mechanics: Your AI agent calls **MCP tools** that return **phase-specific instructions**. It's prompt engineering, but contextual and systematic.
 

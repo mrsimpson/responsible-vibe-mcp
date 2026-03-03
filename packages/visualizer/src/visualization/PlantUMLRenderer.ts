@@ -52,11 +52,9 @@ export class PlantUMLRenderer {
     title.innerHTML = `
       <div style="
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         justify-content: center;
-        gap: 12px;
-        margin-bottom: 10px;
-        flex-wrap: wrap;
+        gap: 8px;
       ">
         <h2 style="
           color: #1e293b;
@@ -69,7 +67,24 @@ export class PlantUMLRenderer {
         "
         class="workflow-title-clickable"
         title="Click to show workflow information"
-        >${workflow.name} Workflow ${workflow.metadata?.domain ? `<span class="domain-pill" data-domain="${workflow.metadata.domain}">${workflow.metadata.domain}</span>` : ''}</h2>
+        >${workflow.name} workflow</h2>
+        ${
+          workflow.metadata?.domain
+            ? `<span class="domain-pill" data-domain="${workflow.metadata.domain}" style="
+          display: inline-block;
+          background-color: #dbeafe;
+          color: #1e40af;
+          padding: 2px;
+          border-radius: 12px;
+          font-size: 0.7rem;
+          font-weight: 600;
+          border: 1px solid #93c5fd;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          margin-top: 6px;
+        ">${workflow.metadata.domain}</span>`
+            : ''
+        }
       </div>
       <p style="color: #64748b; margin-bottom: 20px; text-align: center;">${workflow.description || ''}</p>
     `;
