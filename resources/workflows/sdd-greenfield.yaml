@@ -454,6 +454,7 @@ states:
 
     transitions: []
 
+
 # Global transitions available from any state
 global_transitions:
   - trigger: 'abandon_project'
