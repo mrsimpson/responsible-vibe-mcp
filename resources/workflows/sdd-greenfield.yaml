@@ -452,7 +452,8 @@ states:
 
       Create comprehensive documentation that enables users to successfully adopt and use the project.
 
-    transitions:
+    transitions: []
+
 # Global transitions available from any state
 global_transitions:
   - trigger: 'abandon_project'

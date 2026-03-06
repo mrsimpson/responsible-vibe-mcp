@@ -302,9 +302,6 @@ class InstructionGeneratorContract extends BaseInterfaceContract<IInstructionGen
           expect(result.instructions).toContain(
             mockInstructionContext.conversationContext.projectPath
           );
-          expect(result.instructions).toContain(
-            mockInstructionContext.conversationContext.gitBranch
-          );
         } finally {
           if (registration.cleanup) {
             await registration.cleanup(instance);

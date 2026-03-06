@@ -70,7 +70,8 @@ describe('InstructionGenerator - Core Functionality', () => {
     );
 
     // Core InstructionGenerator always produces markdown-style instructions
-    expect(result.instructions).toContain('mark done with `[x]`');
+    expect(result.instructions).toContain('tasks in other tools');
+    expect(result.instructions).toContain('Maintain `');
     expect(result.instructions).toContain('Call `whats_next()`');
     expect(result.instructions).toContain('**Workflow Continuity:**');
     expect(result.instructions).toContain('Add newly discovered tasks');
@@ -99,7 +100,8 @@ describe('InstructionGenerator - Core Functionality', () => {
     );
 
     expect(result.instructions).toContain('/test/project/.vibe/docs/design.md');
-    expect(result.instructions).toContain('mark done with `[x]`');
+    expect(result.instructions).toContain('tasks in other tools');
+    expect(result.instructions).toContain('Maintain `');
   });
 
   it('should provide consistent instruction structure', async () => {
@@ -128,7 +130,9 @@ describe('InstructionGenerator - Core Functionality', () => {
     );
 
     // Transition reason is communicated via proceed_to_phase, not repeated in whats_next
-    expect(result.instructions).not.toContain('All exploration tasks completed');
+    expect(result.instructions).not.toContain(
+      'All exploration tasks completed'
+    );
   });
 
   it('should handle missing plan file scenario', async () => {

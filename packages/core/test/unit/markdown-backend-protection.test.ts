@@ -60,7 +60,8 @@ describe('Markdown Backend Protection Tests', () => {
       expect(result.instructions).toContain(
         'Work through tasks in the "Design" section'
       );
-      expect(result.instructions).toContain('mark done with `[x]`');
+      expect(result.instructions).toContain('tasks in other tools');
+      expect(result.instructions).toContain('Maintain `');
       expect(result.instructions).toContain('Add newly discovered tasks');
       expect(result.instructions).toContain('log decisions in "Key Decisions"');
       expect(result.instructions).toContain('Call `whats_next()`');
@@ -92,9 +93,7 @@ describe('Markdown Backend Protection Tests', () => {
         customContext
       );
 
-      expect(result.instructions).toContain(
-        `Maintain \`${customPlanPath}\``
-      );
+      expect(result.instructions).toContain(`Maintain \`${customPlanPath}\``);
     });
 
     it('should customize markdown guidance based on phase', async () => {
@@ -178,7 +177,8 @@ describe('Markdown Backend Protection Tests', () => {
       );
 
       // Verify markdown-specific task guidance
-      expect(result.instructions).toContain('mark done with `[x]`');
+      expect(result.instructions).toContain('tasks in other tools');
+      expect(result.instructions).toContain('Maintain `');
       expect(result.instructions).toContain('Call `whats_next()`');
 
       // Verify NO beads task guidance
@@ -268,7 +268,7 @@ describe('Markdown Backend Protection Tests', () => {
         expect(
           result.instructions,
           `Phase ${phase} should have task tracking`
-        ).toContain('mark done with `[x]`');
+        ).toContain('tasks in other tools');
         expect(
           result.instructions,
           `Phase ${phase} should not have beads content`
@@ -337,7 +337,8 @@ describe('Markdown Backend Protection Tests', () => {
 
       // Should still be markdown mode despite beads-like content in instructions
       expect(result.instructions).toContain('**Workflow Continuity:**');
-      expect(result.instructions).toContain('mark done with `[x]`');
+      expect(result.instructions).toContain('tasks in other tools');
+      expect(result.instructions).toContain('Maintain `');
       expect(result.instructions).not.toContain('bd CLI');
 
       // Original instructions should be preserved
@@ -370,7 +371,7 @@ describe('Markdown Backend Protection Tests', () => {
       expect(result.instructions).toContain(
         `Maintain \`${mockConversationContext.planFilePath}\``
       );
-      expect(result.instructions).toContain('mark done with `[x]`');
+      expect(result.instructions).toContain('tasks in other tools');
 
       // Should not contain beads mode elements
       expect(result.instructions).not.toContain('bd CLI');
