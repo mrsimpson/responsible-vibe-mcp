@@ -169,8 +169,8 @@ describe('InstructionGenerator', () => {
       );
 
       // Should contain enhanced instruction elements
-      expect(result.instructions).toContain('Check your plan file');
-      expect(result.instructions).toContain('**Plan File Guidance:**');
+      expect(result.instructions).toContain('**Workflow Continuity:**');
+      expect(result.instructions).toContain('Add newly discovered tasks');
 
       // Should contain substituted variable
       expect(result.instructions).toContain(

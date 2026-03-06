@@ -70,13 +70,10 @@ describe('InstructionGenerator - Core Functionality', () => {
     );
 
     // Core InstructionGenerator always produces markdown-style instructions
-    expect(result.instructions).toContain('Mark completed tasks with [x]');
-    expect(result.instructions).toContain(
-      'Use ONLY the development plan for task management'
-    );
-    expect(result.instructions).toContain('Check your plan file');
-    expect(result.instructions).toContain('**Plan File Guidance:**');
-    expect(result.instructions).toContain('**Important Reminders:**');
+    expect(result.instructions).toContain('mark done with `[x]`');
+    expect(result.instructions).toContain('Call `whats_next()`');
+    expect(result.instructions).toContain('**Workflow Continuity:**');
+    expect(result.instructions).toContain('Add newly discovered tasks');
   });
 
   it('should not contain beads-specific instructions', async () => {
@@ -102,7 +99,7 @@ describe('InstructionGenerator - Core Functionality', () => {
     );
 
     expect(result.instructions).toContain('/test/project/.vibe/docs/design.md');
-    expect(result.instructions).toContain('Mark completed tasks with [x]');
+    expect(result.instructions).toContain('mark done with `[x]`');
   });
 
   it('should provide consistent instruction structure', async () => {
@@ -113,12 +110,12 @@ describe('InstructionGenerator - Core Functionality', () => {
     );
 
     // Check for expected sections
-    expect(result.instructions).toContain('Check your plan file');
-    expect(result.instructions).toContain('**Plan File Guidance:**');
-    expect(result.instructions).toContain('**Important Reminders:**');
+    expect(result.instructions).toContain('**Workflow Continuity:**');
+    expect(result.instructions).toContain('Add newly discovered tasks');
+    expect(result.instructions).toContain('Call `whats_next()`');
   });
 
-  it('should handle transition context when provided', async () => {
+  it('should not include transition reason in instructions', async () => {
     const contextWithTransition = {
       ...mockInstructionContext,
       isModeled: true,
@@ -130,7 +127,8 @@ describe('InstructionGenerator - Core Functionality', () => {
       contextWithTransition
     );
 
-    expect(result.instructions).toContain('All exploration tasks completed');
+    // Transition reason is communicated via proceed_to_phase, not repeated in whats_next
+    expect(result.instructions).not.toContain('All exploration tasks completed');
   });
 
   it('should handle missing plan file scenario', async () => {
@@ -145,7 +143,7 @@ describe('InstructionGenerator - Core Functionality', () => {
     );
 
     expect(result.instructions).toContain(
-      'Plan file will be created when you first update it'
+      'plan file will be created on first update'
     );
   });
 });
