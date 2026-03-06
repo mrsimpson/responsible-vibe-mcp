@@ -465,13 +465,6 @@ states:
 
       The analysis provides a foundation for future development. Consider using other workflows (waterfall, epcc, etc.) with the comprehensive understanding gained.
     transitions:
-      - trigger: 'analysis_complete'
-        to: 'analysis_complete'
-        instructions: >
-          Analysis is complete. The legacy system is now well-documented and understood.
-          Use the comprehensive documentation and `$DISCOVERY_FILE` findings for any future development work.
-        transition_reason: 'Analysis complete, ready for future development'
-
       - trigger: 'refine_analysis'
         to: 'component_analysis'
         additional_instructions: 'Refine specific aspects of analysis. Focus on areas that need additional investigation.'

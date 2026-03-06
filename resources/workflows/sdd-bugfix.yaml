@@ -358,13 +358,6 @@ states:
       - User scenarios work as specified
 
     transitions:
-      - trigger: 'verification_complete'
-        to: 'verify'
-        instructions: >
-          The bug has been resolved, all tests pass, and no regressions have been detected.
-          The fix is ready for deployment.
-        transition_reason: 'Verification complete, bug fix ready for deployment'
-
       - trigger: 'regression_detected'
         to: 'fix'
         instructions: >

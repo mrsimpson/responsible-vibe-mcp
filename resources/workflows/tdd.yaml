@@ -44,14 +44,6 @@ states:
         additional_instructions: 'Update task progress as you complete exploration work.'
         transition_reason: 'Sufficient understanding gained, ready to start TDD cycle with failing test'
 
-      - trigger: 'abandon_feature'
-        to: 'explore'
-        instructions: >
-          Feature development abandoned. Return to exploration state for new tasks.
-          Task history will remain for future reference if needed.
-        additional_instructions: 'Clean up any work in progress and prepare for new tasks.'
-        transition_reason: 'User decided to abandon current feature development'
-
   red:
     description: 'RED phase - Write a failing test that defines the expected behavior'
     default_instructions: |

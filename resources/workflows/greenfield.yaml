@@ -45,14 +45,6 @@ states:
           - perspective: 'ux_expert'
             prompt: 'Evaluate user experience requirements and usability considerations. Ensure user personas, workflows, and interaction patterns are properly defined for the greenfield project.'
 
-      - trigger: 'abandon_project'
-        to: 'ideation'
-        instructions: >
-          Project development abandoned. Return to ideation state for new projects.
-          Task history will remain for future reference if needed.
-        additional_instructions: 'Project development abandoned. Clean up any ideation work and prepare for new projects.'
-        transition_reason: 'User decided to abandon current project development'
-
   architecture:
     description: 'Tech stack selection and architecture design phase'
     default_instructions: |

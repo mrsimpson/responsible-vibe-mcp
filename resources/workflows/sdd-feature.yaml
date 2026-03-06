@@ -447,14 +447,6 @@ states:
       Focus on delivering working, tested increments that integrate seamlessly with the existing system.
 
     transitions:
-      - trigger: 'implementation_complete'
-        to: 'implement'
-        instructions: >
-          Feature implementation completed successfully. All user stories have been implemented,
-          tested, and integrated with the existing system. The feature meets the success criteria
-          defined in the specification.
-        transition_reason: 'Implementation complete, feature ready for use'
-
       - trigger: 'implementation_blocked'
         to: 'plan'
         instructions: >

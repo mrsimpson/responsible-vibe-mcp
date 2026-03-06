@@ -107,56 +107,24 @@ export class InstructionGenerator implements IInstructionGenerator {
     baseInstructions: string,
     context: InstructionContext
   ): Promise<string> {
-    const {
-      phase,
-      conversationContext,
-      transitionReason,
-      isModeled,
-      planFileExists,
-    } = context;
+    const { phase, conversationContext, planFileExists } = context;
 
-    // Generate task management guidance for markdown backend
-    const taskGuidance = this.generateTaskManagementGuidance();
+    const phaseName = this.capitalizePhase(phase);
 
-    let enhanced: string;
+    let workflowSection = `---
+**Workflow Continuity:**
+Maintain \`${conversationContext.planFilePath}\`:
+- Work through tasks in the "${phaseName}" section; Focus on those tasks!
+- Add newly discovered tasks; log decisions in "Key Decisions"
+- DO NOT maintain tasks in other tools or documents than explicitly stated in this plan file!`;
 
-    // Markdown mode: Traditional plan file approach
-    enhanced = `Check your plan file at \`${conversationContext.planFilePath}\` and focus on the "${this.capitalizePhase(phase)}" section.
-
-${baseInstructions}
-
-**Plan File Guidance:**
-- Work on the tasks listed in the ${this.capitalizePhase(phase)} section
-${taskGuidance}
-- Update the "Key Decisions" section with important choices made
-- Add relevant notes to help maintain context`;
-    // Add transition context if this is a modeled transition
-    if (isModeled && transitionReason) {
-      enhanced += `\n\n**Phase Context:**
-- ${transitionReason}`;
-    }
-
-    // Add plan file creation note if needed
     if (!planFileExists) {
-      enhanced +=
-        '\n\n**Note**: Plan file will be created when you first update it.';
+      workflowSection += '\n- Note: plan file will be created on first update';
     }
 
-    // Add continuity and task management instructions
-    enhanced += `\n\n**Important Reminders:**
-- Use ONLY the development plan for task management - do not use your own task management tools
-- Call whats_next() after the next user message to maintain the development workflow`;
+    workflowSection += '\n\nCall `whats_next()` after each user message.';
 
-    return enhanced;
-  }
-
-  /**
-   * Generate task management guidance for markdown backend
-   */
-  private generateTaskManagementGuidance(): string {
-    // Default markdown backend
-    return `- Mark completed tasks with [x] as you finish them
-- Add new tasks as they are identified during your work with the user`;
+    return `## ${phaseName} Phase\n\n${baseInstructions}\n\n${workflowSection}`;
   }
 
   /**
