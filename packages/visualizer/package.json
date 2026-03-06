@@ -28,7 +28,7 @@
     "vue": "^3.5.22"
   },
   "devDependencies": {
-    "@types/node": "^20.19.23",
+    "@types/node": "^24.0.0",
     "nodemon": "^3.1.10",
     "rimraf": "^5.0.10",
     "typescript": "^5.9.3"

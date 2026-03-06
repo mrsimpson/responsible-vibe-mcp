@@ -17,7 +17,7 @@
     "@codemcp/workflows-core": "workspace:*"
   },
   "devDependencies": {
-    "@types/node": "^22.0.0",
+    "@types/node": "^24.0.0",
     "rimraf": "^5.0.10",
     "typescript": "^5.9.3",
     "vitest": "4.0.18"
