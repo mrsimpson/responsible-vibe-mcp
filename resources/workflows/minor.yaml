@@ -47,15 +47,6 @@ states:
         to: 'implement'
         transition_reason: 'Analysis and design complete, ready for streamlined implementation'
 
-      - trigger: 'abandon_feature'
-        to: 'explore'
-        instructions: >
-          Minor enhancement abandoned. Revert potentially made changes.
-          Return to exploration state for new tasks.
-          Task history will remain for future reference if needed.
-        additional_instructions: 'Minor enhancement development abandoned. Clean up any analysis work and prepare for new tasks.'
-        transition_reason: 'User decided to abandon current minor enhancement'
-
   implement:
     description: 'Combined implementation phase - code, test, and commit'
     default_instructions: >

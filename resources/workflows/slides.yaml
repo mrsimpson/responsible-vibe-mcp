@@ -39,15 +39,6 @@ states:
         to: structure
         transition_reason: 'Presentation concept and goals clearly defined, ready for content structuring'
 
-      - trigger: abandon_presentation
-        to: ideate
-        instructions: |
-          **Abandon ideation work** - Clean up any ideation work and prepare for new presentation topics.
-
-          The plan file will remain for future reference if needed.
-        additional_instructions: 'Presentation development abandoned. Prepare for new presentation topics.'
-        transition_reason: 'User decided to abandon current presentation development'
-
   structure:
     description: 'Organize content flow and logical progression'
     default_instructions: |

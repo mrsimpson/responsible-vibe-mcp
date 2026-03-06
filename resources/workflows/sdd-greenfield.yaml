@@ -453,14 +453,6 @@ states:
       Create comprehensive documentation that enables users to successfully adopt and use the project.
 
     transitions:
-      - trigger: 'documentation_complete'
-        to: 'document'
-        instructions: >
-          Project documentation is complete. The specification-driven development process has successfully
-          delivered a working solution with comprehensive documentation. Review all deliverables and
-          ensure they meet the constitutional principles established at the beginning.
-        transition_reason: 'Documentation complete, project ready for delivery'
-
 # Global transitions available from any state
 global_transitions:
   - trigger: 'abandon_project'

@@ -594,10 +594,4 @@ states:
       - Business-friendly documentation for domain architects
 
       The analysis provides a solid foundation for business architecture decisions and technical-business alignment.
-    transitions:
-      - trigger: 'analysis_complete'
-        to: 'analysis_complete'
-        instructions: >
-          Analysis is complete! The business architecture is now well-documented and understood.
-          Use the comprehensive documentation for business architecture decisions and planning.
-        transition_reason: 'Analysis complete, ready for business architecture work'
+    transitions: []

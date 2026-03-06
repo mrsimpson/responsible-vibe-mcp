@@ -45,14 +45,6 @@ states:
         to: story
         transition_reason: 'Topic researched and format decided, ready for story structure development'
 
-      - trigger: abandon_post
-        to: discovery
-        instructions: |
-          Abandon post development. Clean up any discovery work and prepare for new post topics.
-          The `$PLAN_FILE` will remain for future reference if needed.
-        additional_instructions: 'Prepare for new post topics.'
-        transition_reason: 'User decided to abandon current post development'
-
   story:
     description: 'Create narrative structure and story outline'
     default_instructions: |
