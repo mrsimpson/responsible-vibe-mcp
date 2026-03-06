@@ -114,8 +114,9 @@ export class InstructionGenerator implements IInstructionGenerator {
     let workflowSection = `---
 **Workflow Continuity:**
 Maintain \`${conversationContext.planFilePath}\`:
-- Work through tasks in the "${phaseName}" section; mark done with \`[x]\`
-- Add newly discovered tasks; log decisions in "Key Decisions"`;
+- Work through tasks in the "${phaseName}" section; Focus on those tasks!
+- Add newly discovered tasks; log decisions in "Key Decisions"
+- DO NOT maintain tasks in other tools or documents than explicitly stated in this plan file!`;
 
     if (!planFileExists) {
       workflowSection += '\n- Note: plan file will be created on first update';
