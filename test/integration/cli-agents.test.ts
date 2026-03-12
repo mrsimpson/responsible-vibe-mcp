@@ -87,7 +87,7 @@ describe('CLI Agents Commands', () => {
       expect(content).toContain('displayName: Business Analyst');
       expect(content).toContain('VIBE_ROLE: business-analyst');
       expect(content).toContain('VIBE_WORKFLOW_DOMAINS: sdd-crowd');
-      expect(content).toContain('responsible-vibe-mcp@latest');
+      expect(content).toContain("'@codemcp/workflows-server@latest'");
     });
 
     it('should copy agents to custom output directory', () => {

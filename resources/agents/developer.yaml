@@ -45,11 +45,11 @@ llmSettings:
   reasoningEffort: low
 
 mcpServers:
-  responsible-vibe:
+  workflows:
     type: stdio
     command: npx
     args:
-      - responsible-vibe-mcp@latest
+      - '@codemcp/workflows-server@latest'
     env:
       VIBE_ROLE: developer
       VIBE_WORKFLOW_DOMAINS: sdd-crowd
