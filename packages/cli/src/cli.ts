@@ -588,8 +588,8 @@ function showHelp(): void {
 Responsible Vibe CLI Tools
 
 USAGE:
-  responsible-vibe-mcp [COMMAND]
-  responsible-vibe-mcp                      Start the interactive visualizer (default)
+  npx @codemcp/workflows [COMMAND]
+  ade-workflows                      Start the interactive visualizer (default)
 
 SETUP COMMANDS:
   setup <target>                Generate skill files for a coding tool (default mode)

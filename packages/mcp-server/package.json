@@ -1,11 +1,14 @@
 {
-  "name": "@codemcp/workflows",
+  "name": "@codemcp/workflows-server",
   "version": "5.3.0",
-  "description": "MCP server implementation for responsible-vibe",
+  "description": "Lightweight MCP server for responsible-vibe development workflows",
   "type": "module",
   "main": "dist/index.js",
   "bin": {
-    "responsible-vibe-mcp": "dist/index.js"
+    "ade-workflows-server": "dist/index.js"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "files": [
     "dist/**/*",

@@ -10,10 +10,10 @@ Transform any AI coding agent into a structured development partner with battle-
 
 ```bash
 # Setup your coding agent
-npx responsible-vibe-mcp setup config kiro  # or claude, gemini, opencode, copilot
+npx @codemcp/workflows setup config kiro  # or claude, gemini, opencode, copilot
 
 # Or use skills (agentskills.io format) for on-demand loading
-npx responsible-vibe-mcp setup skill claude  # or gemini, opencode, copilot, kiro
+npx @codemcp/workflows setup skill claude  # or gemini, opencode, copilot, kiro
 ```
 
 Head over to a new empty dir and ask your agent: _"Build a UNO-like card game"_ – and instantly experience how your agent doesn't just shoot, but starts engineering – with YOU in the driver seat!
@@ -76,10 +76,10 @@ Enable teams of specialized AI agents to collaborate on development tasks with [
 
 ```bash
 # Copy pre-configured agent definitions
-npx responsible-vibe-mcp@latest agents copy
+npx @codemcp/workflows@latest agents copy
 
 # List available agent configurations
-npx responsible-vibe-mcp@latest agents list
+npx @codemcp/workflows@latest agents list
 ```
 
 See **[Crowd MCP Integration Guide →](packages/docs/user/crowd-mcp-integration.md)** for setup and usage.

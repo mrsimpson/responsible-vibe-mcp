@@ -110,13 +110,13 @@ The CLI provides convenient commands to list and copy workflows:
 
 ```bash
 # List all available workflows
-npx responsible-vibe-mcp workflow list
+npx @codemcp/workflows workflow list
 
 # Copy a built-in workflow to customize it
-npx responsible-vibe-mcp workflow copy waterfall my-custom-waterfall
+npx @codemcp/workflows workflow copy waterfall my-custom-waterfall
 
 # Copy any available workflow
-npx responsible-vibe-mcp workflow copy epcc my-team-process
+npx @codemcp/workflows workflow copy epcc my-team-process
 ```
 
 This copies the workflow to `.vibe/workflows/my-custom-waterfall.yaml` where you can customize it for your needs.

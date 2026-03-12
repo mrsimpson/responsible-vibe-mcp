@@ -13,7 +13,7 @@
     "format": "prettier --write ."
   },
   "dependencies": {
-    "@codemcp/workflows": "workspace:*",
+    "@codemcp/workflows-server": "workspace:*",
     "@codemcp/workflows-core": "workspace:*"
   },
   "devDependencies": {

@@ -22,7 +22,7 @@ if (args.length === 0) {
     import('../../mcp-server/dist/index.js');
   } else {
     // Use string literal to avoid TypeScript resolution issues
-    const mcpServerModule = '@codemcp/workflows';
+    const mcpServerModule = '@codemcp/workflows-server';
     import(mcpServerModule);
   }
 } else {
