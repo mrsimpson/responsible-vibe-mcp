@@ -130,11 +130,19 @@ abstract class ConfigGenerator {
   protected getDefaultMcpConfig(): object {
     const isWindows = process.platform.startsWith('win');
 
+    if (isWindows) {
+      return {
+        workflows: {
+          command: 'cmd',
+          args: ['/c', 'npx', '@codemcp/workflows-server@latest'],
+        },
+      };
+    }
+
     return {
       workflows: {
-        command: isWindows
-          ? ['cmd', '/c', 'npx', '@codemcp/workflows-server@latest']
-          : ['npx', '@codemcp/workflows-server@latest'],
+        command: 'npx',
+        args: ['@codemcp/workflows-server@latest'],
       },
     };
   }
@@ -215,7 +223,7 @@ class AmazonQConfigGenerator extends ConfigGenerator {
 
 /**
  * Claude Code Configuration Generator
- * Generates multiple files: CLAUDE.md, .mcp.json, settings.json
+ * Generates multiple files: .claude/agents/vibe.md, .mcp.json, .claude/settings.json
  * Merges with existing configuration instead of overwriting
  */
 class ClaudeConfigGenerator extends ConfigGenerator {
@@ -223,9 +231,18 @@ class ClaudeConfigGenerator extends ConfigGenerator {
     const systemPrompt = this.getSystemPrompt();
     const mcpServers = this.getDefaultMcpConfig();
 
-    // Generate CLAUDE.md (system prompt) - always overwrite as it's generated content
-    const claudeMdPath = join(outputDir, 'CLAUDE.md');
-    await this.writeFile(claudeMdPath, systemPrompt);
+    // Generate .claude/agents/vibe.md (agent configuration) - always overwrite as it's generated content
+    const claudeDir = join(outputDir, '.claude');
+    const agentsDir = join(claudeDir, 'agents');
+    await mkdir(agentsDir, { recursive: true });
+    const agentContent = `---
+name: Responsible Vibe
+description: AI assistant that helps users develop software features using structured development workflows.
+---
+
+${systemPrompt}`;
+    const agentPath = join(agentsDir, 'vibe.md');
+    await this.writeFile(agentPath, agentContent);
 
     // Generate .mcp.json (MCP server configuration) - merge with existing
     const mcpConfig: Record<string, unknown> = {
@@ -238,7 +255,7 @@ class ClaudeConfigGenerator extends ConfigGenerator {
     );
     await this.writeFile(mcpJsonPath, JSON.stringify(finalMcpConfig, null, 2));
 
-    // Generate settings.json (permissions and security) - merge with existing
+    // Generate .claude/settings.json (permissions and security) - merge with existing
     const settings: Record<string, unknown> = {
       permissions: {
         allow: [
@@ -254,7 +271,7 @@ class ClaudeConfigGenerator extends ConfigGenerator {
         deny: ['Read(./.env)', 'Read(./.env.*)', 'Read(./secrets/**)'],
       },
     };
-    const settingsPath = join(outputDir, 'settings.json');
+    const settingsPath = join(claudeDir, 'settings.json');
     const finalSettings = await this.mergeWithExistingConfig(
       settingsPath,
       settings

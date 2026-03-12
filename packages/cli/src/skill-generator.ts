@@ -78,11 +78,19 @@ export abstract class SkillGenerator {
   protected getDefaultMcpConfig(): object {
     const isWindows = process.platform.startsWith('win');
 
+    if (isWindows) {
+      return {
+        workflows: {
+          command: 'cmd',
+          args: ['/c', 'npx', '@codemcp/workflows-server@latest'],
+        },
+      };
+    }
+
     return {
       workflows: {
-        command: isWindows
-          ? ['cmd', '/c', 'npx', '@codemcp/workflows-server@latest']
-          : ['npx', '@codemcp/workflows-server@latest'],
+        command: 'npx',
+        args: ['@codemcp/workflows-server@latest'],
       },
     };
   }

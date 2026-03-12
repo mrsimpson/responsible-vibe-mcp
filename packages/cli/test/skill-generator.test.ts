@@ -94,9 +94,11 @@ describe('Skill Generator', () => {
 
       expect(config.mcpServers).toBeDefined();
       expect(config.mcpServers['workflows']).toBeDefined();
-      // command should be an array
-      expect(Array.isArray(config.mcpServers['workflows'].command)).toBe(true);
-      expect(config.mcpServers['workflows'].command).toContain('npx');
+      // command should be a string, args should be an array
+      expect(config.mcpServers['workflows'].command).toBe('npx');
+      expect(config.mcpServers['workflows'].args).toContain(
+        '@codemcp/workflows-server@latest'
+      );
     });
   });
 
@@ -146,7 +148,7 @@ describe('Skill Generator', () => {
       expect(config.mcp).toBeDefined();
       expect(config.mcp['workflows']).toBeDefined();
       expect(config.mcp['workflows'].type).toBe('local');
-      // command should be an array
+      // OpenCode uses command as array
       expect(Array.isArray(config.mcp['workflows'].command)).toBe(true);
       expect(config.mcp['workflows'].command).toContain('npx');
       expect(config.mcp['workflows'].command).toContain(
