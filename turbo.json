@@ -15,7 +15,7 @@
     },
     "build": {
       "dependsOn": ["^build"],
-      "outputs": ["dist/**", "resources/**", "tsconfig.tsbuildinfo"]
+      "outputs": ["dist/**", "tsconfig.tsbuildinfo"]
     },
     "clean:build": {
       "dependsOn": ["build"]
