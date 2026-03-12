@@ -140,3 +140,4 @@ dist
 .DS_Store
 **/.DS_Store
 packages/mcp-server/resources
+packages/cli/resources

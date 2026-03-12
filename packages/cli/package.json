@@ -4,7 +4,8 @@
   "description": "CLI tools for responsible-vibe development workflows",
   "type": "module",
   "scripts": {
-    "build": "tsup",
+    "build": "tsup && pnpm copy-resources",
+    "copy-resources": "rm -rf resources && cp -r ../core/resources .",
     "build:tsc": "tsc -p tsconfig.build.json",
     "test": "vitest --run",
     "clean:build": "rimraf ./dist",
