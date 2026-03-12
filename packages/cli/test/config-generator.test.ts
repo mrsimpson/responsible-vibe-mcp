@@ -46,20 +46,27 @@ describe('Config Generator', () => {
     it('should generate Claude configuration files', async () => {
       await generateConfig('claude', tempDir);
 
-      // Check CLAUDE.md
-      const claudeMdPath = join(tempDir, 'CLAUDE.md');
-      expect(existsSync(claudeMdPath)).toBe(true);
-      const claudeContent = readFileSync(claudeMdPath, 'utf-8');
-      expect(claudeContent).toContain('whats_next');
+      // Check .claude/agents/vibe.md (agent config)
+      const agentPath = join(tempDir, '.claude', 'agents', 'vibe.md');
+      expect(existsSync(agentPath)).toBe(true);
+      const agentContent = readFileSync(agentPath, 'utf-8');
+      expect(agentContent).toContain('---');
+      expect(agentContent).toContain('name: Responsible Vibe');
+      expect(agentContent).toContain('description:');
+      expect(agentContent).toContain('whats_next');
 
       // Check .mcp.json
       const mcpJsonPath = join(tempDir, '.mcp.json');
       expect(existsSync(mcpJsonPath)).toBe(true);
       const mcpConfig = JSON.parse(readFileSync(mcpJsonPath, 'utf-8'));
       expect(mcpConfig.mcpServers).toBeDefined();
+      expect(mcpConfig.mcpServers['workflows'].command).toBe('npx');
+      expect(mcpConfig.mcpServers['workflows'].args).toContain(
+        '@codemcp/workflows-server@latest'
+      );
 
-      // Check settings.json
-      const settingsPath = join(tempDir, 'settings.json');
+      // Check .claude/settings.json
+      const settingsPath = join(tempDir, '.claude', 'settings.json');
       expect(existsSync(settingsPath)).toBe(true);
       const settings = JSON.parse(readFileSync(settingsPath, 'utf-8'));
       expect(settings.permissions.allow).toContain('MCP(workflows:whats_next)');
@@ -246,8 +253,10 @@ describe('Config Generator', () => {
         expect(mcpConfig.mcpServers['workflows']).toBeDefined();
       });
 
-      it('should merge settings.json with existing permissions', async () => {
-        const settingsPath = join(tempDir, 'settings.json');
+      it('should merge .claude/settings.json with existing permissions', async () => {
+        const claudeDir = join(tempDir, '.claude');
+        mkdirSync(claudeDir, { recursive: true });
+        const settingsPath = join(claudeDir, 'settings.json');
 
         // Create existing settings
         const existingSettings = {
