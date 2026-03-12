@@ -8,8 +8,10 @@ export default defineConfig({
   dts: false,
   clean: true,
   bundle: true,
-  // Keep core as external - it has resources that can't be bundled
-  external: ['@modelcontextprotocol/sdk', 'zod', '@codemcp/workflows-core'],
+  // SDK and zod are peer/external deps
+  external: ['@modelcontextprotocol/sdk', 'zod'],
+  // Bundle core into the output (it's private, not published)
+  noExternal: ['@codemcp/workflows-core'],
   target: 'node20',
   sourcemap: false,
 });
