@@ -78,11 +78,14 @@ async function main() {
   }
 }
 
+// Export for explicit invocation by the CLI wrapper
+export { main as startMcpServer };
+
 // Start the server if this file is run directly
 // More robust check that works with npx and direct execution
 const isMainModule =
   import.meta.url === `file://${process.argv[1]}` ||
-  process.argv[1]?.endsWith('@codemcp/workflows-server') ||
+  process.argv[1]?.endsWith('ade-workflows-server') ||
   process.argv[1]?.endsWith('index.js');
 
 if (isMainModule) {
