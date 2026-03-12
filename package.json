@@ -18,6 +18,7 @@
   "files": [
     "packages/*/dist/**/*",
     "packages/*/package.json",
+    "packages/*/resources/**/*",
     "packages/docs/.vitepress/dist/**/*",
     "resources/**/*",
     "README.md",
