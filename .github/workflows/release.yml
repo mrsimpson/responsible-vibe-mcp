@@ -161,21 +161,9 @@ jobs:
       - name: Publish to npm
         if: steps.version.outputs.new_tag
         run: |
-          # Publish core package as the build will depended on it
-          cd packages/core
-          pnpm publish --access public --no-git-checks
-          cd ../..
-
-          # Publish MCP server as standalone package
-          cd packages/mcp-server
-          pnpm publish --access public --no-git-checks
-          cd ../..
-
-          # Convert workspace dependencies to actual versions for publishing
-          NEW_VERSION=${{ steps.version.outputs.new_version }}
-          find packages -name "package.json" -exec sed -i '' "s/\"workspace:\*\"/\"^$NEW_VERSION\"/g" {} \;
-
-          # Publish main package
-          git status && pnpm publish --access public --no-git-checks
+          # Publish only public packages (those without "private": true)
+          # Using pnpm publish with --filter to exclude private packages
+          pnpm --filter '@codemcp/workflows-server' publish --access public --no-git-checks
+          pnpm --filter '@codemcp/workflows' publish --access public --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
