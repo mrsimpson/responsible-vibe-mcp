@@ -1,6 +1,6 @@
 {
   "name": "@codemcp/workflows",
-  "version": "5.3.0",
+  "version": "6.0.0",
   "description": "A Model Context Protocol server that acts as an intelligent conversation state manager and development guide for LLMs, featuring comprehensive long-term memory with persistent project artifacts",
   "type": "module",
   "main": "packages/cli/dist/index.js",
@@ -58,6 +58,7 @@
   "devDependencies": {
     "@codemcp/workflows-core": "workspace:*",
     "@modelcontextprotocol/inspector": "0.19.0",
+    "@oxlint/linux-x64-gnu": "^1.43.0",
     "@tsconfig/node24": "24.0.4",
     "@tsconfig/strictest": "2.0.8",
     "@types/jsdom": "27.0.0",
