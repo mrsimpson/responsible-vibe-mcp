@@ -1,5 +1,5 @@
 /**
- * Plugin system interfaces for extending the responsible-vibe-mcp server
+ * Plugin system interfaces for extending the workflows server
  *
  * Core Principle: Plugins receive only read-only context data and cannot
  * directly manipulate core server components. They extend behavior through

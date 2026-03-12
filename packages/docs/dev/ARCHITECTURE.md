@@ -59,21 +59,21 @@ Responsible-Vibe-MCP is organized as a monorepo with clear package separation an
 ### Package Structure
 
 ```
-responsible-vibe-mcp/
+@codemcp/workflows/
 ├── packages/
-│   ├── core/                    # @responsible-vibe/core
+│   ├── core/                    # @codemcp/workflows-core
 │   │   ├── src/                 # Core functionality (state machine, workflow management, database)
 │   │   └── dist/                # Compiled TypeScript output
-│   ├── mcp-server/              # @responsible-vibe/mcp-server
+│   ├── mcp-server/              # @codemcp/workflows-server
 │   │   ├── src/                 # MCP server implementation and tool handlers
 │   │   └── dist/                # Compiled server with bundled dependencies
-│   ├── cli/                     # @responsible-vibe/cli
+│   ├── cli/                     # @codemcp/workflows-cli
 │   │   ├── src/                 # CLI tools and main entry point
 │   │   └── dist/                # CLI executables
-│   ├── visualizer/              # @responsible-vibe/visualizer
+│   ├── visualizer/              # @codemcp/workflows-visualizer
 │   │   ├── src/                 # Vue.js workflow visualization component
 │   │   └── dist/                # Built component for reuse
-│   └── docs/                    # @responsible-vibe/docs
+│   └── docs/                    # @codemcp/workflows-docs
 │       ├── .vitepress/          # VitePress documentation site
 │       └── dev/                 # Developer documentation
 ├── resources/                   # Workflow definitions and templates
@@ -108,7 +108,7 @@ graph TD
 
 ### Publishing Strategy
 
-The monorepo publishes as a single `responsible-vibe-mcp` package containing all built packages, maintaining backward compatibility while providing the benefits of modular development.
+The monorepo publishes as a single `@codemcp/workflows` package containing all built packages, maintaining backward compatibility while providing the benefits of modular development.
 
 ## Static Architecture
 

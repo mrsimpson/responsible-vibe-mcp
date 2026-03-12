@@ -399,7 +399,7 @@ export class WorkflowManager {
       );
     }
 
-    // Strategy 4: npx cache locations (for npx responsible-vibe-mcp@latest)
+    // Strategy 4: npx cache locations (for npx @codemcp/workflows-server@latest)
     // npx typically caches packages in ~/.npm/_npx or similar locations
     const homeDir = process.env.HOME || process.env.USERPROFILE;
     if (homeDir) {
@@ -414,7 +414,7 @@ export class WorkflowManager {
       for (const cachePath of npxCachePaths) {
         if (fs.existsSync(cachePath)) {
           try {
-            // Look for responsible-vibe-mcp in cache subdirectories
+            // Look for @codemcp/workflows in cache subdirectories
             const cacheEntries = fs.readdirSync(cachePath);
             for (const entry of cacheEntries) {
               const entryPath = path.join(cachePath, entry);
@@ -452,7 +452,8 @@ export class WorkflowManager {
     try {
       // Try to resolve the package.json of our own package
       const require = createRequire(import.meta.url);
-      const packagePath = require.resolve('responsible-vibe-mcp/package.json');
+      const packagePath =
+        require.resolve('@codemcp/workflows-core/package.json');
       const packageDir = path.dirname(packagePath);
       strategies.push(path.join(packageDir, 'resources/workflows'));
     } catch (_error) {

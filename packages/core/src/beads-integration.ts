@@ -20,7 +20,7 @@ export interface BeadsPhaseTask {
 }
 
 /**
- * Beads integration manager for responsible-vibe-mcp
+ * Beads integration manager for the workflows server
  */
 export class BeadsIntegration {
   private projectPath: string;

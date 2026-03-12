@@ -1,10 +1,10 @@
 # Agent Setup Guide
 
-This guide explains how to set up AI coding agents to work with the responsible-vibe-mcp server.
+This guide explains how to set up AI coding agents to work with the workflows server.
 
 ## Core Concepts
 
-Every AI coding agent needs two things to work with responsible-vibe-mcp:
+Every AI coding agent needs two things to work with the workflows server:
 
 ### 1. System Prompt
 
@@ -17,14 +17,14 @@ Instructions that tell the agent how to use the MCP tools. The system prompt tea
 
 ### 2. MCP Server Connection
 
-A connection to the responsible-vibe-mcp server that provides the actual tools:
+A connection to the workflows server that provides the actual tools:
 
 ```json
 {
   "mcpServers": {
-    "responsible-vibe-mcp": {
+    "workflows": {
       "command": "npx",
-      "args": ["responsible-vibe-mcp"]
+      "args": ["-y", "@codemcp/workflows-server"]
     }
   }
 }
@@ -35,7 +35,7 @@ A connection to the responsible-vibe-mcp server that provides the actual tools:
 The CLI generates both the system prompt and MCP configuration for your agent:
 
 ```bash
-npx responsible-vibe-mcp setup <mode> <target>
+npx @codemcp/workflows setup <mode> <target>
 ```
 
 ### Modes
@@ -63,15 +63,15 @@ npx responsible-vibe-mcp setup <mode> <target>
 
 ```bash
 # Config mode - embeds system prompt
-npx responsible-vibe-mcp setup config claude
-npx responsible-vibe-mcp setup config kiro
+npx @codemcp/workflows setup config claude
+npx @codemcp/workflows setup config kiro
 
 # Skill mode - on-demand loading
-npx responsible-vibe-mcp setup skill copilot
-npx responsible-vibe-mcp setup skill gemini
+npx @codemcp/workflows setup skill copilot
+npx @codemcp/workflows setup skill gemini
 
 # List all available targets
-npx responsible-vibe-mcp setup
+npx @codemcp/workflows setup
 ```
 
 ## Manual Setup
@@ -85,9 +85,9 @@ For unsupported agents or custom configurations:
    ```json
    {
      "mcpServers": {
-       "responsible-vibe-mcp": {
+       "workflows": {
          "command": "npx",
-         "args": ["responsible-vibe-mcp"]
+         "args": ["-y", "@codemcp/workflows-server"]
        }
      }
    }
@@ -120,7 +120,7 @@ After setup, verify the integration works:
 
 **"Tool not found" errors:**
 
-- Run `npx responsible-vibe-mcp` directly to test the server
+- Run `npx @codemcp/workflows` directly to test the server
 - Check server configuration path and permissions
 
 **Project path issues:**

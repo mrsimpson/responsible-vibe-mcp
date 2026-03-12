@@ -84,7 +84,6 @@ describe('Skill Generator', () => {
 
       // Check content includes system prompt (dynamically generated)
       expect(content).toContain('whats_next');
-      expect(content).toContain('responsible-vibe-mcp');
     });
 
     it('should generate valid MCP config', async () => {
@@ -94,14 +93,10 @@ describe('Skill Generator', () => {
       const config = JSON.parse(readFileSync(mcpPath, 'utf-8'));
 
       expect(config.mcpServers).toBeDefined();
-      expect(config.mcpServers['responsible-vibe-mcp']).toBeDefined();
+      expect(config.mcpServers['workflows']).toBeDefined();
       // command should be an array
-      expect(
-        Array.isArray(config.mcpServers['responsible-vibe-mcp'].command)
-      ).toBe(true);
-      expect(config.mcpServers['responsible-vibe-mcp'].command).toContain(
-        'npx'
-      );
+      expect(Array.isArray(config.mcpServers['workflows'].command)).toBe(true);
+      expect(config.mcpServers['workflows'].command).toContain('npx');
     });
   });
 
@@ -149,15 +144,13 @@ describe('Skill Generator', () => {
       // OpenCode uses 'mcp' key with specific structure
       expect(config.$schema).toBe('https://opencode.ai/config.json');
       expect(config.mcp).toBeDefined();
-      expect(config.mcp['responsible-vibe-mcp']).toBeDefined();
-      expect(config.mcp['responsible-vibe-mcp'].type).toBe('local');
+      expect(config.mcp['workflows']).toBeDefined();
+      expect(config.mcp['workflows'].type).toBe('local');
       // command should be an array
-      expect(Array.isArray(config.mcp['responsible-vibe-mcp'].command)).toBe(
-        true
-      );
-      expect(config.mcp['responsible-vibe-mcp'].command).toContain('npx');
-      expect(config.mcp['responsible-vibe-mcp'].command).toContain(
-        '@codemcp/workflows@latest'
+      expect(Array.isArray(config.mcp['workflows'].command)).toBe(true);
+      expect(config.mcp['workflows'].command).toContain('npx');
+      expect(config.mcp['workflows'].command).toContain(
+        '@codemcp/workflows-server@latest'
       );
     });
   });
@@ -187,7 +180,7 @@ describe('Skill Generator', () => {
 
       // Copilot uses 'servers' key
       expect(config.servers).toBeDefined();
-      expect(config.servers['responsible-vibe-mcp']).toBeDefined();
+      expect(config.servers['workflows']).toBeDefined();
     });
   });
 
@@ -236,7 +229,6 @@ describe('Skill Generator', () => {
 
       // Verify it includes the dynamic system prompt content
       expect(content).toContain('whats_next');
-      expect(content).toContain('responsible-vibe-mcp');
     });
 
     it('should bundle MCP config inside power directory', async () => {
@@ -252,11 +244,11 @@ describe('Skill Generator', () => {
       const config = JSON.parse(readFileSync(mcpPath, 'utf-8'));
 
       expect(config.mcpServers).toBeDefined();
-      expect(config.mcpServers['responsible-vibe-mcp']).toBeDefined();
+      expect(config.mcpServers['workflows']).toBeDefined();
       // Kiro uses command + args format
-      expect(config.mcpServers['responsible-vibe-mcp'].command).toBe('npx');
-      expect(config.mcpServers['responsible-vibe-mcp'].args).toContain(
-        '@codemcp/workflows@latest'
+      expect(config.mcpServers['workflows'].command).toBe('npx');
+      expect(config.mcpServers['workflows'].args).toContain(
+        '@codemcp/workflows-server@latest'
       );
     });
   });
@@ -303,7 +295,6 @@ describe('Skill Generator', () => {
 
       // Verify it includes the dynamic system prompt content
       expect(content).toContain('whats_next');
-      expect(content).toContain('responsible-vibe-mcp');
     });
 
     it('should generate MCP config with command + args format', async () => {
@@ -313,11 +304,11 @@ describe('Skill Generator', () => {
       const config = JSON.parse(readFileSync(mcpPath, 'utf-8'));
 
       expect(config.mcpServers).toBeDefined();
-      expect(config.mcpServers['responsible-vibe-mcp']).toBeDefined();
+      expect(config.mcpServers['workflows']).toBeDefined();
       // Kiro CLI uses command + args format (not array)
-      expect(config.mcpServers['responsible-vibe-mcp'].command).toBe('npx');
-      expect(config.mcpServers['responsible-vibe-mcp'].args).toContain(
-        '@codemcp/workflows@latest'
+      expect(config.mcpServers['workflows'].command).toBe('npx');
+      expect(config.mcpServers['workflows'].args).toContain(
+        '@codemcp/workflows-server@latest'
       );
     });
 

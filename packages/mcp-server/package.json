@@ -1,18 +1,24 @@
 {
-  "name": "@codemcp/workflows",
+  "name": "@codemcp/workflows-server",
   "version": "5.3.0",
-  "description": "MCP server implementation for responsible-vibe",
+  "description": "Lightweight MCP server for responsible-vibe development workflows",
   "type": "module",
   "main": "dist/index.js",
   "bin": {
-    "responsible-vibe-mcp": "dist/index.js"
+    "ade-workflows-server": "dist/index.js"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "files": [
     "dist/**/*",
-    "skill/**/*"
+    "skill/**/*",
+    "resources/**/*"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
+    "build": "tsup && pnpm copy-resources",
+    "copy-resources": "rm -rf resources && cp -r ../core/resources .",
+    "build:tsc": "tsc -p tsconfig.build.json",
     "clean:build": "rimraf ./dist",
     "dev": "tsc --watch",
     "test": "vitest --run",
@@ -22,11 +28,13 @@
     "format": "prettier --write ."
   },
   "dependencies": {
-    "@codemcp/workflows-core": "workspace:*",
-    "@modelcontextprotocol/sdk": "1.25.3"
+    "@modelcontextprotocol/sdk": "1.25.3",
+    "zod": "^3.25.0"
   },
   "devDependencies": {
+    "@codemcp/workflows-core": "workspace:*",
     "@types/node": "^22.0.0",
+    "tsup": "^8.0.0",
     "typescript": "^5.9.3",
     "vitest": "4.0.18"
   }

@@ -1,6 +1,6 @@
-# Beads Integration for Responsible-Vibe-MCP
+# Beads Integration for Workflows Server
 
-Integration between responsible-vibe-mcp and [beads distributed issue tracker](https://github.com/steveyegge/beads) for enhanced AI agent task management.
+Integration between the workflows server and [beads distributed issue tracker](https://github.com/steveyegge/beads) for enhanced AI agent task management.
 
 ## Overview
 

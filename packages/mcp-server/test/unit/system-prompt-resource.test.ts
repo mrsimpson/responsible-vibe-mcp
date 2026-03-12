@@ -34,7 +34,7 @@ describe('System Prompt Resource', () => {
     expect(data.text).toContain(
       'You are an AI assistant that helps users develop software features'
     );
-    expect(data.text).toContain('responsible-vibe-mcp');
+    expect(data.text).toContain('workflows server');
     expect(data.text).toContain('whats_next()');
     expect(data.text).toContain('instructions');
     expect(data.text).toContain('development plan');

@@ -85,7 +85,7 @@ Starting development server...
    npm install
    npm run dev
    
-   Then open http://localhost:5173/responsible-vibe-mcp/ in your browser.
+   Then open http://localhost:5173/ in your browser.
 `);
     process.exit(1);
   }

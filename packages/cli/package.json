@@ -4,7 +4,9 @@
   "description": "CLI tools for responsible-vibe development workflows",
   "type": "module",
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
+    "build": "tsup && pnpm copy-resources",
+    "copy-resources": "rm -rf resources && cp -r ../core/resources .",
+    "build:tsc": "tsc -p tsconfig.build.json",
     "test": "vitest --run",
     "clean:build": "rimraf ./dist",
     "lint": "oxlint .",
@@ -12,14 +14,15 @@
     "format:check": "prettier --check .",
     "format": "prettier --write ."
   },
-  "dependencies": {
-    "@codemcp/workflows": "workspace:*",
-    "@codemcp/workflows-core": "workspace:*"
-  },
+  "dependencies": {},
   "devDependencies": {
+    "@codemcp/workflows-core": "workspace:*",
+    "@codemcp/workflows-server": "workspace:*",
     "@types/node": "^22.0.0",
     "rimraf": "^5.0.10",
+    "tsup": "^8.0.0",
     "typescript": "^5.9.3",
     "vitest": "4.0.18"
-  }
+  },
+  "private": true
 }

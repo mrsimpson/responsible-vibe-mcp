@@ -1,7 +1,7 @@
 /**
  * Plugin system exports
  *
- * This module provides the core plugin system for extending responsible-vibe-mcp
+ * This module provides the core plugin system for extending the workflows server
  * functionality without if-statements in the core application.
  */
 

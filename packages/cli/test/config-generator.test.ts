@@ -37,8 +37,8 @@ describe('Config Generator', () => {
       expect(config.name).toBe('vibe');
       expect(config.description).toBe('Responsible vibe development');
       expect(config.mcpServers).toBeDefined();
-      expect(config.tools).toContain('@responsible-vibe-mcp');
-      expect(config.allowedTools).toContain('@responsible-vibe-mcp/whats_next');
+      expect(config.tools).toContain('@workflows');
+      expect(config.allowedTools).toContain('@workflows/whats_next');
     });
   });
 
@@ -50,7 +50,7 @@ describe('Config Generator', () => {
       const claudeMdPath = join(tempDir, 'CLAUDE.md');
       expect(existsSync(claudeMdPath)).toBe(true);
       const claudeContent = readFileSync(claudeMdPath, 'utf-8');
-      expect(claudeContent).toContain('responsible-vibe-mcp');
+      expect(claudeContent).toContain('whats_next');
 
       // Check .mcp.json
       const mcpJsonPath = join(tempDir, '.mcp.json');
@@ -62,9 +62,7 @@ describe('Config Generator', () => {
       const settingsPath = join(tempDir, 'settings.json');
       expect(existsSync(settingsPath)).toBe(true);
       const settings = JSON.parse(readFileSync(settingsPath, 'utf-8'));
-      expect(settings.permissions.allow).toContain(
-        'MCP(responsible-vibe-mcp:whats_next)'
-      );
+      expect(settings.permissions.allow).toContain('MCP(workflows:whats_next)');
     });
   });
 
@@ -96,9 +94,9 @@ describe('Config Generator', () => {
       expect(existsSync(configPath)).toBe(true);
 
       const config = JSON.parse(readFileSync(configPath, 'utf-8'));
-      expect(config.mcp['responsible-vibe-mcp']).toBeDefined();
+      expect(config.mcp['workflows']).toBeDefined();
       expect(config.agent.vibe).toBeDefined();
-      expect(config.agent.vibe.tools['responsible-vibe-mcp*']).toBe(true);
+      expect(config.agent.vibe.tools['workflows*']).toBe(true);
     });
   });
 
@@ -110,7 +108,7 @@ describe('Config Generator', () => {
       const mcpJsonPath = join(tempDir, '.vscode', 'mcp.json');
       expect(existsSync(mcpJsonPath)).toBe(true);
       const mcpConfig = JSON.parse(readFileSync(mcpJsonPath, 'utf-8'));
-      expect(mcpConfig.servers['responsible-vibe-mcp']).toBeDefined();
+      expect(mcpConfig.servers['workflows']).toBeDefined();
 
       // Check .github/agents/Vibe.agent.md
       const agentPath = join(tempDir, '.github', 'agents', 'Vibe.agent.md');
@@ -120,14 +118,13 @@ describe('Config Generator', () => {
       // Check YAML frontmatter
       expect(agentContent).toContain('---');
       expect(agentContent).toContain(
-        'description: AI assistant that helps users develop software features using the responsible-vibe-mcp server.'
+        'description: AI assistant that helps users develop software features using the workflows server.'
       );
       expect(agentContent).toContain(
-        "tools: ['edit', 'runNotebooks', 'search', 'new', 'runCommands', 'runTasks', 'responsible-vibe-mcp/*'"
+        "tools: ['edit', 'runNotebooks', 'search', 'new', 'runCommands', 'runTasks', 'workflows/*'"
       );
 
       // Check system prompt content
-      expect(agentContent).toContain('responsible-vibe-mcp');
       expect(agentContent).toContain('whats_next()');
     });
   });
@@ -174,7 +171,7 @@ describe('Config Generator', () => {
         // Verify merge
         expect(config.customField).toBe('should be preserved');
         expect(config.mcp['custom-server']).toBeDefined();
-        expect(config.mcp['responsible-vibe-mcp']).toBeDefined();
+        expect(config.mcp['workflows']).toBeDefined();
         expect(config.agent['custom-agent']).toBeDefined();
         expect(config.agent.vibe).toBeDefined();
       });
@@ -218,7 +215,7 @@ describe('Config Generator', () => {
 
         // Verify merge
         expect(config.customField).toBe('preserved');
-        expect(config.tools).toContain('@responsible-vibe-mcp');
+        expect(config.tools).toContain('@workflows');
         expect(config.name).toBe('vibe');
       });
     });
@@ -246,7 +243,7 @@ describe('Config Generator', () => {
 
         // Verify merge
         expect(mcpConfig.mcpServers['custom-server']).toBeDefined();
-        expect(mcpConfig.mcpServers['responsible-vibe-mcp']).toBeDefined();
+        expect(mcpConfig.mcpServers['workflows']).toBeDefined();
       });
 
       it('should merge settings.json with existing permissions', async () => {
@@ -270,7 +267,7 @@ describe('Config Generator', () => {
         // Verify merge
         expect(settings.permissions.customField).toBe('preserved');
         expect(settings.permissions.allow).toContain(
-          'MCP(responsible-vibe-mcp:whats_next)'
+          'MCP(workflows:whats_next)'
         );
       });
     });
@@ -301,7 +298,7 @@ describe('Config Generator', () => {
         expect(settings.theme).toBe('Default');
         expect(settings.customField).toBe('preserved');
         expect(settings.mcpServers['existing-server']).toBeDefined();
-        expect(settings.mcpServers['responsible-vibe-mcp']).toBeDefined();
+        expect(settings.mcpServers['workflows']).toBeDefined();
       });
     });
   });

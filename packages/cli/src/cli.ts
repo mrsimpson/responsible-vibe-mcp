@@ -36,7 +36,7 @@ if (isLocal) {
   // Published package - use relative imports
   // Node.js cannot resolve @codemcp/workflows-core from subdirectories in published packages
   // because it expects packages in node_modules/@codemcp/workflows-core/, not
-  // node_modules/responsible-vibe-mcp/packages/core/
+  // node_modules/@codemcp/workflows/packages/core/
   const coreModule = await import('../../core/dist/index.js');
   generateSystemPrompt = coreModule.generateSystemPrompt as (
     stateMachine: unknown
@@ -588,8 +588,8 @@ function showHelp(): void {
 Responsible Vibe CLI Tools
 
 USAGE:
-  responsible-vibe-mcp [COMMAND]
-  responsible-vibe-mcp                      Start the interactive visualizer (default)
+  npx @codemcp/workflows [COMMAND]
+  npx @codemcp/workflows             Start the interactive visualizer (default)
 
 SETUP COMMANDS:
   setup <target>                Generate skill files for a coding tool (default mode)
@@ -622,7 +622,7 @@ DESCRIPTION:
 
 MORE INFO:
   GitHub: https://github.com/mrsimpson/responsible-vibe-mcp
-  npm: https://www.npmjs.com/package/responsible-vibe-mcp
+  npm: https://www.npmjs.com/package/@codemcp/workflows
 `);
 }
 
