@@ -56,25 +56,20 @@ export class WorkflowResourceHandler implements ResourceHandler {
       const currentFileUrl = import.meta.url;
       const currentFilePath = fileURLToPath(currentFileUrl);
 
-      // Navigate from the compiled location to the project root
-      // From dist/server/resource-handlers/workflow-resource.js -> project root
-      let projectRoot: string;
+      // Navigate from the compiled location to the package root
+      // tsup bundles everything into dist/index.js, so we only need to go up 1 level from dist/
+      let packageRoot: string;
       if (currentFilePath.includes('/dist/')) {
-        // Running from compiled code - from packages/mcp-server/dist/resource-handlers/ to project root is 4 levels up
-        projectRoot = path.resolve(
-          path.dirname(currentFilePath),
-          '../../../../'
-        );
+        // Running from compiled/bundled code - dist/index.js -> package root is 1 level up from dist/
+        const distDir = path.dirname(currentFilePath);
+        packageRoot = path.resolve(distDir, '..');
       } else {
-        // Running from source (development) - src is 4 levels down from project root
-        projectRoot = path.resolve(
-          path.dirname(currentFilePath),
-          '../../../../'
-        );
+        // Running from source (development) - src/resource-handlers/ -> package root is 2 levels up
+        packageRoot = path.resolve(path.dirname(currentFilePath), '../../');
       }
 
       const workflowFile = path.join(
-        projectRoot,
+        packageRoot,
         'resources',
         'workflows',
         `${workflowName}.yaml`
@@ -83,7 +78,7 @@ export class WorkflowResourceHandler implements ResourceHandler {
       if (!fs.existsSync(workflowFile)) {
         // Try .yml extension
         const workflowFileYml = path.join(
-          projectRoot,
+          packageRoot,
           'resources',
           'workflows',
           `${workflowName}.yml`
@@ -96,12 +91,12 @@ export class WorkflowResourceHandler implements ResourceHandler {
             {
               workflowName,
               currentFilePath,
-              projectRoot,
+              packageRoot,
               workflowFile,
               workflowFileYml,
-              workflowsDir: path.join(projectRoot, 'resources', 'workflows'),
+              workflowsDir: path.join(packageRoot, 'resources', 'workflows'),
               workflowsDirExists: fs.existsSync(
-                path.join(projectRoot, 'resources', 'workflows')
+                path.join(packageRoot, 'resources', 'workflows')
               ),
             }
           );
