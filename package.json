@@ -53,13 +53,10 @@
     "prepare": "husky"
   },
   "dependencies": {
-    "@codemcp/workflows-core": "workspace:*",
-    "@modelcontextprotocol/sdk": "1.25.3",
-    "@types/js-yaml": "4.0.9",
-    "js-yaml": "4.1.1",
-    "zod": "^3.25.76"
+    "@modelcontextprotocol/sdk": "1.25.3"
   },
   "devDependencies": {
+    "@codemcp/workflows-core": "workspace:*",
     "@modelcontextprotocol/inspector": "0.19.0",
     "@tsconfig/node24": "24.0.4",
     "@tsconfig/strictest": "2.0.8",
