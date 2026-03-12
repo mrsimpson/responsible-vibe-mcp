@@ -19,11 +19,13 @@ if (args.length === 0) {
   // No arguments, start MCP server
   const isLocal = existsSync(join(__dirname, '../../mcp-server/dist/index.js'));
   if (isLocal) {
-    import('../../mcp-server/dist/index.js');
+    const { startMcpServer } = await import('../../mcp-server/dist/index.js');
+    await startMcpServer();
   } else {
     // Use string literal to avoid TypeScript resolution issues
     const mcpServerModule = '@codemcp/workflows-server';
-    import(mcpServerModule);
+    const { startMcpServer } = await import(mcpServerModule);
+    await startMcpServer();
   }
 } else {
   // Any arguments, run CLI
