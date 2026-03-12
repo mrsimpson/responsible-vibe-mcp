@@ -12,10 +12,12 @@
   },
   "files": [
     "dist/**/*",
-    "skill/**/*"
+    "skill/**/*",
+    "resources/**/*"
   ],
   "scripts": {
-    "build": "tsup",
+    "build": "tsup && pnpm copy-resources",
+    "copy-resources": "rm -rf resources && mkdir -p resources && cp -r ../core/resources/* resources/",
     "build:tsc": "tsc -p tsconfig.build.json",
     "clean:build": "rimraf ./dist",
     "dev": "tsc --watch",

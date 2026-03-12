@@ -139,3 +139,4 @@ dist
 # Mac
 .DS_Store
 **/.DS_Store
+packages/mcp-server/resources
