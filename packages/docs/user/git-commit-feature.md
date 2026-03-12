@@ -1,6 +1,6 @@
 # Git Commits
 
-responsible-vibe-mcp server supports configurable automatic git commits during development. This allows for simpler rollbacks – independent of whether the agent itself supports rollbacks (which usually only roll-back conversation history).
+The workflows server supports configurable automatic git commits during development. This allows for simpler rollbacks – independent of whether the agent itself supports rollbacks (which usually only roll-back conversation history).
 
 ## Configuration
 

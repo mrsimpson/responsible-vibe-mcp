@@ -2,7 +2,7 @@
  * System Prompt Generator for Vibe Feature MCP
  *
  * Dynamically generates a comprehensive system prompt for LLMs to properly
- * integrate with the responsible-vibe-mcp server. The prompt is generated from
+ * integrate with the workflows server. The prompt is generated from
  * the actual state machine definition to ensure accuracy and consistency.
  */
 
@@ -32,7 +32,7 @@ function generateSimpleSystemPrompt(_stateMachine: YamlStateMachine): string {
   logger.debug('Generating system prompt');
 
   const systemPrompt = `
-You are an AI assistant that helps users develop software features using the responsible-vibe-mcp server.
+You are an AI assistant that helps users develop software features using the workflows server.
 
 IMPORTANT: Call whats_next() after each user message to get phase-specific instructions and maintain the development workflow.
 

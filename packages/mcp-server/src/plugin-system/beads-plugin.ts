@@ -1,7 +1,7 @@
 /**
  * Beads Plugin Implementation
  *
- * Plugin that integrates beads task management system with responsible-vibe-mcp.
+ * Plugin that integrates beads task management system with the workflows server.
  * Encapsulates ALL beads-specific functionality to maintain zero core application
  * coupling as specified in plugin architecture design.
  *

@@ -2,7 +2,7 @@
 
 [![Tests](https://github.com/mrsimpson/vibe-feature-mcp/actions/workflows/pr.yml/badge.svg)](https://github.com/mrsimpson/vibe-feature-mcp/actions/workflows/pr.yml)
 [![Release](https://github.com/mrsimpson/vibe-feature-mcp/actions/workflows/release.yml/badge.svg)](https://github.com/mrsimpson/vibe-feature-mcp/actions/workflows/release.yml)
-[![npm version](https://badge.fury.io/js/responsible-vibe-mcp.svg)](https://badge.fury.io/js/responsible-vibe-mcp)
+[![npm version](https://badge.fury.io/js/@codemcp%2Fworkflows.svg)](https://badge.fury.io/js/@codemcp%2Fworkflows)
 
 Transform any AI coding agent into a structured development partner with battle-tested engineering workflows.
 
@@ -55,7 +55,7 @@ The problem: **The faster agents become, the harder it is to engineer**. I stron
 
 Responsible-Vibe-MCP helps to **fill the conversation context with contents from YOUR brain** – instead of relying the agent will have understood what you should have thought about.
 
-And since may developers tend to through structured processing off the cliff once they think they start coding, responsible-vibe-mcp will maintain **proactive process guidance** - your AI knows what to do next in each development phase, follow proven engineering methodologies, and maintain long-term project context.
+And since may developers tend to through structured processing off the cliff once they think they start coding, the workflows server will maintain **proactive process guidance** - your AI knows what to do next in each development phase, follow proven engineering methodologies, and maintain long-term project context.
 
 ## How It Works
 

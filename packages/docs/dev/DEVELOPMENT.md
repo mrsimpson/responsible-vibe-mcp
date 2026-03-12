@@ -179,7 +179,7 @@ Logs can be queried by conversation ID for analysis and debugging purposes. No U
 ```bash
 # Clone the repository
 git clone <repository-url>
-cd responsible-vibe-mcp
+cd  <the folder you cloned to>
 
 # Install dependencies
 npm install
@@ -190,7 +190,7 @@ npm run build
 
 ## Project File Organization
 
-The server creates a `.vibe` subdirectory in your project to store all responsible-vibe-mcp related files:
+The server creates a `.vibe` subdirectory in your project to store all workflow related files:
 
 ```
 your-project/
@@ -296,7 +296,7 @@ docs/
 Enable debug logging to see detailed execution flow:
 
 ```bash
-LOG_LEVEL=DEBUG npx responsible-vibe-mcp
+LOG_LEVEL=DEBUG npx @codemcp/workflows-server
 ```
 
 ### Testing with MCP Inspector

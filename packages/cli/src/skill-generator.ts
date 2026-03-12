@@ -79,10 +79,10 @@ export abstract class SkillGenerator {
     const isWindows = process.platform.startsWith('win');
 
     return {
-      'responsible-vibe-mcp': {
+      workflows: {
         command: isWindows
-          ? ['cmd', '/c', 'npx', '@codemcp/workflows@latest']
-          : ['npx', '@codemcp/workflows@latest'],
+          ? ['cmd', '/c', 'npx', '@codemcp/workflows-server@latest']
+          : ['npx', '@codemcp/workflows-server@latest'],
       },
     };
   }
@@ -95,17 +95,17 @@ export abstract class SkillGenerator {
 
     if (isWindows) {
       return {
-        'responsible-vibe-mcp': {
+        workflows: {
           command: 'cmd',
-          args: ['/c', 'npx', '@codemcp/workflows@latest'],
+          args: ['/c', 'npx', '@codemcp/workflows-server@latest'],
         },
       };
     }
 
     return {
-      'responsible-vibe-mcp': {
+      workflows: {
         command: 'npx',
-        args: ['@codemcp/workflows@latest'],
+        args: ['@codemcp/workflows-server@latest'],
       },
     };
   }
@@ -281,11 +281,11 @@ class OpenCodeSkillGenerator extends SkillGenerator {
     const isWindows = process.platform.startsWith('win');
 
     const mcpConfig = {
-      'responsible-vibe-mcp': {
+      workflows: {
         type: 'local' as const,
         command: isWindows
-          ? ['cmd', '/c', 'npx', '@codemcp/workflows@latest']
-          : ['npx', '@codemcp/workflows@latest'],
+          ? ['cmd', '/c', 'npx', '@codemcp/workflows-server@latest']
+          : ['npx', '@codemcp/workflows-server@latest'],
       },
     };
 

@@ -87,7 +87,7 @@ export async function initializeServerComponents(
   // Initialize MCP server
   const mcpServer = new McpServer(
     {
-      name: 'responsible-vibe-mcp',
+      name: 'workflows',
       version: '1.0.0',
     },
     {
@@ -482,7 +482,7 @@ export async function registerMcpTools(
     'get_tool_info',
     {
       description:
-        'Get comprehensive information about the responsible-vibe-mcp development workflow tools for better tool discoverability and AI integration. Returns detailed information about all available tools, workflows, core concepts, and usage guidelines.',
+        'Get comprehensive information about the workflows development workflow tools for better tool discoverability and AI integration. Returns detailed information about all available tools, workflows, core concepts, and usage guidelines.',
       inputSchema: {
         // No input parameters needed
       },
@@ -668,7 +668,7 @@ export function registerMcpResources(
     'system-prompt://',
     {
       description:
-        'Complete system prompt for LLM integration with responsible-vibe-mcp. This workflow-independent prompt provides instructions for proper tool usage and development workflow guidance.',
+        'Complete system prompt for LLM integration with the workflows server. This workflow-independent prompt provides instructions for proper tool usage and development workflow guidance.',
       mimeType: 'text/plain',
     },
     async (uri: URL) => {

@@ -1,7 +1,7 @@
 /**
  * Get Tool Info Handler
  *
- * Provides comprehensive information about the responsible-vibe-mcp development
+ * Provides comprehensive information about the workflows development
  * workflow tools for better tool discoverability and AI integration.
  */
 

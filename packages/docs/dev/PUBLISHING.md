@@ -29,7 +29,7 @@ The project uses GitHub Actions to automatically:
 
 ### 2. Package Information
 
-- **Package Name**: `@mrsimpson/responsible-vibe-mcp`
+- **Package Name**: `@codemcp/workflows`
 - **Registry**: npm (https://registry.npmjs.org)
 - **Access**: Public (scoped package)
 
@@ -102,7 +102,7 @@ If needed, you can manually trigger releases:
 
 ### Checking Status:
 
-- **npm package**: https://www.npmjs.com/package/@mrsimpson/responsible-vibe-mcp
+- **npm package**: https://www.npmjs.com/package/@codemcp/workflows
 - **GitHub releases**: https://github.com/mrsimpson/vibe-feature-mcp/releases
 - **Actions logs**: https://github.com/mrsimpson/vibe-feature-mcp/actions
 

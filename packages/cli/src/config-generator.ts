@@ -131,16 +131,16 @@ abstract class ConfigGenerator {
     const isWindows = process.platform.startsWith('win');
 
     return {
-      'responsible-vibe-mcp': {
+      workflows: {
         command: isWindows
-          ? ['cmd', '/c', 'npx', '@codemcp/workflows@latest']
-          : ['npx', '@codemcp/workflows@latest'],
+          ? ['cmd', '/c', 'npx', '@codemcp/workflows-server@latest']
+          : ['npx', '@codemcp/workflows-server@latest'],
       },
     };
   }
 
   /**
-   * Get default allowed tools for responsible-vibe-mcp
+   * Get default allowed tools for workflows
    */
   protected getDefaultAllowedTools(): string[] {
     return ['whats_next', 'conduct_review', 'list_workflows', 'get_tool_info'];
@@ -170,15 +170,15 @@ class AmazonQConfigGenerator extends ConfigGenerator {
         'knowledge',
         'thinking',
         'use_aws',
-        '@responsible-vibe-mcp',
+        '@workflows',
       ],
       allowedTools: [
         'fs_read',
         'fs_write',
-        '@responsible-vibe-mcp/whats_next',
-        '@responsible-vibe-mcp/conduct_review',
-        '@responsible-vibe-mcp/list_workflows',
-        '@responsible-vibe-mcp/get_tool_info',
+        '@workflows/whats_next',
+        '@workflows/conduct_review',
+        '@workflows/list_workflows',
+        '@workflows/get_tool_info',
       ],
       toolsSettings: {
         execute_bash: {
@@ -242,10 +242,10 @@ class ClaudeConfigGenerator extends ConfigGenerator {
     const settings: Record<string, unknown> = {
       permissions: {
         allow: [
-          'MCP(responsible-vibe-mcp:whats_next)',
-          'MCP(responsible-vibe-mcp:conduct_review)',
-          'MCP(responsible-vibe-mcp:list_workflows)',
-          'MCP(responsible-vibe-mcp:get_tool_info)',
+          'MCP(workflows:whats_next)',
+          'MCP(workflows:conduct_review)',
+          'MCP(workflows:list_workflows)',
+          'MCP(workflows:get_tool_info)',
           'Read(README.md)',
           'Read(./.vibe/**)',
           'Write(./.vibe/**)',
@@ -282,7 +282,7 @@ class GeminiConfigGenerator extends ConfigGenerator {
       vimMode: false,
       sandbox: false,
       mcpServers: mcpServers,
-      allowMCPServers: ['responsible-vibe-mcp'],
+      allowMCPServers: ['workflows'],
       coreTools: ['ReadFileTool', 'WriteFileTool', 'GlobTool', 'ShellTool'],
       telemetry: {
         enabled: false,
@@ -308,7 +308,7 @@ ${systemPrompt}
 
 ## Project Context
 
-This agent is configured to work with the responsible-vibe-mcp server for structured development workflows.
+This agent is configured to work with the workflows server for structured development workflows.
 
 ## Available Tools
 
@@ -335,11 +335,11 @@ class OpencodeConfigGenerator extends ConfigGenerator {
     const newConfig: Record<string, unknown> = {
       $schema: 'https://opencode.ai/config.json',
       mcp: {
-        'responsible-vibe-mcp': {
+        workflows: {
           type: 'local',
           command: isWindows
-            ? ['cmd', '/c', 'npx', '@codemcp/workflows@latest']
-            : ['npx', '@codemcp/workflows@latest'],
+            ? ['cmd', '/c', 'npx', '@codemcp/workflows-server@latest']
+            : ['npx', '@codemcp/workflows-server@latest'],
         },
       },
       agent: {
@@ -349,12 +349,12 @@ class OpencodeConfigGenerator extends ConfigGenerator {
           mode: 'primary',
           prompt: systemPrompt,
           tools: {
-            'responsible-vibe-mcp*': true,
+            'workflows*': true,
           },
           permission: {
-            'responsible-vibe-mcp_reset_development': 'ask',
-            'responsible-vibe-mcp_start_development': 'ask',
-            'responsible-vibe-mcp_proceed_to_phase': 'ask',
+            workflows_reset_development: 'ask',
+            workflows_start_development: 'ask',
+            workflows_proceed_to_phase: 'ask',
           },
         },
       },
@@ -392,8 +392,8 @@ class VSCodeConfigGenerator extends ConfigGenerator {
     await mkdir(githubAgentsDir, { recursive: true });
 
     const agentContent = `---
-description: AI assistant that helps users develop software features using the responsible-vibe-mcp server.
-tools: ['edit', 'runNotebooks', 'search', 'new', 'runCommands', 'runTasks', 'responsible-vibe-mcp/*', 'usages', 'vscodeAPI', 'problems', 'changes', 'testFailure', 'openSimpleBrowser', 'fetch', 'githubRepo', 'extensions', 'runSubagent']
+description: AI assistant that helps users develop software features using the workflows server.
+tools: ['edit', 'runNotebooks', 'search', 'new', 'runCommands', 'runTasks', 'workflows/*', 'usages', 'vscodeAPI', 'problems', 'changes', 'testFailure', 'openSimpleBrowser', 'fetch', 'githubRepo', 'extensions', 'runSubagent']
 ---
 
 ${systemPrompt}

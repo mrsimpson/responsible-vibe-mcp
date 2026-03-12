@@ -82,7 +82,7 @@ async function main() {
 // More robust check that works with npx and direct execution
 const isMainModule =
   import.meta.url === `file://${process.argv[1]}` ||
-  process.argv[1]?.endsWith('responsible-vibe-mcp') ||
+  process.argv[1]?.endsWith('@codemcp/workflows-server') ||
   process.argv[1]?.endsWith('index.js');
 
 if (isMainModule) {

@@ -11,7 +11,7 @@ Responsible-Vibe-MCP supports **collaborative workflows** that enable teams of s
 Use the CLI to copy pre-configured agent definitions to your project:
 
 ```bash
-npx responsible-vibe-mcp@latest agents copy
+npx @codemcp/workflows@latest agents copy
 ```
 
 This creates three agent configurations in `.crowd/agents/`:
@@ -25,14 +25,14 @@ Each agent is pre-configured with:
 - `VIBE_ROLE` environment variable (business-analyst, architect, or developer)
 - `VIBE_WORKFLOW_DOMAINS=sdd-crowd` to access collaborative workflows
 - System prompts explaining team collaboration
-- MCP server connection to responsible-vibe-mcp
+- MCP server connection to workflows server
 
 ### 2. Give This Prompt to Your Orchestrator
 
 Copy this prompt and give it to your orchestrating agent (the one with access to crowd-mcp tools):
 
 ```
-You are orchestrating a team of AI agents using crowd-mcp and responsible-vibe-mcp.
+You are orchestrating a team of AI agents using crowd-mcp and the workflows server.
 
 ## Agent Discovery
 
@@ -245,7 +245,7 @@ mcpServers:
   responsible-vibe:
     type: stdio
     command: npx
-    args: [responsible-vibe-mcp@latest]
+    args: [@codemcp/workflows-server@latest]
     env:
       VIBE_ROLE: business-analyst
       VIBE_WORKFLOW_DOMAINS: sdd-crowd

@@ -1,10 +1,10 @@
 # Agent Setup Guide
 
-This guide explains how to set up AI coding agents to work with the responsible-vibe-mcp server.
+This guide explains how to set up AI coding agents to work with the workflows server.
 
 ## Core Concepts
 
-Every AI coding agent needs two things to work with responsible-vibe-mcp:
+Every AI coding agent needs two things to work with the workflows server:
 
 ### 1. System Prompt
 
@@ -17,14 +17,14 @@ Instructions that tell the agent how to use the MCP tools. The system prompt tea
 
 ### 2. MCP Server Connection
 
-A connection to the responsible-vibe-mcp server that provides the actual tools:
+A connection to the workflows server that provides the actual tools:
 
 ```json
 {
   "mcpServers": {
-    "ade-workflows": {
+    "workflows": {
       "command": "npx",
-      "args": ["-y", "@codemcp/workflows"]
+      "args": ["-y", "@codemcp/workflows-server"]
     }
   }
 }
@@ -85,9 +85,9 @@ For unsupported agents or custom configurations:
    ```json
    {
      "mcpServers": {
-       "ade-workflows": {
+       "workflows": {
          "command": "npx",
-         "args": ["-y", "@codemcp/workflows"]
+         "args": ["-y", "@codemcp/workflows-server"]
        }
      }
    }
