@@ -49,6 +49,29 @@ import { generateConfig, GeneratorRegistry } from './config-generator.js';
 import { generateSkill, SkillGeneratorRegistry } from './skill-generator.js';
 
 /**
+ * Parse a named flag from an args array, supporting both space-separated and
+ * equals-sign notation:
+ *   --flag value       → returns "value"
+ *   --flag=value       → returns "value"
+ *
+ * Returns `undefined` when the flag is not present.
+ */
+export function parseFlag(args: string[], flag: string): string | undefined {
+  for (let i = 0; i < args.length; i++) {
+    const arg = args[i];
+    // --flag=value notation
+    if (arg.startsWith(`${flag}=`)) {
+      return arg.slice(flag.length + 1);
+    }
+    // --flag value notation
+    if (arg === flag && i + 1 < args.length) {
+      return args[i + 1];
+    }
+  }
+  return undefined;
+}
+
+/**
  * Parse command line arguments and handle CLI commands
  */
 async function parseCliArgs(): Promise<{ shouldExit: boolean }> {
@@ -70,9 +93,7 @@ async function parseCliArgs(): Promise<{ shouldExit: boolean }> {
       handleSetupList();
       return { shouldExit: true };
     } else if (subcommand) {
-      // Parse --mode flag
-      const modeIndex = args.findIndex(arg => arg === '--mode');
-      const mode = modeIndex !== -1 ? args[modeIndex + 1] : 'skill';
+      const mode = parseFlag(args, '--mode') ?? 'skill';
       if (mode !== 'skill' && mode !== 'config') {
         console.error('❌ Error: --mode must be "skill" or "config"');
         process.exit(1);
@@ -119,10 +140,7 @@ async function parseCliArgs(): Promise<{ shouldExit: boolean }> {
       handleCrowdList();
       return { shouldExit: true };
     } else if (subcommand === 'copy') {
-      // Check for --output-dir flag
-      const outputDirIndex = args.findIndex(arg => arg === '--output-dir');
-      const outputDir =
-        outputDirIndex !== -1 ? args[outputDirIndex + 1] : undefined;
+      const outputDir = parseFlag(args, '--output-dir');
       handleCrowdCopy(outputDir);
       return { shouldExit: true };
     } else {
