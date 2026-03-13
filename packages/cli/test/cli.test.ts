@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { parseFlag } from '../src/cli.js';
 
 // Use vi.hoisted for proper test isolation
 const mocks = vi.hoisted(() => ({
@@ -22,6 +23,9 @@ const mocks = vi.hoisted(() => ({
       'opencode',
       'copilot',
     ]),
+    exists: vi.fn((name: string) =>
+      ['kiro', 'claude', 'gemini', 'opencode', 'copilot'].includes(name)
+    ),
     getHelpText: vi.fn(
       () =>
         `  kiro                Generate .amazonq/cli-agents/vibe.json (Kiro/Amazon Q)
@@ -31,6 +35,20 @@ const mocks = vi.hoisted(() => ({
   copilot              Generate .vscode/mcp.json, .github/agents/Vibe.agent.md`
     ),
   },
+  SkillGeneratorRegistry: {
+    getGeneratorNames: vi.fn(() => [
+      'claude',
+      'gemini',
+      'opencode',
+      'copilot',
+      'kiro',
+    ]),
+    exists: vi.fn((name: string) =>
+      ['claude', 'gemini', 'opencode', 'copilot', 'kiro'].includes(name)
+    ),
+    getHelpText: vi.fn(() => ''),
+  },
+  generateSkill: vi.fn(),
 }));
 
 vi.mock('@codemcp/workflows-core', () => ({
@@ -62,6 +80,11 @@ vi.mock('node:child_process', () => ({
 vi.mock('../src/config-generator.js', () => ({
   generateConfig: mocks.generateConfig,
   GeneratorRegistry: mocks.GeneratorRegistry,
+}));
+
+vi.mock('../src/skill-generator.js', () => ({
+  generateSkill: mocks.generateSkill,
+  SkillGeneratorRegistry: mocks.SkillGeneratorRegistry,
 }));
 
 describe('CLI', () => {
@@ -142,8 +165,9 @@ describe('CLI', () => {
       kill: vi.fn(),
     } as unknown);
 
-    // Mock generateConfig to prevent actual file generation
+    // Mock generateConfig and generateSkill to prevent actual file generation
     mocks.generateConfig.mockResolvedValue(undefined);
+    mocks.generateSkill.mockResolvedValue(undefined);
 
     // Import from source
     const module = await import('../src/cli.js');
@@ -385,6 +409,48 @@ describe('CLI', () => {
     });
   });
 
+  describe('Setup Command --mode flag', () => {
+    it('should call generateConfig when --mode config is passed (space notation)', async () => {
+      process.argv = ['node', 'cli.js', 'setup', 'claude', '--mode', 'config'];
+
+      await runCli();
+
+      expect(mocks.generateConfig).toHaveBeenCalledWith('claude', '/mock/cwd');
+    });
+
+    it('should call generateConfig when --mode=config is passed (equals notation)', async () => {
+      process.argv = ['node', 'cli.js', 'setup', 'claude', '--mode=config'];
+
+      await runCli();
+
+      expect(mocks.generateConfig).toHaveBeenCalledWith('claude', '/mock/cwd');
+    });
+
+    it('should show error for invalid --mode value', async () => {
+      process.argv = ['node', 'cli.js', 'setup', 'claude', '--mode=invalid'];
+
+      processExitSpy.mockImplementation(() => undefined as never);
+
+      await runCli();
+
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        expect.stringContaining('--mode must be "skill" or "config"')
+      );
+    });
+
+    it('should show error for invalid --mode= value (equals notation)', async () => {
+      process.argv = ['node', 'cli.js', 'setup', 'claude', '--mode='];
+
+      processExitSpy.mockImplementation(() => undefined as never);
+
+      await runCli();
+
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        expect.stringContaining('--mode must be "skill" or "config"')
+      );
+    });
+  });
+
   describe('Unknown Arguments', () => {
     it('should show error for unknown command', () => {
       process.argv = ['node', 'cli.js', '--unknown-flag'];
@@ -397,6 +463,38 @@ describe('CLI', () => {
       );
       expect(consoleLogSpy).toHaveBeenCalledWith(
         expect.stringContaining('Responsible Vibe CLI Tools')
+      );
+    });
+  });
+
+  describe('parseFlag helper', () => {
+    it('returns value for --flag value notation', () => {
+      expect(parseFlag(['--mode', 'config'], '--mode')).toBe('config');
+    });
+
+    it('returns value for --flag=value notation', () => {
+      expect(parseFlag(['--mode=config'], '--mode')).toBe('config');
+    });
+
+    it('returns undefined when flag is absent', () => {
+      expect(parseFlag(['setup', 'claude'], '--mode')).toBeUndefined();
+    });
+
+    it('returns undefined when --flag appears last with no following value', () => {
+      expect(parseFlag(['--mode'], '--mode')).toBeUndefined();
+    });
+
+    it('handles empty string value from --flag= notation', () => {
+      expect(parseFlag(['--flag='], '--flag')).toBe('');
+    });
+
+    it('does not confuse prefix-matching flags (--mode vs --mode-extra)', () => {
+      expect(parseFlag(['--mode-extra=config'], '--mode')).toBeUndefined();
+    });
+
+    it('returns first match when flag appears multiple times', () => {
+      expect(parseFlag(['--mode=skill', '--mode=config'], '--mode')).toBe(
+        'skill'
       );
     });
   });
